@@ -7,9 +7,6 @@
   <a href="https://github.com/Litleck/Minkinator-Bot/blob/master/LICENSE">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" target="_blank" />
   </a>
-  <a href="https://twitter.com/Litleck">
-    <img alt="Twitter: Litleck" src="https://img.shields.io/twitter/follow/Litleck.svg?style=social" target="_blank" />
-  </a>
 </p>
 
 > Custom Discord bot.
