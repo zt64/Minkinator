@@ -1,11 +1,9 @@
-const fs = require("fs");
+const { prefix, token } = require("./config.json");
 const Discord = require("discord.js");
-const Keyv = require('keyv');
-const KeyvFile = require('keyv-file');
-const {prefix, token} = require("./config.json");
-
+const fs = require("fs");
 const cooldowns = new Discord.Collection();
 const client = new Discord.Client();
+
 client.commands = new Discord.Collection();
 
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
@@ -14,18 +12,6 @@ for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.name, command);
 }
-
-const keyv = new Keyv({
-	store: new KeyvFile({
-		filename: "./temp.json",
-		expiredCheckDelay: 24 * 3600 * 1000,
-		writeDelay: 100,
-		encode: JSON.stringify,
-		decode: JSON.parse
-	})
-})
- 
-keyv.on("error", err => console.error("Keyv connection error:", err));
 
 client.on("ready", () => {
 	console.log("Ready");
@@ -74,7 +60,7 @@ client.on("message", async message => {
 	setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 	
 	try {
-		command.execute(message, args, keyv);
+		command.execute(message, args);
 	} catch (error) {
 		console.error(error);
 		message.reply("An error has occured running that command.");
