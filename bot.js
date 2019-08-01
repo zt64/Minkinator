@@ -17,11 +17,11 @@ for (const file of commandFiles) {
 
 const keyv = new Keyv({
 	store: new KeyvFile({
-		filename: "./temp.json", // the file path to store the data 
-		expiredCheckDelay: 24 * 3600 * 1000, // ms, check and remove expired data in each ms 
-		writeDelay: 100, // ms, batch write to disk in a specific duration, enhance write performance. 
-		encode: JSON.stringify, // serialize function 
-		decode: JSON.parse // deserialize function 
+		filename: "./temp.json",
+		expiredCheckDelay: 24 * 3600 * 1000,
+		writeDelay: 100,
+		encode: JSON.stringify,
+		decode: JSON.parse
 	})
 })
  
@@ -74,7 +74,7 @@ client.on("message", async message => {
 	setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 	
 	try {
-		command.execute(message, args);
+		command.execute(message, args, keyv);
 	} catch (error) {
 		console.error(error);
 		message.reply("An error has occured running that command.");
