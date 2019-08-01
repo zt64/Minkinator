@@ -1,4 +1,4 @@
-const { keyv } = require ("../keyv.js");
+const { keyv } = require("../keyv.js");
 
 module.exports = {
 	name: "guess",
