@@ -1,4 +1,4 @@
-module.exports (async) = {
+module.exports = {
 	name: "guess",
 	description: "Guess a number",
 	usage: "[number]",
