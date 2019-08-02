@@ -1,8 +1,11 @@
-const { prefix, token } = require("./config.json");
+const { prefix } = require("./config.json");
+const { token } = require("./token.json");
 const Discord = require("discord.js");
 const fs = require("fs");
 const cooldowns = new Discord.Collection();
 const client = new Discord.Client();
+let counter = 0;
+let lastMessage = "";
 
 client.commands = new Discord.Collection();
 
@@ -18,11 +21,20 @@ client.on("ready", () => {
 });
 
 client.on("message", async message => {
+	if (message.content == lastMessage && message.author.id !== "602293577594437652") {
+		counter += 1;
+		if (counter == 3) {
+			counter = 0;
+			message.channel.send(message.content);
+		}
+	}
+
+	lastMessage = message.content;
+
 	if (!message.content.startsWith(prefix) || message.author.bot) return;
 	
 	const args = message.content.slice(prefix.length).split(/ +/);
 	const commandName = args.shift().toLowerCase();
-
 	const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 	
 	if (!command) return;
@@ -33,7 +45,7 @@ client.on("message", async message => {
 	
 	if(command.args && !args.length) {
 		if (command.usage) {
-			return message.reply(`The proper usage for \`${prefix}${command.name} is ${command.usage}\``);
+			return message.reply(`The proper usage for that command is \`${prefix}${command.name}${command.usage}\``);
 		} else {
 			return message.reply("You didn't provide any arguments.");
 		}
