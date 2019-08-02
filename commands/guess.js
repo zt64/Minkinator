@@ -2,19 +2,20 @@ const { keyv } = require("../keyv.js");
 
 module.exports = {
 	name: "guess",
-	description: "Guess a number",
+	description: "Guess a number.",
 	usage: "[number]",
 	args: true,
 	async execute(message, args) {
-		val = Math.random() * (0 - 100) + 0;
-		earn = Math.abs(args[0] - val) * 0.1;
+		val = Math.floor(Math.random() * 101);
+		earn = Math.floor(Math.abs(val + args[0]) / 15)
 		id = message.author.id;
-		message.reply(`The number was ${val}, you earned ${earn}.`);
 
-		if (!await keyv.get(id)) { 
-			keyv.set(id, earn)
+		message.reply(`The number was ${val}, you earned ҵ${earn}.`);
+
+		if (await keyv.get(id)) { 
+			keyv.set(id, parseInt(await keyv.get(id)) + earn)
 		} else {
-			keyv.set(id, await keyv.get(id) + earn)
+			keyv.set(id, earn);
 		}
 	}
 }

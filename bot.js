@@ -4,6 +4,7 @@ const Discord = require("discord.js");
 const fs = require("fs");
 const cooldowns = new Discord.Collection();
 const client = new Discord.Client();
+
 let counter = 0;
 let lastMessage = "";
 
@@ -45,7 +46,7 @@ client.on("message", async message => {
 	
 	if(command.args && !args.length) {
 		if (command.usage) {
-			return message.reply(`The proper usage for that command is \`${prefix}${command.name}${command.usage}\``);
+			return message.reply(`The proper usage for that command is \`${prefix}${command.name} ${command.usage}\``);
 		} else {
 			return message.reply("You didn't provide any arguments.");
 		}

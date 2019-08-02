@@ -2,18 +2,22 @@ const { keyv } = require("../keyv.js");
 
 module.exports = {
     name: "balance",
-    description: "Checks your balance",
+    description: "Checks your balance.",
     aliases: ["bal"],
     usage: "<user>",
     async execute(message, args) {
-        user =  message.mentions.members.first() || message.author.id;
-        balance = await keyv.get(user);
+        if (args[0]) {
+            user = message.mentions.users.first();
+        } else {
+            user = message.author;
+        }
 
-        if (isNaN(balance)) {
-            keyv.set(user, 0);
+        if (await keyv.get(user.id)) {
+            balance = await keyv.get(user.id);
+        } else {
             balance = 0;
         }
 
-        message.channel.send(`${user.name} has a balance of ${balance}.`);
+        message.channel.send(`${user} has a balance of ҵ${balance}.`);
     }
 }
