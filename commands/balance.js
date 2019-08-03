@@ -19,6 +19,7 @@ module.exports = {
             balance = 0;
         }
 
-        message.channel.send(`${user} has a balance of ${currency}${balance}.`);
+        message.channel.send(`${user} has a balance of ${currency}${balance}.`); 
+        //message.channel.send("Rumpus");
     }
 }

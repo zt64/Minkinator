@@ -9,11 +9,16 @@ module.exports = {
     args: true,
     async execute(message, args) {
         user = message.mentions.users.first();
-        userBal = parseInt(await keyv.get(user.id));
+
+        if (!(user && message.guild.members.has(user.id))) {
+            return message.channel.send(`The user ${args[0]} does not exist.`);
+        }
+
+        userBal = await keyv.get(user.id);
         balance = await keyv.get(message.author.id);
         amount = parseInt(args[1]);
 
-        if (balance - amount >= 0 && amount !== 0) {
+        if (balance - amount >= 0 && !isNaN(amount)) {
             keyv.set(message.author.id, balance - amount);
             keyv.set(user.id, userBal + amount);
             message.channel.send(`${message.author} has sent ${currency}${amount} to ${user}`);

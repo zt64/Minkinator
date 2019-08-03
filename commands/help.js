@@ -11,8 +11,9 @@ module.exports = {
 		
 		if (!args.length) {
 			data.push("You have summoned I, the Minkinator. What shall I do today?:");
-			data.push(commands.map(command => command.name).join(", "));
+			data.push(`**${commands.map(command => command.name).join(", ")}**`);
 			data.push(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command.`);
+			data.push("Created by **Litleck**.");
 			
 			return message.channel.send(data, {split: true});
 		}

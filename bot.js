@@ -20,6 +20,13 @@ for (const file of commandFiles) {
 
 client.on("ready", () => {
 	console.log(`Minkinator is now online.`);
+	client.user.setPresence({
+        game: { 
+            name: 'over you.',
+            type: 'watching'
+        },
+        status: 'idle'
+    })
 });
 
 client.on("message", async message => {
@@ -82,7 +89,7 @@ client.on("message", async message => {
 	}
 
 	try {
-		command.execute(message, args);
+		command.execute(message, args, client, commandFiles);
 	} catch (error) {
 		console.error(error);
 		message.reply("An error has occured running that command.");
