@@ -1,4 +1,5 @@
 const { keyv } = require("../keyv.js");
+const { currency } = require("../config.json");
 
 module.exports = {
     name: "balance",
@@ -18,6 +19,6 @@ module.exports = {
             balance = 0;
         }
 
-        message.channel.send(`${user} has a balance of ҵ${balance}.`);
+        message.channel.send(`${user} has a balance of ${currency}${balance}.`);
     }
 }

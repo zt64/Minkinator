@@ -4,6 +4,7 @@ module.exports = {
     name: "set",
     description: "Sets a variable",
     usage: "[key] [value]",
+    ownerOnly: true,
     args: true,
     execute(message, args) {
         keyv.set(args[0], args[1]);

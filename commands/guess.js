@@ -1,4 +1,5 @@
 const { keyv } = require("../keyv.js");
+const { currency } = require("../config.json");
 
 module.exports = {
 	name: "guess",
@@ -22,6 +23,6 @@ module.exports = {
 			keyv.set(id, earn);
 		}
 
-		message.reply(`The number was ${val}, you earned ҵ${earn}.`);
+		message.reply(`The number was ${val}, you earned ${currency}${earn}.`);
 	}
 }

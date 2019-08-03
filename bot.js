@@ -2,15 +2,16 @@ const { prefix, ownerID} = require("./config.json");
 const { token } = require("./token.json");
 const Discord = require("discord.js");
 const fs = require("fs");
+
 const cooldowns = new Discord.Collection();
 const client = new Discord.Client();
 
 let counter = 0;
 let lastMessage = "";
 
-client.commands = new Discord.Collection();
-
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
+
+client.commands = new Discord.Collection();
 
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
@@ -18,11 +19,11 @@ for (const file of commandFiles) {
 }
 
 client.on("ready", () => {
-	console.log("Ready");
+	console.log(`Minkinator is now online.`);
 });
 
 client.on("message", async message => {
-	if (message.content == lastMessage && message.author.id !== "602293577594437652") {
+	if (message.content == lastMessage && message.author.id !== message.author.bot) {
 		counter += 1;
 		if (counter == 3) {
 			counter = 0;
@@ -40,13 +41,19 @@ client.on("message", async message => {
 	
 	if (!command) return;
 	
-	if(command.guildOnly && message.channel.type !== "text") {
-		return message.reply("This command cannot be ran inside DMs");
+	if(message.channel.type !== "text") {
+		return message.reply("Commands cannot be run inside DMs.");
+	}
+
+	if (command.adminOnly && !message.member.hasPermission("ADMINISTRATOR")) {
+		return message.reply("You are not an administrator.")
+	} else if (command.ownerOnly && message.author.id !== ownerID) {
+		return message.reply("You are not the bot owner.");
 	}
 	
 	if(command.args && !args.length) {
 		if (command.usage) {
-			return message.reply(`The proper usage for that command is \`${prefix}${command.name} ${command.usage}\``);
+			return message.reply(`The proper usage for that command is \`${prefix}${commandName} ${command.usage}\``);
 		} else {
 			return message.reply("You didn't provide any arguments.");
 		}
