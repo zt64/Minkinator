@@ -5,8 +5,8 @@ module.exports = {
     usage: "[string]",
     adminOnly: true,
     args: true,
-    execute(message, args) {
+    execute(message) {
         message.delete();
-        message.channel.send(message.content.slice(5));
+        message.channel.send(message.content.slice(5));       
     }
 }

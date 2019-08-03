@@ -7,6 +7,7 @@ module.exports = {
     ownerOnly: true,
     args: true,
     async execute(message, args) {
-        message.channel.send(`${args[0]}: ` + await keyv.get(args[0]));
+        value = await keyv.get(args[0]);
+        message.channel.send(`${args[0]} is ${value}.`);
     }
 }

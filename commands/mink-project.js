@@ -4,7 +4,7 @@ const { currency } = require("../config.json");
 module.exports = {
     name: "mink-project",
     description: "Information about the mink project.",
-    async execute(message, args) {
+    async execute(message) {
         balance = await keyv.get("minkProject");
         if (isNaN(balance)) {
             balance = 0;

@@ -1,6 +1,7 @@
 const { prefix, ownerID} = require("./config.json");
 const { token } = require("./token.json");
 const Discord = require("discord.js");
+const Canvas = require('canvas');
 const fs = require("fs");
 
 const cooldowns = new Discord.Collection();
@@ -48,22 +49,20 @@ client.on("message", async message => {
 	
 	if (!command) return;
 	
-	if(message.channel.type !== "text") {
+	if (message.channel.type !== "text") {
 		return message.reply("Commands cannot be run inside DMs.");
 	}
 
-	if (command.adminOnly && !message.member.hasPermission("ADMINISTRATOR")) {
-		return message.reply("You are not an administrator.")
-	} else if (command.ownerOnly && message.author.id !== ownerID) {
+	if (command.ownerOnly && !message.author.id !== ownerID) {
 		return message.reply("You are not the bot owner.");
 	}
-	
-	if(command.args && !args.length) {
-		if (command.usage) {
-			return message.reply(`The proper usage for that command is \`${prefix}${commandName} ${command.usage}\``);
-		} else {
-			return message.reply("You didn't provide any arguments.");
-		}
+
+	if (!message.member.roles.some(r => command.roles.includes(r.name))) {
+		return message.reply(`You are missing one of the required roles: ${command.roles}`);
+	}
+
+	if (command.args && !args.length) {
+		return message.reply(`The proper usage for that command is \`${prefix}${commandName} ${command.usage}\``);
 	}
 	
 	if (!cooldowns.has(command.name)) {
@@ -92,7 +91,7 @@ client.on("message", async message => {
 		command.execute(message, args, client, commandFiles);
 	} catch (error) {
 		console.error(error);
-		message.reply("An error has occured running that command.");
+		return message.reply("An error has occured running that command.");
 	}
 });
 
