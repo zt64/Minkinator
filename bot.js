@@ -11,7 +11,7 @@ const sequelize = new Sequelize('database', 'user', 'password', {
 	storage: 'database.sqlite',
 });
 
-const Tags = sequelize.define('tags', {
+const tags = sequelize.define('tags', {
 	name: {
 		type: Sequelize.STRING,
 		unique: true,
@@ -25,10 +25,9 @@ const Tags = sequelize.define('tags', {
 	},
 });
 
+const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
 const cooldowns = new Discord.Collection();
 const client = new Discord.Client();
-
-const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
 
 client.commands = new Discord.Collection();
 
@@ -49,7 +48,7 @@ client.on("ready", () => {
         },
         status: 'idle'
 	})
-	Tags.sync();
+	tags.sync();
 });
 
 client.on("message", async message => {
@@ -73,9 +72,8 @@ client.on("message", async message => {
 	
 	if (message.channel.type !== "text") return message.reply("Commands cannot be run inside DMs.");
 	if (command.ownerOnly && !message.author.id == ownerID) return message.reply("You are not the bot owner.");
-	if (command.roles && !message.member.roles.some(r => command.roles.includes(r.name))) return message.reply(`You are missing one of the required roles: ${command.roles.join(", ")}`);
+	if (command.roles && !message.member.roles.some(r => command.roles.includes(r.name))) return message.reply(`You are missing one of the required roles: ${command.roles.join(", ")}.`);
 	if (command.args && !args.length) return message.reply(`The proper usage for that command is \`${prefix}${commandName} ${command.usage}\``);
-	
 	if (!cooldowns.has(command.name)) cooldowns.set(command.name, new Discord.Collection());
 	
 	if (message.author.id !== ownerID) {
@@ -97,7 +95,7 @@ client.on("message", async message => {
 	}
 
 	try {
-		command.execute(message, args, client, commandFiles);
+		command.execute(message, args, tags, client, commandFiles);
 	} catch (error) {
 		console.error(error);
 		return message.reply("An error has occured running that command.");

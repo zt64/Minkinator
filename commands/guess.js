@@ -1,4 +1,3 @@
-const { keyv } = require("../keyv.js");
 const { currency } = require("../config.json");
 
 module.exports = {
