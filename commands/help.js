@@ -12,7 +12,7 @@ module.exports = {
 		if (!args.length) {
 			data.push("You have summoned I, the Minkinator. What shall I do today?:");
 			data.push(`**${commands.map(command => command.name).join(", ")}**`);
-			data.push(`\nYou can send \`${prefix}help [command name]\` to get info on a specific command.`);
+			data.push(`\nYou can send \`${prefix}help <command name>\` to get info on a specific command.`);
 			data.push("Created by **Litleck**.");
 			
 			return message.channel.send(data, {split: true});
@@ -30,11 +30,13 @@ module.exports = {
 		if (command.aliases) data.push(`**Aliases**: ${command.aliases.join(",")}`);
 		if (command.description) data.push(`**Description**: ${command.description}`);
 		if (command.usage) data.push(`**Usage**: ${command.usage}`);
+		if (command.roles) { 
+			data.push(`**Roles**: ${command.roles.join(", ")}`);
+		} else {
+			data.push(`**Roles**: Everyone`);
+		}
 
 		data.push(`**Cooldown**: ${command.cooldown || 3} second(s)`);
-
-		if (command.adminOnly) data.push(`**Admin Only**`);
-		if (command.ownerOnly) data.push(`**Owner Only**`);
 
 		message.channel.send(data, {split: true});
 	}

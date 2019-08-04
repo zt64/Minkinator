@@ -1,7 +1,6 @@
 const { prefix, ownerID} = require("./config.json");
 const { token } = require("./token.json");
 const Discord = require("discord.js");
-const Canvas = require('canvas');
 const fs = require("fs");
 
 const cooldowns = new Discord.Collection();
@@ -53,12 +52,12 @@ client.on("message", async message => {
 		return message.reply("Commands cannot be run inside DMs.");
 	}
 
-	if (command.ownerOnly && !message.author.id !== ownerID) {
+	if (command.ownerOnly && !message.author.id == ownerID) {
 		return message.reply("You are not the bot owner.");
 	}
 
-	if (!message.member.roles.some(r => command.roles.includes(r.name))) {
-		return message.reply(`You are missing one of the required roles: ${command.roles}`);
+	if (command.roles && !message.member.roles.some(r => command.roles.includes(r.name))) {
+		return message.reply(`You are missing one of the required roles: ${command.roles.join(", ")}`);
 	}
 
 	if (command.args && !args.length) {

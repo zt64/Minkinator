@@ -3,7 +3,7 @@ module.exports = {
     description: "Reloads the bot commands.",
     aliases: ["restart", "reboot"],
     usage: "<command>",
-    roles: ["programmer"],
+    roles: ["Programmer"],
     async execute(message, args, client, commandFiles) {
         if (args[0] && !commandFiles.includes(`${args[0]}.js`)) {
             return message.channel.send(`\`${args[0]}\` is not a valid command.`)

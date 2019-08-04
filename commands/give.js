@@ -21,7 +21,7 @@ module.exports = {
         if (balance - amount >= 0 && !isNaN(amount)) {
             keyv.set(message.author.id, balance - amount);
             keyv.set(user.id, userBal + amount);
-            message.channel.send(`${message.author} has sent ${currency}${amount} to ${user}`);
+            message.channel.send(`${message.author} has sent ${currency}${amount} to ${user}.`);
         } else {
             message.reply(`You are missing the additional ${currency}${Math.abs(amount - balance)}.`);
         }
