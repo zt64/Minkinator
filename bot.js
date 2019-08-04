@@ -1,13 +1,32 @@
 const { prefix, ownerID} = require("./config.json");
 const { token } = require("./token.json");
+const Sequelize = require('sequelize');
 const Discord = require("discord.js");
 const fs = require("fs");
 
+const sequelize = new Sequelize('database', 'user', 'password', {
+	host: 'localhost',
+	dialect: 'sqlite',
+	logging: false,
+	storage: 'database.sqlite',
+});
+
+const Tags = sequelize.define('tags', {
+	name: {
+		type: Sequelize.STRING,
+		unique: true,
+	},
+	description: Sequelize.TEXT,
+	username: Sequelize.STRING,
+	usage_count: {
+		type: Sequelize.INTEGER,
+		defaultValue: 0,
+		allowNull: false,
+	},
+});
+
 const cooldowns = new Discord.Collection();
 const client = new Discord.Client();
-
-let counter = 0;
-let lastMessage = "";
 
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
 
@@ -18,6 +37,9 @@ for (const file of commandFiles) {
 	client.commands.set(command.name, command);
 }
 
+let counter = 0;
+let lastMessage = "";
+
 client.on("ready", () => {
 	console.log(`Minkinator is now online.`);
 	client.user.setPresence({
@@ -26,7 +48,8 @@ client.on("ready", () => {
             type: 'watching'
         },
         status: 'idle'
-    })
+	})
+	Tags.sync();
 });
 
 client.on("message", async message => {
@@ -48,25 +71,12 @@ client.on("message", async message => {
 	
 	if (!command) return;
 	
-	if (message.channel.type !== "text") {
-		return message.reply("Commands cannot be run inside DMs.");
-	}
-
-	if (command.ownerOnly && !message.author.id == ownerID) {
-		return message.reply("You are not the bot owner.");
-	}
-
-	if (command.roles && !message.member.roles.some(r => command.roles.includes(r.name))) {
-		return message.reply(`You are missing one of the required roles: ${command.roles.join(", ")}`);
-	}
-
-	if (command.args && !args.length) {
-		return message.reply(`The proper usage for that command is \`${prefix}${commandName} ${command.usage}\``);
-	}
+	if (message.channel.type !== "text") return message.reply("Commands cannot be run inside DMs.");
+	if (command.ownerOnly && !message.author.id == ownerID) return message.reply("You are not the bot owner.");
+	if (command.roles && !message.member.roles.some(r => command.roles.includes(r.name))) return message.reply(`You are missing one of the required roles: ${command.roles.join(", ")}`);
+	if (command.args && !args.length) return message.reply(`The proper usage for that command is \`${prefix}${commandName} ${command.usage}\``);
 	
-	if (!cooldowns.has(command.name)) {
-		cooldowns.set(command.name, new Discord.Collection());
-	}
+	if (!cooldowns.has(command.name)) cooldowns.set(command.name, new Discord.Collection());
 	
 	if (message.author.id !== ownerID) {
 		const now = Date.now();
