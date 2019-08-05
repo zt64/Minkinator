@@ -1,29 +1,8 @@
 const { prefix, ownerID} = require("./config.json");
 const { token } = require("./token.json");
-const Sequelize = require('sequelize');
+const { users, variables } = require("./models.js");
 const Discord = require("discord.js");
 const fs = require("fs");
-
-const sequelize = new Sequelize('database', 'user', 'password', {
-	host: 'localhost',
-	dialect: 'sqlite',
-	logging: false,
-	storage: 'database.sqlite',
-});
-
-const tags = sequelize.define('tags', {
-	name: {
-		type: Sequelize.STRING,
-		unique: true,
-	},
-	description: Sequelize.TEXT,
-	username: Sequelize.STRING,
-	usage_count: {
-		type: Sequelize.INTEGER,
-		defaultValue: 0,
-		allowNull: false,
-	},
-});
 
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
 const cooldowns = new Discord.Collection();
@@ -31,16 +10,17 @@ const client = new Discord.Client();
 
 client.commands = new Discord.Collection();
 
+let counter = 1;
+let lastMessage = "";
+
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.name, command);
 }
 
-let counter = 0;
-let lastMessage = "";
-
-client.on("ready", () => {
-	console.log(`Minkinator is now online.`);
+client.on("ready", async () => {
+	users.sync();
+	variables.sync();
 	client.user.setPresence({
         game: { 
             name: 'over you.',
@@ -48,10 +28,28 @@ client.on("ready", () => {
         },
         status: 'idle'
 	})
-	tags.sync();
+
+	if (!await variables.findOne({ where: { name: "minkProject" }})) {
+		await variables.create({
+			name: "minkProject",
+			value: 0,
+		})
+	}
+	for (var user of client.users.values()) {
+        if (!await users.findOne({ where: { id: user.id} })) {
+			await users.create({
+				name: user.tag,
+				id: user.id,
+				balance: 0,
+			});
+			console.log(`User ${user.tag} added.`)
+		}
+		await users.update({ name: user.tag }, { where: { id: user.id}});
+    }
+	console.log(`Minkinator is now online.`);
 });
 
-client.on("message", async message => {
+client.on("message", async (message) => {
 	if (message.content == lastMessage && message.author.id !== message.author.bot) {
 		counter += 1;
 		if (counter == 3) {
@@ -95,7 +93,7 @@ client.on("message", async message => {
 	}
 
 	try {
-		command.execute(message, args, tags, client, commandFiles);
+		command.execute(message, args, client, commandFiles);
 	} catch (error) {
 		console.error(error);
 		return message.reply("An error has occured running that command.");

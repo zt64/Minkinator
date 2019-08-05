@@ -1,3 +1,4 @@
+const { users } = require("../models.js");
 const { currency } = require("../config.json");
 
 module.exports = {
@@ -7,20 +8,13 @@ module.exports = {
 	args: true,
 	cooldown: 0,
 	async execute(message, args) {
-		val = Math.floor(Math.random() * 101);
-		id = message.author.id;
+		const user = await users.findOne({ where: { id: message.author.id} });
+		const input = Math.floor(args[0]);
 
-		if (val == args[0]) {
-			earn = 1000;
-		} else {
-			earn = Math.round(50 / Math.abs(val - args[0]) * 4);
-		}
+		val = Math.round(Math.random() * 100);
+		val !== input ? earn = Math.round(50 / Math.abs(val - input) * 4) : earn = 1000;
 
-		if (await keyv.get(id)) { 
-			keyv.set(id, parseInt(await keyv.get(id)) + earn)
-		} else {
-			keyv.set(id, earn);
-		}
+		await user.update({ balance: user.balance + earn});
 
 		message.reply(`The number was ${val}, you earned ${currency}${earn}.`);
 	}
