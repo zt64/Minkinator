@@ -1,6 +1,6 @@
 const { prefix, ownerID} = require("./config.json");
 const { token } = require("./token.json");
-const { users, variables } = require("./models.js");
+const { users, variables, sequelize } = require("./models.js");
 const Discord = require("discord.js");
 const fs = require("fs");
 
@@ -19,8 +19,8 @@ for (const file of commandFiles) {
 }
 
 client.on("ready", async () => {
-	users.sync();
-	variables.sync();
+	sequelize.sync();
+	
 	client.user.setPresence({
         game: { 
             name: 'over you.',
@@ -35,6 +35,7 @@ client.on("ready", async () => {
 			value: 0,
 		})
 	}
+
 	for (var user of client.users.values()) {
         if (!await users.findOne({ where: { id: user.id} })) {
 			await users.create({
@@ -45,11 +46,27 @@ client.on("ready", async () => {
 			console.log(`User ${user.tag} added.`)
 		}
 		await users.update({ name: user.tag }, { where: { id: user.id}});
-    }
+	}
+	
 	console.log(`Minkinator is now online.`);
 });
 
 client.on("message", async (message) => {
+	if (message.author.bot) return;
+
+	user = await users.findOne({ where: { id: message.author.id } });
+
+	xpTotal = user.level + user.xp;
+	xpRequired = Math.pow(2, user.level);
+	
+	user.update({ xp: xpTotal});
+	user.update({ messages: user.messages + 1 })
+	
+	if (xpTotal >= xpRequired) {
+		user.update({ level: user.level + 1})
+		message.reply(`You leveled up to level ${user.level}!`);
+	}
+	
 	if (message.content == lastMessage && message.author.id !== message.author.bot) {
 		counter += 1;
 		if (counter == 3) {
@@ -60,7 +77,7 @@ client.on("message", async (message) => {
 
 	lastMessage = message.content;
 
-	if (!message.content.startsWith(prefix) || message.author.bot) return;
+	if (!message.content.startsWith(prefix)) return;
 	
 	const args = message.content.slice(prefix.length).split(/ +/);
 	const commandName = args.shift().toLowerCase();

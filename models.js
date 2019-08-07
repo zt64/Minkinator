@@ -21,13 +21,29 @@ exports.users = sequelize.define("users", {
 		type: Sequelize.INTEGER,
 		defaultValue: 0,
 		allowNull: false,
-	},
+    },
+    level: {
+        type: Sequelize.INTEGER,
+        defaultValue: 1,
+        allowNull:false,
+    },
+    xp: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+    },
+    messages: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
+        allowNull: false,
+    },
 });
 
 exports.variables = sequelize.define("variables", {
     name: {
         type: Sequelize.STRING,
         unique: true,
+        primaryKey: true,
     },
     value: {
         type: Sequelize.INTEGER,
@@ -35,3 +51,5 @@ exports.variables = sequelize.define("variables", {
         allowNull: false,
     },
 })
+
+exports.sequelize = sequelize;

@@ -14,9 +14,9 @@ module.exports = {
         if (user.balance - amount >= 0 && amount !== 0) {
             await user.update({ balance: user.balance - amount});
             await project.update({ value: project.value + amount});
-            message.reply(`Thank you for donating ${currency}${amount} to the mink project. \nThe mink project now stands at a balance of ${currency}${project.value}.`);
+            return message.reply(`Thank you for donating ${currency}${amount} to the mink project. \nThe mink project now stands at a balance of ${currency}${project.value}.`);
         } else {
-            message.reply(`You are missing the additional ${currency}${Math.abs(amount - user.balance)}.`);
+            return message.reply(`You are missing the additional ${currency}${Math.abs(amount - user.balance)}.`);
         }
     }
 }
