@@ -10,7 +10,7 @@ module.exports = {
     async execute(message, args) {
         if (args[0]) {
             user = await users.findOne({ where: { id: message.mentions.members.first().id} });
-            member = message.mentions.members.first();
+            member = message.mentions.users.first();
         } else {
             user = await users.findOne({ where: { id: message.author.id} });
             member = message.author;
