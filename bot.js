@@ -1,120 +1,38 @@
-const { prefix, ownerID} = require("./config.json");
 const { token } = require("./token.json");
-const { users, variables, sequelize } = require("./models.js");
+const models = require("./models.js");
+const config  = require("./config.json");
 const Discord = require("discord.js");
 const fs = require("fs");
 
-const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
-const cooldowns = new Discord.Collection();
 const client = new Discord.Client();
 
 client.commands = new Discord.Collection();
+client.cooldowns = new Discord.Collection();
 
-let counter = 1;
-let lastMessage = "";
+client.discord = Discord;
+client.models = models;
+client.config = config;
 
-for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	client.commands.set(command.name, command);
-}
-
-client.on("ready", async () => {
-	sequelize.sync();
-	
-	client.user.setPresence({
-        game: { 
-            name: 'over you.',
-            type: 'watching'
-        },
-        status: 'idle'
-	})
-
-	if (!await variables.findOne({ where: { name: "minkProject" }})) {
-		await variables.create({
-			name: "minkProject",
-			value: 0,
-		})
-	}
-
-	for (var user of client.users.values()) {
-        if (!await users.findOne({ where: { id: user.id} })) {
-			await users.create({
-				name: user.tag,
-				id: user.id,
-				balance: 0,
-			});
-			console.log(`User ${user.tag} added.`)
-		}
-		await users.update({ name: user.tag }, { where: { id: user.id}});
-	}
-	
-	console.log(`Minkinator is now online.`);
+fs.readdir("./events/", (err, files) => {
+	if (err) return console.error(err);
+	files.forEach(file => {
+	  if (!file.endsWith(".js")) return;
+	  const event = require(`./events/${file}`);
+	  let eventName = file.split(".")[0];
+	  client.on(eventName, event.bind(null, client));
+	  delete require.cache[require.resolve(`./events/${file}`)];
+	});
 });
 
-client.on("message", async (message) => {
-	if (message.author.bot) return;
-
-	user = await users.findOne({ where: { id: message.author.id } });
-
-	xpTotal = user.level + user.xp;
-	xpRequired = Math.pow(2, user.level);
-	
-	user.update({ xp: xpTotal});
-	user.update({ messages: user.messages + 1 })
-	
-	if (xpTotal >= xpRequired) {
-		user.update({ level: user.level + 1})
-		message.reply(`You leveled up to level ${user.level}!`);
-	}
-	
-	if (message.content == lastMessage && message.author.id !== message.author.bot) {
-		counter += 1;
-		if (counter == 3) {
-			counter = 0;
-			message.channel.send(message.content);
-		}
-	}
-
-	lastMessage = message.content;
-
-	if (!message.content.startsWith(prefix)) return;
-	
-	const args = message.content.slice(prefix.length).split(/ +/);
-	const commandName = args.shift().toLowerCase();
-	const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-	
-	if (!command) return;
-	
-	if (message.channel.type !== "text") return message.reply("Commands cannot be run inside DMs.");
-	if (command.ownerOnly && !message.author.id == ownerID) return message.reply("You are not the bot owner.");
-	if (command.roles && !message.member.roles.some(r => command.roles.includes(r.name))) return message.reply(`You are missing one of the required roles: ${command.roles.join(", ")}.`);
-	if (command.args && !args.length) return message.reply(`The proper usage for that command is \`${prefix}${commandName} ${command.usage}\``);
-	if (!cooldowns.has(command.name)) cooldowns.set(command.name, new Discord.Collection());
-	
-	if (message.author.id !== ownerID) {
-		const now = Date.now();
-		const timestamps = cooldowns.get(command.name);
-		const cooldownAmount = (command.cooldown || 3) * 1000;
-	
-		if (timestamps.has(message.author.id)) {
-			const expirationTime = timestamps.get(message.author.id) + cooldownAmount;
-			
-			if (now < expirationTime) {
-				const timeLeft = (expirationTime - now) / 1000;
-				return message.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing ${command.name}.`);
-			}
-		}
-	
-		timestamps.set(message.author.id, now);
-		setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
-	}
-
-	try {
-		command.execute(message, args, client, commandFiles);
-	} catch (error) {
-		console.error(error);
-		return message.reply("An error has occured running that command.");
-	}
+fs.readdir("./commands/", (err, files) => {
+	if (err) return console.error(err);
+	files.forEach(file => {
+	  if (!file.endsWith(".js")) return;
+	  let props = require(`./commands/${file}`);
+	  let commandName = file.split(".")[0];
+	  console.log(`Attempting to load command ${commandName}`);
+	  client.commands.set(commandName, props);
+	});
 });
 
 client.login(token);

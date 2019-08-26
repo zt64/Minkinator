@@ -6,8 +6,7 @@ module.exports = {
 	description: "Guess a number.",
 	usage: "[number]",
 	args: true,
-	cooldown: 0,
-	async execute(message, args) {
+	async execute(client, message, args) {
 		const user = await users.findOne({ where: { id: message.author.id} });
 		const input = Math.floor(args[0]);
 

@@ -9,8 +9,9 @@
   "author": "Litleck",
   "license": "ISC",
   "dependencies": {
+    "@tensorflow/tfjs-node": "^1.2.7",
     "discord.js": "^11.5.1",
     "sequelize": "^5.12.2",
-    "sqlite3": "^4.0.9"
+    "sqlite3": "^4.1.0"
   }
 }

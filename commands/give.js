@@ -7,7 +7,7 @@ module.exports = {
     aliases: ["send"],
     usage: "[user] [amount]",
     args: true,
-    async execute(message, args) {
+    async execute(client, message, args) {
         if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid user.`);
         const target = await users.findOne({ where: { id: message.mentions.members.first().id }});
         const user = await users.findOne({ where: { id: message.author.id} });

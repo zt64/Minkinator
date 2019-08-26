@@ -7,7 +7,7 @@ module.exports = {
     description: "Displays a users statistics.",
     aliases: ["statistics", "info", "information"],
     usage: "<user>",
-    async execute(message, args) {
+    async execute(client, message, args) {
         if (args[0]) {
             user = await users.findOne({ where: { id: message.mentions.members.first().id} });
             member = message.mentions.users.first();

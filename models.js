@@ -11,11 +11,11 @@ exports.users = sequelize.define("users", {
     name: {
         type: Sequelize.STRING,
         unique: true,
-        primaryKey: true,
     },
 	id: {
 		type: Sequelize.INTEGER,
-		unique: true,
+        unique: true,
+        primaryKey: true,
 	},
 	balance: {
 		type: Sequelize.INTEGER,
@@ -37,6 +37,7 @@ exports.users = sequelize.define("users", {
         defaultValue: 0,
         allowNull: false,
     },
+    timestamps:false,
 });
 
 exports.variables = sequelize.define("variables", {
@@ -50,6 +51,6 @@ exports.variables = sequelize.define("variables", {
         defaultValue: 0,
         allowNull: false,
     },
-})
+});
 
 exports.sequelize = sequelize;

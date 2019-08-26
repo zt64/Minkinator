@@ -1,7 +1,3 @@
-function timeout(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 module.exports = {
     name: "say",
     description: "Repeats a users input.",
@@ -9,7 +5,7 @@ module.exports = {
     usage: "[string]",
     adminOnly: true,
     args: true,
-    async execute(message) {
+    async execute(client, message) {
         message.delete();
 
         message.channel.send(message.content.slice(5));       

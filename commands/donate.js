@@ -6,7 +6,7 @@ module.exports = {
     description: "Donate to the mink project.",
     usage: "[amount]",
     args: true,
-    async execute(message, args) {
+    async execute(client, message, args) {
         const user = await users.findOne({ where: { id: message.author.id} });
         const project = await variables.findOne({ where: { name: "minkProject"} });
         const amount = Math.floor(parseInt(args[0]));

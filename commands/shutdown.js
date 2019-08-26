@@ -6,9 +6,7 @@ module.exports = {
     name: "shutdown",
     description: "Shutdowns the bot.",
     usage: "<delay>",
-    async execute(message, args) {
-        console.log(`${message.author.name} has ran the command ${message.content}.`);
-        
+    async execute(client, message, args) {
         if (args[0]) {
             message.channel.send(`Shutting down in ${args[0]} seconds.`);
             await timeout(args[0] * 1000);
