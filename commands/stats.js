@@ -1,26 +1,22 @@
-const Discord = require("discord.js");
-const { users } = require("../models.js");
-const { currency } = require("../config.json");
-
 module.exports = {
     name: "stats",
     description: "Displays a users statistics.",
-    aliases: ["statistics", "info", "information"],
+    aliases: ["bal", "balance", "statistics"],
     usage: "<user>",
     async execute(client, message, args) {
         if (args[0]) {
-            user = await users.findOne({ where: { id: message.mentions.members.first().id} });
+            user = await client.models.users.findByPk(message.mentions.members.first().id);
             member = message.mentions.users.first();
         } else {
-            user = await users.findOne({ where: { id: message.author.id} });
+            user = await client.models.users.findByPk(message.author.id);
             member = message.author;
         }
         
-        const embed = new Discord.RichEmbed() 
+        const embed = new client.discord.RichEmbed() 
             .setColor(`#34eb3d`)
             .setTitle(`Statistics for @${user.name}`)
             .setThumbnail(member.displayAvatarURL)
-            .addField(`Balance`, `${currency}${user.balance}`)
+            .addField(`Balance`, `${client.config.currency}${user.balance}`)
             .addField(`Level`, `${user.level}`)
             .addField(`Total experience`, `${user.xp} XP`)
             .addField(`Total messages`, `${user.messages}` )

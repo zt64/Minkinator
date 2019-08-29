@@ -3,7 +3,6 @@ module.exports = {
     description: "Reloads the bot commands.",
     aliases: ["restart", "reboot"],
     usage: "<command>",
-    roles: ["Programmer"],
     async execute(client, message, args) {
         if(!args || args.length < 1) return message.reply("Must provide a command name to reload.");
 

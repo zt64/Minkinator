@@ -1,5 +1,3 @@
-const { sequelize } = require("../models.js");
-
 module.exports = {
     name: "get",
     description: "Gets a value from a database.",
@@ -7,7 +5,7 @@ module.exports = {
     args: true,
     async execute(client, message, args) {
         try {
-            model = sequelize.model(args[0]);
+            model = client.models.sequelize.model(args[0]);
         } catch(e) {
             return message.channel.send(`Model: ${args[0]}, does not exist.`);
         }

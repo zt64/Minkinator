@@ -3,7 +3,7 @@ module.exports = {
     description: "Information about the mink project.",
     aliases: ["mp"],
     async execute(client, message) {
-        balance = await client.models.variables.findByPk("minkProject");
+        const balance = await client.models.variables.findByPk("minkProject");
         message.channel.send(`The mink project stands at a balance of ${client.config.currency}${balance.value}.`)
     }
 }

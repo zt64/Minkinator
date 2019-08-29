@@ -36,8 +36,9 @@ exports.users = sequelize.define("users", {
         type: Sequelize.INTEGER,
         defaultValue: 0,
         allowNull: false,
-    },
-    timestamps:false,
+    }
+}, {
+    timestamps: false,
 });
 
 exports.variables = sequelize.define("variables", {

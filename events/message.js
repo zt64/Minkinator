@@ -1,12 +1,13 @@
-let counter = 1;
-let lastMessage = "";
+var counter = 1;
+var lastMessage = "";
 
 module.exports = async(client, message,) => {
 	if (message.author.bot) return;
-	user = await client.models.users.findByPk(message.author.id);
+	
+	const user = await client.models.users.findByPk(message.author.id);
 
-	xpTotal = user.level + user.xp;
-	xpRequired = Math.pow(2, user.level);
+	const xpTotal = user.level + user.xp;
+	const xpRequired = Math.pow(2, user.level);
 	
 	user.update({ xp: xpTotal, messages: user.messages + 1});
 	
@@ -38,12 +39,11 @@ module.exports = async(client, message,) => {
 	if (!command) return;
 	
 	if (message.channel.type !== "text") return message.reply("Commands cannot be run inside DMs.");
-	if (command.ownerOnly && !message.author.id == ownerID) return message.reply("You are not the bot owner.");
 	if (command.roles && !message.member.roles.some(role => command.roles.includes(role.name))) return message.reply(`You are missing one of the required roles: ${command.roles.join(", ")}.`);
 	if (command.args && !args.length) return message.reply(`The proper usage for that command is \`${client.config.prefix}${commandName} ${command.usage}\``);
 	if (!client.cooldowns.has(command.name)) client.cooldowns.set(command.name, new client.discord.Collection());
 	
-	if (message.author.id !== client.config.ownerID) {
+	if (!command.roles) {
 		const now = Date.now();
 		const timestamps = client.cooldowns.get(command.name);
 		const cooldownAmount = (command.cooldown || 3) * 1000;
@@ -58,6 +58,7 @@ module.exports = async(client, message,) => {
 		}
 	
 		timestamps.set(message.author.id, now);
+
 		setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
 	}
 
