@@ -1,5 +1,5 @@
 function timeout (ms) {
-  return new Promise(resolve => setTimeout(resolve, ms))
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 module.exports = {
@@ -8,13 +8,13 @@ module.exports = {
   usage: '<delay>',
   async execute (client, message, args) {
     if (args[0]) {
-      message.channel.send(`Shutting down in ${args[0]} seconds.`)
-      await timeout(args[0] * 1000)
+      message.channel.send(`Shutting down in ${args[0]} seconds.`);
+      await timeout(args[0] * 1000);
     }
 
-    await console.log('Shutting down')
-    await message.channel.send('Shutting down.')
+    await console.log('Shutting down');
+    await message.channel.send('Shutting down.');
 
-    process.exit()
+    process.exit();
   }
-}
+};

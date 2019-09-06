@@ -4,25 +4,22 @@ module.exports = {
   aliases: ['bal', 'balance', 'statistics'],
   usage: '<user>',
   async execute (client, message, args) {
-    if (args[0]) {
-      var user = await client.models.users.findByPk(message.mentions.members.first().id)
-      var member = message.mentions.users.first()
-    } else {
-      user = await client.models.users.findByPk(message.author.id)
-      member = message.author
-    }
+    const user = message.mentions.users.first() || message.author;
+    const userData = await client.models.users.findByPk(user.id);
 
     const embed = new client.discord.RichEmbed()
-      .setColor('#34eb3d')
-      .setTitle(`Statistics for @${user.name}`)
-      .setThumbnail(member.displayAvatarURL)
-      .addField('Balance', `${client.config.currency}${user.balance}`)
-      .addField('Level', `${user.level}`)
-      .addField('Total experience', `${user.xp} XP`)
-      .addField('Total messages', `${user.messages}`)
-      .setTimestamp()
-      .setFooter(`${user.name}`)
+      .setColor('#1ED760')
+      .setTitle(`Statistics for ${userData.name}`)
+      .setThumbnail(user.displayAvatarURL)
+      .addField('Balance:', `${client.config.currency}${userData.balance}`)
+      .addField('Level:', `${userData.level}`)
+      .addField('Total experience:', `${userData.xp} XP`)
+      .addField('Total messages:', `${userData.messages}`)
+      .addField('Joined:', `${message.guild.member(user).joinedAt.toLocaleDateString()}`)
+      .addField('Created:', `${user.createdAt.toLocaleDateString()}`)
+      .setFooter(`${userData.id}`)
+      .setTimestamp();
 
-    message.channel.send(embed)
+    return message.channel.send(embed);
   }
-}
+};
