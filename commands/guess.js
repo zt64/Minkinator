@@ -4,7 +4,7 @@ module.exports = {
   usage: '[number]',
   args: true,
   async execute (client, message, args) {
-    const user = await client.models.users.findByPk(message.author.id);
+    const user = await client.models.members.findByPk(message.author.id);
     const input = Math.floor(args[0]);
 
     const value = Math.round(Math.random() * 100);

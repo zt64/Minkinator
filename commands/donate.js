@@ -4,9 +4,9 @@ module.exports = {
   usage: '[amount]',
   args: true,
   async execute (client, message, args) {
-    if (args[1] < 1 || isNaN(args[1])) return message.reply('That is not a valid amount.');
+    if (args[0] < 1 || isNaN(args[0])) return message.reply('That is not a valid amount.');
 
-    const user = await client.models.users.findByPk(message.author.id);
+    const user = await client.models.members.findByPk(message.author.id);
     const project = await client.models.variables.findByPk('minkProject');
     const amount = Math.floor(parseInt(args[0]));
 

@@ -1,21 +1,20 @@
-const Sequelize = require('sequelize')
+const Sequelize = require('sequelize');
 
 const sequelize = new Sequelize('database', 'user', 'password', {
   host: 'localhost',
   dialect: 'sqlite',
   storage: 'database.sqlite',
   logging: false
-})
+});
 
-exports.users = sequelize.define('users', {
-  name: {
-    type: Sequelize.STRING,
-    unique: true
-  },
+exports.members = sequelize.define('members', {
   id: {
     type: Sequelize.TEXT,
-    unique: true,
-    primaryKey: true
+    primaryKey: true,
+    unique: true
+  },
+  name: {
+    type: Sequelize.TEXT
   },
   balance: {
     type: Sequelize.INTEGER,
@@ -39,12 +38,11 @@ exports.users = sequelize.define('users', {
   }
 }, {
   timestamps: false
-})
+});
 
 exports.variables = sequelize.define('variables', {
   name: {
-    type: Sequelize.STRING,
-    unique: true,
+    type: Sequelize.CHAR(255),
     primaryKey: true
   },
   value: {
@@ -52,6 +50,6 @@ exports.variables = sequelize.define('variables', {
     defaultValue: 0,
     allowNull: false
   }
-})
+});
 
-exports.sequelize = sequelize
+exports.sequelize = sequelize;

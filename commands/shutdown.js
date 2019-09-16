@@ -6,6 +6,7 @@ module.exports = {
   name: 'shutdown',
   description: 'Shutdowns the bot.',
   usage: '<delay>',
+  roles: ['Programmer'],
   async execute (client, message, args) {
     if (args[0]) {
       message.channel.send(`Shutting down in ${args[0]} seconds.`);

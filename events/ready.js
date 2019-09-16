@@ -6,14 +6,14 @@ module.exports = async (client, message) => {
       name: 'over you.',
       type: 'watching'
     },
-    status: 'idle'
+    status: 'online'
   });
 
   await client.models.variables.findOrCreate({ where: { name: 'minkProject' }, defaults: { value: 0 } });
 
-  for (var member of await client.users.array()) {
-    const [_user] = await client.models.users.findOrCreate({ where: { name: member.tag, id: member.id } });
-    await _user.update({ name: member.tag });
+  for (var user of await client.users.array()) {
+    const [member] = await client.models.members.findOrCreate({ where: { name: user.tag, id: user.id } });
+    await member.update({ name: user.tag });
   }
 
   console.log('Minkinator is now online.');

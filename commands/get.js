@@ -19,7 +19,7 @@ module.exports = {
       modelData.setTitle(`${args[0]}.${args[1]}`);
       modelData.setColor('#34eb3d');
 
-      return console.log(await model.findAll().map(x => x[primaryKey]));
+      return message.channel.send(await model.findAll().map(x => x[primaryKey]));
     }
 
     try {

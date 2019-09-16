@@ -1,7 +1,8 @@
-/* eslint-disable no-eval */
 module.exports = {
   name: 'eval',
-  description: 'evaluates',
+  description: 'Evaluates',
+  usage: '[input]',
+  roles: ['Programmer'],
   args: true,
   execute (client, message, args) {
     try {

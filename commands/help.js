@@ -1,43 +1,46 @@
-const { prefix } = require('../config.json');
-
+/* eslint-disable no-mixed-operators */
 module.exports = {
   name: 'help',
   description: 'Displays information about a specific command.',
   usage: '<command name>',
   aliases: ['commands'],
   execute (client, message, args) {
-    const data = [];
-    const { commands } = message.client;
+    const embed = new client.discord.RichEmbed()
+      .setColor('#1ED760');
 
     if (!args.length) {
-      data.push('You have summoned I, the Minkinator. What shall I do today?:');
-      data.push(`**${commands.map(command => command.name).join(', ')}**`);
-      data.push(`\nYou can send \`${prefix}help <command name>\` to get info on a specific command.`);
-      data.push('Created by **Litleck**.');
-
-      return message.channel.send(data, { split: true });
+      embed.setTitle('You have summoned I, the Minkinator. What shall I do today?');
+      embed.setDescription(`You can send \`${client.config.prefix}help <command name>\` to get info on a specific command.`);
+      embed.setThumbnail(client.user.displayAvatarURL);
+      embed.addField('**Commands**', `${client.commands.map(command => {
+          if (command.roles && !message.member.roles.some(role => command.roles.includes(role.name))) {
+            return;
+          }
+          return command.name;
+        }).filter(Boolean).join(', ')}`);
+      embed.setFooter('Created by Litleck.');
+      embed.setTimestamp();
+      return message.channel.send(embed);
     }
 
     const name = args[0].toLowerCase();
-    const command = commands.get(name) || commands.find(c => c.aliases && c.aliases.includes(name));
+    const command = client.commands.get(name) || client.commands.find(c => c.aliases && c.aliases.includes(name));
 
-    if (!command) {
+    if (!command || command.roles && !message.member.roles.some(role => command.roles.includes(role.name))) {
       return message.reply("That's not a valid command.");
     }
 
-    data.push(`**Name**: ${command.name}`);
+    embed.addField('**Command**:', command.name);
 
-    if (command.aliases) data.push(`**Aliases**: ${command.aliases.join(',')}`);
-    if (command.description) data.push(`**Description**: ${command.description}`);
-    if (command.usage) data.push(`**Usage**: ${command.usage}`);
-    if (command.roles) {
-      data.push(`**Roles**: ${command.roles.join(', ')}`);
-    } else {
-      data.push('**Roles**: Everyone');
-    }
+    if (command.aliases) embed.addField('**Aliases**:', command.aliases.join(', '), true);
+    if (command.description) embed.addField('**Description**:', command.description, true);
+    if (command.usage) embed.addField('**Usage**:', command.usage, true);
 
-    data.push(`**Cooldown**: ${command.cooldown || 3} second(s)`);
+    embed.addField('**Cooldown**:', `${command.cooldown || 3} second(s)`, true);
+    embed.addField('**Roles**:', command.roles ? command.roles.join(', ') : 'Everyone', true);
 
-    message.channel.send(data, { split: true });
+    embed.setFooter('Created by Litleck');
+    embed.setTimestamp();
+    return message.channel.send(embed);
   }
 };
