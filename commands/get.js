@@ -16,10 +16,12 @@ module.exports = {
     if (!args[1]) {
       var primaryKey = model.primaryKeyAttributes[0];
 
-      modelData.setTitle(`${args[0]}.${args[1]}`);
+      modelData.setTitle(`${args[0]}`);
       modelData.setColor('#34eb3d');
 
-      return message.channel.send(await model.findAll().map(x => x[primaryKey]));
+      await model.findAll().map(object => modelData.addField(object[primaryKey], '⠀', true));
+
+      return message.channel.send(modelData);
     }
 
     try {

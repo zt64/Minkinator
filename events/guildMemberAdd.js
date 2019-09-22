@@ -8,5 +8,5 @@ module.exports = async (client, member) => {
 
   client.channels.get('618243068956508160').send(embed);
 
-  await client.models.users.create({ name: member.user.tag, id: member.id });
+  await client.models.members.create({ name: member.user.tag, id: member.id });
 };

@@ -41,10 +41,12 @@ module.exports = async (client, message) => {
   lastMessage = message.content;
   lastAuthor = message.author;
 
-  if (!message.content.startsWith(client.config.prefix)) {
-    trainingData.push(message.content);
+  if (!message.content.startsWith(client.config.prefix) && message.content.length >= 8) {
+    trainingData.push(message.content.toLowerCase());
     return client.fs.writeFileSync('./trainingData.json', JSON.stringify(trainingData));
   }
+
+  if (!message.content.startsWith(client.config.prefix)) return;
 
   const args = message.content.slice(client.config.prefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
@@ -57,7 +59,7 @@ module.exports = async (client, message) => {
   if (command.args && !args.length) return message.reply(`The proper usage for that command is \`${client.config.prefix}${commandName} ${command.usage}\``);
   if (!client.cooldowns.has(command.name)) client.cooldowns.set(command.name, new client.discord.Collection());
 
-  if (!command.roles || message.author.id !== client.config.ownerID) {
+  if (message.author.id !== client.config.ownerID) {
     const now = Date.now();
     const timestamps = client.cooldowns.get(command.name);
     const cooldownAmount = (command.cooldown || 3) * 1000;

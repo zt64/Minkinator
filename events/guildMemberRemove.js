@@ -9,5 +9,5 @@ module.exports = async (client, member) => {
 
   client.channels.get('618243068956508160').send(embed);
 
-  (await client.models.users.findByPk(member.id)).destroy();
+  (await client.models.members.findByPk(member.id)).destroy();
 };
