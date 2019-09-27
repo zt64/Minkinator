@@ -1,13 +1,13 @@
-const trainingData = require('../trainingData.json');
+const data = require('../data.json');
 
-var today = new Date();
-var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-var time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
-var dateTime = date + ' ' + time;
+const today = new Date();
+const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+const time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+const dateTime = date + ' ' + time;
 
-var lastMessage = '';
-var lastAuthor = '';
-var counter = 1;
+let lastMessage = '';
+let lastAuthor = '';
+let counter = 0;
 
 module.exports = async (client, message) => {
   if (message.author.bot) return;
@@ -41,22 +41,31 @@ module.exports = async (client, message) => {
   lastMessage = message.content;
   lastAuthor = message.author;
 
+  if (Math.random() > 0.95) {
+    markov();
+  } else if (message.mentions.users.first()) {
+    if (message.mentions.users.first().id === client.user.id) {
+      markov();
+    }
+  }
+
   if (!message.content.startsWith(client.config.prefix) && message.content.length >= 8) {
-    trainingData.push(message.content.toLowerCase());
-    return client.fs.writeFileSync('./trainingData.json', JSON.stringify(trainingData));
+    data.push(message.content.toLowerCase());
+    return client.fs.writeFileSync('./data.json', JSON.stringify(data));
   }
 
   if (!message.content.startsWith(client.config.prefix)) return;
 
   const args = message.content.slice(client.config.prefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
-  const command = client.commands.get(commandName) || client.commands.find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
+  const command = client.commands.get(commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 
   if (!command) return;
 
   if (message.channel.type !== 'text') return message.reply('Commands cannot be run inside DMs.');
-  if (command.roles && !message.member.roles.some(role => command.roles.includes(role.name))) return message.reply(`You are missing one of the required roles: ${command.roles.join(', ')}.`);
+  if (command.permissions && !message.member.hasPermission(command.permissions)) return message.reply(`You are missing one of the required roles: ${command.permissions.join(', ')}.`);
   if (command.args && !args.length) return message.reply(`The proper usage for that command is \`${client.config.prefix}${commandName} ${command.usage}\``);
+  if (command.ownerOnly && message.member.id !== client.config.ownerID) return message.reply('You are not allowed to run this command');
   if (!client.cooldowns.has(command.name)) client.cooldowns.set(command.name, new client.discord.Collection());
 
   if (message.author.id !== client.config.ownerID) {
@@ -84,5 +93,14 @@ module.exports = async (client, message) => {
   } catch (error) {
     console.error(error);
     return message.reply('An error has occured running that command.');
+  }
+
+  function markov () {
+    const markov = client.markov;
+
+    markov.addStates(require('../data.json'));
+    markov.train(4);
+
+    message.channel.send(markov.generateRandom(2000));
   }
 };

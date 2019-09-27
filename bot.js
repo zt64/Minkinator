@@ -2,23 +2,26 @@ const { token } = require('./token.json');
 const config = require('./config.json');
 const models = require('./models.js');
 
+const snekfetch = require('snekfetch');
 const Discord = require('discord.js');
+const Markov = require('js-markov');
 const canvas = require('canvas');
-const rita = require('rita');
 const fs = require('fs');
 
 const eventFiles = fs.readdirSync('./events/');
 const commandFiles = fs.readdirSync('./commands/');
 
 const client = new Discord.Client();
+const markov = new Markov();
 
 client.cooldowns = new Discord.Collection();
 client.commands = new Discord.Collection();
 client.events = new Discord.Collection();
 
+client.snekfetch = snekfetch;
 client.discord = Discord;
+client.markov = markov;
 client.canvas = canvas;
-client.rita = rita;
 client.fs = fs;
 
 client.models = models;

@@ -2,7 +2,7 @@ module.exports = {
   name: 'eval',
   description: 'Evaluates',
   usage: '[input]',
-  roles: ['Programmer'],
+  ownerOnly: true,
   args: true,
   execute (client, message, args) {
     try {

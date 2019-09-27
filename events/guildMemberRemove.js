@@ -7,7 +7,7 @@ module.exports = async (client, member) => {
     .setColor('#1ED760')
     .setTimestamp();
 
-  client.channels.get('618243068956508160').send(embed);
+  client.channels.get('625415676932259840').send(embed);
 
   (await client.models.members.findByPk(member.id)).destroy();
 };

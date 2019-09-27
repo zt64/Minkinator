@@ -3,11 +3,11 @@ module.exports = {
   description: 'Generates a markov chain',
   usage: '<input>',
   async execute (client, message, args) {
-    const rita = client.rita;
-    const rm = new rita.RiMarkov(4);
+    const markov = client.markov;
 
-    rm.loadFrom('./data.txt', function () {
-      console.log(rm.generateSentence(1));
-    });
+    markov.addStates(require('../data.json'));
+    markov.train(4);
+
+    message.channel.send(markov.generateRandom(2000));
   }
 };

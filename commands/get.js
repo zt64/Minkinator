@@ -2,6 +2,7 @@ module.exports = {
   name: 'get',
   description: 'Gets a value from a database.',
   usage: '[model] <object>',
+  permissions: ['ADMINISTRATOR'],
   args: true,
   async execute (client, message, args) {
     const modelData = new client.discord.RichEmbed();

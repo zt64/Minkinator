@@ -2,6 +2,7 @@ module.exports = {
   name: 'set',
   description: 'Sets a property of a variable.',
   usage: ['[model] [object] [property] [value]'],
+  permissions: ['ADMINISTRATOR'],
   args: true,
   async execute (client, message, args) {
     try {
