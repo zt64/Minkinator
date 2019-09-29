@@ -1,0 +1,15 @@
+module.exports = {
+  name: 'reset',
+  description: 'Resets a members data.',
+  usage: '[member]',
+  args: true,
+  async execute (client, message, args) {
+    const member = message.mentions.users.first();
+    const data = await client.models.members.findByPk(member.id);
+
+    await data.destroy();
+    await client.models.members.create({ name: member.tag, id: member.id });
+
+    return message.channel.send(`${member.tag}'s data has been reset.`);
+  }
+};

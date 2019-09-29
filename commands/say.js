@@ -5,7 +5,7 @@ module.exports = {
   usage: '[string]',
   args: true,
   async execute (client, message) {
-    message.delete();
+    await message.delete();
 
     return message.channel.send(message.content.slice(5));
   }

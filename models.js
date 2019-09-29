@@ -50,6 +50,8 @@ exports.variables = sequelize.define('variables', {
     defaultValue: 0,
     allowNull: false
   }
+}, {
+  timestamps: false
 });
 
 exports.sequelize = sequelize;

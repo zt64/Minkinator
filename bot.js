@@ -8,9 +8,6 @@ const Markov = require('js-markov');
 const canvas = require('canvas');
 const fs = require('fs');
 
-const eventFiles = fs.readdirSync('./events/');
-const commandFiles = fs.readdirSync('./commands/');
-
 const client = new Discord.Client();
 const markov = new Markov();
 
@@ -28,7 +25,7 @@ client.models = models;
 client.config = config;
 
 client.loadEvents = function loadEvents () {
-  eventFiles.forEach(event => {
+  fs.readdirSync('./events/').forEach(event => {
     delete require.cache[require.resolve(`./events/${event}`)];
 
     const eventName = event.split('.')[0];
@@ -41,7 +38,7 @@ client.loadEvents = function loadEvents () {
 };
 
 client.loadCommands = function loadCommands () {
-  commandFiles.forEach(command => {
+  fs.readdirSync('./commands/').forEach(command => {
     delete require.cache[require.resolve(`./commands/${command}`)];
 
     const commandName = command.split('.')[0];
@@ -54,8 +51,8 @@ client.loadCommands = function loadCommands () {
 client.loadEvents();
 client.loadCommands();
 
-console.log(`Succesfully loaded ${eventFiles.length} events.`);
-console.log(`Succesfully loaded ${commandFiles.length} commands.`);
+console.log(`Succesfully loaded ${fs.readdirSync('./events/').length} events.`);
+console.log(`Succesfully loaded ${fs.readdirSync('./commands/').length} commands.`);
 
 client.login(token);
 

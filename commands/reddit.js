@@ -6,8 +6,8 @@ module.exports = {
   args: true,
   async execute (client, message, args) {
     const { body } = await client.snekfetch
-      .get(`https://www.reddit.com/${args[0]}/${args[1]}.json?sort=top&t=week`)
-      .query({ limit: 1024 });
+      .get(`https://www.reddit.com/r/${args[0]}.json?sort=top&t=week`)
+      .query({ limit: 8192 });
 
     const posts = body.data.children.filter(post => !post.data.over_18 && (post.data.url || post.data.link_url));
 
