@@ -1,4 +1,5 @@
 node_modules
 token.json
+data.json
 .eslintrc.js
 *.sqlite
