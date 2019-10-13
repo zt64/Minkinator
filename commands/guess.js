@@ -2,6 +2,7 @@ module.exports = {
   name: 'guess',
   description: 'Guess a number.',
   usage: '[number]',
+  cooldown: '120',
   args: true,
   async execute (client, message, args) {
     const user = await client.models.members.findByPk(message.author.id);

@@ -1,13 +1,10 @@
 module.exports = {
   name: 'markov',
   description: 'Generates a markov chain',
-  usage: '<input>',
+  usage: '<input> <length>',
   async execute (client, message, args) {
     const markov = client.markov;
 
-    markov.addStates(require('../data.json'));
-    markov.train(4);
-
-    message.channel.send(markov.generateRandom(2000));
+    return message.channel.send(markov.generate(args[0], parseInt(args[1])), { disableEveryone: true });
   }
 };

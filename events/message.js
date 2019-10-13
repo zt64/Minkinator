@@ -15,7 +15,7 @@ module.exports = async (client, message) => {
   const member = await client.models.members.findByPk(message.author.id);
 
   const xpTotal = member.level + member.xp;
-  const xpRequired = Math.pow(3, member.level);
+  const xpRequired = Math.pow(2, member.level);
 
   member.update({ xp: xpTotal, messages: member.messages + 1 });
 
@@ -41,12 +41,8 @@ module.exports = async (client, message) => {
   lastMessage = message.content;
   lastAuthor = message.author;
 
-  if (Math.random() > 0.95) {
-    markov();
-  } else if (message.mentions.users.first()) {
-    if (message.mentions.users.first().id === client.user.id) {
-      markov();
-    }
+  if (Math.random() > 0.95 || (message.mentions.users.first() && message.mentions.users.first().id === client.user.id)) {
+    message.channel.send(client.markov.generate(), { disableEveryone: true });
   }
 
   if (!message.content.startsWith(client.config.prefix) && message.content.length >= 8) {
@@ -93,14 +89,5 @@ module.exports = async (client, message) => {
   } catch (error) {
     console.error(error);
     return message.reply('An error has occured running that command.');
-  }
-
-  function markov () {
-    const markov = client.markov;
-
-    markov.addStates(require('../data.json'));
-    markov.train(4);
-
-    message.channel.send(markov.generateRandom(2000));
   }
 };

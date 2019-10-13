@@ -5,7 +5,10 @@ module.exports = {
   permissions: ['KICK_MEMBERS'],
   args: true,
   execute (client, message, args) {
-    const member = message.guild.member(message.mentions.users.first());
-    return member.kick();
+    const member = message.mentions.members.first();
+
+    if (!member) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
+
+    return message.guild.member(member).kick();
   }
 };

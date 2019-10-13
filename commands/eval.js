@@ -1,3 +1,4 @@
+/* eslint-disable no-eval */
 module.exports = {
   name: 'eval',
   description: 'Evaluates',
