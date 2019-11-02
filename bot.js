@@ -6,7 +6,7 @@ class Markov {
     this.strings = strings.map(x => [this.START, ...x.split(mode === 'word' ? ' ' : ''), this.END]);
   }
 
-  generate (start, length = 10) {
+  generate (start, length) {
     const str = [this.START];
     if (start) { str.push(start); }
     while (true) {

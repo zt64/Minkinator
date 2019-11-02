@@ -42,11 +42,11 @@ exports.members = sequelize.define('members', {
 
 exports.variables = sequelize.define('variables', {
   name: {
-    type: Sequelize.CHAR(255),
+    type: Sequelize.TEXT,
     primaryKey: true
   },
   value: {
-    type: Sequelize.INTEGER,
+    type: Sequelize.TEXT,
     defaultValue: 0,
     allowNull: false
   }

@@ -9,14 +9,14 @@ module.exports = {
 
     const embed = new client.discord.RichEmbed()
       .setColor('#1ED760')
-      .setTitle(`Statistics for ${memberData.name}`)
+      .setTitle(`Statistics for ${memberData.name}`, true)
       .setThumbnail(member.displayAvatarURL)
-      .addField('Balance:', `${client.config.currency}${memberData.balance}`)
-      .addField('Level:', `${memberData.level}`)
-      .addField('Total experience:', `${memberData.xp} XP`)
-      .addField('Total messages:', `${memberData.messages}`)
-      .addField('Joined:', `${message.guild.member(member).joinedAt.toLocaleDateString()}`)
-      .addField('Created:', `${member.createdAt.toLocaleDateString()}`)
+      .addField('Balance:', `${client.config.currency}${memberData.balance}`, true)
+      .addField('Level:', memberData.level, true)
+      .addField('Total experience:', `${memberData.xp} XP`, true)
+      .addField('Total messages:', memberData.messages, true)
+      .addField('Joined:', message.guild.member(member).joinedAt.toLocaleDateString(), true)
+      .addField('Created:', member.createdAt.toLocaleDateString(), true)
       .setFooter(`${memberData.id}`)
       .setTimestamp();
 

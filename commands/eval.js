@@ -8,8 +8,8 @@ module.exports = {
   execute (client, message, args) {
     try {
       message.channel.send(`\`\`\`js\n${eval(args.join(' '))}\n\`\`\``);
-    } catch (error) {
-      message.channel.send(`\`\`\`js\n${error}\n\`\`\``);
+    } catch (e) {
+      message.channel.send(`\`\`\`js\n${e}\n\`\`\``);
     }
   }
 };

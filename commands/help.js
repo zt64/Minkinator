@@ -3,13 +3,14 @@ module.exports = {
   description: 'Displays information about a specific command.',
   usage: '<command name>',
   aliases: ['commands'],
-  execute (client, message, args) {
+  async execute (client, message, args) {
+    const prefix = (await client.models.variables.findByPk('prefix')).value;
     const embed = new client.discord.RichEmbed()
       .setColor('#1ED760');
 
     if (!args.length) {
       embed.setTitle('You have summoned I, the Minkinator. What shall I do today?');
-      embed.setDescription(`You can send \`${client.config.prefix}help <command name>\` to get info on a specific command.`);
+      embed.setDescription(`You can send \`${prefix}help <command name>\` to get info on a specific command.`);
       embed.setThumbnail(client.user.displayAvatarURL);
       embed.addField('**Commands**', `${client.commands.map(command => {
           if (command.permissions && !message.member.hasPermission(command.permissions)) {
@@ -17,7 +18,7 @@ module.exports = {
           }
           return command.name;
         }).filter(Boolean).join(', ')}`);
-      embed.setFooter('Created by Litleck.');
+      embed.setFooter('Created by Litleck');
       embed.setTimestamp();
 
       return message.channel.send(embed);

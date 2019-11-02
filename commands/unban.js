@@ -1,5 +1,5 @@
 module.exports = {
-  name: 'mute',
+  name: 'unban',
   description: 'Mutes a member',
   usage: '[member] <reason> <time>',
   permissions: ['BAN_MEMBERS'],
@@ -9,6 +9,11 @@ module.exports = {
     const member = message.mentions.members.first();
 
     message.guild.unban(member.user);
-    return message.channel.send(`${member.user.tag} has been unbanned.`);
+
+    return message.channel.send(new client.discord.RichEmbed()
+      .setColor('#1ED760')
+      .setAuthor(`${member.user.tag} has been unbanned`, member.user.displayAvatarURL)
+      .setFooter(member.id)
+      .setTimestamp());
   }
 };

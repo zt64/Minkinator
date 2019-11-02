@@ -1,5 +1,5 @@
 module.exports = {
-  name: 'mute',
+  name: 'unmute',
   description: 'Mutes a member',
   usage: '[member] <reason> <time>',
   permissions: ['MANAGE_CHANNELS'],
@@ -9,6 +9,11 @@ module.exports = {
     const member = message.mentions.members.first();
 
     member.removeRole('625385600081592321');
-    return message.channel.send(`${member.user.tag} has been unmuted.`);
+
+    return message.channel.send(new client.discord.RichEmbed()
+      .setColor('#1ED760')
+      .setAuthor(`${member.user.tag} has been unmuted`, member.user.displayAvatarURL)
+      .setFooter(member.id)
+      .setTimestamp());
   }
 };

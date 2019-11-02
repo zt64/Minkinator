@@ -6,6 +6,7 @@ module.exports = {
   args: true,
   async execute (client, message, args) {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
+
     const member = message.mentions.members.first();
     const reason = args.slice(2).join(' ');
 

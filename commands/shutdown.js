@@ -5,7 +5,7 @@ function timeout (ms) {
 module.exports = {
   name: 'shutdown',
   description: 'Shutdowns the bot.',
-  usage: '<delay>',
+  usage: '<seconds>',
   ownerOnly: true,
   async execute (client, message, args) {
     if (args[0]) {

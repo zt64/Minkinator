@@ -18,8 +18,8 @@ module.exports = {
     }
 
     try {
-      await object.update({ [args[2]]: args[3] });
-      return message.channel.send(`Set ${args[0]}.${args[1]}.${args[2]} to ${args[3]}.`);
+      await object.update({ [args[2]]: args.slice(3).join(' ') });
+      return message.channel.send(`Set ${args[0]}.${args[1]}.${args[2]} to \`${args.slice(3).join(' ')}\`.`);
     } catch (e) {
       return message.channel.send(`Property: ${args[2]}, does not exist.`);
     }

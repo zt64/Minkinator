@@ -1,17 +1,18 @@
 const data = require('../data.json');
 
 const today = new Date();
-const date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-const time = today.getHours() + ':' + today.getMinutes() + ':' + today.getSeconds();
+const date = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
+const time = `${today.getHours()}:${today.getMinutes()}`;
 const dateTime = date + ' ' + time;
 
-let lastMessage = '';
-let lastAuthor = '';
-let counter = 0;
+var lastMessage = '';
+var lastAuthor = '';
+var counter = 0;
 
 module.exports = async (client, message) => {
   if (message.author.bot) return;
 
+  const prefix = (await client.models.variables.findByPk('prefix')).value;
   const member = await client.models.members.findByPk(message.author.id);
 
   const xpTotal = member.level + member.xp;
@@ -24,7 +25,7 @@ module.exports = async (client, message) => {
 
     if (member.level % 5 === 0) {
       member.update({ balance: member.balance + 500 });
-      message.reply(`You leveled up to level ${member.level} and as a reward earned ${client.config.currency} 500 as a reward!`);
+      message.reply(`You leveled up to level ${member.level} and as a reward earned ${client.config.currency} 500!`);
     } else {
       message.reply(`You leveled up to level ${member.level}!`);
     }
@@ -41,18 +42,18 @@ module.exports = async (client, message) => {
   lastMessage = message.content;
   lastAuthor = message.author;
 
-  if (Math.random() > 0.95 || (message.mentions.users.first() && message.mentions.users.first().id === client.user.id)) {
+  if (Math.random() > 0.99 || (message.mentions.users.first() && message.mentions.users.first().id === client.user.id)) {
     message.channel.send(client.markov.generate(), { disableEveryone: true });
   }
 
-  if (!message.content.startsWith(client.config.prefix) && message.content.length >= 8) {
+  if (!message.content.startsWith(prefix) && message.content.length >= 8) {
     data.push(message.content.toLowerCase());
     return client.fs.writeFileSync('./data.json', JSON.stringify(data));
   }
 
-  if (!message.content.startsWith(client.config.prefix)) return;
+  if (!message.content.startsWith(prefix)) return;
 
-  const args = message.content.slice(client.config.prefix.length).split(/ +/);
+  const args = message.content.slice(prefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
   const command = client.commands.get(commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 
@@ -60,7 +61,7 @@ module.exports = async (client, message) => {
 
   if (message.channel.type !== 'text') return message.reply('Commands cannot be run inside DMs.');
   if (command.permissions && !message.member.hasPermission(command.permissions)) return message.reply(`You are missing one of the required roles: ${command.permissions.join(', ')}.`);
-  if (command.args && !args.length) return message.reply(`The proper usage for that command is \`${client.config.prefix}${commandName} ${command.usage}\``);
+  if (command.args && !args.length) return message.reply(`The proper usage for that command is \`${prefix}${commandName} ${command.usage}\``);
   if (command.ownerOnly && message.member.id !== client.config.ownerID) return message.reply('You are not allowed to run this command');
   if (!client.cooldowns.has(command.name)) client.cooldowns.set(command.name, new client.discord.Collection());
 
@@ -84,7 +85,7 @@ module.exports = async (client, message) => {
   }
 
   try {
-    console.log(dateTime, message.author.tag, command.name, args);
+    console.log(dateTime, `[${message.channel.name}]`, message.author.tag, command.name, args);
     return command.execute(client, message, args);
   } catch (error) {
     console.error(error);
