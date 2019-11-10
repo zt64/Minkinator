@@ -1,11 +1,11 @@
 const data = require('../data.json');
 
-var lastMessage, lastAuthor;
-var index = 0;
+var lastMessage, lastAuthor, index;
 
 module.exports = async (client, message) => {
   if (message.author.bot) return;
 
+  const time = client.moment().format('l LT');
   const prefix = (await client.models.variables.findByPk('prefix')).value;
   const member = await client.models.members.findByPk(message.author.id);
 
@@ -75,7 +75,7 @@ module.exports = async (client, message) => {
   }
 
   try {
-    console.log(dateTime, `[${message.channel.name}]`, message.author.tag, command.name, args);
+    console.log(time, `#${message.channel.name}`, message.author.tag, command.name, args);
     return command.execute(client, message, args);
   } catch (error) {
     console.error(error);

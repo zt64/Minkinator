@@ -4,6 +4,7 @@ const models = require('./models.js');
 
 const snekfetch = require('snekfetch');
 const Discord = require('discord.js');
+const moment = require('moment');
 const canvas = require('canvas');
 const fs = require('fs');
 
@@ -15,6 +16,7 @@ client.events = new Discord.Collection();
 
 client.snekfetch = snekfetch;
 client.discord = Discord;
+client.moment = moment;
 client.canvas = canvas;
 client.fs = fs;
 
