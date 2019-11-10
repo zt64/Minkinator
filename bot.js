@@ -1,25 +1,3 @@
-class Markov {
-  constructor (strings, mode = 'word') {
-    this.mode = mode;
-    this.START = String.fromCharCode(0xEDAD);
-    this.END = String.fromCharCode(0xEF00);
-    this.strings = strings.map(x => [this.START, ...x.split(mode === 'word' ? ' ' : ''), this.END]);
-  }
-
-  generate (start, length) {
-    const str = [this.START];
-    if (start) { str.push(start); }
-    while (true) {
-      const last = str[str.length - 1];
-      const all = this.strings.filter(x => x.includes(last)).map(x => x[x.indexOf(last) + 1]);
-      const toAdd = all[Math.floor(Math.random() * all.length)];
-      str.push(toAdd);
-      if (toAdd === this.END || str.length >= length) { break; }
-    }
-    return str.slice(1, -1).join(this.mode === 'word' ? ' ' : '');
-  }
-}
-
 const { token } = require('./token.json');
 const config = require('./config.json');
 const models = require('./models.js');
@@ -30,7 +8,6 @@ const canvas = require('canvas');
 const fs = require('fs');
 
 const client = new Discord.Client();
-const markov = new Markov(require('./data.json'));
 
 client.cooldowns = new Discord.Collection();
 client.commands = new Discord.Collection();
@@ -38,7 +15,6 @@ client.events = new Discord.Collection();
 
 client.snekfetch = snekfetch;
 client.discord = Discord;
-client.markov = markov;
 client.canvas = canvas;
 client.fs = fs;
 

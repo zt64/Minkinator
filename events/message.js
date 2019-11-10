@@ -7,7 +7,7 @@ const dateTime = date + ' ' + time;
 
 var lastMessage = '';
 var lastAuthor = '';
-var counter = 0;
+var index = 0;
 
 module.exports = async (client, message) => {
   if (message.author.bot) return;
@@ -24,7 +24,7 @@ module.exports = async (client, message) => {
     member.update({ level: member.level + 1 });
 
     if (member.level % 5 === 0) {
-      member.update({ balance: member.balance + 500 });
+      member.update({ balance: parseInt(member.balance) + 500 });
       message.reply(`You leveled up to level ${member.level} and as a reward earned ${client.config.currency} 500!`);
     } else {
       message.reply(`You leveled up to level ${member.level}!`);
@@ -32,9 +32,9 @@ module.exports = async (client, message) => {
   }
 
   if (message.content === lastMessage && lastAuthor !== message.author) {
-    counter += 1;
-    if (counter === 3) {
-      counter = 0;
+    index++;
+    if (index === 3) {
+      index = 0;
       message.channel.send(message.content);
     }
   }
@@ -61,8 +61,8 @@ module.exports = async (client, message) => {
 
   if (message.channel.type !== 'text') return message.reply('Commands cannot be run inside DMs.');
   if (command.permissions && !message.member.hasPermission(command.permissions)) return message.reply(`You are missing one of the required roles: ${command.permissions.join(', ')}.`);
-  if (command.args && !args.length) return message.reply(`The proper usage for that command is \`${prefix}${commandName} ${command.usage}\``);
   if (command.ownerOnly && message.member.id !== client.config.ownerID) return message.reply('You are not allowed to run this command');
+  if (command.args && !args.length) return message.reply(`The proper usage for that command is \`${prefix}${commandName} ${command.usage}\``);
   if (!client.cooldowns.has(command.name)) client.cooldowns.set(command.name, new client.discord.Collection());
 
   if (message.author.id !== client.config.ownerID) {
