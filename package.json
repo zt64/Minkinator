@@ -11,7 +11,7 @@
   "dependencies": {
     "canvas": "^2.6.0",
     "discord.js": "^11.5.1",
-    "node-os-utils": "^1.0.7",
+    "moment": "^2.24.0",
     "sequelize": "^5.17.0",
     "sqlite3": "^4.1.0"
   },

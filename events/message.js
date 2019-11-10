@@ -1,12 +1,6 @@
 const data = require('../data.json');
 
-const today = new Date();
-const date = `${today.getDate()}-${today.getMonth() + 1}-${today.getFullYear()}`;
-const time = `${today.getHours()}:${today.getMinutes()}`;
-const dateTime = date + ' ' + time;
-
-var lastMessage = '';
-var lastAuthor = '';
+var lastMessage, lastAuthor;
 var index = 0;
 
 module.exports = async (client, message) => {
@@ -41,10 +35,6 @@ module.exports = async (client, message) => {
 
   lastMessage = message.content;
   lastAuthor = message.author;
-
-  if (Math.random() > 0.99 || (message.mentions.users.first() && message.mentions.users.first().id === client.user.id)) {
-    message.channel.send(client.markov.generate(), { disableEveryone: true });
-  }
 
   if (!message.content.startsWith(prefix) && message.content.length >= 8) {
     data.push(message.content.toLowerCase());
