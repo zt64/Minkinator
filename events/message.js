@@ -36,7 +36,7 @@ module.exports = async (client, message) => {
   lastMessage = message.content;
   lastAuthor = message.author;
 
-  if (!message.content.startsWith(prefix) && message.content.length >= 8) {
+  if (!message.content.startsWith(prefix) && !message.content.startsWith(';') && message.content.length >= 8) {
     data.push(message.content.toLowerCase());
     return client.fs.writeFileSync('./data.json', JSON.stringify(data));
   }
