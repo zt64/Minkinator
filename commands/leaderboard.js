@@ -6,7 +6,7 @@ module.exports = {
   args: true,
   async execute (client, message, args) {
     const members = await client.models.members.findAll({ order: [[args[0], 'DESC']] });
-    const leaderboard = new client.discord.RichEmbed();
+    const leaderboard = new client.discord.MessageEmbed();
     const pages = Math.ceil(members.length / 10);
     const stat = args[0];
 

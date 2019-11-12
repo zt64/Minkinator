@@ -1,7 +1,5 @@
 const data = require('../data.json');
 
-var lastMessage, lastAuthor, index;
-
 module.exports = async (client, message) => {
   if (message.author.bot) return;
 
@@ -11,6 +9,8 @@ module.exports = async (client, message) => {
 
   const xpTotal = member.level + member.xp;
   const xpRequired = Math.pow(2, member.level);
+
+  var lastMessage, lastAuthor, index;
 
   member.update({ xp: xpTotal, messages: member.messages + 1 });
 

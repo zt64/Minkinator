@@ -10,9 +10,9 @@ module.exports = {
 
     message.guild.unban(member.user);
 
-    return message.channel.send(new client.discord.RichEmbed()
+    return message.channel.send(new client.discord.MessageEmbed()
       .setColor('#1ED760')
-      .setAuthor(`${member.user.tag} has been unbanned`, member.user.displayAvatarURL)
+      .setAuthor(`${member.user.tag} has been unbanned`, member.user.avatarURL)
       .setFooter(member.id)
       .setTimestamp());
   }

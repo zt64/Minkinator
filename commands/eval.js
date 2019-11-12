@@ -3,7 +3,6 @@ module.exports = {
   name: 'eval',
   description: 'Evaluates',
   usage: '[input]',
-  ownerOnly: true,
   args: true,
   execute (client, message, args) {
     try {

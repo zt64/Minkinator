@@ -16,10 +16,13 @@ module.exports = {
 
     const post = posts[Math.floor(Math.random() * posts.length)].data;
 
-    const embed = new client.discord.RichEmbed()
+    const embed = new client.discord.MessageEmbed()
       .setColor('#1ED760')
       .setTitle(`r/${args[0]} ${post.title}`)
-      .setDescription(`Posted by: ${post.author}\n${post.selftext ? ',' + post.selftext : ''}`);
+      .setURL(`https://reddit.com${post.permalink}`)
+      .setDescription(post.selftext ? ',' + post.selftext : '')
+      .addField('Author:', post.author, true)
+      .addField('Score:', post.score, true);
 
     if (post.url.endsWith('.jpg') || post.url.endsWith('.png')) embed.setImage(post.url);
 

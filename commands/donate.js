@@ -12,7 +12,7 @@ module.exports = {
 
     if (user.balance - amount >= 0) {
       await user.update({ balance: user.balance - amount });
-      await project.update({ value: project.value + amount });
+      await project.update({ value: parseInt(project.value) + amount });
 
       return message.reply(`Thank you for donating ${client.config.currency}${amount} to the mink project. \nThe mink project now stands at a balance of ${client.config.currency}${project.value}.`);
     } else {

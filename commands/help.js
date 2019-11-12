@@ -5,13 +5,13 @@ module.exports = {
   aliases: ['commands'],
   async execute (client, message, args) {
     const prefix = (await client.models.variables.findByPk('prefix')).value;
-    const embed = new client.discord.RichEmbed()
+    const embed = new client.discord.MessageEmbed()
       .setColor('#1ED760');
 
     if (!args.length) {
       embed.setTitle('You have summoned I, the Minkinator. What shall I do today?');
       embed.setDescription(`You can send \`${prefix}help <command name>\` to get info on a specific command.`);
-      embed.setThumbnail(client.user.displayAvatarURL);
+      embed.setThumbnail(client.user.avatarURL());
       embed.addField('**Commands**', `${client.commands.map(command => {
           if (command.permissions && !message.member.hasPermission(command.permissions)) {
             return;

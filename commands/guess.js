@@ -6,13 +6,22 @@ module.exports = {
   args: true,
   async execute (client, message, args) {
     const user = await client.models.members.findByPk(message.author.id);
-    const input = Math.floor(args[0]);
+    const currency = client.config.currency;
+    const guess = Math.floor(args[0]);
 
     const value = Math.round(Math.random() * 100);
-    const earn = value !== input ? Math.round(50 / Math.abs(value - input) * 4) : 1000;
+    const earn = value !== guess ? Math.round(50 / Math.abs(value - guess) * 4) : 1000;
 
     await user.update({ balance: user.balance + earn });
 
-    return message.reply(`The number was ${value}, you earned ${client.config.currency}${earn}.`);
+    return message.channel.send(new client.discord.MessageEmbed()
+      .setColor('#1ED760')
+      .setTitle('Guessing Game')
+      .addField('Guess:', `${currency}${guess}`, true)
+      .addField('Number:', value, true)
+      .addField('Earning:', `${currency}${earn}`, true)
+      .addField('Balance:', `${currency}${user.balance.toLocaleString()}`, true)
+      .setFooter(message.author.id)
+      .setTimestamp());
   }
 };

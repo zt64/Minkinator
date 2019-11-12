@@ -8,11 +8,11 @@ module.exports = {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
     const member = message.mentions.members.first();
 
-    member.removeRole('625385600081592321');
+    member.roles.remove('625385600081592321');
 
-    return message.channel.send(new client.discord.RichEmbed()
+    return message.channel.send(new client.discord.MessageEmbed()
       .setColor('#1ED760')
-      .setAuthor(`${member.user.tag} has been unmuted`, member.user.displayAvatarURL)
+      .setAuthor(`${member.user.tag} has been unmuted`, member.user.avatarURL())
       .setFooter(member.id)
       .setTimestamp());
   }

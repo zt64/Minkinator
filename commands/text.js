@@ -19,7 +19,7 @@ module.exports = {
     ctx.textAlign = 'center';
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
-    const attachment = new client.discord.Attachment(canvas.toBuffer());
+    const attachment = new client.discord.MessageAttachment(canvas.toBuffer());
     return message.channel.send(attachment);
   }
 };

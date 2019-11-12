@@ -7,8 +7,8 @@ module.exports = async (client, message) => {
   await variables.findOrCreate({ where: { name: 'minkProject' }, defaults: { value: 0 } });
   await variables.findOrCreate({ where: { name: 'prefix' }, defaults: { value: '!' } });
 
-  await variables.findOrCreate({ where: { name: 'presenceType' }, defaults: { value: 'Watching' } });
-  await variables.findOrCreate({ where: { name: 'presenceName' }, defaults: { value: 'you sleep' } });
+  const [activityName] = await variables.findOrCreate({ where: { name: 'activityName' }, defaults: { value: 'you melt' } });
+  const [activityType] = await variables.findOrCreate({ where: { name: 'activityType' }, defaults: { value: 'WATCHING' } });
 
   await client.users.array().map(async user => {
     if (user.id === 1) return;
@@ -18,17 +18,12 @@ module.exports = async (client, message) => {
 
   members.findAll().map(async member => {
     if (!client.users.array().map(user => user.id).includes(member.id)) {
-      console.log(`${member.name} destroyed.`);
       (await members.findByPk(member.id)).destroy();
+      console.log(`${member.name} destroyed.`);
     }
   });
 
-  client.user.setPresence({
-    game: {
-      type: (await variables.findByPk('presenceType')).value,
-      name: (await variables.findByPk('presenceName')).value
-    }
-  });
+  client.user.setActivity(activityName.value, { type: activityType.value.toUpperCase() });
 
   console.log('Minkinator is now online.');
 };

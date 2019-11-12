@@ -5,8 +5,8 @@ module.exports = {
   permissions: ['ADMINISTRATOR'],
   args: true,
   async execute (client, message, args) {
-    const modelData = new client.discord.RichEmbed();
-    const objectData = new client.discord.RichEmbed();
+    const modelData = new client.discord.MessageEmbed();
+    const objectData = new client.discord.MessageEmbed();
 
     try {
       var model = client.models.sequelize.model(args[0]);

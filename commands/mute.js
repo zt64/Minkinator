@@ -9,18 +9,23 @@ module.exports = {
 
     const member = message.mentions.members.first();
 
-    await member.addRole('625385600081592321');
+    await member.roles.add('625385600081592321');
 
-    message.channel.send(new client.discord.RichEmbed()
+    message.channel.send(new client.discord.MessageEmbed()
       .setColor('#1ED760')
-      .setTitle(`${member.user.tag} has been muted${args[1] ? ` for ${args[1]} minute(s)` : ''}.`)
+      .setAuthor(`${member.user.tag} has been muted${args[1] ? ` for ${args[1]} minute(s)` : ''}.`, member.user.avatarURL)
       .setDescription(args[2] ? args.slice(2).join(' ') : 'No reason provided.')
+      .setFooter(member.id)
       .setTimestamp());
 
     if (args[1]) {
       setTimeout(() => {
         member.removeRole('625385600081592321');
-        return message.channel.send(`${member.user.tag} has been unmuted.`);
+        return message.channel.send(new client.discord.MessageEmbed()
+          .setColor('#1ED760')
+          .setAuthor(`${member.user.tag} has been unmuted`, member.user.avatarURL)
+          .setFooter(member.id)
+          .setTimestamp());
       }, args[1] * 60000);
     }
   }

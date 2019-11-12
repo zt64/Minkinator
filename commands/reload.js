@@ -1,7 +1,7 @@
 module.exports = {
   name: 'reload',
   description: 'Reloads the bot commands.',
-  aliases: ['restart', 'reboot'],
+  aliases: ['restart', 'reboot', 'r'],
   usage: '<command>',
   ownerOnly: true,
   async execute (client, message, args) {

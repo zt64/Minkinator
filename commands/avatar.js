@@ -4,8 +4,14 @@ module.exports = {
   usage: '<member>',
   aliases: ['pfp', 'a'],
   async execute (client, message, args) {
-    const member = message.mentions.users.first() || message.author;
+    const user = message.mentions.users.first() || message.author;
 
-    return message.channel.send(member.displayAvatarURL);
+    return message.channel.send(new client.discord.MessageEmbed()
+      .setColor('#1ED760')
+      .setTitle(`Avatar of ${user.tag}`)
+      .setURL(user.avatarURL())
+      .setImage(user.avatarURL())
+      .setFooter(user.id)
+    );
   }
 };
