@@ -1,7 +1,7 @@
 module.exports = {
   name: 'mute',
-  description: 'Mutes a member',
-  usage: '[member] <minutes> <reason>',
+  description: 'Mutes a member.',
+  usage: '[member] <time> <reason>',
   permissions: ['MANAGE_CHANNELS'],
   args: true,
   async execute (client, message, args) {
@@ -12,8 +12,8 @@ module.exports = {
     await member.roles.add('625385600081592321');
 
     message.channel.send(new client.discord.MessageEmbed()
-      .setColor('#1ED760')
-      .setAuthor(`${member.user.tag} has been muted${args[1] ? ` for ${args[1]} minute(s)` : ''}.`, member.user.avatarURL)
+      .setColor(client.config.embedColor)
+      .setAuthor(`${member.user.tag} has been muted${args[1] ? ` for ${args[1]} minute(s)` : ''}.`, member.user.avatarURL())
       .setDescription(args[2] ? args.slice(2).join(' ') : 'No reason provided.')
       .setFooter(member.id)
       .setTimestamp());
@@ -22,11 +22,11 @@ module.exports = {
       setTimeout(() => {
         member.removeRole('625385600081592321');
         return message.channel.send(new client.discord.MessageEmbed()
-          .setColor('#1ED760')
+          .setColor(client.config.embedColor)
           .setAuthor(`${member.user.tag} has been unmuted`, member.user.avatarURL)
           .setFooter(member.id)
           .setTimestamp());
-      }, args[1] * 60000);
+      }, client.functions.convertTime());
     }
   }
 };

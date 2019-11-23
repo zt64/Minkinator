@@ -5,7 +5,7 @@ module.exports = {
   aliases: ['lb'],
   args: true,
   async execute (client, message, args) {
-    const members = await client.models.members.findAll({ order: [[args[0], 'DESC']] });
+    const members = await client.models[message.guild.name].members.findAll({ order: [[args[0], 'DESC']] });
     const leaderboard = new client.discord.MessageEmbed();
     const pages = Math.ceil(members.length / 10);
     const stat = args[0];
@@ -18,7 +18,7 @@ module.exports = {
     leaderboard.setFooter(`Page ${nonIndexedPage} of ${pages}`);
     leaderboard.setTimestamp();
 
-    if (!(stat in client.models.members.rawAttributes)) return message.channel.send(`${stat} is not a statistic.`);
+    if (!(stat in client.models[message.guild.name].members.rawAttributes)) return message.channel.send(`${stat} is not a statistic.`);
     if (nonIndexedPage > pages || nonIndexedPage < 1 || isNaN(nonIndexedPage)) return message.channel.send(`Page ${nonIndexedPage} does not exist.`);
 
     members.slice(indexedPage * 10, nonIndexedPage * 10).map((member, index) => {

@@ -3,7 +3,7 @@ module.exports = {
   description: 'Reloads the bot commands.',
   aliases: ['restart', 'reboot', 'r'],
   usage: '<command>',
-  ownerOnly: true,
+  permissions: ['ADMINISTRATOR'],
   async execute (client, message, args) {
     message.channel.send(`Reloading ${client.commands.size} commands and ${client.events.size} events.`);
 

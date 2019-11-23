@@ -7,7 +7,7 @@ module.exports = {
     const user = message.mentions.users.first() || message.author;
 
     return message.channel.send(new client.discord.MessageEmbed()
-      .setColor('#1ED760')
+      .setColor(client.config.embedColor)
       .setTitle(`Avatar of ${user.tag}`)
       .setURL(user.avatarURL())
       .setImage(user.avatarURL())

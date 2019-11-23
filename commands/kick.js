@@ -13,7 +13,7 @@ module.exports = {
     message.guild.member(member).kick();
 
     return message.channel.send(new client.discord.MessageEmbed()
-      .setColor('#1ED760')
+      .setColor(client.config.embedColor)
       .setTitle(`${member.user.tag} has been kicked`)
       .setDescription(args[2] ? reason : 'No reason provided.')
       .setTimestamp());

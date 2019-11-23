@@ -1,29 +1,31 @@
 module.exports = async (client, message) => {
-  await client.models.sequelize.sync();
+  client.guilds.map(async guild => {
+    const models = client.models[guild.name];
 
-  const variables = client.models.variables;
-  const members = client.models.members;
+    await models.sequelize.sync();
 
-  await variables.findOrCreate({ where: { name: 'minkProject' }, defaults: { value: 0 } });
-  await variables.findOrCreate({ where: { name: 'prefix' }, defaults: { value: '!' } });
+    const variables = models.variables;
+    const members = models.members;
 
-  const [activityName] = await variables.findOrCreate({ where: { name: 'activityName' }, defaults: { value: 'you melt' } });
-  const [activityType] = await variables.findOrCreate({ where: { name: 'activityType' }, defaults: { value: 'WATCHING' } });
+    await variables.findOrCreate({ where: { name: 'minkProject' }, defaults: { value: 0 } });
+    await variables.findOrCreate({ where: { name: 'prefix' }, defaults: { value: '!' } });
 
-  await client.users.array().map(async user => {
-    if (user.id === 1) return;
-    const [member] = await members.findOrCreate({ where: { id: user.id } });
-    member.update({ name: user.tag });
-  });
+    for (const member of guild.members.array()) {
+      const user = member.user;
+      const [memberData] = await members.findOrCreate({ where: { id: user.id } });
 
-  members.findAll().map(async member => {
-    if (!client.users.array().map(user => user.id).includes(member.id)) {
-      (await members.findByPk(member.id)).destroy();
-      console.log(`${member.name} destroyed.`);
+      return memberData.update({ name: user.tag });
+    };
+
+    for (const member of await members.findAll()) {
+      if (!guild.members.array().map(member => member.user.id).includes(member.id)) {
+        (await members.findByPk(member.id)).destroy();
+        return console.log(`${member.user.tag} destroyed.`);
+      }
     }
   });
 
-  client.user.setActivity(activityName.value, { type: activityType.value.toUpperCase() });
+  client.user.setActivity(client.config.activityName, { type: client.config.activityType.toUpperCase() });
 
   console.log('Minkinator is now online.');
 };

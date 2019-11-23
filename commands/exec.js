@@ -1,8 +1,8 @@
 module.exports = {
   name: 'exec',
-  description: 'Executes',
+  description: 'Executes in terminal.',
   usage: '[input]',
-  ownerOnly: true,
+  permissions: ['ADMINISTRATOR'],
   args: true,
   execute (client, message, args) {
     const execSync = require('child_process').execSync;

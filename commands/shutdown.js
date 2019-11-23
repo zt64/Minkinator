@@ -2,8 +2,8 @@ module.exports = {
   name: 'shutdown',
   description: 'Shutdowns the bot.',
   usage: '<seconds>',
-  aliases: ['stop'],
-  ownerOnly: true,
+  aliases: ['stop', 'exit', 'quit'],
+  permissions: ['ADMINISTRATOR'],
   async execute (client, message, args) {
     if (!isNaN(args[0])) {
       message.channel.send(`Shutting down in ${args[0]} seconds.`);
@@ -15,9 +15,9 @@ module.exports = {
     }
 
     async function shutdown () {
-      await console.log('Shutting down');
+      await console.log('Shutting down.');
       await message.channel.send('Shutting down.');
-      process.exit();
+      client.destroy();
     }
   }
 };

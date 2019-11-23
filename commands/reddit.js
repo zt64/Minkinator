@@ -17,7 +17,7 @@ module.exports = {
     const post = posts[Math.floor(Math.random() * posts.length)].data;
 
     const embed = new client.discord.MessageEmbed()
-      .setColor('#1ED760')
+      .setColor(client.config.embedColor)
       .setTitle(`r/${args[0]} ${post.title}`)
       .setURL(`https://reddit.com${post.permalink}`)
       .setDescription(post.selftext ? ',' + post.selftext : '')

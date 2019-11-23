@@ -4,9 +4,9 @@ module.exports = {
   usage: '<command name>',
   aliases: ['commands'],
   async execute (client, message, args) {
-    const prefix = (await client.models.variables.findByPk('prefix')).value;
+    const prefix = (await client.models[message.guild.name].variables.findByPk('prefix')).value;
     const embed = new client.discord.MessageEmbed()
-      .setColor('#1ED760');
+      .setColor(client.config.embedColor);
 
     if (!args.length) {
       embed.setTitle('You have summoned I, the Minkinator. What shall I do today?');

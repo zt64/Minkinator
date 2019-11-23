@@ -1,6 +1,6 @@
 module.exports = {
   name: 'say',
-  description: 'Repeats a users input.',
+  description: 'Says a string of text.',
   aliases: ['repeat'],
   usage: '[string]',
   args: true,

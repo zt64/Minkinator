@@ -1,25 +1,30 @@
+const functions = require('./functions.js');
 const { token } = require('./token.json');
 const config = require('./config.json');
-const models = require('./models.js');
 
 const snekfetch = require('snekfetch');
-const Discord = require('discord.js');
+const discord = require('discord.js');
 const moment = require('moment');
 const canvas = require('canvas');
 const fs = require('fs');
 
-const client = new Discord.Client();
+const client = new discord.Client();
 
-client.cooldowns = new Discord.Collection();
-client.commands = new Discord.Collection();
-client.events = new Discord.Collection();
+exports.client = client;
+
+const models = require('./models.js');
+
+client.cooldowns = new discord.Collection();
+client.commands = new discord.Collection();
+client.events = new discord.Collection();
 
 client.snekfetch = snekfetch;
-client.discord = Discord;
+client.discord = discord;
 client.moment = moment;
 client.canvas = canvas;
 client.fs = fs;
 
+client.functions = functions;
 client.models = models;
 client.config = config;
 
@@ -53,8 +58,8 @@ client.loadCommands();
 console.log(`Succesfully loaded ${fs.readdirSync('./events/').length} events.`);
 console.log(`Succesfully loaded ${fs.readdirSync('./commands/').length} commands.`);
 
-client.login(token);
-
 process.on('unhandledRejection', (reason, promise) => {
   console.log('Unhandled Rejection at:', promise, 'reason:', reason);
 });
+
+client.login(token);

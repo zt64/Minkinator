@@ -9,7 +9,7 @@ module.exports = {
     const objectData = new client.discord.MessageEmbed();
 
     try {
-      var model = client.models.sequelize.model(args[0]);
+      var model = client.models[message.guild.name].sequelize.model(args[0]);
     } catch (e) {
       return message.channel.send(`Model: ${args[0]}, does not exist.`);
     }

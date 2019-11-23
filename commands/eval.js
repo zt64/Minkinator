@@ -1,10 +1,12 @@
 /* eslint-disable no-eval */
 module.exports = {
   name: 'eval',
-  description: 'Evaluates',
+  description: 'Evaluates Javascript code.',
   usage: '[input]',
+  permissions: ['ADMINISTRATOR'],
+  aliases: ['evaluate'],
   args: true,
-  execute (client, message, args) {
+  async execute (client, message, args) {
     try {
       message.channel.send(`\`\`\`js\n${eval(args.join(' '))}\n\`\`\``);
     } catch (e) {

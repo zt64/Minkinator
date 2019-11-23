@@ -4,8 +4,8 @@ module.exports = async (client, message) => {
   if (message.author.bot) return;
 
   const time = client.moment().format('l LT');
-  const prefix = (await client.models.variables.findByPk('prefix')).value;
-  const member = await client.models.members.findByPk(message.author.id);
+  const prefix = (await client.models[message.guild.name].variables.findByPk('prefix')).value;
+  const member = await client.models[message.guild.name].members.findByPk(message.author.id);
 
   const xpTotal = member.level + member.xp;
   const xpRequired = Math.pow(2, member.level);
@@ -38,7 +38,7 @@ module.exports = async (client, message) => {
 
   if (!message.content.startsWith(prefix) && !message.content.startsWith(';') && message.content.length >= 8) {
     data.push(message.content.toLowerCase());
-    return client.fs.writeFileSync('./data.json', JSON.stringify(data));
+    return client.fs.writeFileSync('data.json', JSON.stringify(data));
   }
 
   if (!message.content.startsWith(prefix)) return;
@@ -50,9 +50,32 @@ module.exports = async (client, message) => {
   if (!command) return;
 
   if (message.channel.type !== 'text') return message.reply('Commands cannot be run inside DMs.');
-  if (command.permissions && !message.member.hasPermission(command.permissions)) return message.reply(`You are missing one of the required roles: ${command.permissions.join(', ')}.`);
-  if (command.ownerOnly && message.member.id !== client.config.ownerID) return message.reply('You are not allowed to run this command');
-  if (command.args && !args.length) return message.reply(`The proper usage for that command is \`${prefix}${commandName} ${command.usage}\``);
+
+  if (command.permissions && !message.member.hasPermission(command.permissions)) {
+    const permissionError = await message.channel.send(new client.discord.MessageEmbed()
+      .setColor(client.config.embedColor)
+      .setTitle('Missing Permissions')
+      .addField('You are missing one the following permissions:', command.permissions.join(', '))
+    );
+
+    await setTimeout(() => {
+      permissionError.delete();
+    }, 3000);
+  }
+
+  if (command.args && !args.length) {
+    const usageError = await message.channel.send(new client.discord.MessageEmbed()
+      .setColor(client.config.embedColor)
+      .setTitle(`Improper Usage of ${commandName}`)
+      .setDescription(command.description)
+      .addField('Proper Usage:', `${prefix}${commandName} ${command.usage}`)
+    );
+
+    await setTimeout(() => {
+      usageError.delete();
+    }, 3000);
+  }
+
   if (!client.cooldowns.has(command.name)) client.cooldowns.set(command.name, new client.discord.Collection());
 
   if (message.author.id !== client.config.ownerID) {
@@ -75,7 +98,7 @@ module.exports = async (client, message) => {
   }
 
   try {
-    console.log(time, `#${message.channel.name}`, message.author.tag, command.name, args);
+    console.log(time, `#${message.channel.name}`, message.author.tag, message.content);
     return command.execute(client, message, args);
   } catch (error) {
     console.error(error);

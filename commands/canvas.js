@@ -19,7 +19,7 @@ module.exports = {
 
     ctx.putImageData(imgData, 10, 10);
 
-    const attachment = new client.discord.Attachment(canvas.toBuffer());
+    const attachment = new client.discord.MessageAttachment(canvas.toBuffer());
     message.channel.send(attachment);
   }
 };
