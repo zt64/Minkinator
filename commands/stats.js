@@ -1,7 +1,7 @@
 module.exports = {
   name: 'stats',
   description: 'Displays a members statistics.',
-  aliases: ['bal', 'balance', 'statistics'],
+  aliases: ['bal', 'balance', 'statistics', 'userinfo', 'level', 'lvl'],
   usage: '<member>',
   async execute (client, message, args) {
     const user = message.mentions.users.first() || message.author;
@@ -17,6 +17,8 @@ module.exports = {
       .addField('Total messages:', memberData.messages.toLocaleString(), true)
       .addField('Joined:', member.joinedAt.toLocaleDateString(), true)
       .addField('Created:', user.createdAt.toLocaleDateString(), true)
+      .addField('Status:', member.presence.status)
+      .addField('Presence:', member.presence.activity.details)
       .setFooter(`${memberData.id}`)
       .setTimestamp();
 
