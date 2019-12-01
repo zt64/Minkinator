@@ -1,8 +1,8 @@
 module.exports = {
   name: 'help',
   description: 'Displays information about a specific command.',
+  aliases: ['commands', 'father-i-need-help'],
   usage: '<command name>',
-  aliases: ['commands'],
   async execute (client, message, args) {
     const prefix = (await client.models[message.guild.name].variables.findByPk('prefix')).value;
     const embed = new client.discord.MessageEmbed()

@@ -7,7 +7,7 @@ module.exports = async (client, member) => {
     .setColor(client.config.embedColor)
     .setTimestamp());
 
-  console.log(`${member.user.tag} has joined the server.`);
+  console.log(`${member.user.tag} has joined ${member.guild.name}.`);
 
   await client.models[member.guild.name].members.create({ name: member.user.tag, id: member.id });
 };

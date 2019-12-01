@@ -10,15 +10,14 @@ module.exports = {
 
     const embed = new client.discord.MessageEmbed()
       .setColor(client.config.embedColor)
-      .setAuthor(`Statistics for ${member.nickname}`, user.avatarURL())
+      .setAuthor(`Statistics for ${member.nickname || user.tag}`, user.avatarURL())
       .addField('Balance:', `${client.config.currency}${memberData.balance.toLocaleString()}`, true)
       .addField('Level:', memberData.level.toLocaleString(), true)
       .addField('Total experience:', `${memberData.xp.toLocaleString()} XP`, true)
       .addField('Total messages:', memberData.messages.toLocaleString(), true)
       .addField('Joined:', member.joinedAt.toLocaleDateString(), true)
       .addField('Created:', user.createdAt.toLocaleDateString(), true)
-      .addField('Status:', member.presence.status)
-      .addField('Presence:', member.presence.activity.details)
+      .addField('Status:', member.presence.status, true)
       .setFooter(`${memberData.id}`)
       .setTimestamp();
 

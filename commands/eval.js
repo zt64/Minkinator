@@ -3,7 +3,7 @@ module.exports = {
   name: 'eval',
   description: 'Evaluates Javascript code.',
   usage: '[input]',
-  permissions: ['ADMINISTRATOR'],
+  botOwner: true,
   aliases: ['evaluate'],
   args: true,
   async execute (client, message, args) {

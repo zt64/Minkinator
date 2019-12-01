@@ -1,6 +1,7 @@
 module.exports = {
   name: 'guilds',
   description: 'Shows the current guilds and members Minkinator is watching.',
+  aliases: ['servers'],
   async execute (client, message, args) {
     const guilds = client.guilds;
 

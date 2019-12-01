@@ -5,15 +5,13 @@ module.exports = {
   permissions: ['ADMINISTRATOR'],
   args: true,
   async execute (client, message, args) {
-    const variables = client.models.variables;
+    const activityType = args[0];
+    const activityName = args.slice(1).join(' ');
 
-    const name = await variables.findByPk('activityName');
-    const type = await variables.findByPk('activityType');
-
-    name.update({ value: args.slice(1).join(' ') });
-    type.update({ value: args[0] });
-
-    client.user.setActivity(name.value, { type: type.value.toUpperCase() });
+    client.config.activityType = activityType;
+    client.config.activityName = activityName;
+    
+    await client.user.setActivity(activityName, { type: activityType.toUpperCase() });
 
     return message.channel.send(`Set status to \`${args.join(' ')}\`.`);
   }

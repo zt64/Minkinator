@@ -9,7 +9,7 @@ module.exports = async (client, member) => {
       .setTimestamp());
   }
 
-  console.log(`${member.user.tag} has left the server.`);
+  console.log(`${member.user.tag} has left ${member.guild.name}.`);
 
   (await client.models[member.guild.name].members.findByPk(member.id)).destroy();
 };

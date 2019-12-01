@@ -14,12 +14,13 @@
     "gifencoder": "^2.0.1",
     "graceful-fs": "^4.2.3",
     "moment": "^2.24.0",
+    "node-fetch": "^2.6.0",
     "sequelize": "^5.21.2",
     "snekfetch": "^4.0.4",
     "sqlite3": "^4.1.0"
   },
   "devDependencies": {
-    "eslint": "^6.4.0",
+    "eslint": "^6.7.2",
     "eslint-config-google": "^0.14.0",
     "eslint-config-standard": "^14.1.0",
     "eslint-plugin-import": "^2.18.2",

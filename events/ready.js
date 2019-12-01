@@ -13,8 +13,8 @@ module.exports = async (client, message) => {
     for (const member of guild.members.array()) {
       const user = member.user;
       const [memberData] = await members.findOrCreate({ where: { id: user.id } });
-
-      return memberData.update({ name: user.tag });
+  
+      memberData.update({ name: user.tag });
     };
 
     for (const member of await members.findAll()) {

@@ -2,7 +2,7 @@ const functions = require('./functions.js');
 const { token } = require('./token.json');
 const config = require('./config.json');
 
-const snekfetch = require('snekfetch');
+const fetch = require('node-fetch');
 const discord = require('discord.js');
 const moment = require('moment');
 const canvas = require('canvas');
@@ -18,10 +18,10 @@ client.cooldowns = new discord.Collection();
 client.commands = new discord.Collection();
 client.events = new discord.Collection();
 
-client.snekfetch = snekfetch;
 client.discord = discord;
 client.moment = moment;
 client.canvas = canvas;
+client.fetch = fetch;
 client.fs = fs;
 
 client.functions = functions;

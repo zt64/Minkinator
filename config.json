@@ -1,8 +1,7 @@
 {
-    "prefix" : "m@",
-    "ownerID" : "289556910426816513",
-    "currency" : "₼",
-    "embedColor" : "#1ED760",
-    "activityType" : "WATCHING",
-    "activityName" : "minky sleep"
+  "botOwner" : "289556910426816513",
+  "currency" : "₼",
+  "embedColor" : "#1ED760",
+  "activityType" : "WATCHING",
+  "activityName" : "minky sleep"
 }
