@@ -7,13 +7,15 @@ module.exports = async (client, message) => {
     const variables = models.variables;
     const members = models.members;
 
-    await variables.findOrCreate({ where: { name: 'minkProject' }, defaults: { value: 0 } });
     await variables.findOrCreate({ where: { name: 'prefix' }, defaults: { value: '!' } });
+    await variables.findOrCreate({ where: { name: 'currency' }, defaults: { value: '₼' } });
+    await variables.findOrCreate({ where: { name: 'minkProject' }, defaults: { value: 0 } });
+    await variables.findOrCreate({ where: { name: 'errorTimeout' }, defaults: { value: 3000 } });
 
     for (const member of guild.members.array()) {
       const user = member.user;
       const [memberData] = await members.findOrCreate({ where: { id: user.id } });
-  
+
       memberData.update({ name: user.tag });
     };
 

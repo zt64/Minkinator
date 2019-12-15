@@ -1,25 +1,27 @@
 module.exports = {
   name: 'canvas',
-  description: 'Canvas',
-  usage: '[scale]',
-  args: true,
+  usage: '[url/attachement]',
+  attachment: true,
   async execute (client, message, args) {
-    const scale = parseInt(args[0]);
-    const canvas = client.canvas.createCanvas(scale, scale);
-    const ctx = canvas.getContext('2d');
+    const imageURL = message.attachments.first() ? message.attachments.first().url : args[0];
+    const image = await client.canvas.loadImage(imageURL);
 
-    var imgData = ctx.createImageData(canvas.width, canvas.height);
+    const canvas = client.canvas.createCanvas(image.width, image.height);
+    const context = canvas.getContext('2d');
 
-    for (var i = 0; i < imgData.data.length; i += 4) {
-      imgData.data[i + 0] = Math.random() * 255;
-      imgData.data[i + 1] = Math.random() * 255;
-      imgData.data[i + 2] = Math.random() * 255;
-      imgData.data[i + 3] = 255;
+    context.drawImage(image, 0, 0);
+
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+      data[i] = data[i] * (data[i] / 256);
+      data[i + 1] = data[i + 1] * (data[i + 1] / 256);
+      data[i + 2] = data[i + 2] * (data[i + 2] / 256);
     }
 
-    ctx.putImageData(imgData, 10, 10);
+    context.putImageData(imageData, 0, 0);
 
-    const attachment = new client.discord.MessageAttachment(canvas.toBuffer());
-    message.channel.send(attachment);
+    return message.channel.send(new client.discord.MessageAttachment(canvas.toBuffer()));
   }
 };

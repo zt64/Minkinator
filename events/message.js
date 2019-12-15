@@ -1,46 +1,50 @@
-const data = require('../data.json');
-
 module.exports = async (client, message) => {
   if (message.author.bot) return;
 
+  const models = await client.models[message.guild.name];
+
   const time = client.moment().format('l LT');
-  const prefix = (await client.models[message.guild.name].variables.findByPk('prefix')).value;
-  const member = await client.models[message.guild.name].members.findByPk(message.author.id);
+  const prefix = (await models.variables.findByPk('prefix')).value;
+  const member = await models.members.findByPk(message.author.id);
 
   const level = member.level;
-  const xpTotal = member.level + member.xp;
+  const xpTotal = level / 2 + member.xp;
   const xpRequired = 15 * level * (level + 1);
-  console.log(xpRequired);
 
-  var lastMessage, lastAuthor, index;
+  let lastMessage;
+  let lastAuthor;
+  let index;
 
-  member.update({xp: xpTotal, messages: member.messages + 1});
+  member.update({ xp: xpTotal, messages: member.messages + 1 });
 
   if (xpTotal >= xpRequired) {
-    member.update({level: member.level + 1});
+    member.increment('level', { by: 1 });
 
     if (member.level % 5 === 0) {
-      member.update({balance: parseInt(member.balance) + 500});
-      message.reply(`You leveled up to level ${member.level} and as a reward earned ${client.config.currency}500!`);
+      member.increment('balance', { by: 500 });
+
+      message.reply(`You leveled up to level ${level} and as a reward earned ${client.config.currency}500!`);
     } else {
-      message.reply(`You leveled up to level ${member.level}!`);
+      message.reply(`You leveled up to level ${level}!`);
     }
   }
 
   if (message.content === lastMessage && lastAuthor !== message.author) {
     index++;
-    if (index === 3) {
-      index = 0;
+    if (index >= 3) {
       message.channel.send(message.content);
+      index = 0;
     }
   }
 
   lastMessage = message.content;
   lastAuthor = message.author;
 
-  if (!message.content.startsWith(prefix) && !message.content.startsWith(';') && message.content.length >= 8) {
+  if (!message.content.startsWith(prefix) && !message.content.startsWith('%') && message.content.length >= 8) {
+    const data = require('../data.json');
+
     data.push(message.content.toLowerCase());
-    return client.fs.writeFileSync('data.json', JSON.stringify(data));
+    return client.fs.writeFileSync('./data.json', JSON.stringify(data));
   }
 
   if (!message.content.startsWith(prefix)) return;
@@ -55,27 +59,23 @@ module.exports = async (client, message) => {
 
   if ((command.permissions && !message.member.hasPermission(command.permissions)) || (command.botOwner && message.author.id !== client.config.botOwner)) {
     const permissionError = await message.channel.send(new client.discord.MessageEmbed()
-        .setColor(client.config.embedColor)
-        .setTitle('Missing Permissions')
-        .addField('You are missing one the following permissions:', command.permissions ? command.permissions.join(', ') : 'Bot Owner only'),
+      .setColor(client.config.embedColor)
+      .setTitle('Missing Permissions')
+      .addField('You are missing one the following permissions:', command.permissions ? command.permissions.join(', ') : 'Bot Owner only')
     );
 
-    return setTimeout(() => {
-      permissionError.delete();
-    }, 3000);
+    return permissionError.delete({ timeout: (await models.variables.findByPk('errorTimeout')).value });
   }
 
   if (command.args && !args.length) {
     const usageError = await message.channel.send(new client.discord.MessageEmbed()
-        .setColor(client.config.embedColor)
-        .setTitle(`Improper Usage of ${commandName}`)
-        .setDescription(command.description)
-        .addField('Proper Usage:', `${prefix}${commandName} ${command.usage}`),
+      .setColor(client.config.embedColor)
+      .setTitle(`Improper Usage of ${commandName}`)
+      .setDescription(command.description)
+      .addField('Proper Usage:', `${prefix}${commandName} ${command.usage}`)
     );
 
-    return setTimeout(() => {
-      usageError.delete();
-    }, 3000);
+    return usageError.delete({ timeout: (await models.variables.findByPk('errorTimeout')).value });
   }
 
   if (!client.cooldowns.has(command.name)) client.cooldowns.set(command.name, new client.discord.Collection());

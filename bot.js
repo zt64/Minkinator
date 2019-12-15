@@ -2,10 +2,12 @@ const functions = require('./functions.js');
 const { token } = require('./token.json');
 const config = require('./config.json');
 
-const fetch = require('node-fetch');
 const discord = require('discord.js');
+const fetch = require('node-fetch');
+const GifEncoder = require('gif-encoder');
 const moment = require('moment');
 const canvas = require('canvas');
+const qr = require('qrcode');
 const fs = require('fs');
 
 const client = new discord.Client();
@@ -18,10 +20,12 @@ client.cooldowns = new discord.Collection();
 client.commands = new discord.Collection();
 client.events = new discord.Collection();
 
+client.GifEncoder = GifEncoder;
 client.discord = discord;
 client.moment = moment;
 client.canvas = canvas;
 client.fetch = fetch;
+client.qr = qr;
 client.fs = fs;
 
 client.functions = functions;

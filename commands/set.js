@@ -1,6 +1,6 @@
 module.exports = {
   name: 'set',
-  description: 'Sets a property of a variable.',
+  description: 'Sets a property of a letiable.',
   usage: ['[model] [object] [property] [value]'],
   permissions: ['ADMINISTRATOR'],
   args: true,

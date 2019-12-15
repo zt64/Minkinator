@@ -6,9 +6,9 @@ module.exports = {
   args: true,
   async execute (client, message, args) {
     const body = await (await client.fetch(`https://www.reddit.com/r/${args[0]}.json`)).json();
-    
+
     if (!body.data) return message.channel.send(`Subreddit \`\`r/${args[0]}\`\` does not exist.`);
-    
+
     const posts = body.data.children.filter(post => !post.data.over_18);
 
     if (!posts.length) return message.channel.send(`No posts found in \`\`r/${args[0]}.\`\``);

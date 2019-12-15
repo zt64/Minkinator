@@ -16,3 +16,7 @@ exports.convertTime = (time) => {
 
   return ms;
 };
+
+exports.randomInteger = (min, max) => {
+  return Math.random() * (max - min) + min;
+};

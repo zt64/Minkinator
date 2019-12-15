@@ -2,6 +2,7 @@ module.exports = {
   name: 'reset',
   description: 'Resets a members data.',
   permissions: ['ADMINISTRATOR'],
+  aliases: ['demolish', 'destroy', 'obliterate', 'disintegrate'],
   usage: '[member]',
   args: true,
   async execute (client, message, args) {
