@@ -9,7 +9,7 @@
   "author": "Litleck",
   "license": "MIT",
   "dependencies": {
-    "canvas": "^2.6.0",
+    "canvas": "^2.6.1",
     "discord.js": "github:discordjs/discord.js",
     "gif-encoder": "^0.7.2",
     "gifencoder": "^2.0.1",
