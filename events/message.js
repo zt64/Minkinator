@@ -11,9 +11,9 @@ module.exports = async (client, message) => {
   const xpTotal = level / 2 + member.xp;
   const xpRequired = 15 * level * (level + 1);
 
-  let lastMessage;
-  let lastAuthor;
-  let index;
+  var lastMessage;
+  var lastAuthor;
+  var index;
 
   member.update({ xp: xpTotal, messages: member.messages + 1 });
 
@@ -25,7 +25,7 @@ module.exports = async (client, message) => {
 
       message.reply(`You leveled up to level ${level} and as a reward earned ${client.config.currency}500!`);
     } else {
-      message.reply(`You leveled up to level ${level}!`);
+      message.reply(`You leveled up to level ${level + 1}!`);
     }
   }
 
@@ -99,11 +99,15 @@ module.exports = async (client, message) => {
     setTimeout(() => timestamps.delete(message.author.id), cooldownAmount);
   }
 
+  message.channel.startTyping();
+
   try {
     console.log(time, `#${message.channel.name}`, message.author.tag, message.content);
-    return command.execute(client, message, args);
+    command.execute(client, message, args);
   } catch (error) {
     console.error(error);
-    return message.reply('An error has occured running that command.');
+    message.reply('An error has occured running that command.');
   }
+
+  return message.channel.stopTyping();
 };
