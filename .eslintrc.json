@@ -16,6 +16,7 @@
     },
     "rules": {
         "semi": [2, "always"],
-        "eol-last": ["error", "never"]
+        "eol-last": ["error", "never"],
+        "no-unused-vars": "off"
     }
 }

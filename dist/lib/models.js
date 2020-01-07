@@ -1,0 +1,84 @@
+exports.createDatabase = async function createDatabase(client, guild) {
+    const Sequelize = client.Sequelize;
+    const guildName = guild.name;
+    const sequelize = new Sequelize('database', 'user', 'password', {
+        host: 'localhost',
+        dialect: 'sqlite',
+        storage: `./databases/${guildName}.sqlite`,
+        logging: false
+    });
+    const members = sequelize.define('members', {
+        id: {
+            type: Sequelize.TEXT,
+            primaryKey: true,
+            unique: true
+        },
+        name: {
+            type: Sequelize.TEXT
+        },
+        balance: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0,
+            allowNull: false
+        },
+        level: {
+            type: Sequelize.INTEGER,
+            defaultValue: 1,
+            allowNull: false
+        },
+        xp: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0,
+            allowNull: false
+        },
+        messages: {
+            type: Sequelize.INTEGER,
+            defaultValue: 0,
+            allowNull: false
+        },
+        inventory: {
+            type: Sequelize.JSON,
+            defaultValue: {},
+            allowNull: false
+        }
+    }, {
+        timestamps: false
+    });
+    const variables = sequelize.define('variables', {
+        name: {
+            type: Sequelize.TEXT,
+            primaryKey: true
+        },
+        value: {
+            type: Sequelize.ARRAY(Sequelize.JSON),
+            defaultValue: 0,
+            allowNull: false
+        }
+    }, {
+        timestamps: false
+    });
+    exports[guildName] = {};
+    exports[guildName].sequelize = sequelize;
+    exports[guildName].members = members;
+    exports[guildName].variables = variables;
+    await sequelize.sync();
+    await variables.findOrCreate({ where: { name: 'prefix' }, defaults: { value: '!' } });
+    await variables.findOrCreate({ where: { name: 'currency' }, defaults: { value: '₼' } });
+    await variables.findOrCreate({ where: { name: 'minkProject' }, defaults: { value: 0 } });
+    await variables.findOrCreate({ where: { name: 'errorTimeout' }, defaults: { value: 3000 } });
+    await variables.findOrCreate({ where: { name: 'items' }, defaults: { value: {} } });
+    for (const member of guild.members.array()) {
+        const user = member.user;
+        const [memberData] = await members.findOrCreate({ where: { id: user.id } });
+        memberData.update({ name: user.tag });
+    }
+    ;
+    for (const member of await members.findAll()) {
+        if (!guild.members.array().map(member => member.user.id).includes(member.id)) {
+            (await members.findByPk(member.id)).destroy();
+            return console.log(`${member.user.tag} destroyed.`);
+        }
+    }
+    return console.log(`Created database for ${guildName}`);
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoibW9kZWxzLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vc3JjL2xpYi9tb2RlbHMuanMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsT0FBTyxDQUFDLGNBQWMsR0FBRyxLQUFLLFVBQVUsY0FBYyxDQUFFLE1BQU0sRUFBRSxLQUFLO0lBQ25FLE1BQU0sU0FBUyxHQUFHLE1BQU0sQ0FBQyxTQUFTLENBQUM7SUFDbkMsTUFBTSxTQUFTLEdBQUcsS0FBSyxDQUFDLElBQUksQ0FBQztJQUU3QixNQUFNLFNBQVMsR0FBRyxJQUFJLFNBQVMsQ0FBQyxVQUFVLEVBQUUsTUFBTSxFQUFFLFVBQVUsRUFBRTtRQUM5RCxJQUFJLEVBQUUsV0FBVztRQUNqQixPQUFPLEVBQUUsUUFBUTtRQUNqQixPQUFPLEVBQUUsZUFBZSxTQUFTLFNBQVM7UUFDMUMsT0FBTyxFQUFFLEtBQUs7S0FDZixDQUFDLENBQUM7SUFFSCxNQUFNLE9BQU8sR0FBRyxTQUFTLENBQUMsTUFBTSxDQUFDLFNBQVMsRUFBRTtRQUMxQyxFQUFFLEVBQUU7WUFDRixJQUFJLEVBQUUsU0FBUyxDQUFDLElBQUk7WUFDcEIsVUFBVSxFQUFFLElBQUk7WUFDaEIsTUFBTSxFQUFFLElBQUk7U0FDYjtRQUNELElBQUksRUFBRTtZQUNKLElBQUksRUFBRSxTQUFTLENBQUMsSUFBSTtTQUNyQjtRQUNELE9BQU8sRUFBRTtZQUNQLElBQUksRUFBRSxTQUFTLENBQUMsT0FBTztZQUN2QixZQUFZLEVBQUUsQ0FBQztZQUNmLFNBQVMsRUFBRSxLQUFLO1NBQ2pCO1FBQ0QsS0FBSyxFQUFFO1lBQ0wsSUFBSSxFQUFFLFNBQVMsQ0FBQyxPQUFPO1lBQ3ZCLFlBQVksRUFBRSxDQUFDO1lBQ2YsU0FBUyxFQUFFLEtBQUs7U0FDakI7UUFDRCxFQUFFLEVBQUU7WUFDRixJQUFJLEVBQUUsU0FBUyxDQUFDLE9BQU87WUFDdkIsWUFBWSxFQUFFLENBQUM7WUFDZixTQUFTLEVBQUUsS0FBSztTQUNqQjtRQUNE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

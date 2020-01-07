@@ -3,19 +3,18 @@
   "version": "1.2.2",
   "description": "A minkinator bot",
   "main": "bot.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "Litleck",
   "license": "MIT",
   "dependencies": {
+    "@types/node": "^13.1.4",
     "canvas": "^2.6.1",
     "discord.js": "github:discordjs/discord.js",
     "gif-encoder": "^0.7.2",
-    "gifencoder": "^2.0.1",
     "graceful-fs": "^4.2.3",
+    "js-markov": "^3.0.1",
     "moment": "^2.24.0",
     "node-fetch": "^2.6.0",
+    "pretty-ms": "^5.1.0",
     "qrcode": "^1.4.4",
     "sequelize": "^5.21.2",
     "snekfetch": "^4.0.4",
