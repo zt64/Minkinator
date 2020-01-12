@@ -10,7 +10,7 @@ module.exports = {
     ],
     coolDown: '120',
     async execute(client, message, args) {
-        const member = await client.models[message.guild.name].members.findByPk(message.author.id);
+        const member = await client.model.members.findByPk(message.author.id);
         const currency = client.config.currency;
         const guess = Math.floor(args[0]);
         const value = Math.round(Math.random() * 100);

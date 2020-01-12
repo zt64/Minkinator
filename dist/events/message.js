@@ -3,7 +3,7 @@ module.exports = async (client, message) => {
         return;
     if (message.channel.type === 'dm')
         return message.channel.send('Commands cannot be run inside DMs.');
-    const models = await client.models[message.guild.name];
+    const models = await client.model;
     const time = client.moment().format('HH:mm M/D/Y');
     const prefix = (await models.variables.findByPk('prefix')).value;
     const memberData = await models.members.findByPk(message.author.id);

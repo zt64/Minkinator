@@ -11,7 +11,7 @@ module.exports = {
     async execute(client, message, args) {
         const user = message.mentions.users.first() || message.author;
         const member = message.guild.member(user);
-        const memberData = await client.models[message.guild.name].members.findByPk(user.id);
+        const memberData = await client.model.members.findByPk(user.id);
         return message.channel.send(new client.discord.MessageEmbed()
             .setColor(client.config.embedColor)
             .setAuthor(`Statistics for ${member.nickname || user.tag}`, user.avatarURL())

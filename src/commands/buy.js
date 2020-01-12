@@ -13,8 +13,8 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const memberData = await client.models[message.guild.name].members.findByPk(message.author.id);
-    const itemArray = (await client.models[message.guild.name].variables.findByPk('items')).value;
+    const memberData = await client.model.members.findByPk(message.author.id);
+    const itemArray = (await client.model.variables.findByPk('items')).value;
     const currency = await client.config.currency;
     const inventory = memberData.inventory;
     const balance = memberData.balance;
@@ -23,26 +23,27 @@ module.exports = {
     const amount = parseInt(args[1]) || 1;
 
     if (!itemArray.find(x => x.name === itemName)) return message.channel.send(`${itemName} is not available for sale.`);
-    const itemPrice = itemArray.find(x => x.name === itemName).price * amount;
 
-    if (balance < itemPrice) return message.channel.send(`You cannot afford ${amount} ${itemName}(s)`);
+    const shopItem = itemArray.find(x => x.name === itemName);
 
-    inventory.find(item => {
-      if (item.name === itemName) {
-        item.amount += amount;
-      } else {
-        inventory.push(
-          {
-            name: itemName,
-            amount: amount
-          }
-        );
-      }
-    });
+    if (balance < shopItem.price) return message.channel.send(`You cannot afford ${amount} ${itemName}(s)`);
 
-    memberData.decrement('balance', { by: itemPrice });
+    const inventoryItem = inventory.find(item => item.name === itemName);
+
+    if (inventoryItem) {
+      inventoryItem.amount += amount;
+    } else {
+      inventory.push(
+        {
+          name: itemName,
+          amount: amount
+        }
+      );
+    }
+
+    memberData.decrement('balance', { by: shopItem.price });
     memberData.update({ inventory: inventory });
 
-    return message.channel.send(`Bought ${amount} ${itemName}(s) for ${currency}${itemPrice}`);
+    return message.channel.send(`Bought ${amount} ${itemName}(s) for ${currency}${shopItem.price}`);
   }
 };

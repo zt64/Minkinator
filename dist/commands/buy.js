@@ -13,8 +13,8 @@ module.exports = {
         }
     ],
     async execute(client, message, args) {
-        const memberData = await client.models[message.guild.name].members.findByPk(message.author.id);
-        const items = await client.models[message.guild.name].variables.findByPk('listings').value;
+        const memberData = await client.model.members.findByPk(message.author.id);
+        const items = await client.model.variables.findByPk('listings').value;
         const inventory = memberData.inventory;
         const balance = memberData.balance;
         const item = args[0];

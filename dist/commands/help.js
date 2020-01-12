@@ -4,7 +4,7 @@ module.exports = {
     aliases: ['commands', 'father-i-need-help'],
     usage: '<command name>',
     async execute(client, message, args) {
-        const prefix = (await client.models[message.guild.name].variables.findByPk('prefix')).value;
+        const prefix = (await client.model.variables.findByPk('prefix')).value;
         const embed = new client.discord.MessageEmbed()
             .setColor(client.config.embedColor);
         if (!args.length) {

@@ -9,7 +9,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const prefix = await client.models[message.guild.name].variables.findByPk('prefix');
+    const prefix = await client.model.variables.findByPk('prefix');
 
     console.log(prefix);
 

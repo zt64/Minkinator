@@ -9,7 +9,7 @@ module.exports = {
         }
     ],
     async execute(client, message, args) {
-        const prefix = (await client.models[message.guild.name].variables.findByPk('prefix')).value;
+        const prefix = (await client.model.variables.findByPk('prefix')).value;
         const helpEmbed = new client.discord.MessageEmbed()
             .setColor(client.config.embedColor)
             .setTitle('Home page')

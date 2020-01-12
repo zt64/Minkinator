@@ -14,7 +14,7 @@ module.exports = {
         }
     ],
     async execute(client, message, args) {
-        const members = await client.models[message.guild.name].members.findAll({ order: [[args[0], 'DESC']] });
+        const members = await client.model.members.findAll({ order: [[args[0], 'DESC']] });
         const leaderBoardEmbed = new client.discord.MessageEmbed();
         let pages = Math.ceil(members.length / 10);
         const stat = args[0];
@@ -26,7 +26,7 @@ module.exports = {
         leaderBoardEmbed.setTitle(`Member ${args[0]} leader board`);
         leaderBoardEmbed.setFooter(`Page ${nonIndexedPage} of ${pages}`);
         leaderBoardEmbed.setTimestamp();
-        if (!(stat in client.models[message.guild.name].members.rawAttributes))
+        if (!(stat in client.model.members.rawAttributes))
             return message.channel.send(`${stat} is not a statistic.`);
         if (nonIndexedPage > pages || nonIndexedPage < 1 || isNaN(nonIndexedPage))
             return message.channel.send(`Page ${nonIndexedPage} does not exist.`);

@@ -9,20 +9,16 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const prefix = (await client.models[message.guild.name].variables.findByPk('prefix')).value;
+    const prefix = (await client.model.variables.findByPk('prefix')).value;
 
     const helpEmbed = new client.discord.MessageEmbed()
       .setColor(client.config.embedColor)
       .setTitle('Home page')
-      .setDescription('There is a total of 3 command categories ')
-      .setFooter('Page 1 of 1');
+      .setDescription('There is a total of 3 command categories ');
 
     const helpMessage = await message.channel.send(helpEmbed);
 
-    helpMessage.react('🛠️');
-    helpMessage.react('🥳');
-    helpMessage.react('🕴️');
-    helpMessage.react('❌');
+    ['🛠️', '🥳', '🕴️', '❌'].map(reaction => helpMessage.react(reaction));
 
     const filter = (reaction, user) => user.id === message.author.id && (
       reaction.emoji.name === '🏠' ||
@@ -42,11 +38,11 @@ module.exports = {
           helpEmbed.setTitle('Home page');
           helpEmbed.setDescription('There is a total of 3 command categories ');
           helpEmbed.fields = [];
+
           helpMessage.reactions.removeAll();
-          helpMessage.react('🛠️');
-          helpMessage.react('🥳');
-          helpMessage.react('🕴️');
-          helpMessage.react('❌');
+
+          ['🛠️', '🥳', '🕴️', '❌'].map(reaction => helpMessage.react(reaction));
+
           break;
         case '🛠️':
           helpEmbed.setTitle('Utility commands');
@@ -58,8 +54,9 @@ module.exports = {
           });
 
           helpMessage.reactions.removeAll();
-          helpMessage.react('🏠');
-          helpMessage.react('❌');
+
+          ['🏠', '❌'].map(reaction => helpMessage.react(reaction));
+
           break;
         case '🥳':
           helpEmbed.setTitle('Fun commands');
@@ -71,8 +68,9 @@ module.exports = {
           });
 
           helpMessage.reactions.removeAll();
-          helpMessage.react('🏠');
-          helpMessage.react('❌');
+
+          ['🏠', '❌'].map(reaction => helpMessage.react(reaction));
+
           break;
         case '🕴️':
           helpEmbed.setTitle('Administrator commands');
@@ -80,16 +78,17 @@ module.exports = {
 
           client.commands.map((command, index) => {
             if (command.category !== 'Administrator') return;
+
             helpEmbed.addField(`\`\`${prefix}${command.name}\`\``, command.description);
           });
 
           helpMessage.reactions.removeAll();
-          helpMessage.react('🏠');
-          helpMessage.react('❌');
+
+          ['🏠', '❌'].map(reaction => helpMessage.react(reaction));
+
           break;
         case '❌':
-          helpMessage.delete();
-          break;
+          return helpMessage.delete();
       }
 
       await helpMessage.edit(helpEmbed);

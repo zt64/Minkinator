@@ -14,23 +14,22 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const members = await client.models[message.guild.name].members.findAll({ order: [[args[0], 'DESC']] });
+    const members = await client.model.members.findAll({ order: [[args[0], 'DESC']] });
     const leaderBoardEmbed = new client.discord.MessageEmbed();
-    let pages = Math.ceil(members.length / 10);
+    const pages = Math.ceil(members.length / 10);
     const stat = args[0];
 
     const indexedPage = args[1] - 1 || 0;
     const nonIndexedPage = args[1] || 1;
 
     let page = 1;
-    pages++;
 
     leaderBoardEmbed.setColor(client.config.embedColor);
     leaderBoardEmbed.setTitle(`Member ${args[0]} leader board`);
     leaderBoardEmbed.setFooter(`Page ${nonIndexedPage} of ${pages}`);
     leaderBoardEmbed.setTimestamp();
 
-    if (!(stat in client.models[message.guild.name].members.rawAttributes)) return message.channel.send(`${stat} is not a statistic.`);
+    if (!(stat in client.model.members.rawAttributes)) return message.channel.send(`${stat} is not a statistic.`);
     if (nonIndexedPage > pages || nonIndexedPage < 1 || isNaN(nonIndexedPage)) return message.channel.send(`Page ${nonIndexedPage} does not exist.`);
 
     members.slice(indexedPage * 10, nonIndexedPage * 10).map((member, index) => {
@@ -84,8 +83,7 @@ module.exports = {
           leaderBoardMessage.react('❌');
           break;
         case '❌':
-          leaderBoardMessage.delete();
-          break;
+          return leaderBoardMessage.delete();
       }
 
       leaderBoardMessage.edit(leaderBoardEmbed);

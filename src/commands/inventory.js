@@ -1,6 +1,7 @@
 module.exports = {
   name: 'inventory',
   description: 'Shows a members inventory.',
+  aliases: ['inv'],
   parameters: [
     {
       name: 'member',
@@ -10,7 +11,7 @@ module.exports = {
   async execute (client, message, args) {
     const user = message.mentions.users.first() || message.author;
     const member = message.guild.member(user);
-    const inventory = (await client.models[message.guild.name].members.findByPk(user.id)).inventory;
+    const inventory = (await client.model.members.findByPk(user.id)).inventory;
 
     const inventoryEmbed = new client.discord.MessageEmbed()
       .setColor(client.config.embedColor)

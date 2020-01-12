@@ -26,7 +26,7 @@ module.exports = {
   ],
   async execute (client, message, args) {
     try {
-      var model = client.models[message.guild.name].sequelize.model(args[0]);
+      var model = client.model.sequelize.model(args[0]);
     } catch (e) {
       return message.channel.send(`Model: ${args[0]}, does not exist.`);
     }

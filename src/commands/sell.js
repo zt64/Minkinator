@@ -11,34 +11,33 @@ module.exports = {
       name: 'amount',
       type: Number,
       required: true
-    },
-    {
-      name: 'price',
-      type: Number,
-      required: true
     }
   ],
   async execute (client, message, args) {
-    const memberData = await client.models[message.guild.name].members.findByPk(message.author.id);
-    const listings = await client.models[message.guild.name].variables.findByPk('items').value;
+    const memberData = await client.model.members.findByPk(message.author.id);
+    const items = (await client.model.variables.findByPk('items')).value;
     const inventory = memberData.inventory;
-    const balance = memberData.balance;
+    const currency = await client.config.currency;
 
-    const itemAmount = args[0];
-    const itemName = args[1];
+    var balance = memberData.balance;
 
-    inventory.find(item => {
-      if (item.name === itemName) {
-        if (itemAmount > item.amount) return message.channel.send('You do not have that much');
+    const itemName = args[0];
+    const itemAmount = args[1];
 
-        itemAmount < item.amount ? item.amount -= itemAmount : inventory.splice(, 1);
+    const shopItem = items.find(item => item.name === itemName);
+    const inventoryItem = inventory.find(item => item.name === itemName);
 
-        memberData.update({ balance: itemPrice, inventory: inventory });
+    const itemPrice = (itemAmount * shopItem.price) / 2;
 
-        return message.channel.send(`Successfully sold ${itemAmount} ${itemName}(s) for ${itemPrice}`);
-      }
-    });
+    if (!inventoryItem) return message.channel.send(`You are lacking the ${itemName}`);
+    if (itemAmount > inventoryItem.amount) return message.channel.send('You do not have that much');
 
-    return message.channel.send(`You are lacking the ${itemName}`);
+    inventoryItem.amount - itemAmount ? inventoryItem.amount -= itemAmount : inventory.splice(inventory.indexOf(inventoryItem), 1);
+
+    balance += itemPrice;
+
+    memberData.update({ balance: balance, inventory: inventory });
+
+    return message.channel.send(`Successfully sold ${itemAmount} ${itemName}(s) for ${currency}${itemPrice}`);
   }
 };

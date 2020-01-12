@@ -2,24 +2,29 @@ module.exports = async (client, message) => {
   if (message.author.bot) return;
   if (message.channel.type === 'dm') return message.channel.send('Commands cannot be run inside DMs.');
 
-  const models = await client.models[message.guild.name];
+  const model = await client.models[message.guild.name];
 
   const time = client.moment().format('HH:mm M/D/Y');
-  const prefix = (await models.variables.findByPk('prefix')).value;
-  const memberData = await models.members.findByPk(message.author.id);
+  const prefix = (await model.variables.findByPk('prefix')).value;
+  const memberData = await model.members.findByPk(message.author.id);
 
   let level = memberData.level;
+
+  client.model = model;
+
   const xpTotal = Math.round(Math.random() * level) + memberData.xp;
   const xpRequired = 15 * level * (level + 1);
 
   const lastMessage = message.content;
   const lastAuthor = message.author;
+
   let index = 0;
 
   memberData.update({ xp: xpTotal, messages: memberData.messages + 1 });
 
   if (xpTotal >= xpRequired) {
     memberData.increment('level', { by: 1 });
+
     level++;
 
     const levelUpEmbed = new client.discord.MessageEmbed()
@@ -31,10 +36,10 @@ module.exports = async (client, message) => {
       memberData.increment('balance', { by: 500 });
 
       levelUpEmbed.setDescription(`${message.author} is now level ${level} and earned ${client.config.currency}500 as a reward!`);
-      message.channel.send(levelUpEmbed);
+      // message.channel.send(levelUpEmbed);
     } else {
       levelUpEmbed.setDescription(`${message.author} is now level ${level}.`);
-      message.channel.send(levelUpEmbed);
+      // message.channel.send(levelUpEmbed);
     }
   }
 
@@ -61,30 +66,19 @@ module.exports = async (client, message) => {
 
   if (!command) return;
 
-  if ((command.permissions && !message.member.hasPermission(command.permissions)) || (command.botOwner && message.author.id !== client.config.botOwner)) {
+  if (((command.botOwner && message.author.id !== client.config.botOwner) && (command.permissions && !message.member.hasPermission(command.permissions))) || (command.botOwner && message.author.id !== client.config.botOwner)) {
     const permissionError = await message.channel.send(new client.discord.MessageEmbed()
       .setColor(client.config.embedError)
       .setTitle('Missing Permissions')
       .addField('You are missing one the following permissions:', command.permissions ? command.permissions.join(', ') : 'Bot Owner only')
     );
 
-    return permissionError.delete({ timeout: (await models.variables.findByPk('errorTimeout')).value });
-  }
-
-  if (command.args && !args.length) {
-    const usageError = await message.channel.send(new client.discord.MessageEmbed()
-      .setColor(client.config.embedError)
-      .setTitle(`Improper Usage of ${commandName}`)
-      .setDescription(command.description)
-      .addField('Proper Usage:', `${prefix}${commandName} ${command.usage}`)
-    );
-
-    return usageError.delete({ timeout: (await models.variables.findByPk('errorTimeout')).value });
+    return permissionError.delete({ timeout: (await model.variables.findByPk('errorTimeout')).value });
   }
 
   async function error () {
     const usageMessage = await message.channel.send(usageEmbed);
-    return usageMessage.delete({ timeout: (await models.variables.findByPk('errorTimeout')).value });
+    return usageMessage.delete({ timeout: (await model.variables.findByPk('errorTimeout')).value });
   }
 
   if (command.parameters) {
@@ -126,7 +120,15 @@ module.exports = async (client, message) => {
 
       if (now < expirationTime) {
         const timeLeft = (expirationTime - now) / 1000;
-        return message.reply(`Please wait ${timeLeft.toFixed(1)} more second(s) before reusing ${command.name}.`);
+
+        const coolDownError = await message.channel.send(new client.discord.MessageEmbed()
+          .setColor(client.config.embedError)
+          .setTitle('Cooldown active')
+          .setDescription(`Please wait, a cool down of ${timeLeft.toFixed(1)} second(s) is remaining.`)
+          .setTimestamp()
+        );
+
+        return coolDownError.delete({ timeout: (await model.variables.findByPk('errorTimeout')).value });
       }
     }
 

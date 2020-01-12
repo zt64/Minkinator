@@ -17,6 +17,7 @@ module.exports = {
     const msg = args[1];
 
     user.send(msg);
+
     return message.channel.send(`Sent a DM to ${user}`);
   }
 };

@@ -2,8 +2,8 @@ module.exports = {
     name: 'list',
     description: 'Lists items available to buy.',
     async execute(client, message, args) {
-        const items = await client.models[message.guild.name].variables.findByPk('listings').value;
-        const prefix = client.models[message.guild.name].variables.findByPk('prefix').value;
+        const items = await client.model.variables.findByPk('listings').value;
+        const prefix = client.model.variables.findByPk('prefix').value;
         const listingEmbed = new client.discord.MessageEmbed()
             .setColor(client.config.embedColor)
             .setTitle('The Shop')

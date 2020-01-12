@@ -71,7 +71,6 @@ exports.createDatabase = async function createDatabase (client, guild) {
 
   await variables.findOrCreate({ where: { name: 'prefix' }, defaults: { value: '!' } });
   await variables.findOrCreate({ where: { name: 'currency' }, defaults: { value: '₼' } });
-  await variables.findOrCreate({ where: { name: 'minkProject' }, defaults: { value: 0 } });
   await variables.findOrCreate({ where: { name: 'errorTimeout' }, defaults: { value: 3000 } });
   await variables.findOrCreate({
     where: { name: 'items' },
@@ -79,29 +78,35 @@ exports.createDatabase = async function createDatabase (client, guild) {
       value: [
         {
           name: 'gold',
-          price: 40
+          price: 260
         },
         {
           name: 'bread',
-          price: 5
+          price: 30
+        },
+        {
+          name: 'souls',
+          price: 666
         }
       ]
     }
   });
 
-  for (const member of guild.members.array()) {
-    const user = member.user;
+  for (const guildMember of guild.members.array()) {
+    const user = guildMember.user;
     const [memberData] = await members.findOrCreate({ where: { id: user.id } });
 
     memberData.update({ name: user.tag });
   };
 
-  for (const member of await members.findAll()) {
-    if (!guild.members.array().map(member => member.user.id).includes(member.id)) {
-      (await members.findByPk(member.id)).destroy();
-      return console.log(`${member.user.tag} destroyed.`);
+  for (const memberData of await members.findAll()) {
+    try {
+      await guild.members.fetch(memberData.id);
+    } catch (e) {
+      memberData.destroy();
+      console.log(`${memberData.name} destroyed.`);
     }
-  }
+  };
 
   return console.log(`Created database for ${guildName}`);
 };

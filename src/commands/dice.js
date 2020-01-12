@@ -4,10 +4,17 @@ module.exports = {
   async execute (client, message, args) {
     const result = client.functions.randomInteger(1, 6);
 
-    return message.channel.send(new client.discord.MessageEmbed()
+    const diceEmbed = new client.discord.MessageEmbed()
       .setColor(client.config.embedColor)
       .setTitle('Dice roll')
-      .setDescription(result)
-    );
+      .setDescription('Rolling...')
+      .setTimestamp();
+
+    const diceMessage = await message.channel.send(diceEmbed);
+
+    setTimeout(() => {
+      diceEmbed.setDescription(result);
+      diceMessage.edit(diceEmbed);
+    }, 1000);
   }
 };

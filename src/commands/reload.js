@@ -4,7 +4,7 @@ module.exports = {
   description: 'Reloads the bot commands.',
   aliases: ['restart', 'reboot', 'r'],
   usage: '<command>',
-  permissions: ['ADMINISTRATOR'],
+  botOwner: true,
   async execute (client, message, args) {
     const commands = client.commands;
     const events = client.events;

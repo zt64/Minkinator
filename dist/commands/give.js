@@ -19,8 +19,8 @@ module.exports = {
             return message.reply(`${message.mentions.members.first()} is not a valid member.`);
         if (args[1] < 1 || isNaN(args[1]))
             return message.reply('That is not a valid amount.');
-        const target = await client.models[message.guild.name].members.findByPk(message.mentions.members.first().id);
-        const member = await client.models[message.guild.name].members.findByPk(message.author.id);
+        const target = await client.model.members.findByPk(message.mentions.members.first().id);
+        const member = await client.model.members.findByPk(message.author.id);
         if (member.balance - args[1] >= 0) {
             await member.update({ balance: member.balance - parseInt(args[1]) });
             await target.update({ balance: target.balance + parseInt(args[1]) });

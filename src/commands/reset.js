@@ -13,10 +13,10 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const member = message.mentions.users.first();
-    const data = await client.models[message.guild.name].members.findByPk(member.id);
+    const data = await client.model.members.findByPk(member.id);
 
     await data.destroy();
-    await client.models[message.guild.name].members.create({ name: member.tag, id: member.id });
+    await client.model.members.create({ name: member.tag, id: member.id });
 
     return message.channel.send(`${member.tag}'s data has been reset.`);
   }

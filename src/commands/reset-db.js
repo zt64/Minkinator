@@ -4,7 +4,7 @@ module.exports = {
   description: 'Resets a guilds database',
   permissions: ['ADMINISTRATOR'],
   async execute (client, message, args) {
-    await client.models[message.guild.name].drop();
+    await client.model.drop();
     return message.channel.send('Successfully reset the database.');
   }
 };
