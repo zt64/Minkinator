@@ -1,7 +1,0 @@
-module.exports = async (client, guild) => {
-    console.log(`Minkinator has left ${guild.name} (${guild.id})`);
-    await client.models[guild.name].sequelize.drop();
-    await client.fs.unlinkSync(`./databases/${guild.name}.sqlite`);
-};
-// it doesnt work of course.
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZ3VpbGREZWxldGUuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi9zcmMvZXZlbnRzL2d1aWxkRGVsZXRlLmpzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBLE1BQU0sQ0FBQyxPQUFPLEdBQUcsS0FBSyxFQUFFLE1BQU0sRUFBRSxLQUFLLEVBQUUsRUFBRTtJQUN2QyxPQUFPLENBQUMsR0FBRyxDQUFDLHVCQUF1QixLQUFLLENBQUMsSUFBSSxLQUFLLEtBQUssQ0FBQyxFQUFFLEdBQUcsQ0FBQyxDQUFDO0lBQy9ELE1BQU0sTUFBTSxDQUFDLE1BQU0sQ0FBQyxLQUFLLENBQUMsSUFBSSxDQUFDLENBQUMsU0FBUyxDQUFDLElBQUksRUFBRSxDQUFDO0lBQ2pELE1BQU0sTUFBTSxDQUFDLEVBQUUsQ0FBQyxVQUFVLENBQUMsZUFBZSxLQUFLLENBQUMsSUFBSSxTQUFTLENBQUMsQ0FBQztBQUNqRSxDQUFDLENBQUM7QUFFRiw0QkFBNEIifQ==

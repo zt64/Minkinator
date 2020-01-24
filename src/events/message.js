@@ -1,16 +1,20 @@
 module.exports = async (client, message) => {
+  const guildDatabase = await client.models[message.guild.name];
+  const guildSettings = guildDatabase.settings;
+
   if (message.author.bot) return;
   if (message.channel.type === 'dm') return message.channel.send('Commands cannot be run inside DMs.');
 
-  const model = await client.models[message.guild.name];
+  const guildVariables = guildDatabase.variables;
+  const guildMembers = guildDatabase.members;
 
   const time = client.moment().format('HH:mm M/D/Y');
-  const prefix = (await model.variables.findByPk('prefix')).value;
-  const memberData = await model.members.findByPk(message.author.id);
+  const guildPrefix = (await guildVariables.findByPk('prefix')).value;
+  const memberData = await guildMembers.findByPk(message.author.id);
 
-  let level = memberData.level;
+  const level = memberData.level;
 
-  client.model = model;
+  client.model = guildDatabase;
 
   const xpTotal = Math.round(Math.random() * level) + memberData.xp;
   const xpRequired = 15 * level * (level + 1);
@@ -25,8 +29,6 @@ module.exports = async (client, message) => {
   if (xpTotal >= xpRequired) {
     memberData.increment('level', { by: 1 });
 
-    level++;
-
     const levelUpEmbed = new client.discord.MessageEmbed()
       .setColor(client.config.embedColor)
       .setTitle(`${message.author.username} has levelled up!`)
@@ -35,10 +37,10 @@ module.exports = async (client, message) => {
     if (level % 5 === 0) {
       memberData.increment('balance', { by: 500 });
 
-      levelUpEmbed.setDescription(`${message.author} is now level ${level} and earned ${client.config.currency}500 as a reward!`);
+      levelUpEmbed.setDescription(`${message.author} is now level ${level + 1} and earned ${client.config.currency}500 as a reward!`);
       // message.channel.send(levelUpEmbed);
     } else {
-      levelUpEmbed.setDescription(`${message.author} is now level ${level}.`);
+      levelUpEmbed.setDescription(`${message.author} is now level ${level + 1}.`);
       // message.channel.send(levelUpEmbed);
     }
   }
@@ -51,16 +53,16 @@ module.exports = async (client, message) => {
     }
   }
 
-  if (!message.content.startsWith(prefix) && !message.content.startsWith('%') && message.content.length >= 8) {
+  if (!message.content.startsWith(guildPrefix) && !message.content.startsWith('%') && message.content.length >= 8) {
     const data = require('../data.json');
 
     data.push(message.content.toLowerCase());
     return client.fs.writeFileSync('./data.json', JSON.stringify(data));
   }
 
-  if (!message.content.startsWith(prefix)) return;
+  if (!message.content.startsWith(guildPrefix)) return;
 
-  const args = message.content.slice(prefix.length).split(/ +/);
+  const args = message.content.slice(guildPrefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
   const command = client.commands.get(commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 
@@ -73,12 +75,12 @@ module.exports = async (client, message) => {
       .addField('You are missing one the following permissions:', command.permissions ? command.permissions.join(', ') : 'Bot Owner only')
     );
 
-    return permissionError.delete({ timeout: (await model.variables.findByPk('errorTimeout')).value });
+    return permissionError.delete({ timeout: (await guildVariables.findByPk('errorTimeout')).value });
   }
 
   async function error () {
     const usageMessage = await message.channel.send(usageEmbed);
-    return usageMessage.delete({ timeout: (await model.variables.findByPk('errorTimeout')).value });
+    return usageMessage.delete({ timeout: (await guildVariables.findByPk('errorTimeout')).value });
   }
 
   if (command.parameters) {
@@ -86,7 +88,7 @@ module.exports = async (client, message) => {
       .setColor(client.config.embedError)
       .setTitle(`Improper usage of ${commandName}`)
       .setDescription(command.description)
-      .addField('Proper usage', `${prefix}${command.name} `);
+      .addField('Proper usage', `${guildPrefix}${command.name} `);
 
     command.parameters.map(parameter => {
       const field = usageEmbed.fields[0];
@@ -128,7 +130,7 @@ module.exports = async (client, message) => {
           .setTimestamp()
         );
 
-        return coolDownError.delete({ timeout: (await model.variables.findByPk('errorTimeout')).value });
+        return coolDownError.delete({ timeout: (await guildVariables.findByPk('errorTimeout')).value });
       }
     }
 
@@ -140,11 +142,13 @@ module.exports = async (client, message) => {
   message.channel.startTyping();
 
   try {
-    console.log(`(${time}) (${message.guild.name} #${message.channel.name})`, message.author.tag, message.content);
+    console.log(`(${time})`.green + ` (${message.guild.name} #${message.channel.name})`.cyan, message.author.tag, message.content);
+
     command.execute(client, message, args);
   } catch (error) {
     console.error(error);
-    message.reply('An error has occurred running that command.');
+
+    message.reply('An error has occurred running that command. See console for more information.');
   }
 
   return message.channel.stopTyping();

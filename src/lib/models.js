@@ -1,4 +1,4 @@
-exports.createDatabase = async function createDatabase (client, guild) {
+exports.createDatabase = async (client, guild) => {
   const Sequelize = client.Sequelize;
   const guildName = guild.name;
 
@@ -109,4 +109,8 @@ exports.createDatabase = async function createDatabase (client, guild) {
   };
 
   return console.log(`Created database for ${guildName}`);
+};
+
+exports.destroyDatabase = (database) => {
+
 };
