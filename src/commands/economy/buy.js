@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'buy',
   description: 'Buy a shop item.',
   parameters: [
     {

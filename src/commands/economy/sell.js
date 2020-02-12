@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'sell',
   description: 'List items.',
   parameters: [
     {
@@ -16,6 +15,7 @@ module.exports = {
   async execute (client, message, args) {
     const memberData = await client.model.members.findByPk(message.author.id);
     const items = (await client.model.variables.findByPk('items')).value;
+
     const inventory = memberData.inventory;
     const currency = await client.config.currency;
 
@@ -38,6 +38,6 @@ module.exports = {
 
     memberData.update({ balance: balance, inventory: inventory });
 
-    return message.channel.send(`Successfully sold ${itemAmount} ${itemName}(s) for ${currency}${itemPrice}`);
+    return message.channel.send(`Successfully sold ${itemAmount} ${itemName}(s) for ${currency}${itemPrice.toFixed(2)}`);
   }
 };

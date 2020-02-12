@@ -1,8 +1,5 @@
 module.exports = {
-  name: 'shutdown',
-  category: 'Administrator',
   description: 'Shutdowns the bot.',
-  botOwner: true,
   parameters: [
     {
       name: 'seconds',
@@ -25,6 +22,7 @@ module.exports = {
       await message.channel.send('Shutting down.');
 
       client.destroy();
+      process.exit();
     }
   }
 };

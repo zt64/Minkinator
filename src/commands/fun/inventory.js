@@ -14,7 +14,7 @@ module.exports = {
     const inventory = (await client.model.members.findByPk(user.id)).inventory;
 
     const inventoryEmbed = new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setTitle(`Inventory of ${member.displayName}`);
 
     inventory.map(item => {

@@ -15,15 +15,16 @@ module.exports = {
     const guess = Math.floor(args[0]);
 
     const value = Math.round(Math.random() * 100);
-    const earn = value !== guess ? Number(50 / Math.abs(value - guess) * 4).toFixed(2) : 1000;
+    const earn = value === guess ? 1000 : (50 / Math.abs(value - guess) * 4).toFixed(2);
 
-    await member.update({ balance: member.balance + earn });
+    const newBalance = (member.balance + parseFloat(earn)).toFixed(2);
+
+    await member.update({ balance: newBalance });
 
     return message.channel.send(new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setTitle('Number Guessing Game')
-      .setDescription(`You guessed ${guess}, and the number was ${value}. \n Earning you ${currency}${earn} puts your balance at ${currency}${member.balance.toLocaleString()}`)
-      .setFooter(message.author.id)
-      .setTimestamp());
+      .setDescription(`You guessed ${guess}, and the number was ${value}. \n Earning you ${currency}${earn} puts your balance at ${currency}${newBalance}`)
+    );
   }
 };

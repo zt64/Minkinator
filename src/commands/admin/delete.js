@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'create',
   description: 'Create a new variable',
   permissions: ['ADMINISTRATOR'],
   parameters: [

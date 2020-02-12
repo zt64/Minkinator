@@ -13,7 +13,7 @@ module.exports = {
     const user = message.mentions.users.first() || message.author;
 
     return message.channel.send(new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setTitle(`Avatar of ${user.tag}`)
       .setURL(user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))
       .setImage(user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))

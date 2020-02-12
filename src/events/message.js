@@ -1,14 +1,19 @@
 module.exports = async (client, message) => {
+  if (message.channel.type === 'dm') {
+    if (message.author.bot) return;
+    return message.channel.send('Commands cannot be run inside DMs.');
+  }
+
   const guildDatabase = await client.models[message.guild.name];
   const guildSettings = guildDatabase.settings;
 
   if (message.author.bot) return;
-  if (message.channel.type === 'dm') return message.channel.send('Commands cannot be run inside DMs.');
 
   const guildVariables = guildDatabase.variables;
   const guildMembers = guildDatabase.members;
 
   const time = client.moment().format('HH:mm M/D/Y');
+
   const guildPrefix = (await guildVariables.findByPk('prefix')).value;
   const memberData = await guildMembers.findByPk(message.author.id);
 
@@ -30,7 +35,7 @@ module.exports = async (client, message) => {
     memberData.increment('level', { by: 1 });
 
     const levelUpEmbed = new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setTitle(`${message.author.username} has levelled up!`)
       .setTimestamp();
 
@@ -54,10 +59,11 @@ module.exports = async (client, message) => {
   }
 
   if (!message.content.startsWith(guildPrefix) && !message.content.startsWith('%') && message.content.length >= 8) {
-    const data = require('../data.json');
+    const data = JSON.parse(client.fs.readFileSync('./data/data.json'));
 
     data.push(message.content.toLowerCase());
-    return client.fs.writeFileSync('./data.json', JSON.stringify(data));
+
+    return client.fs.writeFileSync('./data/data.json', JSON.stringify(data));
   }
 
   if (!message.content.startsWith(guildPrefix)) return;
@@ -68,9 +74,9 @@ module.exports = async (client, message) => {
 
   if (!command) return;
 
-  if (((command.botOwner && message.author.id !== client.config.botOwner) && (command.permissions && !message.member.hasPermission(command.permissions))) || (command.botOwner && message.author.id !== client.config.botOwner)) {
+  if ((command.permissions && !message.member.hasPermission(command.permissions)) || (command.ownerOnly && message.author.id !== client.config.ownerID)) {
     const permissionError = await message.channel.send(new client.discord.MessageEmbed()
-      .setColor(client.config.embedError)
+      .setColor(client.config.embed.error)
       .setTitle('Missing Permissions')
       .addField('You are missing one the following permissions:', command.permissions ? command.permissions.join(', ') : 'Bot Owner only')
     );
@@ -85,7 +91,7 @@ module.exports = async (client, message) => {
 
   if (command.parameters) {
     var usageEmbed = new client.discord.MessageEmbed()
-      .setColor(client.config.embedError)
+      .setColor(client.config.embed.error)
       .setTitle(`Improper usage of ${commandName}`)
       .setDescription(command.description)
       .addField('Proper usage', `${guildPrefix}${command.name} `);
@@ -112,7 +118,7 @@ module.exports = async (client, message) => {
 
   if (!client.coolDowns.has(command.name)) client.coolDowns.set(command.name, new client.discord.Collection());
 
-  if (message.author.id !== client.config.botOwner || !message.guild.member(message.author).hasPermission('ADMINISTRATOR')) {
+  if (message.author.id !== client.config.ownerID || !message.guild.member(message.author).hasPermission('ADMINISTRATOR')) {
     const now = Date.now();
     const timestamps = client.coolDowns.get(command.name);
     const coolDownAmount = (command.coolDown || 3) * 1000;
@@ -124,7 +130,7 @@ module.exports = async (client, message) => {
         const timeLeft = (expirationTime - now) / 1000;
 
         const coolDownError = await message.channel.send(new client.discord.MessageEmbed()
-          .setColor(client.config.embedError)
+          .setColor(client.config.embed.error)
           .setTitle('Cooldown active')
           .setDescription(`Please wait, a cool down of ${timeLeft.toFixed(1)} second(s) is remaining.`)
           .setTimestamp()

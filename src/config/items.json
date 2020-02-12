@@ -1,11 +1,22 @@
-{
-  "gold": {
-    "price": 260
+[
+  {
+    "name": "bread",
+    "price": "5"
   },
-  "bread": {
-    "price": 30
+  {
+    "name": "bone",
+    "price": "200"
   },
-  "souls": {
-    "price": 666
+  {
+    "name": "skin",
+    "price": "350"
+  },
+  {
+    "name": "muscle",
+    "price": "350"
+  },
+  {
+    "name": "liver",
+    "price": "700"
   }
-}
+]

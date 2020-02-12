@@ -15,7 +15,7 @@ module.exports = {
     const memberData = await client.model.members.findByPk(user.id);
 
     return message.channel.send(new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setAuthor(`Statistics for ${member.nickname || user.tag}`, user.avatarURL())
       .addField('Balance:', `${client.config.currency}${memberData.balance.toFixed(2).toLocaleString()}`, true)
       .addField('Level:', memberData.level.toLocaleString(), true)
@@ -23,8 +23,6 @@ module.exports = {
       .addField('Total messages:', memberData.messages.toLocaleString(), true)
       .addField('Joined:', member.joinedAt.toLocaleDateString(), true)
       .addField('Created:', user.createdAt.toLocaleDateString(), true)
-      .addField('Status:', member.presence.status, true)
-      .setFooter(`${memberData.id}`)
-      .setTimestamp());
+    );
   }
 };

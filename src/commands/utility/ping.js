@@ -20,7 +20,7 @@ module.exports = {
     const gateway = ws.gateway;
 
     return m.edit(new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setTitle('Ping')
       .addField('API Ping:', `\`\`${apiPing}ms\`\``, true)
       .addField('Response Time:', `\`\`${pms(Number(end - now) / 1000000, { formatSubMilliseconds: true })}\`\``, true)

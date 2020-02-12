@@ -15,14 +15,22 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const activityType = args[0];
+    const config = client.config;
+
+    const activityType = args[0].toUpperCase();
     const activityName = args.slice(1).join(' ');
 
-    client.config.activityType = activityType;
-    client.config.activityName = activityName;
+    config.activity.type = activityType;
+    config.activity.name = activityName;
 
-    await client.user.setActivity(activityName, { type: activityType.toUpperCase() });
+    client.fs.writeFileSync('./config/config.json', JSON.stringify(config, null, 2));
 
-    return message.channel.send(`Set status to \`${args.join(' ')}\`.`);
+    await client.user.setActivity(activityName, { type: activityType });
+
+    return message.channel.send(new client.discord.MessageEmbed()
+      .setTitle('Succesfully changed status')
+      .setColor(client.config.embed.color)
+      .setDescription(`Set status to \`${activityType.toLowerCase()} ${activityName}\`.`)
+    );
   }
 };

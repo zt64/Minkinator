@@ -1,6 +1,4 @@
 module.exports = {
-  name: 'reset',
-  category: 'Administrator',
   description: 'Resets a members data.',
   permissions: ['ADMINISTRATOR'],
   aliases: ['demolish', 'destroy', 'obliterate', 'disintegrate'],

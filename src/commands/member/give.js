@@ -27,7 +27,7 @@ module.exports = {
 
       return message.channel.send(new client.discord.MessageEmbed()
         .setTitle('Payment Transaction')
-        .setColor(client.config.embedColor)
+        .setColor(client.config.embed.color)
         .setDescription(`${message.author} has sent ${client.config.currency}${args[1]} to ${message.mentions.members.first()}`)
         .addField(`${message.author.username}'s new balance:`, `${client.config.currency}${member.balance}`, true)
         .addField(`${message.mentions.members.first().user.username}'s new balance:`, `${client.config.currency}${target.balance}`, true)

@@ -9,10 +9,15 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const prefix = await client.model.variables.findByPk('prefix');
+    const prefixVariable = await client.model.variables.findByPk('prefix');
+    const prefix = args[0];
 
-    await prefix.update({ value: args[0] });
+    await prefixVariable.update({ value: prefix });
 
-    return message.channel.send(`Set guild prefix to \`${args[0]}\`.`);
+    return message.channel.send(new client.discord.MessageEmbed()
+      .setTitle('Succesfully changed prefix')
+      .setColor(client.config.embed.color)
+      .setDescription(`Set guild prefix to \`${prefix}\`.`)
+    );
   }
 };

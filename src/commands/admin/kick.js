@@ -1,6 +1,4 @@
 module.exports = {
-  name: 'kick',
-  category: 'Administrator',
   description: 'Kicks a member.',
   usage: '[member] <reason>',
   permissions: ['KICK_MEMBERS'],
@@ -24,7 +22,7 @@ module.exports = {
     message.guild.member(member).kick();
 
     return message.channel.send(new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setTitle(`${member.user.tag} has been kicked`)
       .setDescription(args[2] ? reason : 'No reason provided.')
       .setTimestamp());

@@ -6,7 +6,7 @@ module.exports = {
     const os = require('os');
 
     return message.channel.send(new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setTitle('OS Information')
       .addField('Platform', os.platform(), true)
       .addField('Architecture', os.arch(), true)

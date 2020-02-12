@@ -20,7 +20,7 @@ module.exports = {
     const question = (await (await client.fetch(`https://opentdb.com/api.php?amount=1&token=${token}`)).json()).results[0];
 
     const questionEmbed = new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setTitle(`${question.category} question`)
       .setDescription(question.question);
 
@@ -48,7 +48,7 @@ module.exports = {
 
     await setTimeout(() => {
       message.channel.send(new client.discord.MessageEmbed()
-        .setColor(client.config.embedColor)
+        .setColor(client.config.embed.color)
         .setTitle('Trivia Answer')
         .setDescription(`The correct answer was ${answer}, \n Good job`)
       );

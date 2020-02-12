@@ -5,7 +5,7 @@ module.exports = async (client, member) => {
     channel.send(new client.discord.MessageEmbed()
       .setAuthor(`${member.user.tag} (${member.id})`, member.user.avatarURL())
       .setFooter('User joined')
-      .setColor(client.models[member.guild.name].variables.findByPk('embedColor').value)
+      .setColor(client.config.embed.color)
       .setTimestamp());
   }
 

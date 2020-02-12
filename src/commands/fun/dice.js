@@ -5,7 +5,7 @@ module.exports = {
     const result = client.functions.randomInteger(1, 6);
 
     const diceEmbed = new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setTitle('Dice roll')
       .setDescription('Rolling...')
       .setTimestamp();

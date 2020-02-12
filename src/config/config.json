@@ -1,9 +1,14 @@
 {
-  "botOwner": "289556910426816513",
+  "token": "NjAyMjkzNTc3NTk0NDM3NjUy.XjzB-g.0t2RPLc5lkccHQzJLKY0Slv35Do",
+  "ownerID": "289556910426816513",
   "currency": "₼",
-  "embedColor" : "#1ED760",
-  "embedError" : "#FF0000",
   "errorTimeout": 5000,
-  "activityType": "WATCHING",
-  "activityName": "members | !help"
+  "activity": {
+    "type": "PLAYING",
+    "name": "with nukes"
+  },
+  "embed": {
+    "color": "#1ED760",
+    "error": "#FF0000"
+  }
 }

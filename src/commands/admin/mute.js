@@ -1,6 +1,4 @@
 module.exports = {
-  name: 'mute',
-  category: 'Administrator',
   description: 'Mutes a member.',
   permissions: ['MANAGE_CHANNELS'],
   parameters: [
@@ -23,10 +21,10 @@ module.exports = {
 
     const member = message.mentions.members.first();
 
-    await member.roles.add('625385600081592321');
+    await member.roles.add('671902495726895127');
 
     message.channel.send(new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setAuthor(`${member.user.tag} has been muted${args[1] ? ` for ${args[1]} minute(s)` : ''}.`, member.user.avatarURL())
       .setDescription(args[2] ? args.slice(2).join(' ') : 'No reason provided.')
       .setFooter(member.id)
@@ -36,7 +34,7 @@ module.exports = {
       setTimeout(() => {
         member.removeRole('625385600081592321');
         return message.channel.send(new client.discord.MessageEmbed()
-          .setColor(client.config.embedColor)
+          .setColor(client.config.embed.color)
           .setAuthor(`${member.user.tag} has been unmuted`, member.user.avatarURL)
           .setFooter(member.id)
           .setTimestamp());

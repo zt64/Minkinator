@@ -26,7 +26,7 @@ module.exports = {
     member.ban({ reason: reason });
 
     message.channel.send(new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setAuthor(`${member.user.tag} has been banned${args[1] ? ` for ${args[1]} minute(s)` : ''}.`, member.user.avatarURL())
       .setDescription(args[2] ? reason : 'No reason provided.')
       .setFooter(member.id)
@@ -36,7 +36,7 @@ module.exports = {
       setTimeout(() => {
         message.guild.unban(member.user);
         return message.channel.send(new client.discord.MessageEmbed()
-          .setColor(client.config.embedColor)
+          .setColor(client.config.embed.color)
           .setAuthor(`${member.user.tag} has been unbanned`, member.user.avatarURL())
           .setFooter(member.id)
           .setTimestamp());

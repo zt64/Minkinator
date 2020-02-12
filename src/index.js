@@ -1,6 +1,5 @@
 
 const functions = require('./lib/functions.js');
-const { token } = require('./config/token.json');
 const config = require('./config/config.json');
 const models = require('./lib/models.js');
 
@@ -14,7 +13,7 @@ const colors = require('colors');
 const qr = require('qrcode');
 const fs = require('fs');
 
-const client = new discord.Client();
+const client = new discord.Client({ fetchAllMembers: true });
 
 client.coolDowns = new discord.Collection();
 client.commands = new discord.Collection();
@@ -64,6 +63,8 @@ client.loadCommands = function loadCommands () {
 
       command.name = commandName;
       command.category = category;
+
+      if (category === 'owner') command.ownerOnly = true;
     });
   });
   console.log(`Successfully loaded ${client.commands.size} commands.`);
@@ -84,4 +85,4 @@ process.stdin.on('data', async data => {
   }
 });
 
-client.login(token);
+client.login(config.token);

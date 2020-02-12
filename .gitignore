@@ -1,5 +1,5 @@
 node_modules
-databases
+data
 token.json
 data.json
 .eslintrc.js

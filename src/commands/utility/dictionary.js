@@ -6,7 +6,7 @@ module.exports = {
     const dictionary = (await client.fetch(`https://api.urbandictionary.com/v0/define?term=${args[0]}`)).json();
 
     return message.channel.send(client.discord.messageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setTitle('Dictionary')
       .setDescription()
     );

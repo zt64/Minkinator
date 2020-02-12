@@ -1,12 +1,11 @@
 module.exports = {
-  name: 'help',
   description: 'Displays information about a specific command.',
   aliases: ['commands', 'father-i-need-help'],
   usage: '<command name>',
   async execute (client, message, args) {
     const prefix = (await client.model.variables.findByPk('prefix')).value;
     const embed = new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor);
+      .setColor(client.config.embed.color);
 
     if (!args.length) {
       embed.setTitle('You have summoned I, the Minkinator. What shall I do today?');
@@ -27,7 +26,7 @@ module.exports = {
 
     if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
       return message.channel.send(new client.discord.MessageEmbed()
-        .setColor(client.config.embedColor)
+        .setColor(client.config.embed.color)
         .setTitle('Invalid Command')
         .setDescription(`\`\`${name}\`\` is not a valid command.`));
     }

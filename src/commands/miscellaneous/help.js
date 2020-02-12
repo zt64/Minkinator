@@ -1,7 +1,7 @@
 module.exports = {
   name: 'help',
   description: 'Displays information about a specific command.',
-  aliases: ['commands', 'father-i-need-help'],
+  aliases: ['commands'],
   parameters: [
     {
       name: 'command name',
@@ -17,19 +17,17 @@ module.exports = {
 
       if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
         return message.channel.send(new client.discord.MessageEmbed()
-          .setColor(client.config.embedColor)
+          .setColor(client.config.embed.color)
           .setTitle('Invalid Command')
-          .setDescription(`\`\`${commandName}\`\` is not a valid command.`))
-          .setTimestamp();
+          .setDescription(`\`\`${commandName}\`\` is not a valid command.`));
       }
 
       const helpEmbed = new client.discord.MessageEmbed()
-        .setColor(client.config.embedColor)
+        .setColor(client.config.embed.color)
         .addField('Command:', command.name)
         .addField('Description:', command.description)
         .addField('Cool down:', `${command.coolDown || 3} second(s)`, true)
         .addField('Permissions:', command.permissions ? command.permissions.join(', ') : 'Everyone', true)
-        .setTimestamp();
 
       if (command.aliases) helpEmbed.addField('Aliases:', command.aliases.join(', '), true);
       if (command.usage) helpEmbed.addField('Usage:', command.usage, true);
@@ -38,9 +36,9 @@ module.exports = {
     }
 
     const helpEmbed = new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setTitle('Home page')
-      .setDescription('There is a total of 5 command categories ')
+      .setDescription(`There is a total of 5 command categories. For information on a specific command, run: \`${prefix}help <command>\``)
       .addField('Fun', 'Fun commands to play around with.')
       .addField('Utility', 'Tools for the more technical.')
       .addField('Admin', 'Take control of a guild.')
@@ -128,7 +126,7 @@ module.exports = {
 
           helpEmbed.fields = [];
 
-          populate('canas');
+          populate('canvas');
 
           helpMessage.reactions.removeAll();
 

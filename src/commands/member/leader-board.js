@@ -24,7 +24,7 @@ module.exports = {
 
     let page = 1;
 
-    leaderBoardEmbed.setColor(client.config.embedColor);
+    leaderBoardEmbed.setColor(client.config.embed.color);
     leaderBoardEmbed.setTitle(`Member ${args[0]} leader board`);
     leaderBoardEmbed.setFooter(`Page ${nonIndexedPage} of ${pages}`);
     leaderBoardEmbed.setTimestamp();

@@ -21,7 +21,7 @@ module.exports = {
     message.guild.unban(member.user);
 
     return message.channel.send(new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setAuthor(`${member.user.tag} has been unbanned`, member.user.avatarURL)
       .setFooter(member.id)
       .setTimestamp());

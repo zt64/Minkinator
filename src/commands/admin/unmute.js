@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'unmute',
   category: 'Administrator',
   description: 'Revokes a members mute.',
   permissions: ['MANAGE_CHANNELS'],
@@ -18,10 +17,10 @@ module.exports = {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
     const member = message.mentions.members.first();
 
-    member.roles.remove('625385600081592321');
+    member.roles.remove('671902495726895127');
 
     return message.channel.send(new client.discord.MessageEmbed()
-      .setColor(client.config.embedColor)
+      .setColor(client.config.embed.color)
       .setAuthor(`${member.user.tag} has been unmuted`, member.user.avatarURL())
       .setFooter(member.id)
       .setTimestamp());
