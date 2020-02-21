@@ -30,7 +30,7 @@ client.qr = qr;
 client.fs = fs;
 
 client.functions = functions;
-client.models = models;
+client.databases = models;
 client.config = config;
 
 client.loadEvents = function loadEvents () {
@@ -73,9 +73,7 @@ client.loadCommands = function loadCommands () {
 client.loadEvents();
 client.loadCommands();
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.log('Unhandled Rejection at:', promise);
-});
+process.on('unhandledRejection', error => console.error('Unhandled Promise Rejection at:', error));
 
 process.stdin.on('data', async data => {
   try {

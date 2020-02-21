@@ -1,14 +1,23 @@
 module.exports = {
-  name: 'dictionary',
   description: 'Get the definition for a word.',
   aliases: ['dict', 'define', 'def'],
   async execute (client, message, args) {
-    const dictionary = (await client.fetch(`https://api.urbandictionary.com/v0/define?term=${args[0]}`)).json();
+    const fetch = client.fetch;
+    const querystring = require('querystring');
+    const query = querystring.stringify({ term: args.join(' ') });
 
-    return message.channel.send(client.discord.messageEmbed()
+    const { list } = await fetch(`https://api.urbandictionary.com/v0/define?${query}`).then(response => response.json());
+
+    const [answer] = list;
+
+    if (!list.length) return message.channel.send(`No results for \`${args.join(' ')}\``);
+
+    return message.channel.send(new client.discord.MessageEmbed()
       .setColor(client.config.embed.color)
-      .setTitle('Dictionary')
-      .setDescription()
+      .setTitle(`Definition of ${answer.word}`)
+      .setURL(answer.permalink)
+      .addField('Definition:', answer.definition)
+      .addField('Example:', answer.example)
     );
   }
 };

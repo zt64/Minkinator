@@ -1,7 +1,6 @@
 module.exports = {
-  name: 'swarm',
   description: 'Sends a message using a swarm.',
-  permissions: ['MANAGE_WEBHOOKS'],
+  permissions: ['MANAGED_WEBHOOKS'],
   parameters: [
     {
       name: 'amount',
@@ -15,22 +14,28 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const webhooks = {};
+    const webHooks = {};
 
     if (isNaN(args[0]) || args[0] < 1 || args[0] > 10) return message.channel.send('Enter a number between 1 and 10');
 
+    // Create web hooks
+
     for (let i = 0; i < args[0]; i++) {
-      webhooks[i] = await message.channel.createWebhook(`Minker ${i + 1}`, {
+      webHooks[i] = await message.channel.createWebhook(`Minker ${i + 1}`, {
         avatar: client.user.avatarURL()
       });
     }
 
-    for (let i = 0; i < args[0]; i++) {
-      await webhooks[i].send(args.slice(1).join(' '));
-    }
+    // Send message
 
     for (let i = 0; i < args[0]; i++) {
-      webhooks[i].delete();
+      await webHooks[i].send(args.slice(1).join(' '));
+    }
+
+    // Delete web hooks
+
+    for (let i = 0; i < args[0]; i++) {
+      webHooks[i].delete();
     }
   }
 };

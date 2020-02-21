@@ -1,6 +1,4 @@
 module.exports = {
-  name: 'set',
-  category: 'Administrator',
   description: 'Manipulate guild database properties.',
   permissions: ['ADMINISTRATOR'],
   parameters: [
@@ -11,7 +9,7 @@ module.exports = {
     },
     {
       name: 'object',
-      type: String,
+      // type: String,
       required: true
     },
     {
@@ -20,13 +18,13 @@ module.exports = {
       required: true
     },
     {
-      name: 'value',
-      type: String
+      name: 'value'
+      // type: String
     }
   ],
   async execute (client, message, args) {
     try {
-      var model = client.model.sequelize.model(args[0]);
+      var model = client.database.sequelize.model(args[0]);
     } catch (e) {
       return message.channel.send(`Model: ${args[0]}, does not exist.`);
     }

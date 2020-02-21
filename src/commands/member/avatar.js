@@ -1,7 +1,5 @@
-
 module.exports = {
-  name: 'avatar',
-  descriptions: 'Displays a users avatar.',
+  description: 'Displays a users avatar.',
   parameters: [
     {
       name: 'member',

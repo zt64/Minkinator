@@ -11,14 +11,14 @@ module.exports = {
   async execute (client, message, args) {
     const user = message.mentions.users.first() || message.author;
     const member = message.guild.member(user);
-    const inventory = (await client.model.members.findByPk(user.id)).inventory;
+    const inventory = (await client.database.members.findByPk(user.id)).inventory;
 
     const inventoryEmbed = new client.discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle(`Inventory of ${member.displayName}`);
 
     inventory.map(item => {
-      inventoryEmbed.addField(item.name, item.amount);
+      inventoryEmbed.addField(item.name, item.amount, true);
     });
 
     return message.channel.send(inventoryEmbed);

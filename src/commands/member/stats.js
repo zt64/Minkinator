@@ -1,7 +1,6 @@
 module.exports = {
-  name: 'stats',
   description: 'Displays a members statistics.',
-  aliases: ['bal', 'balance', 'statistics', 'userinfo', 'level', 'lvl'],
+  aliases: ['bal', 'balance', 'statistics', 'user-info', 'level', 'lvl'],
   parameters: [
     {
       name: 'member',
@@ -12,7 +11,7 @@ module.exports = {
     const user = message.mentions.users.first() || message.author;
     const member = message.guild.member(user);
 
-    const memberData = await client.model.members.findByPk(user.id);
+    const memberData = await client.database.members.findByPk(user.id);
 
     return message.channel.send(new client.discord.MessageEmbed()
       .setColor(client.config.embed.color)

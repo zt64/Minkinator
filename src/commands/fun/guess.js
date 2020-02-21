@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'guess',
   description: 'Guess a number 1 - 100 to earn a reward.',
   parameters: [
     {
@@ -10,7 +9,7 @@ module.exports = {
   ],
   coolDown: '120',
   async execute (client, message, args) {
-    const member = await client.model.members.findByPk(message.author.id);
+    const member = await client.database.members.findByPk(message.author.id);
     const currency = client.config.currency;
     const guess = Math.floor(args[0]);
 

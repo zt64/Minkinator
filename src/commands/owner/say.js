@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'say',
   description: 'Says a string of text.',
   aliases: ['repeat'],
   parameters: [

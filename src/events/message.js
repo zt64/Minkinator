@@ -1,35 +1,37 @@
 module.exports = async (client, message) => {
+  const time = client.moment().format('HH:mm M/D/Y');
+
   if (message.channel.type === 'dm') {
     if (message.author.bot) return;
+
     return message.channel.send('Commands cannot be run inside DMs.');
   }
 
-  const guildDatabase = await client.models[message.guild.name];
-  const guildSettings = guildDatabase.settings;
-
-  if (message.author.bot) return;
+  const guildDatabase = await client.databases[message.guild.name];
 
   const guildVariables = guildDatabase.variables;
   const guildMembers = guildDatabase.members;
 
-  const time = client.moment().format('HH:mm M/D/Y');
+  const guildConfig = (await guildVariables.findByPk('configuration')).value;
+
+  if (guildConfig.ignoreBots && message.author.bot) return;
+
+  const errorTimeout = (await guildVariables.findByPk('errorTimeout')).value;
 
   const guildPrefix = (await guildVariables.findByPk('prefix')).value;
   const memberData = await guildMembers.findByPk(message.author.id);
 
+  const memberConfig = memberData.configuration;
   const level = memberData.level;
-
-  client.model = guildDatabase;
 
   const xpTotal = Math.round(Math.random() * level) + memberData.xp;
   const xpRequired = 15 * level * (level + 1);
 
-  const lastMessage = message.content;
-  const lastAuthor = message.author;
-
-  let index = 0;
-
   memberData.update({ xp: xpTotal, messages: memberData.messages + 1 });
+
+  client.database = guildDatabase;
+
+  // Check if message author can level up
 
   if (xpTotal >= xpRequired) {
     memberData.increment('level', { by: 1 });
@@ -39,24 +41,22 @@ module.exports = async (client, message) => {
       .setTitle(`${message.author.username} has levelled up!`)
       .setTimestamp();
 
-    if (level % 5 === 0) {
-      memberData.increment('balance', { by: 500 });
+    if (guildConfig.levelUpMention && memberConfig.levelUpMention) { 
+      if (!(level % 5)) {
+        memberData.increment('balance', { by: 500 });
 
-      levelUpEmbed.setDescription(`${message.author} is now level ${level + 1} and earned ${client.config.currency}500 as a reward!`);
-      // message.channel.send(levelUpEmbed);
-    } else {
-      levelUpEmbed.setDescription(`${message.author} is now level ${level + 1}.`);
-      // message.channel.send(levelUpEmbed);
+        levelUpEmbed.setDescription(`${message.author} is now level ${level + 1} and earned ${client.config.currency}500 as a reward!`);
+        
+        message.channel.send(levelUpEmbed);
+      } else {
+        levelUpEmbed.setDescription(`${message.author} is now level ${level + 1}.`);
+        
+        message.channel.send(levelUpEmbed);
+      }
     }
   }
 
-  if (message.content === lastMessage && lastAuthor !== message.author) {
-    index++;
-    if (index >= 3) {
-      message.channel.send(message.content);
-      index = 0;
-    }
-  }
+  // Write message to data.json
 
   if (!message.content.startsWith(guildPrefix) && !message.content.startsWith('%') && message.content.length >= 8) {
     const data = JSON.parse(client.fs.readFileSync('./data/data.json'));
@@ -68,57 +68,31 @@ module.exports = async (client, message) => {
 
   if (!message.content.startsWith(guildPrefix)) return;
 
+  // Check if command exists
+
   const args = message.content.slice(guildPrefix.length).split(/ +/);
   const commandName = args.shift().toLowerCase();
   const command = client.commands.get(commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 
   if (!command) return;
 
-  if ((command.permissions && !message.member.hasPermission(command.permissions)) || (command.ownerOnly && message.author.id !== client.config.ownerID)) {
-    const permissionError = await message.channel.send(new client.discord.MessageEmbed()
-      .setColor(client.config.embed.error)
-      .setTitle('Missing Permissions')
-      .addField('You are missing one the following permissions:', command.permissions ? command.permissions.join(', ') : 'Bot Owner only')
-    );
+  if (message.author.id !== client.config.ownerID) {
+    // Check if message author has permission
 
-    return permissionError.delete({ timeout: (await guildVariables.findByPk('errorTimeout')).value });
-  }
+    if (command.ownerOnly || (!message.member.hasPermission(command.permissions))) {
+      const permissionError = await message.channel.send(new client.discord.MessageEmbed()
+        .setColor(client.config.embed.error)
+        .setTitle('Missing Permissions')
+        .addField('You are missing one of the following permissions:', command.permissions ? command.permissions.join(', ') : 'Bot owner only')
+      );
 
-  async function error () {
-    const usageMessage = await message.channel.send(usageEmbed);
-    return usageMessage.delete({ timeout: (await guildVariables.findByPk('errorTimeout')).value });
-  }
+      return permissionError.delete({ timeout: errorTimeout });
+    }
 
-  if (command.parameters) {
-    var usageEmbed = new client.discord.MessageEmbed()
-      .setColor(client.config.embed.error)
-      .setTitle(`Improper usage of ${commandName}`)
-      .setDescription(command.description)
-      .addField('Proper usage', `${guildPrefix}${command.name} `);
+    if (!client.coolDowns.has(command.name)) client.coolDowns.set(command.name, new client.discord.Collection());
 
-    command.parameters.map(parameter => {
-      const field = usageEmbed.fields[0];
+    // Check if command cool down exists
 
-      parameter.required ? field.value += `[${parameter.name}] ` : field.value += `<${parameter.name}> `;
-    });
-
-    for (const parameter of command.parameters) {
-      const i = command.parameters.indexOf(parameter);
-
-      if (!parameter.required) continue;
-      if (!args[i]) return error();
-
-      try {
-        if (JSON.parse(args[i]).constructor !== parameter.type) return error();
-      } catch (e) {
-        if (parameter.type !== String) return error();
-      }
-    };
-  };
-
-  if (!client.coolDowns.has(command.name)) client.coolDowns.set(command.name, new client.discord.Collection());
-
-  if (message.author.id !== client.config.ownerID || !message.guild.member(message.author).hasPermission('ADMINISTRATOR')) {
     const now = Date.now();
     const timestamps = client.coolDowns.get(command.name);
     const coolDownAmount = (command.coolDown || 3) * 1000;
@@ -131,9 +105,8 @@ module.exports = async (client, message) => {
 
         const coolDownError = await message.channel.send(new client.discord.MessageEmbed()
           .setColor(client.config.embed.error)
-          .setTitle('Cooldown active')
+          .setTitle('Cool down active')
           .setDescription(`Please wait, a cool down of ${timeLeft.toFixed(1)} second(s) is remaining.`)
-          .setTimestamp()
         );
 
         return coolDownError.delete({ timeout: (await guildVariables.findByPk('errorTimeout')).value });
@@ -145,16 +118,59 @@ module.exports = async (client, message) => {
     setTimeout(() => timestamps.delete(message.author.id), coolDownAmount);
   }
 
+  // Check if parameters are correct
+
+  if (command.parameters) {
+    var usageEmbed = new client.discord.MessageEmbed()
+      .setColor(client.config.embed.error)
+      .setTitle(`Improper usage of ${commandName}`)
+      .setDescription(command.description)
+      .addField('Proper usage', `${guildPrefix}${command.name} `);
+
+    for (const parameter of command.parameters) {
+      const i = command.parameters.indexOf(parameter);
+
+      if (!parameter.required) continue;
+      if (!parameter.type) continue;
+      if (!args[i]) return error();
+
+      try {
+        if (JSON.parse(args[i]).constructor !== parameter.type) return error();
+      } catch (e) {
+        if (parameter.type !== String) return error();
+      }
+    };
+  };
+
+  async function error () {
+    command.parameters.map(parameter => {
+      const field = usageEmbed.fields[0];
+
+      parameter.required ? field.value += `[${parameter.name}] ` : field.value += `<${parameter.name}> `;
+    });
+
+    const usageMessage = await message.channel.send(usageEmbed);
+
+    return usageMessage.delete({ timeout: errorTimeout });
+  }
+
+  // Execute the command
+
   message.channel.startTyping();
 
   try {
     console.log(`(${time})`.green + ` (${message.guild.name} #${message.channel.name})`.cyan, message.author.tag, message.content);
 
-    command.execute(client, message, args);
+    await command.execute(client, message, args);
   } catch (error) {
     console.error(error);
 
-    message.reply('An error has occurred running that command. See console for more information.');
+    message.channel.send(new client.discord.MessageEmbed()
+      .setColor(client.config.embed.error)
+      .setTitle('Command Execution Error')
+      .setDescription(`\`\`\`${error}\`\`\``)
+      .setFooter('See console for more information')
+    )
   }
 
   return message.channel.stopTyping();

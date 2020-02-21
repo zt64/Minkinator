@@ -1,5 +1,5 @@
 module.exports = async (client, member) => {
-  const channel = member.guild.channels.find(channel => channel.name.includes('member-log'));
+  const channel = member.guild.channels.cache.find(channel => channel.name.includes('member-log'));
 
   if (channel) {
     channel.send(new client.discord.MessageEmbed()
@@ -11,5 +11,5 @@ module.exports = async (client, member) => {
 
   console.log(`${member.user.tag} has joined ${member.guild.name}.`);
 
-  await client.models[member.guild.name].members.create({ name: member.user.tag, id: member.id });
+  await client.databases[member.guild.name].members.create({ name: member.user.tag, id: member.id });
 };

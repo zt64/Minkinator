@@ -9,7 +9,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const variables = await client.model.variables;
+    const variables = await client.database.variables;
 
     const variableName = args[0];
 

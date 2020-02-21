@@ -1,19 +1,16 @@
 module.exports = async (client) => {
-  for (const guild of client.guilds.array()) {
-    var database = await client.models.createDatabase(client, guild);
+  for (const guild of client.guilds.cache.array()) {
+    const database = await client.databases.create(client, guild);
 
-    client.models.populateDatabase(client, guild, database);
+    await client.databases.populate(client, guild, database);
 
-    client.models[guild.name] = {};
+    client.databases[guild.name] = database;
 
-    client.models[guild.name].sequelize = database.sequelize;
-    client.models[guild.name].members = database.members;
-    client.models[guild.name].variables = database.variables;
-
-    console.log(`Initialized database for ${guild.name}.`);
+    console.log(`Initialized database for ${guild.name} (${guild.id}).`);
   };
 
   client.user.setActivity(client.config.activity.name, { type: client.config.activity.type });
+
   // client.user.setActivity(`${client.users.size} users | !help`, { type: 'WATCHING' });
 
   return console.log('Minkinator is now online.');

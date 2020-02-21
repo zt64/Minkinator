@@ -1,5 +1,5 @@
 module.exports = {
-  name: 'canvas',
+  description: 'Chaos.',
   parameters: [
     {
       name: 'url',

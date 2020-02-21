@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'leader-board',
   description: 'Leader board for user stats',
   aliases: ['lb'],
   parameters: [
@@ -14,10 +13,13 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const members = await client.model.members.findAll({ order: [[args[0], 'DESC']] });
+    const stat = args[0];
+
+    if (!(stat in client.database.members.rawAttributes)) return message.channel.send(`${stat} is not a statistic.`);
+
+    const members = await client.database.members.findAll({ order: [[stat, 'DESC']] });
     const leaderBoardEmbed = new client.discord.MessageEmbed();
     const pages = Math.ceil(members.length / 10);
-    const stat = args[0];
 
     const indexedPage = args[1] - 1 || 0;
     const nonIndexedPage = args[1] || 1;
@@ -27,13 +29,11 @@ module.exports = {
     leaderBoardEmbed.setColor(client.config.embed.color);
     leaderBoardEmbed.setTitle(`Member ${args[0]} leader board`);
     leaderBoardEmbed.setFooter(`Page ${nonIndexedPage} of ${pages}`);
-    leaderBoardEmbed.setTimestamp();
 
-    if (!(stat in client.model.members.rawAttributes)) return message.channel.send(`${stat} is not a statistic.`);
     if (nonIndexedPage > pages || nonIndexedPage < 1 || isNaN(nonIndexedPage)) return message.channel.send(`Page ${nonIndexedPage} does not exist.`);
 
     members.slice(indexedPage * 10, nonIndexedPage * 10).map((member, index) => {
-      leaderBoardEmbed.addField(`${index + 1 + indexedPage * 10}. ${member.name}:`, member[args[0]].toLocaleString());
+      leaderBoardEmbed.addField(`${index + 1 + indexedPage * 10}. ${member.name}:`, member[stat].toLocaleString());
     });
 
     const leaderBoardMessage = await message.channel.send(leaderBoardEmbed);
@@ -85,6 +85,14 @@ module.exports = {
         case '❌':
           return leaderBoardMessage.delete();
       }
+
+      leaderBoardEmbed.fields = [];
+
+      members.slice(indexedPage * 10, page * 10).map((member, index) => {
+        leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${member.name}:`, member[stat].toLocaleString());
+      });
+
+      leaderBoardEmbed.setFooter(`Page ${page} of ${pages}`);
 
       leaderBoardMessage.edit(leaderBoardEmbed);
     });

@@ -1,46 +1,38 @@
 {
   "name": "minkinator",
-  "version": "1.2.2",
-  "description": "A minkinator bot",
-  "main": "bot.js",
-  "author": "Litleck",
-  "license": "MIT",
+  "version": "2.7.0",
+  "description": "A discord bot",
+  "main": "index.js",
   "dependencies": {
     "@discordjs/opus": "^0.1.0",
-    "@types/node": "^13.1.4",
     "canvas": "^2.6.1",
     "colors": "^1.4.0",
     "discord.js": "github:discordjs/discord.js",
+    "entities": "^2.0.0",
     "gif-encoder": "^0.7.2",
-    "graceful-fs": "^4.2.3",
-    "js-markov": "^3.0.1",
-    "moment": "^2.24.0",
+    "momentjs": "^2.0.0",
     "node-fetch": "^2.6.0",
-    "pretty-ms": "^5.1.0",
+    "pretty-ms": "^6.0.0",
     "qrcode": "^1.4.4",
-    "sequelize": "^5.21.2",
-    "snekfetch": "^4.0.4",
-    "sqlite3": "^4.1.0"
+    "sequelize": "^5.21.4",
+    "sodium": "^3.0.2",
+    "sqlite3": "^4.1.1"
   },
-  "devDependencies": {
-    "eslint": "^6.8.0",
-    "eslint-config-google": "^0.14.0",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-plugin-import": "^2.19.1",
-    "eslint-plugin-node": "^11.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1"
+  "devDependencies": {},
+  "scripts": {
+    "start": "node ."
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Litleck/Minkinator-Bot.git"
+    "url": "git+https://github.com/Litleck/Minkinator.git"
   },
   "keywords": [
-    "bot",
-    "discord.js"
+    "discord"
   ],
+  "author": "Litleck",
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Litleck/Minkinator-Bot/issues"
+    "url": "https://github.com/Litleck/Minkinator/issues"
   },
-  "homepage": "https://github.com/Litleck/Minkinator-Bot#readme"
+  "homepage": "https://github.com/Litleck/Minkinator#readme"
 }

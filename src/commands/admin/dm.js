@@ -1,6 +1,6 @@
 module.exports = {
   name: 'dm',
-  description: 'DM a user with a message.',
+  description: 'Send a direct message to a user.',
   permissions: ['ADMINISTRATOR'],
   parameters: [
     {

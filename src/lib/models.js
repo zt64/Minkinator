@@ -1,19 +1,17 @@
-exports.createDatabase = async (client, guild) => {
+exports.create = async (client, guild) => {
   const Sequelize = client.Sequelize;
-  const guildName = guild.name;
-
   const database = {};
 
   const sequelize = new Sequelize('database', 'user', 'password', {
     host: 'localhost',
     dialect: 'sqlite',
-    storage: `./data/${guildName}.sqlite`,
+    storage: `./data/${guild.id}.sqlite`,
     logging: false
   });
 
   const members = sequelize.define('members', {
     id: {
-      type: Sequelize.TEXT,
+      type: Sequelize.INTEGER,
       primaryKey: true,
       unique: true
     },
@@ -44,13 +42,18 @@ exports.createDatabase = async (client, guild) => {
       type: Sequelize.JSON,
       defaultValue: [],
       allowNull: false
+    },
+    configuration: {
+      type: Sequelize.JSON,
+      defaultValue: [],
+      allowNull: false
     }
   }, {
     timestamps: false
   });
 
   const variables = sequelize.define('variables', {
-    name: {
+    key: {
       type: Sequelize.TEXT,
       primaryKey: true
     },
@@ -72,20 +75,24 @@ exports.createDatabase = async (client, guild) => {
   return database;
 };
 
-exports.populateDatabase = async (client, guild, database) => {
+exports.populate = async (client, guild, database) => {
   const databaseMembers = database.members;
   const variables = database.variables;
 
-  for (const guildMember of guild.members.array()) {
+  for (const guildMember of guild.members.cache.array()) {
     const user = guildMember.user;
     const [memberData] = await databaseMembers.findOrCreate({ where: { id: user.id } });
 
-    await memberData.update({ name: user.tag });
+    memberData.configuration = {
+      levelUpMention: true
+    };
+
+    await memberData.update({ name: user.tag, configuration: memberData.configuration });
   };
 
   for (const memberData of await databaseMembers.findAll()) {
     try {
-      await guild.members.fetch(memberData.id);
+      guild.members.fetch(memberData.id);
     } catch (e) {
       memberData.destroy();
 
@@ -93,15 +100,28 @@ exports.populateDatabase = async (client, guild, database) => {
     }
   };
 
-  await variables.findOrCreate({ where: { name: 'prefix' }, defaults: { value: '!' } });
-  await variables.findOrCreate({ where: { name: 'currency' }, defaults: { value: '₼' } });
-  await variables.findOrCreate({ where: { name: 'errorTimeout' }, defaults: { value: 3000 } });
+  await variables.findOrCreate({ where: { key: 'prefix' }, defaults: { value: '!' } });
+  await variables.findOrCreate({ where: { key: 'currency' }, defaults: { value: '₼' } });
+  await variables.findOrCreate({ where: { key: 'errorTimeout' }, defaults: { value: 3000 } });
+
   await variables.findOrCreate({
-    where: { name: 'items' },
+    where: { key: 'items' },
     defaults: {
       value: JSON.parse(client.fs.readFileSync('./config/items.json'))
     }
   });
+
+  await variables.findOrCreate({
+    where: { key: 'configuration' },
+    defaults: {
+      value: {
+        levelUpMention: true,
+        ignoreBots: true
+      }
+    }
+  });
+
+  return database;
 };
 
 exports.destroyDatabase = (database) => {

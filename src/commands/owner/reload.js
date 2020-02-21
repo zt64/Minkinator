@@ -22,7 +22,8 @@ module.exports = {
       await client.loadCommands();
     } catch (error) {
       console.error(error);
-      return message.channel.send('An error has occured reloading. Please check console.');
+
+      return message.channel.send('An error has occurred reloading. Please check console.');
     }
 
     reloadEmbed.setTitle('Finished reloading');

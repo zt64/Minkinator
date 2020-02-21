@@ -9,7 +9,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const prefix = (await client.model.variables.findByPk('prefix')).value;
+    const prefix = (await client.database.variables.findByPk('prefix')).value;
 
     if (args[0]) {
       const commandName = args[0].toLowerCase();
@@ -24,10 +24,11 @@ module.exports = {
 
       const helpEmbed = new client.discord.MessageEmbed()
         .setColor(client.config.embed.color)
-        .addField('Command:', command.name)
+        .addField('Command:', command.name, true)
+        .addField('Category:', command.category, true)
         .addField('Description:', command.description)
         .addField('Cool down:', `${command.coolDown || 3} second(s)`, true)
-        .addField('Permissions:', command.permissions ? command.permissions.join(', ') : 'Everyone', true)
+        .addField('Permissions:', command.permissions ? command.permissions.join(', ') : 'Everyone', true);
 
       if (command.aliases) helpEmbed.addField('Aliases:', command.aliases.join(', '), true);
       if (command.usage) helpEmbed.addField('Usage:', command.usage, true);
@@ -59,6 +60,8 @@ module.exports = {
     }
 
     await react(['🥳', '💵', '👤', '🖌️', '🛠️', '🔒', '❔', '❌']);
+
+    // Create reaction collector
 
     const filter = (reaction, user) => user.id === message.author.id && (
       ['🏠', '🛠️', '🥳', '🔒', '❌'].map(emoji => reaction.emoji.name === emoji)
