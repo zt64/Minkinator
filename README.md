@@ -10,13 +10,11 @@
 
 > Custom Discord bot.
 
-### 🏠 [Homepage](https://github.com/Litleck/Minkinator-Bot)
+### [Homepage](https://github.com/Litleck/Minkinator-Bot)
 
-## Usage
+## Requirements
 
-```sh
- Requires Discord.js
-```
+* Discord.js v12
 
 ## Author
 
@@ -29,17 +27,10 @@
 
 Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/Litleck/Minkinator-Bot/issues).
 
-## Show your support
-
-Give a ⭐️ if this project helped you!
-
-<a href="https://www.patreon.com/Litleck">
-  <img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160">
-</a>
 
 ## 📝 License
 
-Copyright © 2019 [Nicholas Owens](https://github.com/Litleck).<br />
+Copyright © 2020 [Nicholas Owens](https://github.com/Litleck).<br />
 This project is [MIT](https://github.com/Litleck/Minkinator-Bot/blob/master/LICENSE) licensed.
 
 ***
