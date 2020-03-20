@@ -16,13 +16,6 @@
 
 * Discord.js v12
 
-## Author
-
-👤 **Nicholas Owens**
-
-* Twitter: [@Litleck](https://twitter.com/Litleck)
-* Github: [@Litleck](https://github.com/Litleck)
-
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/Litleck/Minkinator-Bot/issues).
