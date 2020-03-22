@@ -6,6 +6,7 @@
   "dependencies": {
     "@discordjs/opus": "^0.1.0",
     "canvas": "^2.6.1",
+    "chart.js": "^2.9.3",
     "colors": "^1.4.0",
     "discord.js": "github:discordjs/discord.js",
     "entities": "^2.0.0",

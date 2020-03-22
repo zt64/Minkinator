@@ -13,13 +13,14 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
+    const guildConfig = (await client.database.properties.findByPk('configuration')).value;
     const memberData = await client.database.members.findByPk(message.author.id);
-    const items = (await client.database.variables.findByPk('items')).value;
+    const items = guildConfig.items;
+    const currency = guildConfig.currency;
 
-    // Set member variables
+    // Set member properties
 
     const inventory = memberData.inventory;
-    const currency = await client.config.currency;
 
     var balance = memberData.balance;
 

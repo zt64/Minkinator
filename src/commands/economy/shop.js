@@ -1,10 +1,11 @@
 module.exports = {
   description: 'Lists items available to buy.',
-  aliases: ['shop'],
+  aliases: ['list'],
   async execute (client, message, args) {
-    const items = (await client.database.variables.findByPk('items')).value;
-    const prefix = (await client.database.variables.findByPk('prefix')).value;
-    const currency = await client.config.currency;
+    const guildConfig = (await client.database.properties.findByPk('configuration')).value;
+    const items = (await client.database.properties.findByPk('items')).value;
+    const currency = guildConfig.currency;
+    const prefix = guildConfig.prefix;  
 
     var page = args[0] || 1;
     var pages = Math.ceil(items.length / 10);
@@ -12,13 +13,16 @@ module.exports = {
     const shopEmbed = new client.discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle('The Shop')
-      .setDescription(`Buy items using \`\`${prefix}buy [item] <amount>\`\` \n Sell items using \`\`${prefix}sell [item] [amount] [price]\`\``);
+      .setDescription(`Buy items using \`\`${prefix}buy [item] <amount>\`\` \n Sell items using \`\`${prefix}sell [item] [amount] [price]\`\``)
+      .setFooter(`Page 1 of ${pages}`);
 
     items.map((item, index) => shopEmbed.addField(item.name, `${currency}${item.price}`, true));
 
     const shopMessage = await message.channel.send(shopEmbed);
 
     if (pages > 1) shopMessage.react('➡️');
+
+    shopMessage.react('❌');
 
     const filter = (reaction, user) => user.id === message.author.id && (
       reaction.emoji.name === '🏠' ||

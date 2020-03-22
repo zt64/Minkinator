@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'dice',
   description: 'Roll a dice.',
   async execute (client, message, args) {
     const result = client.functions.randomInteger(1, 6);

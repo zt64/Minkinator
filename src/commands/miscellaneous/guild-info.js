@@ -8,8 +8,8 @@ module.exports = {
 
     const infoEmbed = new client.discord.MessageEmbed()
       .setColor(client.config.embed.color)
-      .setTitle('Guild Information')
       .setThumbnail(guild.iconURL())
+      .setTitle('Guild Information')
       .addField('Name:', guild.name, true)
       .addField('ID:', guild.id, true)
       .addField('Owner:', guild.owner, true)

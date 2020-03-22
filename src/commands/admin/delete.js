@@ -9,11 +9,11 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const variables = await client.database.variables;
+    const properties = await client.database.properties;
 
     const variableName = args[0];
 
-    const variable = await variables.findByPk(variableName);
+    const variable = await properties.findByPk(variableName);
 
     if (!variable) return message.channel.send(`${variableName} is not a guild variable.`);
 

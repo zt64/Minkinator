@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'help',
   description: 'Displays information about a specific command.',
   aliases: ['commands'],
   parameters: [
@@ -9,7 +8,8 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const prefix = (await client.database.variables.findByPk('prefix')).value;
+    const guildConfig = (await client.database.properties.findByPk('configuration')).value;
+    const prefix = guildConfig.prefix;
 
     if (args[0]) {
       const commandName = args[0].toLowerCase();

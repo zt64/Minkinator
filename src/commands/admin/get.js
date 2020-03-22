@@ -1,5 +1,4 @@
 module.exports = {
-  category: 'Administrator',
   description: 'Gets a value from a database.',
   permissions: ['ADMINISTRATOR'],
   parameters: [

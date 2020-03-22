@@ -8,9 +8,9 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message) {
+  async execute (client, message, args) {
     await message.delete();
 
-    return message.channel.send(message.content.slice(5));
+    return message.channel.send(args.join(' '));
   }
 };

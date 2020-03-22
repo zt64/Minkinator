@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'inventory',
   description: 'Shows a members inventory.',
   aliases: ['inv'],
   parameters: [

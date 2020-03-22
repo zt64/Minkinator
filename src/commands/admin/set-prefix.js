@@ -9,7 +9,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const prefixVariable = await client.database.variables.findByPk('prefix');
+    const prefixVariable = await client.database.properties.findByPk('prefix');
     const prefix = args[0];
 
     await prefixVariable.update({ value: prefix });

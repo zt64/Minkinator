@@ -1,6 +1,5 @@
 exports.create = async (client, guild) => {
   const Sequelize = client.Sequelize;
-  const database = {};
 
   const sequelize = new Sequelize('database', 'user', 'password', {
     host: 'localhost',
@@ -9,9 +8,13 @@ exports.create = async (client, guild) => {
     logging: false
   });
 
-  const members = sequelize.define('members', {
+  const database = {};
+
+  // Define database members
+
+  database.members = sequelize.define('members', {
     id: {
-      type: Sequelize.INTEGER,
+      type: Sequelize.TEXT,
       primaryKey: true,
       unique: true
     },
@@ -33,6 +36,11 @@ exports.create = async (client, guild) => {
       defaultValue: 0,
       allowNull: false
     },
+    xpRequired: {
+      type: Sequelize.INTEGER,
+      defaultValue: 50,
+      allowNull: false
+    },
     messages: {
       type: Sequelize.INTEGER,
       defaultValue: 0,
@@ -52,7 +60,9 @@ exports.create = async (client, guild) => {
     timestamps: false
   });
 
-  const variables = sequelize.define('variables', {
+  // Define database properties
+
+  database.properties = sequelize.define('properties', {
     key: {
       type: Sequelize.TEXT,
       primaryKey: true
@@ -67,8 +77,6 @@ exports.create = async (client, guild) => {
   });
 
   database.sequelize = sequelize;
-  database.members = members;
-  database.variables = variables;
 
   await sequelize.sync();
 
@@ -77,22 +85,26 @@ exports.create = async (client, guild) => {
 
 exports.populate = async (client, guild, database) => {
   const databaseMembers = database.members;
-  const variables = database.variables;
+  const databaseProperties = database.properties;
+
+  // Create model if it doesn't exist
 
   for (const guildMember of guild.members.cache.array()) {
     const user = guildMember.user;
     const [memberData] = await databaseMembers.findOrCreate({ where: { id: user.id } });
 
     memberData.configuration = {
-      levelUpMention: true
+      levelMention: true
     };
 
     await memberData.update({ name: user.tag, configuration: memberData.configuration });
   };
 
+  // Destroy model if the member left
+
   for (const memberData of await databaseMembers.findAll()) {
     try {
-      guild.members.fetch(memberData.id);
+      await guild.members.fetch(memberData.id);
     } catch (e) {
       memberData.destroy();
 
@@ -100,22 +112,28 @@ exports.populate = async (client, guild, database) => {
     }
   };
 
-  await variables.findOrCreate({ where: { key: 'prefix' }, defaults: { value: '!' } });
-  await variables.findOrCreate({ where: { key: 'currency' }, defaults: { value: '₼' } });
-  await variables.findOrCreate({ where: { key: 'errorTimeout' }, defaults: { value: 3000 } });
+  // Set guild properties
 
-  await variables.findOrCreate({
+  await databaseProperties.findOrCreate({ where: { key: 'id'}, defaults: { value: guild.id }});
+  await databaseProperties.findOrCreate({ where: { key: 'name'}, defaults: { value: guild.name }});
+  await databaseProperties.findOrCreate({ where: { key: 'data'}, defaults: { value: [] } });
+
+  await databaseProperties.findOrCreate({
     where: { key: 'items' },
     defaults: {
       value: JSON.parse(client.fs.readFileSync('./config/items.json'))
     }
   });
-
-  await variables.findOrCreate({
+  
+  await databaseProperties.findOrCreate({
     where: { key: 'configuration' },
     defaults: {
       value: {
-        levelUpMention: true,
+        prefix: '!',
+        currency: '₼',
+        errorTimeout: 3000,
+        redditNSFW: false,
+        levelMention: true,
         ignoreBots: true
       }
     }

@@ -2,9 +2,9 @@ module.exports = {
   description: 'Change guild settings.',
   permissions: ['ADMINISTRATOR'],
   async execute (client, message, args) {
-    const variables = client.database.variables;
+    const properties = client.database.properties;
 
-    const guildConfigDB = await variables.findByPk('configuration');
+    const guildConfigDB = await properties.findByPk('configuration');
     const guildConfig = guildConfigDB.value;
 
     const key = args[0];
@@ -14,11 +14,18 @@ module.exports = {
       if (key in guildConfig) {
         if (!value) return message.channel.send(`A value is required for \`${key}\`.`);
 
-        guildConfig[key] = JSON.parse(value);
-
+        try {
+          guildConfig[key] = JSON.parse(value);
+        } catch (error) {
+          guildConfig[key] = value;
+        }
+        
         guildConfigDB.update({ value: guildConfig });
 
-        return message.channel.send(`Successfully set \`${key}\` to \`${value}\`.`);
+        return message.channel.send(new client.discord.MessageEmbed()
+          .setColor(client.config.embed.color)
+          .setTitle('Guild Configuration')
+          .setDescription(`Successfully set \`${key}\` to \`${value}\`.`));
       } else {
         return message.channel.send(`\`${key}\` does not exist in the guild configuration.`);
       }
