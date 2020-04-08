@@ -21,7 +21,7 @@ module.exports = {
       }
     };
 
-    const configEmbed = new client.discord.MessageEmbed()
+    const configEmbed = new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle('Member Configuration');
 

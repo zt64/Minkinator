@@ -16,13 +16,13 @@ module.exports = {
       const command = client.commands.get(commandName) || client.commands.find(c => c.aliases && c.aliases.includes(commandName));
 
       if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
-        return message.channel.send(new client.discord.MessageEmbed()
+        return message.channel.send(new client.Discord.MessageEmbed()
           .setColor(client.config.embed.color)
           .setTitle('Invalid Command')
           .setDescription(`\`\`${commandName}\`\` is not a valid command.`));
       }
 
-      const helpEmbed = new client.discord.MessageEmbed()
+      const helpEmbed = new client.Discord.MessageEmbed()
         .setColor(client.config.embed.color)
         .addField('Command:', command.name, true)
         .addField('Category:', command.category, true)
@@ -36,7 +36,7 @@ module.exports = {
       return message.channel.send(helpEmbed);
     }
 
-    const helpEmbed = new client.discord.MessageEmbed()
+    const helpEmbed = new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle('Home page')
       .setDescription(`There is a total of 5 command categories. For information on a specific command, run: \`${prefix}help <command>\``)

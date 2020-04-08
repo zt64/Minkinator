@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'set-status',
   description: 'Changes Minkinators status.',
   permissions: ['ADMINISTRATOR'],
   parameters: [
@@ -27,8 +26,8 @@ module.exports = {
 
     await client.user.setActivity(activityName, { type: activityType });
 
-    return message.channel.send(new client.discord.MessageEmbed()
-      .setTitle('Succesfully changed status')
+    return message.channel.send(new client.Discord.MessageEmbed()
+      .setTitle('Successfully changed status')
       .setColor(client.config.embed.color)
       .setDescription(`Set status to \`${activityType.toLowerCase()} ${activityName}\`.`)
     );

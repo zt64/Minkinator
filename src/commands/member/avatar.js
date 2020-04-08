@@ -10,7 +10,7 @@ module.exports = {
   async execute (client, message, args) {
     const user = message.mentions.users.first() || message.author;
 
-    return message.channel.send(new client.discord.MessageEmbed()
+    return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle(`Avatar of ${user.tag}`)
       .setURL(user.displayAvatarURL({ format: 'png', dynamic: true, size: 256 }))

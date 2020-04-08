@@ -18,7 +18,7 @@ module.exports = {
     if (!(stat in client.database.members.rawAttributes)) return message.channel.send(`${stat} is not a statistic.`);
 
     const members = await client.database.members.findAll({ order: [[stat, 'DESC']] });
-    const leaderBoardEmbed = new client.discord.MessageEmbed();
+    const leaderBoardEmbed = new client.Discord.MessageEmbed();
     const pages = Math.ceil(members.length / 10);
 
     const indexedPage = args[1] - 1 || 0;
@@ -27,7 +27,7 @@ module.exports = {
     let page = 1;
 
     leaderBoardEmbed.setColor(client.config.embed.color);
-    leaderBoardEmbed.setTitle(`Member ${args[0]} leader board`);
+    leaderBoardEmbed.setTitle(`Member ${stat} leader board`);
     leaderBoardEmbed.setFooter(`Page ${nonIndexedPage} of ${pages}`);
 
     if (nonIndexedPage > pages || nonIndexedPage < 1 || isNaN(nonIndexedPage)) return message.channel.send(`Page ${nonIndexedPage} does not exist.`);

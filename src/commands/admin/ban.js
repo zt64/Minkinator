@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'ban',
   description: 'Bans a member.',
   permissions: ['BAN_MEMBERS'],
   parameters: [
@@ -22,25 +21,26 @@ module.exports = {
 
     const member = message.mentions.members.first();
     const reason = args.slice(2).join(' ');
+    const minutes = args[1];
 
     member.ban({ reason: reason });
 
-    message.channel.send(new client.discord.MessageEmbed()
+    message.channel.send(new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
-      .setAuthor(`${member.user.tag} has been banned${args[1] ? ` for ${args[1]} minute(s)` : ''}.`, member.user.avatarURL())
+      .setAuthor(`${member.user.tag} has been banned${minutes ? ` for ${minutes} minute(s)` : ''}.`, member.user.avatarURL())
       .setDescription(args[2] ? reason : 'No reason provided.')
       .setFooter(member.id)
       .setTimestamp());
 
-    if (args[1]) {
+    if (minutes) {
       setTimeout(() => {
         message.guild.unban(member.user);
-        return message.channel.send(new client.discord.MessageEmbed()
+        return message.channel.send(new client.Discord.MessageEmbed()
           .setColor(client.config.embed.color)
           .setAuthor(`${member.user.tag} has been unbanned`, member.user.avatarURL())
           .setFooter(member.id)
           .setTimestamp());
-      }, args[1] * 60000);
+      }, minutes * 60000);
     }
   }
 };

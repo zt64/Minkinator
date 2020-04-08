@@ -11,16 +11,16 @@ module.exports = {
     const execSync = require('child_process').execSync;
 
     try {
-      return message.channel.send(new client.discord.MessageEmbed()
+      return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(client.config.embed.color)
         .setTitle('Execution Result')
-        .setDescription(`\`\`\`bash\n${execSync(args.join(' '), { encoding: 'utf-8' })}\n\`\`\``)
+        .setDescription(execSync(args.join(' '), { encoding: 'utf-8' }), { code: 'bash' })
       );
-    } catch (e) {
-      return message.channel.send(new client.discord.MessageEmbed()
+    } catch (error) {
+      return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(client.config.embed.error)
         .setTitle('Execution Error')
-        .setDescription(`\`\`\`bash\n${e}\n\`\`\``)
+        .setDescription(error, { code: 'bash' })
       );
     }
   }

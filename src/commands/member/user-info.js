@@ -3,11 +3,11 @@ module.exports = {
   async execute (client, message, args) {
     const user = message.mentions.users.first() || message.author;
 
-    const infoEmbed = new client.discord.MessageEmbed()
+    const infoEmbed = new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle('User information')
-      .addField('ID:', user.id)
+      .addField('ID:', user.id);
 
     return message.channel.send(infoEmbed);
   }
-}
+};

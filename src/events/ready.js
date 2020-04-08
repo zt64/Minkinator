@@ -1,4 +1,6 @@
 module.exports = async (client) => {
+  const time = client.moment().format('HH:mm M/D/Y');
+
   for (const guild of client.guilds.cache.array()) {
     const database = await client.databases.create(client, guild);
 
@@ -6,12 +8,17 @@ module.exports = async (client) => {
 
     client.databases[guild.name] = database;
 
-    console.log(`Initialized database for ${guild.name} (${guild.id}).`);
+    const data = await database.properties.findByPk('data').then(key => key.value);
+    const markov = new client.Markov(data, { stateSize: 2 });
+
+    markov.buildCorpus();
+
+    client.databases[guild.name].markov = markov;
+
+    console.log(`${`(${time})`.green} Initialized database for: ${guild.name} (${guild.id}).`);
   };
 
-  client.user.setActivity(client.config.activity.name, { type: client.config.activity.type });
+  client.user.setActivity(`${client.users.cache.size} users`, { type: 'WATCHING' });
 
-  // client.user.setActivity(`${client.users.size} users | !help`, { type: 'WATCHING' });
-
-  return console.log('Minkinator is now online.');
+  return console.log(`${`(${time})`.green} Minkinator is now online.`);
 };

@@ -4,7 +4,7 @@ module.exports = {
   usage: '<command name>',
   async execute (client, message, args) {
     const prefix = (await client.database.properties.findByPk('prefix')).value;
-    const embed = new client.discord.MessageEmbed()
+    const embed = new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color);
 
     if (!args.length) {
@@ -25,7 +25,7 @@ module.exports = {
     const command = client.commands.get(name) || client.commands.find(c => c.aliases && c.aliases.includes(name));
 
     if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
-      return message.channel.send(new client.discord.MessageEmbed()
+      return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(client.config.embed.color)
         .setTitle('Invalid Command')
         .setDescription(`\`\`${name}\`\` is not a valid command.`));

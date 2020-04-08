@@ -8,13 +8,12 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const randomInteger = client.functions.randomInteger;
     const entities = require('entities');
 
     // Fetch questions
 
-    const responses = (await (await client.fetch(`https://opentdb.com/api.php?amount=10`)).json());
-    const response = responses.results[0]
+    const responses = (await (await client.fetch('https://opentdb.com/api.php?amount=10')).json());
+    const response = responses.results[0];
 
     const question = entities.decodeHTML(response.question);
 
@@ -27,11 +26,11 @@ module.exports = {
 
     // Create embed
 
-    const questionEmbed = new client.discord.MessageEmbed()
+    const questionEmbed = new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle(`${response.category} question`)
       .setDescription(question);
-    
+
     if (response.type === 'multiple') {
       answers.map((answer, index) => questionEmbed.addField(letters[index], answer));
     } else {
@@ -49,16 +48,17 @@ module.exports = {
 
     // Setup reaction collector
 
-    const filter = (reaction, user) => ['🇦', '🇧', '🇨', '🇩'].map(emoji => reaction.emoji.name === emoji)
+    const filter = (reaction, user) => ['🇦', '🇧', '🇨', '🇩'].map(emoji => reaction.emoji.name === emoji);
 
-    const collector = questionMessage.createReactionCollector
+    const collector = questionMessage.createReactionCollector;
 
     collector.on('end', collected => {
-      message.channel.send(new client.discord.MessageEmbed()
-      .setColor(client.config.embed.color)
-      .setTitle('Trivia Answer')
-      .setDescription(`The correct answer was ${answer}, \n Good job`)
-      )}
+      message.channel.send(new client.Discord.MessageEmbed()
+        .setColor(client.config.embed.color)
+        .setTitle('Trivia Answer')
+        .setDescription(`The correct answer was ${answer}, \n Good job`)
+      );
+    }
     );
   }
 };

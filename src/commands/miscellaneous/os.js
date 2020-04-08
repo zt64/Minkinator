@@ -1,11 +1,10 @@
 module.exports = {
-  name: 'os-info',
   description: 'Returns information about the host OS.',
   aliases: ['os'],
   async execute (client, message, args) {
     const os = require('os');
 
-    return message.channel.send(new client.discord.MessageEmbed()
+    return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle('OS Information')
       .addField('Platform', os.platform(), true)

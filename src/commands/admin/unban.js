@@ -1,6 +1,4 @@
 module.exports = {
-  name: 'unban',
-  category: 'Administrator',
   description: 'Revokes a members ban.',
   permissions: ['BAN_MEMBERS'],
   parameters: [
@@ -20,7 +18,7 @@ module.exports = {
 
     message.guild.unban(member.user);
 
-    return message.channel.send(new client.discord.MessageEmbed()
+    return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setAuthor(`${member.user.tag} has been unbanned`, member.user.avatarURL)
       .setFooter(member.id)

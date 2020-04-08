@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'threshold',
   description: 'Filters an images RGB channels according to a threshold.',
   aliases: ['t'],
   parameters: [
@@ -44,6 +43,6 @@ module.exports = {
 
     context.putImageData(imageData, 0, 0);
 
-    return message.channel.send(new client.discord.MessageAttachment(canvas.toBuffer()));
+    return message.channel.send(new client.Discord.MessageAttachment(canvas.toBuffer()));
   }
 };

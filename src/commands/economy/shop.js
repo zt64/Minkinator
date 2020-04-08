@@ -5,12 +5,12 @@ module.exports = {
     const guildConfig = (await client.database.properties.findByPk('configuration')).value;
     const items = (await client.database.properties.findByPk('items')).value;
     const currency = guildConfig.currency;
-    const prefix = guildConfig.prefix;  
+    const prefix = guildConfig.prefix;
 
     var page = args[0] || 1;
     var pages = Math.ceil(items.length / 10);
 
-    const shopEmbed = new client.discord.MessageEmbed()
+    const shopEmbed = new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle('The Shop')
       .setDescription(`Buy items using \`\`${prefix}buy [item] <amount>\`\` \n Sell items using \`\`${prefix}sell [item] [amount] [price]\`\``)

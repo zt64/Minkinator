@@ -24,19 +24,28 @@ exports.randomInteger = (min, max) => {
 exports.getUser = async (client, message, string) => {
   try {
     console.log(await client.users.fetch(string));
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
   };
 
   try {
     console.log(message.mentions.first());
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
   };
 
   try {
     console.log(message.author);
-  } catch (e) {
-    console.log(e);
+  } catch (error) {
+    console.log(error);
   };
+};
+
+exports.fToC = (f) => {
+  return (f - 32) / 1.8;
+};
+
+exports.capitalize = (string) => {
+  if (typeof (string) !== 'string') return '';
+  return string.charAt(0).toUpperCase() + string.slice(1);
 };

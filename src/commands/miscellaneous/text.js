@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'text',
   description: 'Creates an image from text.',
   parameters: [
     {
@@ -34,7 +33,7 @@ module.exports = {
     ctx.textAlign = 'center';
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
-    const attachment = new client.discord.MessageAttachment(canvas.toBuffer());
+    const attachment = new client.Discord.MessageAttachment(canvas.toBuffer());
     return message.channel.send(attachment);
   }
 };

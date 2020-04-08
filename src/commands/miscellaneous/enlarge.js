@@ -1,5 +1,4 @@
 module.exports = {
-  name: 'enlarge',
   description: 'Enlarges an emoji',
   parameters: [
     {

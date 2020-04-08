@@ -1,5 +1,5 @@
 module.exports = {
-  description: 'List items.',
+  description: 'List shopItems.',
   parameters: [
     {
       name: 'item',
@@ -13,9 +13,9 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = (await client.database.properties.findByPk('configuration')).value;
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const shopItems = await client.database.properties.findByPk('items').then(key => key.value);
     const memberData = await client.database.members.findByPk(message.author.id);
-    const items = guildConfig.items;
     const currency = guildConfig.currency;
 
     // Set member properties
@@ -27,7 +27,7 @@ module.exports = {
     const itemName = args[0];
     const itemAmount = args[1];
 
-    const shopItem = items.find(item => item.name === itemName);
+    const shopItem = shopItems.find(item => item.name === itemName);
     const inventoryItem = inventory.find(item => item.name === itemName);
 
     const sellPrice = (itemAmount * shopItem.price) / 2;

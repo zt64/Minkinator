@@ -13,8 +13,8 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const modelDataEmbed = new client.discord.MessageEmbed();
-    const objectDataEmbed = new client.discord.MessageEmbed();
+    const modelDataEmbed = new client.Discord.MessageEmbed();
+    const objectDataEmbed = new client.Discord.MessageEmbed();
 
     const modelName = args[0];
     const objectName = args[1];

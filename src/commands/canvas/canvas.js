@@ -44,6 +44,6 @@ module.exports = {
 
     context.putImageData(imageData, 0, 0);
 
-    return message.channel.send(new client.discord.MessageAttachment(canvas.toBuffer()));
+    return message.channel.send(new client.Discord.MessageAttachment(canvas.toBuffer()));
   }
 };

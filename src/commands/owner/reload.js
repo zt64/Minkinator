@@ -6,7 +6,7 @@ module.exports = {
     const commands = client.commands;
     const events = client.events;
 
-    const reloadEmbed = new client.discord.MessageEmbed()
+    const reloadEmbed = new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle('Reloading')
       .setDescription(`Reloading ${commands.size} commands and ${events.size} events`)

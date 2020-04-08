@@ -1,11 +1,25 @@
+// import fs from 'fs';
+// import GifEncoder from 'gif-encoder';
+// import colors from 'colors';
+// import qr from 'qrcode';
+// import moment from 'moment';
+// import Sequelize from 'sequelize';
+// import canvas from 'canvas';
+// import fetch from 'node-fetch';
+// import discord from 'discord.js';
+
+// import functions from './lib/functions.js';
+// import models from './lib/models.js';
+// const config = JSON.parse(fs.readFileSync('./config/config.json'));
 
 const functions = require('./lib/functions.js');
 const config = require('./config/config.json');
 const models = require('./lib/models.js');
 
+const Markov = require('markov-strings').default;
 const GifEncoder = require('gif-encoder');
 const Sequelize = require('sequelize');
-const discord = require('discord.js');
+const Discord = require('discord.js');
 const fetch = require('node-fetch');
 const moment = require('moment');
 const canvas = require('canvas');
@@ -13,15 +27,17 @@ const colors = require('colors');
 const qr = require('qrcode');
 const fs = require('fs');
 
-const client = new discord.Client({ fetchAllMembers: true });
+const client = new Discord.Client({ fetchAllMembers: true });
+const time = moment().format('HH:mm M/D/Y');
 
-client.coolDowns = new discord.Collection();
-client.commands = new discord.Collection();
-client.events = new discord.Collection();
+client.coolDowns = new Discord.Collection();
+client.commands = new Discord.Collection();
+client.events = new Discord.Collection();
 
 client.GifEncoder = GifEncoder;
 client.Sequelize = Sequelize;
-client.discord = discord;
+client.Discord = Discord;
+client.Markov = Markov;
 client.moment = moment;
 client.canvas = canvas;
 client.colors = colors;
@@ -45,7 +61,7 @@ client.loadEvents = function loadEvents () {
 
     client.on(eventName, eventFile.bind(null, client));
   });
-  console.log(`Successfully loaded ${client.events.size} events.`);
+  console.log(`${`(${time})`.green} Successfully loaded ${client.events.size} events.`);
 };
 
 client.loadCommands = function loadCommands () {
@@ -67,7 +83,7 @@ client.loadCommands = function loadCommands () {
       if (category === 'owner') command.ownerOnly = true;
     });
   });
-  console.log(`Successfully loaded ${client.commands.size} commands.`);
+  console.log(`${`(${time})`.green} Successfully loaded ${client.commands.size} commands.`);
 };
 
 client.loadEvents();
@@ -78,8 +94,8 @@ process.on('unhandledRejection', error => console.error('Unhandled Promise Rejec
 process.stdin.on('data', async data => {
   try {
     console.log(await eval(`(async()=>{${data.toString()}})()`));
-  } catch (e) {
-    console.log(e.message);
+  } catch (error) {
+    console.error(error.message);
   }
 });
 

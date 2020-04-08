@@ -1,6 +1,4 @@
 module.exports = {
-  name: 'clear',
-  category: 'Administrator',
   description: 'Removes a set amount of messages.',
   aliases: ['purge', 'sweep'],
   permissions: ['MANAGE_MESSAGES'],
@@ -12,8 +10,10 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    if (isNaN(args[0]) || args[0] < 1) return message.channel.send('Please enter a valid number between 1 and 100');
+    const messages = args[0];
 
-    return message.channel.bulkDelete(Math.round(args[0]));
+    if (isNaN(messages) || messages < 1) return message.channel.send('Please enter a valid number between 1 and 100');
+
+    return message.channel.bulkDelete(Math.round(messages));
   }
 };

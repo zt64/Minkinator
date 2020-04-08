@@ -21,7 +21,7 @@ module.exports = {
 
     await memberData.update({ balance: newBalance });
 
-    return message.channel.send(new client.discord.MessageEmbed()
+    return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle('Number Guessing Game')
       .setDescription(`You guessed ${guess}, and the number was ${value}. \n Earning you ${currency}${earn} puts your balance at ${currency}${newBalance}`)

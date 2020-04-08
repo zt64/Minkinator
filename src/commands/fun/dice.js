@@ -5,7 +5,7 @@ module.exports = {
 
     // Create embed
 
-    const diceEmbed = new client.discord.MessageEmbed()
+    const diceEmbed = new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle('Dice roll')
       .setDescription('Rolling...')

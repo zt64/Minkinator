@@ -11,16 +11,16 @@ module.exports = {
   ],
   async execute (client, message, args) {
     try {
-      return message.channel.send(new client.discord.MessageEmbed()
+      return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(client.config.embed.color)
         .setTitle('JS Result')
-        .setDescription(`\`\`\`js\n${await eval(`(async() => {${args.join(' ')}})()`)}\n\`\`\``)
+        .setDescription(await eval(`(async() => {${args.join(' ')}})()`), { code: 'js' })
       );
-    } catch (e) {
-      return message.channel.send(new client.discord.MessageEmbed()
+    } catch (error) {
+      return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(client.config.embed.error)
         .setTitle('JS Error')
-        .setDescription(`\`\`\`js\n${e}\n\`\`\``)
+        .setDescription(error, { code: 'js' })
       );
     }
   }

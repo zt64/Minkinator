@@ -18,7 +18,7 @@ module.exports = {
     const member = message.guild.member(user);
     const memberData = await client.database.members.findByPk(user.id);
 
-    return message.channel.send(new client.discord.MessageEmbed()
+    return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setAuthor(`Statistics for ${member.nickname || user.tag}`, user.avatarURL())
       .addField('Balance:', `${currency}${memberData.balance.toFixed(2).toLocaleString()}`, true)

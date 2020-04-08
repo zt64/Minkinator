@@ -22,7 +22,7 @@ module.exports = {
     const itemName = args[0];
     const amount = parseInt(args[1]) || 1;
 
-    if (!itemArray.find(x => x.name === itemName)) return message.channel.send(`${itemName} is not available for sale.`);
+    if (!itemArray.find(x => x.name === itemName)) return message.channel.send(`\`${itemName}\` is not available for sale.`);
 
     const shopItem = itemArray.find(x => x.name === itemName);
     const shopItemPrice = amount * shopItem.price;
@@ -45,6 +45,8 @@ module.exports = {
     memberData.decrement('balance', { by: shopItemPrice });
     memberData.update({ inventory: inventory });
 
-    return message.channel.send(`Bought ${amount} ${itemName}(s) for ${currency}${shopItemPrice.toFixed(2)}.`);
+    message.channel.send(new client.D)
+
+    return message.channel.send(`Bought ${amount} ${itemName}(s) for ${currency}${shopItemPrice.toLocaleString().toFixed(2)}.`);
   }
 };

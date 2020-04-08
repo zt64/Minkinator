@@ -23,23 +23,26 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
+    const modelName = args[0];
+    const objectName = args[1];
+    const propertyName = args[2];
     try {
-      var model = client.database.sequelize.model(args[0]);
+      var model = client.database.sequelize.model(modelName);
     } catch (e) {
-      return message.channel.send(`Model: ${args[0]}, does not exist.`);
+      return message.channel.send(`Model: ${modelName}, does not exist.`);
     }
 
     try {
-      var object = await model.findByPk(args[1]);
+      var object = await model.findByPk(objectName);
     } catch (e) {
-      return message.channel.send(`Object: ${args[1]}, does not exist.`);
+      return message.channel.send(`Object: ${objectName}, does not exist.`);
     }
 
     try {
-      await object.update({ [args[2]]: JSON.parse(args.slice(3).join(' ')) });
-      return message.channel.send(`Set ${args[0]}.${args[1]}.${args[2]} to \`${args.slice(3).join(' ')}\`.`);
+      await object.update({ [propertyName]: JSON.parse(args.slice(3).join(' ')) });
+      return message.channel.send(`Set ${modelName}: ${objectName}.${propertyName} to \`${args.slice(3).join(' ')}\`.`);
     } catch (e) {
-      return message.channel.send(`Property: ${args[2]}, does not exist.`);
+      return message.channel.send(`Property: ${propertyName}, does not exist.`);
     }
   }
 };

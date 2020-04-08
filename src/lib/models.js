@@ -114,9 +114,9 @@ exports.populate = async (client, guild, database) => {
 
   // Set guild properties
 
-  await databaseProperties.findOrCreate({ where: { key: 'id'}, defaults: { value: guild.id }});
-  await databaseProperties.findOrCreate({ where: { key: 'name'}, defaults: { value: guild.name }});
-  await databaseProperties.findOrCreate({ where: { key: 'data'}, defaults: { value: [] } });
+  await databaseProperties.findOrCreate({ where: { key: 'id' }, defaults: { value: guild.id } });
+  await databaseProperties.findOrCreate({ where: { key: 'name' }, defaults: { value: guild.name } });
+  await databaseProperties.findOrCreate({ where: { key: 'data' }, defaults: { value: [] } });
 
   await databaseProperties.findOrCreate({
     where: { key: 'items' },
@@ -124,13 +124,14 @@ exports.populate = async (client, guild, database) => {
       value: JSON.parse(client.fs.readFileSync('./config/items.json'))
     }
   });
-  
+
   await databaseProperties.findOrCreate({
     where: { key: 'configuration' },
     defaults: {
       value: {
         prefix: '!',
         currency: '₼',
+        embedColor: '#1ED760',
         errorTimeout: 3000,
         redditNSFW: false,
         levelMention: true,

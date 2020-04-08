@@ -19,10 +19,10 @@ module.exports = {
         } catch (error) {
           guildConfig[key] = value;
         }
-        
+
         guildConfigDB.update({ value: guildConfig });
 
-        return message.channel.send(new client.discord.MessageEmbed()
+        return message.channel.send(new client.Discord.MessageEmbed()
           .setColor(client.config.embed.color)
           .setTitle('Guild Configuration')
           .setDescription(`Successfully set \`${key}\` to \`${value}\`.`));
@@ -31,12 +31,12 @@ module.exports = {
       }
     };
 
-    const configEmbed = new client.discord.MessageEmbed()
+    const configEmbed = new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle('Guild Configuration');
 
     for (const [key, value] of Object.entries(guildConfig)) {
-      configEmbed.addField(key, value);
+      configEmbed.addField(key, value, true);
     }
 
     return message.channel.send(configEmbed);

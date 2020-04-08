@@ -1,5 +1,4 @@
 module.exports = {
-  category: 'Administrator',
   description: 'Revokes a members mute.',
   permissions: ['MANAGE_CHANNELS'],
   parameters: [
@@ -19,7 +18,7 @@ module.exports = {
 
     member.roles.remove('671902495726895127');
 
-    return message.channel.send(new client.discord.MessageEmbed()
+    return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setAuthor(`${member.user.tag} has been unmuted`, member.user.avatarURL())
       .setFooter(member.id)

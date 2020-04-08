@@ -20,7 +20,7 @@ module.exports = async (client, message) => {
 
   // Set guild constants
 
-  const guildConfig = (await guildProperties.findByPk('configuration')).value;
+  const guildConfig = await guildProperties.findByPk('configuration').then(key => key.value);
   const errorTimeout = guildConfig.errorTimeout;
   const currency = guildConfig.currency;
   const prefix = guildConfig.prefix;
@@ -47,17 +47,17 @@ module.exports = async (client, message) => {
     memberData.update({ level: level + 1, xpRequired: 15 * level });
     level++;
 
-    if (guildConfig.levelMention && memberConfig.levelMention) {;
-      const levelUpEmbed = new client.discord.MessageEmbed()
+    if (guildConfig.levelMention && memberConfig.levelMention) {
+      const levelUpEmbed = new client.Discord.MessageEmbed()
         .setColor(client.config.embed.color)
         .setTitle(`${message.author.username} has levelled up!`)
         .setDescription(`${message.author} is now level ${level}.`);
-      
+
       if (!(level % 5)) {
         levelUpEmbed.setDescription(`${message.author} is now level ${level} and earned ${currency}500 as a reward!`);
         memberData.increment('balance', { by: 500 });
       }
-      
+
       message.channel.send(levelUpEmbed);
     }
   }
@@ -87,7 +87,7 @@ module.exports = async (client, message) => {
     // Check if message author has permission
 
     if (command.ownerOnly || (!message.member.hasPermission(command.permissions))) {
-      const permissionError = await message.channel.send(new client.discord.MessageEmbed()
+      const permissionError = await message.channel.send(new client.Discord.MessageEmbed()
         .setColor(client.config.embed.error)
         .setTitle('Missing Permissions')
         .addField('You are missing one of the following permissions:', command.permissions ? command.permissions.join(', ') : 'Bot owner only')
@@ -100,7 +100,7 @@ module.exports = async (client, message) => {
   // Check if parameters are correct
 
   if (command.parameters) {
-    var usageEmbed = new client.discord.MessageEmbed()
+    var usageEmbed = new client.Discord.MessageEmbed()
       .setColor(client.config.embed.error)
       .setTitle(`Improper usage of ${commandName}`)
       .setDescription(command.description)
@@ -133,11 +133,10 @@ module.exports = async (client, message) => {
     return usageMessage.delete({ timeout: errorTimeout });
   }
 
-
   // Check if command cool down exists
 
   if (message.author.id !== client.config.ownerID) {
-    if (!client.coolDowns.has(commandName)) client.coolDowns.set(commandName, new client.discord.Collection());
+    if (!client.coolDowns.has(commandName)) client.coolDowns.set(commandName, new client.Discord.Collection());
 
     const now = Date.now();
     const timestamps = client.coolDowns.get(commandName);
@@ -149,7 +148,7 @@ module.exports = async (client, message) => {
       if (now < expirationTime) {
         const timeLeft = (expirationTime - now) / 1000;
 
-        const coolDownError = await message.channel.send(new client.discord.MessageEmbed()
+        const coolDownError = await message.channel.send(new client.Discord.MessageEmbed()
           .setColor(client.config.embed.error)
           .setTitle('Cool down active')
           .setDescription(`Please wait, a cool down of ${timeLeft.toFixed(1)} second(s) is remaining.`)
@@ -168,19 +167,18 @@ module.exports = async (client, message) => {
 
   message.channel.startTyping();
 
+  console.log(`(${time})`.green + ` (${message.guild.name} #${message.channel.name})`.cyan, message.author.tag, message.content);
   try {
-    console.log(`(${time})`.green + ` (${message.guild.name} #${message.channel.name})`.cyan, message.author.tag, message.content);
-
     await command.execute(client, message, args);
   } catch (error) {
     console.error(error);
 
-    message.channel.send(new client.discord.MessageEmbed()
+    message.channel.send(new client.Discord.MessageEmbed()
       .setColor(client.config.embed.error)
-      .setTitle('Command Execution Error')
-      .setDescription(`\`\`\`${error}\`\`\``)
+      .setTitle('An error has occurred')
+      .setDescription(error, { code: 'js' })
       .setFooter('See console for more information')
-    )
+    );
   }
 
   return message.channel.stopTyping();

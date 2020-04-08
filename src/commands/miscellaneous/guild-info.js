@@ -6,7 +6,7 @@ module.exports = {
 
     const createdAt = client.moment(guild.createdAt).format('MM/DD/YYYY');
 
-    const infoEmbed = new client.discord.MessageEmbed()
+    const infoEmbed = new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setThumbnail(guild.iconURL())
       .setTitle('Guild Information')

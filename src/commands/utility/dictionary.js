@@ -12,12 +12,12 @@ module.exports = {
 
     if (!list.length) return message.channel.send(`No results for \`${args.join(' ')}\``);
 
-    return message.channel.send(new client.discord.MessageEmbed()
+    return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(client.config.embed.color)
       .setTitle(`Definition of ${answer.word}`)
-      .setURL(answer.permalink)
       .addField('Definition:', answer.definition)
       .addField('Example:', answer.example)
+      .setURL(answer.permalink)
     );
   }
 };
