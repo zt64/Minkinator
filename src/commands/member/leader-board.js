@@ -15,25 +15,25 @@ module.exports = {
   async execute (client, message, args) {
     const stat = args[0];
 
-    if (!(stat in client.database.members.rawAttributes)) return message.channel.send(`${stat} is not a statistic.`);
+    if (!(stat in client.database.members.rawAttributes)) return message.channel.send(`\`${stat}\` is not a member statistic.`);
+
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
 
     const members = await client.database.members.findAll({ order: [[stat, 'DESC']] });
     const leaderBoardEmbed = new client.Discord.MessageEmbed();
     const pages = Math.ceil(members.length / 10);
 
-    const indexedPage = args[1] - 1 || 0;
-    const nonIndexedPage = args[1] || 1;
+    let page = args[1] || 1;
 
-    let page = 1;
-
-    leaderBoardEmbed.setColor(client.config.embed.color);
+    leaderBoardEmbed.setColor(embedColor);
     leaderBoardEmbed.setTitle(`Member ${stat} leader board`);
-    leaderBoardEmbed.setFooter(`Page ${nonIndexedPage} of ${pages}`);
+    leaderBoardEmbed.setFooter(`Page ${page} of ${pages}`);
 
-    if (nonIndexedPage > pages || nonIndexedPage < 1 || isNaN(nonIndexedPage)) return message.channel.send(`Page ${nonIndexedPage} does not exist.`);
+    if (page > pages || page < 1 || isNaN(page)) return message.channel.send(`Page \`${page}\` does not exist.`);
 
-    members.slice(indexedPage * 10, nonIndexedPage * 10).map((member, index) => {
-      leaderBoardEmbed.addField(`${index + 1 + indexedPage * 10}. ${member.name}:`, member[stat].toLocaleString());
+    members.slice((page - 1) * 10, page * 10).map((member, index) => {
+      leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${member.name}:`, member[stat].toLocaleString());
     });
 
     const leaderBoardMessage = await message.channel.send(leaderBoardEmbed);
@@ -43,10 +43,7 @@ module.exports = {
     leaderBoardMessage.react('❌');
 
     const filter = (reaction, user) => user.id === message.author.id && (
-      reaction.emoji.name === '🏠' ||
-        reaction.emoji.name === '⬅️' ||
-        reaction.emoji.name === '➡️' ||
-        reaction.emoji.name === '❌'
+      ['🏠', '⬅️', '➡️', '❌'].map(emoji => reaction.emoji.name === emoji)
     );
 
     const collector = leaderBoardMessage.createReactionCollector(filter);
@@ -57,6 +54,7 @@ module.exports = {
       switch (emoji) {
         case '🏠':
           page = 1;
+
           leaderBoardMessage.reactions.removeAll();
 
           if (pages > 1) leaderBoardMessage.react('➡️');
@@ -65,6 +63,7 @@ module.exports = {
           break;
         case '⬅️':
           page--;
+
           leaderBoardMessage.reactions.removeAll();
 
           if (page !== 1) leaderBoardMessage.react('🏠');
@@ -74,7 +73,9 @@ module.exports = {
           break;
         case '➡️':
           page++;
+
           leaderBoardMessage.reactions.removeAll();
+
           leaderBoardMessage.react('🏠');
           leaderBoardMessage.react('⬅️');
 
@@ -88,7 +89,7 @@ module.exports = {
 
       leaderBoardEmbed.fields = [];
 
-      members.slice(indexedPage * 10, page * 10).map((member, index) => {
+      members.slice((page - 1) * 10, page * 10).map((member, index) => {
         leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${member.name}:`, member[stat].toLocaleString());
       });
 

@@ -1,5 +1,5 @@
 module.exports = {
-  description: 'List shopItems.',
+  description: 'Sell an item to the shop for half the price.',
   parameters: [
     {
       name: 'item',
@@ -13,19 +13,21 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const shopItems = await client.database.properties.findByPk('items').then(key => key.value);
-    const memberData = await client.database.members.findByPk(message.author.id);
+    const properties = client.database.properties;
+    const guildConfig = await properties.findByPk('configuration').then(key => key.value);
+    const shopItems = await properties.findByPk('items').then(key => key.value);
+
+    const embedColor = guildConfig.embedSuccessColor;
     const currency = guildConfig.currency;
 
     // Set member properties
 
+    const memberData = await client.database.members.findByPk(message.author.id);
     const inventory = memberData.inventory;
-
-    var balance = memberData.balance;
+    let balance = memberData.balance;
 
     const itemName = args[0];
-    const itemAmount = args[1];
+    const itemAmount = parseInt(args[1]);
 
     const shopItem = shopItems.find(item => item.name === itemName);
     const inventoryItem = inventory.find(item => item.name === itemName);
@@ -34,8 +36,8 @@ module.exports = {
 
     // Check if possible to sell
 
-    if (!inventoryItem) return message.channel.send(`You are lacking the ${itemName}`);
-    if (itemAmount > inventoryItem.amount) return message.channel.send('You do not have that much');
+    if (!inventoryItem) return message.channel.send(`You do not have: \`${itemName}\``);
+    if (itemAmount > inventoryItem.amount) return message.channel.send(`You are missing the additional: \`${itemAmount - inventoryItem.amount}\` ${itemName}.`);
 
     inventoryItem.amount - itemAmount ? inventoryItem.amount -= itemAmount : inventory.splice(inventory.indexOf(inventoryItem), 1);
 
@@ -43,6 +45,10 @@ module.exports = {
 
     memberData.update({ balance: balance, inventory: inventory });
 
-    return message.channel.send(`Successfully sold ${itemAmount} ${itemName}(s) for ${currency}${sellPrice.toFixed(2)}`);
+    return message.channel.send(new client.Discord.MessageEmbed()
+      .setColor(embedColor)
+      .setTitle('Transaction Successful')
+      .setDescription(`Sold ${client.pluralize(itemName, itemAmount, true)} for ${currency}${sellPrice.toFixed(2)}`)
+    );
   }
 };

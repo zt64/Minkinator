@@ -2,6 +2,9 @@ module.exports = {
   description: 'Get the definition for a word.',
   aliases: ['dict', 'define', 'def'],
   async execute (client, message, args) {
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+
     const fetch = client.fetch;
     const querystring = require('querystring');
     const query = querystring.stringify({ term: args.join(' ') });
@@ -13,7 +16,7 @@ module.exports = {
     if (!list.length) return message.channel.send(`No results for \`${args.join(' ')}\``);
 
     return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
+      .setColor(embedColor)
       .setTitle(`Definition of ${answer.word}`)
       .addField('Definition:', answer.definition)
       .addField('Example:', answer.example)

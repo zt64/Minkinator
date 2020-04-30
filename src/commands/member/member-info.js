@@ -1,6 +1,6 @@
 module.exports = {
   description: 'Displays a members statistics.',
-  aliases: ['bal', 'balance', 'statistics', 'user-info', 'level', 'lvl'],
+  aliases: ['bal', 'balance', 'stats', 'xp', 'level', 'lvl'],
   parameters: [
     {
       name: 'member',
@@ -8,7 +8,8 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = (await client.database.properties.findByPk('configuration')).value;
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
     const currency = guildConfig.currency;
 
     const user = message.mentions.users.first() || message.author;
@@ -19,14 +20,14 @@ module.exports = {
     const memberData = await client.database.members.findByPk(user.id);
 
     return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
-      .setAuthor(`Statistics for ${member.nickname || user.tag}`, user.avatarURL())
+      .setColor(embedColor)
+      .setAuthor(`Member information: ${member.nickname || user.tag}`, user.avatarURL())
       .addField('Balance:', `${currency}${memberData.balance.toFixed(2).toLocaleString()}`, true)
       .addField('Level:', memberData.level.toLocaleString(), true)
-      .addField('Total experience:', `${memberData.xp.toLocaleString()} XP`, true)
       .addField('Total messages:', memberData.messages.toLocaleString(), true)
+      .addField('Total experience:', `${memberData.xpTotal.toLocaleString()} XP`, true)
+      .addField('Required experience', `${memberData.xpRequired.toLocaleString()} XP`, true)
       .addField('Joined:', member.joinedAt.toLocaleDateString(), true)
-      .addField('Created:', user.createdAt.toLocaleDateString(), true)
     );
   }
 };

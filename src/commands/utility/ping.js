@@ -4,6 +4,9 @@ module.exports = {
   description: 'Returns ping and web socket information.',
   aliases: ['ws'],
   async execute (client, message, args) {
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+
     const ws = client.ws;
     const connections = ['READY', 'CONNECTING', 'RECONNECTING', 'IDLE', 'NEARLY', 'DISCONNECTED'];
 
@@ -18,7 +21,7 @@ module.exports = {
     const gateway = ws.gateway;
 
     return m.edit(new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
+      .setColor(embedColor)
       .setTitle('Ping')
       .addField('API Ping:', `\`\`${apiPing}ms\`\``, true)
       .addField('Response Time:', `\`\`${pms(Number(end - now) / 1000000, { formatSubMilliseconds: true })}\`\``, true)

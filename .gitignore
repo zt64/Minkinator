@@ -1,6 +1,4 @@
 node_modules
-data
-data.json
-.eslintrc.js
-*.sqlite
-src/config/config.json
+data/
+keys.json
+.vscode

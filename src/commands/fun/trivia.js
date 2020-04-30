@@ -10,9 +10,12 @@ module.exports = {
   async execute (client, message, args) {
     const entities = require('entities');
 
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+
     // Fetch questions
 
-    const responses = (await (await client.fetch('https://opentdb.com/api.php?amount=10')).json());
+    const responses = await client.fetch('https://opentdb.com/api.php?amount=10').then(res => res.json());
     const response = responses.results[0];
 
     const question = entities.decodeHTML(response.question);
@@ -27,7 +30,7 @@ module.exports = {
     // Create embed
 
     const questionEmbed = new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
+      .setColor(embedColor)
       .setTitle(`${response.category} question`)
       .setDescription(question);
 
@@ -54,7 +57,7 @@ module.exports = {
 
     collector.on('end', collected => {
       message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(client.config.embed.color)
+        .setColor(embedColor)
         .setTitle('Trivia Answer')
         .setDescription(`The correct answer was ${answer}, \n Good job`)
       );

@@ -1,22 +1,39 @@
 module.exports = {
   description: 'Lists items available to buy.',
-  aliases: ['list'],
+  aliases: ['items', 'store'],
+  parameters: [
+    {
+      name: 'page',
+      type: Number
+    }
+  ],
   async execute (client, message, args) {
-    const guildConfig = (await client.database.properties.findByPk('configuration')).value;
-    const items = (await client.database.properties.findByPk('items')).value;
+    const properties = client.database.properties;
+
+    const items = await properties.findByPk('items').then(key => key.value);
+    const guildConfig = await properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+
     const currency = guildConfig.currency;
     const prefix = guildConfig.prefix;
 
-    var page = args[0] || 1;
-    var pages = Math.ceil(items.length / 10);
+    const pages = Math.ceil(items.length / 10);
+
+    if (!pages) return message.channel.send('The shop is currently empty.');
+
+    let page = args[1] || 1;
+
+    if (page > pages || page < 1 || isNaN(page)) return message.channel.send(`Page \`${page}\` does not exist.`);
 
     const shopEmbed = new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
+      .setColor(embedColor)
       .setTitle('The Shop')
-      .setDescription(`Buy items using \`\`${prefix}buy [item] <amount>\`\` \n Sell items using \`\`${prefix}sell [item] [amount] [price]\`\``)
-      .setFooter(`Page 1 of ${pages}`);
+      .setDescription(`Buy items using \`${prefix}buy [item] <amount>\` \n Sell items using \`${prefix}sell [item] [amount] [price]\``)
+      .setFooter(`Page ${page} of ${pages}`);
 
-    items.map((item, index) => shopEmbed.addField(item.name, `${currency}${item.price}`, true));
+    items.slice((page - 1) * 10, page * 10).map((item, index) => {
+      shopEmbed.addField(item.name, `${currency}${item.price.toLocaleString()}`, true);
+    });
 
     const shopMessage = await message.channel.send(shopEmbed);
 
@@ -25,10 +42,7 @@ module.exports = {
     shopMessage.react('❌');
 
     const filter = (reaction, user) => user.id === message.author.id && (
-      reaction.emoji.name === '🏠' ||
-        reaction.emoji.name === '⬅️' ||
-        reaction.emoji.name === '➡️' ||
-        reaction.emoji.name === '❌'
+      ['🏠', '⬅️', '➡️', '❌'].map(emoji => reaction.emoji.name === emoji)
     );
 
     const collector = shopMessage.createReactionCollector(filter);
@@ -62,7 +76,8 @@ module.exports = {
           shopMessage.reactions.removeAll();
 
           shopMessage.react('🏠');
-          shopMessage.react('⬅️');
+
+          if (pages > 2) shopMessage.react('⬅️');
 
           if (pages > page) shopMessage.react('➡️');
 
@@ -74,7 +89,9 @@ module.exports = {
 
       shopEmbed.fields = [];
 
-      items.map(item => shopEmbed.addField(item.name, `${currency}${item.price}`, true));
+      items.slice((page - 1) * 10, page * 10).map((item, index) => {
+        shopEmbed.addField(item.name, `${currency}${item.price.toLocaleString()}`, true);
+      });
 
       shopEmbed.setFooter(`Page ${page} of ${pages}`);
 

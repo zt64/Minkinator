@@ -1,6 +1,5 @@
 module.exports = {
-  description: 'Changes Minkinators status.',
-  permissions: ['ADMINISTRATOR'],
+  description: 'Change the status of Minkinator.',
   parameters: [
     {
       name: 'type',
@@ -16,6 +15,9 @@ module.exports = {
   async execute (client, message, args) {
     const config = client.config;
 
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+
     const activityType = args[0].toUpperCase();
     const activityName = args.slice(1).join(' ');
 
@@ -27,8 +29,8 @@ module.exports = {
     await client.user.setActivity(activityName, { type: activityType });
 
     return message.channel.send(new client.Discord.MessageEmbed()
+      .setColor(embedColor)
       .setTitle('Successfully changed status')
-      .setColor(client.config.embed.color)
       .setDescription(`Set status to \`${activityType.toLowerCase()} ${activityName}\`.`)
     );
   }

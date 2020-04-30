@@ -9,20 +9,23 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = (await client.database.properties.findByPk('configuration')).value;
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+    const redditNSFW = guildConfig.redditNSFW;
+
     const subreddit = args[0];
-    const body = await (await client.fetch(`https://www.reddit.com/r/${subreddit}/top/.json?limit=256`)).json();
+    const body = await client.fetch(`https://www.reddit.com/r/${subreddit}/top/.json?limit=256`).then(response => response.json());
 
-    if (!body.data) return message.channel.send(`Subreddit \`\`r/${subreddit}\`\` does not exist.`);
+    if (!body.data) return message.channel.send(`Subreddit \`r/${subreddit}\` does not exist.`);
 
-    const posts = guildConfig.redditNSFW ? body.data.children : body.data.children.filter(post => !post.data.over_18);
+    const posts = redditNSFW ? body.data.children : body.data.children.filter(post => !post.data.over_18);
 
-    if (!posts.length) return message.channel.send(`No posts found in \`\`r/${subreddit}.\`\``);
+    if (!posts.length) return message.channel.send(`No posts found in \`r/${subreddit}.\``);
 
     const post = posts[Math.floor(Math.random() * posts.length)].data;
 
     const embed = new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
+      .setColor(embedColor)
       .setTitle(`r/${subreddit} ${post.title}`)
       .setURL(`https://reddit.com${post.permalink}`)
       .setDescription(post.selftext ? post.selftext : '\u200b')

@@ -3,10 +3,13 @@ module.exports = {
   async execute (client, message, args) {
     const result = client.functions.randomInteger(1, 6);
 
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+
     // Create embed
 
     const diceEmbed = new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
+      .setColor(embedColor)
       .setTitle('Dice roll')
       .setDescription('Rolling...')
       .setTimestamp();

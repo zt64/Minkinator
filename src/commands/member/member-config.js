@@ -4,6 +4,9 @@ module.exports = {
     const memberData = await client.database.members.findByPk(message.author.id);
     const memberConfig = memberData.configuration;
 
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+
     const key = args[0];
     const value = args[1];
 
@@ -13,7 +16,7 @@ module.exports = {
 
         memberConfig[key] = JSON.parse(value);
 
-        memberData.update({ configuration: memberConfig });
+        await memberData.update({ configuration: memberConfig });
 
         return message.channel.send(`Successfully set \`${key}\` to \`${value}\`.`);
       } else {
@@ -22,7 +25,7 @@ module.exports = {
     };
 
     const configEmbed = new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
+      .setColor(embedColor)
       .setTitle('Member Configuration');
 
     for (const [key, value] of Object.entries(memberConfig)) {

@@ -7,7 +7,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const emoji = client.emojis.find(emoji => emoji === args[0]);
+    const emoji = client.emojis.resolve(args[0]);
 
     return message.channel.send(emoji.url);
   }

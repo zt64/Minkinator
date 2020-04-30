@@ -1,14 +1,18 @@
 {
-  "token": "NjQ2NjkzMzkwMjUwOTM0Mjg1.XnkMRQ.blu0nJ_pIvSHuVX1WUw3_spr7wY",
   "ownerID": "289556910426816513",
-  "currency": "₼",
-  "errorTimeout": 5000,
-  "activity": {
-    "type": "PLAYING",
-    "name": "with nukes"
-  },
-  "embed": {
-    "color": "#1ED760",
-    "error": "#FF0000"
+  "clientOptions": {
+    "messageCacheMaxSize": 100,
+    "messageSweepInterval": 3600,
+    "fetchAllMembers": true,
+    "presence": {
+      "status": "online",
+      "activity": {
+        "name": "users",
+        "type": "WATCHING"
+      }
+    },
+    "ws": {
+      "large_threshold": 100
+    }
   }
 }

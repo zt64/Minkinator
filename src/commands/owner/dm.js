@@ -12,11 +12,11 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const user = message.mentions.users.first();
+    const user = message.mentions.users.first() || args[0];
     const msg = args[1];
 
-    user.send(msg);
+    await user.send(msg);
 
-    return message.channel.send(`Sent a DM to ${user}`);
+    return message.channel.send(`Sent a DM to \`${user}\``);
   }
 };

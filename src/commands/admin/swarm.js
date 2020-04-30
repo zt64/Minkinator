@@ -1,6 +1,6 @@
 module.exports = {
   description: 'Sends a message using a swarm.',
-  permissions: ['MANAGED_WEBHOOKS'],
+  permissions: ['MANAGE_WEBHOOKS'],
   parameters: [
     {
       name: 'amount',
@@ -14,28 +14,27 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const webHooks = {};
+    const amount = args[0];
+    const string = args.slice(1).join(' ');
 
-    if (isNaN(args[0]) || args[0] < 1 || args[0] > 10) return message.channel.send('Enter a number between 1 and 10');
+    const users = client.users.cache.array();
 
-    // Create web hooks
+    if (amount < 1) return message.channel.send('Enter an amount above one.');
 
-    for (let i = 0; i < args[0]; i++) {
-      webHooks[i] = await message.channel.createWebhook(`Minker ${i + 1}`, {
-        avatar: client.user.avatarURL()
-      });
+    // Create webhook
+    const webhook = await message.channel.createWebhook('Swarm', {
+      avatar: client.user.avatarURL()
+    });
+
+    // Send messages
+
+    for (let i = 0; i < amount; i++) {
+      const user = users[Math.floor(Math.random() * users.length)];
+      await webhook.send(string, { username: user.username, avatarURL: user.avatarURL() });
     }
 
-    // Send message
+    // Delete webhook
 
-    for (let i = 0; i < args[0]; i++) {
-      await webHooks[i].send(args.slice(1).join(' '));
-    }
-
-    // Delete web hooks
-
-    for (let i = 0; i < args[0]; i++) {
-      webHooks[i].delete();
-    }
+    webhook.delete();
   }
 };

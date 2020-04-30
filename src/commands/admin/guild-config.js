@@ -6,6 +6,7 @@ module.exports = {
 
     const guildConfigDB = await properties.findByPk('configuration');
     const guildConfig = guildConfigDB.value;
+    const embedColor = guildConfig.embedSuccessColor;
 
     const key = args[0];
     const value = args[1];
@@ -23,7 +24,7 @@ module.exports = {
         guildConfigDB.update({ value: guildConfig });
 
         return message.channel.send(new client.Discord.MessageEmbed()
-          .setColor(client.config.embed.color)
+          .setColor(embedColor)
           .setTitle('Guild Configuration')
           .setDescription(`Successfully set \`${key}\` to \`${value}\`.`));
       } else {
@@ -32,7 +33,7 @@ module.exports = {
     };
 
     const configEmbed = new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
+      .setColor(embedColor)
       .setTitle('Guild Configuration');
 
     for (const [key, value] of Object.entries(guildConfig)) {

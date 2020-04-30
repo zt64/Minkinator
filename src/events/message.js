@@ -21,6 +21,8 @@ module.exports = async (client, message) => {
   // Set guild constants
 
   const guildConfig = await guildProperties.findByPk('configuration').then(key => key.value);
+  const embedColor = guildConfig.embedSuccessColor;
+  const errorColor = guildConfig.embedErrorColor;
   const errorTimeout = guildConfig.errorTimeout;
   const currency = guildConfig.currency;
   const prefix = guildConfig.prefix;
@@ -36,29 +38,29 @@ module.exports = async (client, message) => {
 
   let level = memberData.level;
 
-  const xpTotal = Math.round(Math.random() * (level / 0.5)) + memberData.xp;
+  const xpTotal = memberData.xpTotal + Math.round(Math.random() * (level / 0.5));
   const xpRequired = memberData.xpRequired;
 
-  memberData.update({ xp: xpTotal, messages: memberData.messages + 1 });
+  memberData.update({ xpTotal: xpTotal, messages: memberData.messages + 1 });
 
   // Check if message author can level up
 
   if (xpTotal >= xpRequired) {
-    memberData.update({ level: level + 1, xpRequired: 15 * level });
+    memberData.update({ level: level + 1, xpRequired: Math.round(xpRequired * 1.5) });
     level++;
 
     if (guildConfig.levelMention && memberConfig.levelMention) {
-      const levelUpEmbed = new client.Discord.MessageEmbed()
-        .setColor(client.config.embed.color)
-        .setTitle(`${message.author.username} has levelled up!`)
-        .setDescription(`${message.author} is now level ${level}.`);
-
       if (!(level % 5)) {
-        levelUpEmbed.setDescription(`${message.author} is now level ${level} and earned ${currency}500 as a reward!`);
-        memberData.increment('balance', { by: 500 });
-      }
+        const levelUpEmbed = new client.Discord.MessageEmbed()
+          .setColor(embedColor)
+          .setTitle(`${message.author.username} has levelled up!`)
+          .setDescription(`${message.author} is now level ${level}.`);
 
-      message.channel.send(levelUpEmbed);
+        levelUpEmbed.setDescription(`${message.author} is now level ${level.toLocaleString()} and earned ${currency}500 as a reward!`);
+        memberData.increment('balance', { by: 500 });
+
+        message.channel.send(levelUpEmbed);
+      }
     }
   }
 
@@ -88,7 +90,7 @@ module.exports = async (client, message) => {
 
     if (command.ownerOnly || (!message.member.hasPermission(command.permissions))) {
       const permissionError = await message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(client.config.embed.error)
+        .setColor(errorColor)
         .setTitle('Missing Permissions')
         .addField('You are missing one of the following permissions:', command.permissions ? command.permissions.join(', ') : 'Bot owner only')
       );
@@ -101,7 +103,7 @@ module.exports = async (client, message) => {
 
   if (command.parameters) {
     var usageEmbed = new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.error)
+      .setColor(errorColor)
       .setTitle(`Improper usage of ${commandName}`)
       .setDescription(command.description)
       .addField('Proper usage', `${prefix}${commandName} `);
@@ -120,6 +122,14 @@ module.exports = async (client, message) => {
       }
     };
   };
+
+  if (command.subCommands) {
+    const subCommand = command.subCommands.some(subCommand => subCommand.name === args[0]);
+
+    if (!subCommand) message.channel.send(`${args[0]} is not a sub-command.`);
+
+    console.log(subCommand);
+  }
 
   async function error () {
     command.parameters.map(parameter => {
@@ -149,9 +159,9 @@ module.exports = async (client, message) => {
         const timeLeft = (expirationTime - now) / 1000;
 
         const coolDownError = await message.channel.send(new client.Discord.MessageEmbed()
-          .setColor(client.config.embed.error)
+          .setColor(errorColor)
           .setTitle('Cool down active')
-          .setDescription(`Please wait, a cool down of ${timeLeft.toFixed(1)} second(s) is remaining.`)
+          .setDescription(`Please wait, a cool down of ${client.pluralize('second', timeLeft.toFixed(1), true)} is remaining.`)
         );
 
         return coolDownError.delete({ timeout: errorTimeout });
@@ -167,14 +177,15 @@ module.exports = async (client, message) => {
 
   message.channel.startTyping();
 
-  console.log(`(${time})`.green + ` (${message.guild.name} #${message.channel.name})`.cyan, message.author.tag, message.content);
+  console.log(`${`(${time})`.green} ${`(${message.guild.name} #${message.channel.name})`.cyan}`, message.author.tag.yellow, message.content);
+
   try {
     await command.execute(client, message, args);
   } catch (error) {
     console.error(error);
 
-    message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.error)
+    await message.channel.send(new client.Discord.MessageEmbed()
+      .setColor(errorColor)
       .setTitle('An error has occurred')
       .setDescription(error, { code: 'js' })
       .setFooter('See console for more information')

@@ -31,7 +31,7 @@ exports.create = async (client, guild) => {
       defaultValue: 1,
       allowNull: false
     },
-    xp: {
+    xpTotal: {
       type: Sequelize.INTEGER,
       defaultValue: 0,
       allowNull: false
@@ -94,6 +94,7 @@ exports.populate = async (client, guild, database) => {
     const [memberData] = await databaseMembers.findOrCreate({ where: { id: user.id } });
 
     memberData.configuration = {
+      measurement: 'metric',
       levelMention: true
     };
 
@@ -118,12 +119,7 @@ exports.populate = async (client, guild, database) => {
   await databaseProperties.findOrCreate({ where: { key: 'name' }, defaults: { value: guild.name } });
   await databaseProperties.findOrCreate({ where: { key: 'data' }, defaults: { value: [] } });
 
-  await databaseProperties.findOrCreate({
-    where: { key: 'items' },
-    defaults: {
-      value: JSON.parse(client.fs.readFileSync('./config/items.json'))
-    }
-  });
+  await databaseProperties.findOrCreate({ where: { key: 'items' }, defaults: { value: [] } });
 
   await databaseProperties.findOrCreate({
     where: { key: 'configuration' },
@@ -131,8 +127,11 @@ exports.populate = async (client, guild, database) => {
       value: {
         prefix: '!',
         currency: '₼',
-        embedColor: '#1ED760',
+        embedErrorColor: '#FF0000',
+        embedSuccessColor: '#1ED760',
         errorTimeout: 3000,
+        markovTries: 1000,
+        markovScore: 100,
         redditNSFW: false,
         levelMention: true,
         ignoreBots: true
@@ -141,8 +140,4 @@ exports.populate = async (client, guild, database) => {
   });
 
   return database;
-};
-
-exports.destroyDatabase = (database) => {
-
 };

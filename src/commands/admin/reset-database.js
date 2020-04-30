@@ -16,6 +16,6 @@ module.exports = {
 
     client.databases[guild.name] = database;
 
-    return message.channel.send(`Successfully reset database for ${guild.name}`);
+    return message.channel.send(`Successfully reset \`${guild.name}\` database.`);
   }
 };

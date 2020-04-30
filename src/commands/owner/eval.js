@@ -5,20 +5,22 @@ module.exports = {
   parameters: [
     {
       name: 'input',
-      type: String,
       required: true
     }
   ],
   async execute (client, message, args) {
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+
     try {
       return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(client.config.embed.color)
+        .setColor(embedColor)
         .setTitle('JS Result')
         .setDescription(await eval(`(async() => {${args.join(' ')}})()`), { code: 'js' })
       );
     } catch (error) {
       return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(client.config.embed.error)
+        .setColor(embedColor)
         .setTitle('JS Error')
         .setDescription(error, { code: 'js' })
       );

@@ -2,10 +2,13 @@ module.exports = {
   description: 'Returns information about the host OS.',
   aliases: ['os'],
   async execute (client, message, args) {
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+
     const os = require('os');
 
     return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
+      .setColor(embedColor)
       .setTitle('OS Information')
       .addField('Platform', os.platform(), true)
       .addField('Architecture', os.arch(), true)

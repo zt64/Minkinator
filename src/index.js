@@ -14,11 +14,13 @@
 
 const functions = require('./lib/functions.js');
 const config = require('./config/config.json');
+const keys = require('./config/keys.json');
 const models = require('./lib/models.js');
 
 const Markov = require('markov-strings').default;
 const GifEncoder = require('gif-encoder');
 const Sequelize = require('sequelize');
+const pluralize = require('pluralize');
 const Discord = require('discord.js');
 const fetch = require('node-fetch');
 const moment = require('moment');
@@ -27,7 +29,8 @@ const colors = require('colors');
 const qr = require('qrcode');
 const fs = require('fs');
 
-const client = new Discord.Client({ fetchAllMembers: true });
+const client = new Discord.Client(config.clientOptions);
+
 const time = moment().format('HH:mm M/D/Y');
 
 client.coolDowns = new Discord.Collection();
@@ -36,6 +39,7 @@ client.events = new Discord.Collection();
 
 client.GifEncoder = GifEncoder;
 client.Sequelize = Sequelize;
+client.pluralize = pluralize;
 client.Discord = Discord;
 client.Markov = Markov;
 client.moment = moment;
@@ -48,6 +52,7 @@ client.fs = fs;
 client.functions = functions;
 client.databases = models;
 client.config = config;
+client.keys = keys;
 
 client.loadEvents = function loadEvents () {
   fs.readdirSync('./events/').forEach(eventName => {
@@ -89,6 +94,8 @@ client.loadCommands = function loadCommands () {
 client.loadEvents();
 client.loadCommands();
 
+client.login(keys.token);
+
 process.on('unhandledRejection', error => console.error('Unhandled Promise Rejection at:', error));
 
 process.stdin.on('data', async data => {
@@ -98,5 +105,3 @@ process.stdin.on('data', async data => {
     console.error(error.message);
   }
 });
-
-client.login(config.token);

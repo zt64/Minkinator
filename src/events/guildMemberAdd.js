@@ -10,9 +10,9 @@ module.exports = async (client, member) => {
   if (!channel) return;
 
   return channel.send(new client.Discord.MessageEmbed()
+    .setColor(client.config.embed.color)
     .setAuthor(`${member.user.tag} (${member.id})`, member.user.avatarURL())
     .setFooter('User joined')
-    .setColor(client.config.embed.color)
     .setTimestamp()
   );
 };

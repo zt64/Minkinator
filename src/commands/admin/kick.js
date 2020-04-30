@@ -1,6 +1,5 @@
 module.exports = {
   description: 'Kicks a member.',
-  usage: '[member] <reason>',
   permissions: ['KICK_MEMBERS'],
   parameters: [
     {
@@ -13,7 +12,10 @@ module.exports = {
       type: String
     }
   ],
-  execute (client, message, args) {
+  async execute (client, message, args) {
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+
     const member = message.mentions.members.first();
     const reason = args.slice(1).join(' ');
 
@@ -22,9 +24,9 @@ module.exports = {
     message.guild.member(member).kick();
 
     return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
+      .setColor(embedColor)
       .setTitle(`${member.user.tag} has been kicked`)
-      .setDescription(args[2] ? reason : 'No reason provided.')
-      .setTimestamp());
+      .setDescription(reason || 'No reason provided.')
+    );
   }
 };

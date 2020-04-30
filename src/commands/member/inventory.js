@@ -8,12 +8,15 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+
     const user = message.mentions.users.first() || message.author;
     const member = message.guild.member(user);
     const inventory = (await client.database.members.findByPk(user.id)).inventory;
 
     const inventoryEmbed = new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
+      .setColor(embedColor)
       .setTitle(`Inventory of ${member.displayName}`);
 
     inventory.map(item => {

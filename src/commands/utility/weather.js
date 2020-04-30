@@ -15,17 +15,20 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+
     const latitude = args[0];
     const longitude = args[1];
 
-    const key = 'ed4b51136c17551e3d97b3a669b65d40';
+    const key = client.keys.darkSky;
     const weather = await client.fetch(`https://api.darksky.net/forecast/${key}/${latitude},${longitude}`).then(response => response.json());
 
     const currently = weather.currently;
     const temp = currently.temperature;
 
     const weatherEmbed = new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
+      .setColor(embedColor)
       .setTitle(`Weather for ${latitude}, ${longitude}`)
       .setURL(`https://darksky.net/forecast/${latitude},${longitude}`)
       .setDescription(`${currently.summary}.`)

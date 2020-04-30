@@ -1,6 +1,5 @@
 module.exports = {
   description: 'Information about the arguments provided.',
-  usage: '[arguments]',
   parameters: [
     {
       name: 'arguments',

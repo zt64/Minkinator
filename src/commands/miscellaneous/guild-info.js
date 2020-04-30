@@ -1,13 +1,16 @@
 module.exports = {
-  description: 'Shows guild information.',
+  description: 'Show guild information.',
   aliases: ['gi', 'guildinfo'],
   async execute (client, message, args) {
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const embedColor = guildConfig.embedSuccessColor;
+
     const guild = message.guild;
 
     const createdAt = client.moment(guild.createdAt).format('MM/DD/YYYY');
 
     const infoEmbed = new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color)
+      .setColor(embedColor)
       .setThumbnail(guild.iconURL())
       .setTitle('Guild Information')
       .addField('Name:', guild.name, true)

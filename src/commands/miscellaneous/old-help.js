@@ -1,11 +1,18 @@
 module.exports = {
-  description: 'Displays information about a specific command.',
-  aliases: ['commands', 'father-i-need-help'],
-  usage: '<command name>',
+  description: 'Information regarding commands and their usage.',
+  aliases: ['commands'],
+  parameters: [
+    {
+      name: 'command',
+      type: String
+    }
+  ],
   async execute (client, message, args) {
-    const prefix = (await client.database.properties.findByPk('prefix')).value;
+    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const prefix = guildConfig.prefix;
+    const embedColor = guildConfig.embedSuccessColor;
     const embed = new client.Discord.MessageEmbed()
-      .setColor(client.config.embed.color);
+      .setColor(embedColor);
 
     if (!args.length) {
       embed.setTitle('You have summoned I, the Minkinator. What shall I do today?');
@@ -15,8 +22,7 @@ module.exports = {
           if (command.permissions && !message.member.hasPermission(command.permissions)) return;
           return command.name;
         }).filter(Boolean).join(', ')}`);
-      embed.setFooter('Created by Litleck');
-      embed.setTimestamp();
+      embed.setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
 
       return message.channel.send(embed);
     }
@@ -26,7 +32,7 @@ module.exports = {
 
     if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
       return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(client.config.embed.color)
+        .setColor(embedColor)
         .setTitle('Invalid Command')
         .setDescription(`\`\`${name}\`\` is not a valid command.`));
     }
@@ -37,10 +43,10 @@ module.exports = {
     if (command.description) embed.addField('**Description**:', command.description, true);
     if (command.usage) embed.addField('**Usage**:', command.usage, true);
 
-    embed.addField('**Cool down**:', `${command.coolDown || 3} second(s)`, true);
+    embed.addField('**Cool down**:', client.pluralize('second', command.coolDown || 3, true), true);
     embed.addField('**Permissions**:', command.permissions ? command.permissions.join(', ') : 'Everyone', true);
 
-    embed.setFooter('Created by Litleck');
+    embed.setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
     embed.setTimestamp();
 
     return message.channel.send(embed);
