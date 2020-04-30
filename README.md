@@ -1,3 +1,7 @@
+![GitHub](https://img.shields.io/github/license/litleck/minkinator)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/litleck/minkinator)
+![Discord](https://img.shields.io/badge/discord-rXVnuTB-6666ee?logo=discord)
+
 # Minkinator, another Discord bot.
 
 ## Requirements
