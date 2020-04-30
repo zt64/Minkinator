@@ -2,7 +2,6 @@
 
 ## Requirements
 
-* Discord.js v12 or newer
 * Node v12.16 or newer
 * NPM v6.14 or newer
 * Discord bot token
