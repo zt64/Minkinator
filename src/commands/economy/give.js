@@ -20,23 +20,25 @@ module.exports = {
 
     const amount = parseInt(args[1]);
 
-    if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
-    if (amount < 1 || isNaN(amount)) return message.channel.send(`${amount} is not a valid amount.`);
+    const target = message.mentions.members.first();
 
-    const target = await client.database.members.findByPk(message.mentions.members.first().id);
-    const member = await client.database.members.findByPk(message.author.id);
+    if (!message.mentions.members.first()) return message.reply(`\`${target}\` is not a valid member.`);
+    if (amount < 1 || isNaN(amount)) return message.channel.send(`\`${amount}\` is not a valid amount.`);
 
-    if (member.balance - amount < 0) return message.reply(`You are missing the additional ${currency}${Math.abs(amount - member.balance)}.`);
+    const [targetData] = await client.database.members.findOrCreate({ where: { id: target.user.id }, defaults: { name: target.user.tag } });
+    const memberData = await client.database.members.findByPk(message.author.id);
 
-    await member.decrement('balance', { by: parseInt(amount) });
-    await target.increment('balance', { by: parseInt(amount) });
+    if (memberData.balance - amount < 0) return message.reply(`You are missing the additional ${currency}${Math.abs(amount - memberData.balance)}.`);
+
+    await memberData.decrement('balance', { by: parseInt(amount) });
+    await targetData.increment('balance', { by: parseInt(amount) });
 
     return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(embedColor)
       .setTitle('Payment Transaction')
-      .setDescription(`${message.author} has sent ${currency}${amount} to ${message.mentions.members.first()}`)
-      .addField(`${message.author.username}'s new balance:`, `${currency}${(member.balance - amount).toLocaleString()}`, true)
-      .addField(`${message.mentions.members.first().user.username}'s new balance:`, `${currency}${target.balance + amount}`, true)
+      .setDescription(`${message.author} has sent ${currency}${amount} to ${target}`)
+      .addField(`${message.author.username}'s new balance:`, `${currency}${(memberData.balance - amount).toLocaleString()}`, true)
+      .addField(`${target.user.username}'s new balance:`, `${currency}${targetData.balance + amount}`, true)
     );
   }
 };

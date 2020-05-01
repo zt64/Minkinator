@@ -33,7 +33,7 @@ module.exports = async (client, message) => {
 
   // Set member constants;
 
-  const memberData = await guildMembers.findByPk(message.author.id);
+  const [memberData] = await guildMembers.findOrCreate({ where: { id: message.author.id }, defaults: { name: message.author.tag } });
   const memberConfig = memberData.configuration;
 
   let level = memberData.level;
@@ -113,25 +113,47 @@ module.exports = async (client, message) => {
 
       if (!parameter.required) continue;
       if (!parameter.type) continue;
-      if (!args[i]) return error();
+      if (!args[i]) return error(command);
 
       try {
-        if (JSON.parse(args[i]).constructor !== parameter.type) return error();
+        if (JSON.parse(args[i]).constructor !== parameter.type) return error(command);
       } catch (e) {
-        if (parameter.type !== String) return error();
+        if (parameter.type !== String) return error(command);
       }
     };
   };
 
+  // Check sub commands
+
   if (command.subCommands) {
-    const subCommand = command.subCommands.some(subCommand => subCommand.name === args[0]);
+    const subCommand = command.subCommands.find(subCommand => subCommand.name === args[0]);
 
-    if (!subCommand) message.channel.send(`${args[0]} is not a sub-command.`);
+    if (!subCommand) return message.channel.send(`${args[0]} is not a sub-command.`);
 
-    console.log(subCommand);
+    if (subCommand.parameters) {
+      var usageEmbed = new client.Discord.MessageEmbed()
+        .setColor(errorColor)
+        .setTitle(`Improper usage of ${commandName}`)
+        .setDescription(command.description)
+        .addField('Proper usage', `${prefix}${commandName} ${subCommand.name} `);
+
+      for (const parameter of subCommand.parameters) {
+        const i = subCommand.parameters.indexOf(parameter);
+
+        if (!parameter.required) continue;
+        if (!parameter.type) continue;
+        if (!args[i + 1]) return error(subCommand);
+
+        try {
+          if (JSON.parse(args[i + 1]).constructor !== parameter.type) return error(subCommand);
+        } catch (e) {
+          if (parameter.type !== String) return error(subCommand);
+        }
+      }
+    }
   }
 
-  async function error () {
+  async function error (command) {
     command.parameters.map(parameter => {
       const field = usageEmbed.fields[0];
 

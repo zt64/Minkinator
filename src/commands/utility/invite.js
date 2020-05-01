@@ -11,7 +11,6 @@ module.exports = {
       .setTitle('Invite Minkinator to any server')
       .setDescription(`Click on the title URL and you can add Minkinator to other servers. This does require administrator rights in the server to be added. \n\n ${inviteURL}`)
       .setURL(inviteURL)
-      .setTimestamp()
     );
   }
 };

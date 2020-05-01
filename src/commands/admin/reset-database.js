@@ -5,14 +5,13 @@ module.exports = {
   async execute (client, message, args) {
     const guildModel = client.database;
     const sequelize = guildModel.sequelize;
-
     const guild = message.guild;
 
     await sequelize.sync({ force: true });
 
     const database = await client.databases.create(client, guild);
 
-    client.databases.populate(client, guild, database);
+    await client.databases.populate(client, guild, database);
 
     client.databases[guild.name] = database;
 

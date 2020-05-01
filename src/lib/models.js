@@ -23,38 +23,41 @@ exports.create = async (client, guild) => {
     },
     balance: {
       type: Sequelize.FLOAT,
-      defaultValue: 0.00,
-      allowNull: false
+      allowNull: false,
+      defaultValue: 0.00
     },
     level: {
       type: Sequelize.INTEGER,
-      defaultValue: 1,
-      allowNull: false
+      allowNull: false,
+      defaultValue: 1
     },
     xpTotal: {
       type: Sequelize.INTEGER,
-      defaultValue: 0,
-      allowNull: false
+      allowNull: false,
+      defaultValue: 0
     },
     xpRequired: {
       type: Sequelize.INTEGER,
-      defaultValue: 50,
-      allowNull: false
+      allowNull: false,
+      defaultValue: 50
     },
     messages: {
       type: Sequelize.INTEGER,
-      defaultValue: 0,
-      allowNull: false
+      allowNull: false,
+      defaultValue: 0
     },
     inventory: {
       type: Sequelize.JSON,
-      defaultValue: [],
-      allowNull: false
+      allowNull: false,
+      defaultValue: []
     },
     configuration: {
       type: Sequelize.JSON,
-      defaultValue: [],
-      allowNull: false
+      allowNull: false,
+      defaultValue: {
+        measurement: 'metric',
+        levelMention: true
+      }
     }
   }, {
     timestamps: false
@@ -89,17 +92,12 @@ exports.populate = async (client, guild, database) => {
 
   // Create model if it doesn't exist
 
-  for (const guildMember of guild.members.cache.array()) {
-    const user = guildMember.user;
-    const [memberData] = await databaseMembers.findOrCreate({ where: { id: user.id } });
+  // for (const guildMember of guild.members.cache.array()) {
+  //   const user = guildMember.user;
+  //   const [memberData] = await databaseMembers.findOrCreate({ where: { id: user.id } });
 
-    memberData.configuration = {
-      measurement: 'metric',
-      levelMention: true
-    };
-
-    await memberData.update({ name: user.tag, configuration: memberData.configuration });
-  };
+  //   await memberData.update({ name: user.tag });
+  // };
 
   // Destroy model if the member left
 
@@ -107,7 +105,7 @@ exports.populate = async (client, guild, database) => {
     try {
       await guild.members.fetch(memberData.id);
     } catch (e) {
-      memberData.destroy();
+      await memberData.destroy();
 
       console.log(`${memberData.name} destroyed.`);
     }
@@ -118,8 +116,10 @@ exports.populate = async (client, guild, database) => {
   await databaseProperties.findOrCreate({ where: { key: 'id' }, defaults: { value: guild.id } });
   await databaseProperties.findOrCreate({ where: { key: 'name' }, defaults: { value: guild.name } });
   await databaseProperties.findOrCreate({ where: { key: 'data' }, defaults: { value: [] } });
-
   await databaseProperties.findOrCreate({ where: { key: 'items' }, defaults: { value: [] } });
+  await databaseProperties.findOrCreate({ where: { key: 'mutes' }, defaults: { value: [] } });
+  await databaseProperties.findOrCreate({ where: { key: 'bans' }, defaults: { value: [] } });
+  await databaseProperties.findOrCreate({ where: { key: 'coolDowns' }, defaults: { value: [] } });
 
   await databaseProperties.findOrCreate({
     where: { key: 'configuration' },
@@ -129,9 +129,10 @@ exports.populate = async (client, guild, database) => {
         currency: '₼',
         embedErrorColor: '#FF0000',
         embedSuccessColor: '#1ED760',
-        errorTimeout: 3000,
+        errorTimeout: 5000,
         markovTries: 1000,
         markovScore: 100,
+        sellPrice: 0.5,
         redditNSFW: false,
         levelMention: true,
         ignoreBots: true
