@@ -111,8 +111,7 @@ module.exports = async (client, message) => {
     for (const parameter of command.parameters) {
       const i = command.parameters.indexOf(parameter);
 
-      if (!parameter.required) continue;
-      if (!parameter.type) continue;
+      if (!parameter.required || !parameter.type) continue;
       if (!args[i]) return error(command);
 
       try {
@@ -140,8 +139,7 @@ module.exports = async (client, message) => {
       for (const parameter of subCommand.parameters) {
         const i = subCommand.parameters.indexOf(parameter);
 
-        if (!parameter.required) continue;
-        if (!parameter.type) continue;
+        if (!parameter.required || !parameter.type) continue;
         if (!args[i + 1]) return error(subCommand);
 
         try {
