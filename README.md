@@ -13,8 +13,8 @@
 
 ## Setup
 
-To get started, clone this repository using `git clone https://github.com/Litleck/Minkinator.git`
-After cloning the run `npm install` in your terminal before starting the bot.
+To get started, clone this repository using `git clone https://github.com/Litleck/Minkinator.git`.
+After cloning run `npm install` in your terminal before starting the bot.
 You will also need a bot token and a DarkSky API key.
 
 Create a file called `tokens.json` in the `/src/config/`, and paste the tokens in their respective places.
