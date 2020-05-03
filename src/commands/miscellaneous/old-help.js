@@ -34,7 +34,7 @@ module.exports = {
       return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(embedColor)
         .setTitle('Invalid Command')
-        .setDescription(`\`\`${name}\`\` is not a valid command.`));
+        .setDescription(`\`${name}\` is not a valid command.`));
     }
 
     embed.addField('**Command**:', command.name, true);
@@ -47,7 +47,6 @@ module.exports = {
     embed.addField('**Permissions**:', command.permissions ? command.permissions.join(', ') : 'Everyone', true);
 
     embed.setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
-    embed.setTimestamp();
 
     return message.channel.send(embed);
   }

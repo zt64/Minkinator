@@ -16,7 +16,8 @@ module.exports = async (client) => {
 
     if (data.length !== 0) {
       const markov = new client.Markov(data, { stateSize: 2 });
-      await markov.buildCorpus();
+
+      markov.buildCorpus();
 
       client.databases[guild.name].markov = markov;
     }

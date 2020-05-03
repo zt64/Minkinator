@@ -23,11 +23,11 @@ module.exports = {
     return m.edit(new client.Discord.MessageEmbed()
       .setColor(embedColor)
       .setTitle('Ping')
-      .addField('API Ping:', `\`\`${apiPing}ms\`\``, true)
-      .addField('Response Time:', `\`\`${pms(Number(end - now) / 1000000, { formatSubMilliseconds: true })}\`\``, true)
-      .addField('Connection Ping:', `\`\`${pms(Number(ender - nower) / 1000000, { formatSubMilliseconds: true })}\`\``, true)
-      .addField('Connection Status:', `\`\`${connectionStatus}\`\``, true)
-      .addField('Gateway:', `\`\`${gateway}\`\``, true)
-      .setTimestamp());
+      .addField('API Ping:', `\`${apiPing}ms\``, true)
+      .addField('Response Time:', `\`${pms(Number(end - now) / 1000000, { formatSubMilliseconds: true })}\``, true)
+      .addField('Connection Ping:', `\`${pms(Number(ender - nower) / 1000000, { formatSubMilliseconds: true })}\``, true)
+      .addField('Connection Status:', `\`${connectionStatus}\``, true)
+      .addField('Gateway:', `\`${gateway}\``, true)
+    );
   }
 };

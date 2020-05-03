@@ -14,7 +14,7 @@
 
 const functions = require('./lib/functions.js');
 const config = require('./config/config.json');
-const keys = require('./config/keys.json');
+const tokens = require('./config/tokens.json');
 const models = require('./lib/models.js');
 
 const Markov = require('markov-strings').default;
@@ -52,7 +52,7 @@ client.fs = fs;
 client.functions = functions;
 client.databases = models;
 client.config = config;
-client.keys = keys;
+client.tokens = tokens;
 
 client.loadEvents = function loadEvents () {
   fs.readdirSync('./events/').forEach(eventName => {
@@ -94,7 +94,7 @@ client.loadCommands = function loadCommands () {
 client.loadEvents();
 client.loadCommands();
 
-client.login(keys.token);
+client.login(tokens.token);
 
 process.on('unhandledRejection', error => console.error('Unhandled Promise Rejection at:', error));
 

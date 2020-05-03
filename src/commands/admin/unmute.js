@@ -25,6 +25,6 @@ module.exports = {
       .setColor(embedColor)
       .setAuthor(`${member.user.tag} has been unmuted`, member.user.avatarURL())
       .setFooter(member.id)
-      .setTimestamp());
+    );
   }
 };

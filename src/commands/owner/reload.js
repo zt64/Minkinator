@@ -13,8 +13,7 @@ module.exports = {
     const reloadEmbed = new client.Discord.MessageEmbed()
       .setColor(embedColor)
       .setTitle('Reloading')
-      .setDescription(`Reloading \`${commands.size}\` commands and \`${events.size}\` events`)
-      .setTimestamp();
+      .setDescription(`Reloading \`${commands.size}\` commands and \`${events.size}\` events`);
 
     const reloadMessage = await message.channel.send(reloadEmbed);
 
@@ -24,6 +23,8 @@ module.exports = {
     try {
       await client.loadEvents();
       await client.loadCommands();
+
+      client.emit('ready');
     } catch (error) {
       console.error(error);
 

@@ -13,7 +13,7 @@
     "discord.js": "github:discordjs/discord.js",
     "entities": "^2.0.0",
     "gif-encoder": "^0.7.2",
-    "markov-strings": "^2.1.0",
+    "markov-strings": "^2.1.1",
     "momentjs": "^2.0.0",
     "node-fetch": "^2.6.0",
     "pluralize": "^8.0.0",

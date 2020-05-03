@@ -9,7 +9,7 @@ module.exports = {
     const embedColor = guildConfig.embedSuccessColor;
 
     const key = args[0];
-    const value = args[1];
+    const value = args.slice(1).join(' ');
 
     if (key) {
       if (key in guildConfig) {
@@ -37,7 +37,7 @@ module.exports = {
       .setTitle('Guild Configuration');
 
     for (const [key, value] of Object.entries(guildConfig)) {
-      configEmbed.addField(key, value, true);
+      configEmbed.addField(key, `\`\`\`${JSON.stringify(value, null, 2)}\`\`\``, true);
     }
 
     return message.channel.send(configEmbed);

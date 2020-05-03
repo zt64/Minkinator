@@ -11,8 +11,7 @@ module.exports = {
     const diceEmbed = new client.Discord.MessageEmbed()
       .setColor(embedColor)
       .setTitle('Dice roll')
-      .setDescription('Rolling...')
-      .setTimestamp();
+      .setDescription('Rolling...');
 
     // Send message
 

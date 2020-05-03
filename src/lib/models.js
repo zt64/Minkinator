@@ -104,7 +104,7 @@ exports.populate = async (client, guild, database) => {
   for (const memberData of await databaseMembers.findAll()) {
     try {
       await guild.members.fetch(memberData.id);
-    } catch (e) {
+    } catch (error) {
       await memberData.destroy();
 
       console.log(`${memberData.name} destroyed.`);
@@ -129,6 +129,7 @@ exports.populate = async (client, guild, database) => {
         currency: '₼',
         embedErrorColor: '#FF0000',
         embedSuccessColor: '#1ED760',
+        ignore: ['!'],
         errorTimeout: 5000,
         markovTries: 1000,
         markovScore: 100,

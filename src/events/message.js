@@ -26,6 +26,7 @@ module.exports = async (client, message) => {
   const errorTimeout = guildConfig.errorTimeout;
   const currency = guildConfig.currency;
   const prefix = guildConfig.prefix;
+  const ignore = guildConfig.ignore;
 
   // Return if ignoreBots is true and author is bot
 
@@ -54,9 +55,8 @@ module.exports = async (client, message) => {
         const levelUpEmbed = new client.Discord.MessageEmbed()
           .setColor(embedColor)
           .setTitle(`${message.author.username} has levelled up!`)
-          .setDescription(`${message.author} is now level ${level}.`);
+          .setDescription(`${message.author} is now level ${level.toLocaleString()} and earned ${currency}500 as a reward!`);
 
-        levelUpEmbed.setDescription(`${message.author} is now level ${level.toLocaleString()} and earned ${currency}500 as a reward!`);
         memberData.increment('balance', { by: 500 });
 
         message.channel.send(levelUpEmbed);
@@ -66,16 +66,14 @@ module.exports = async (client, message) => {
 
   // Write message to data.json
 
-  if (!message.content.startsWith(prefix) && !message.content.startsWith('::') && message.content.length >= 8) {
+  if (!message.content.startsWith(prefix) && ignore.some(element => message.content.startsWith(element))) {
     const dataProperty = await guildProperties.findByPk('data');
     const data = dataProperty.value;
 
-    data.push(message.content.toLowerCase());
+    data.push(message.content);
 
     return dataProperty.update({ value: data });
   }
-
-  if (!message.content.startsWith(prefix)) return;
 
   // Check if command exists
 

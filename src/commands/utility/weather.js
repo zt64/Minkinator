@@ -21,7 +21,7 @@ module.exports = {
     const latitude = args[0];
     const longitude = args[1];
 
-    const key = client.keys.darkSky;
+    const key = client.tokens.darkSky;
     const weather = await client.fetch(`https://api.darksky.net/forecast/${key}/${latitude},${longitude}`).then(response => response.json());
 
     const currently = weather.currently;
