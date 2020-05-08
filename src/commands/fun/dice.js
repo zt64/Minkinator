@@ -1,5 +1,6 @@
 module.exports = {
   description: 'Roll a dice.',
+  aliases: ['roll'],
   async execute (client, message, args) {
     const result = client.functions.randomInteger(1, 6);
 
@@ -17,11 +18,9 @@ module.exports = {
 
     const diceMessage = await message.channel.send(diceEmbed);
 
-    // Delete message
+    await client.functions.sleep(1000);
 
-    setTimeout(() => {
-      diceEmbed.setDescription(result);
-      diceMessage.edit(diceEmbed);
-    }, 1000);
+    diceEmbed.setDescription(result);
+    diceMessage.edit(diceEmbed);
   }
 };

@@ -2,3 +2,4 @@ vscode
 node_modules
 data
 tokens.json
+.eslintrc.json

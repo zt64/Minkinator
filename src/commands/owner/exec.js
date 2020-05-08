@@ -17,13 +17,13 @@ module.exports = {
       return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(embedColor)
         .setTitle('Execution Result')
-        .setDescription(execSync(args.join(' '), { encoding: 'utf-8' }), { code: 'bash' })
+        .setDescription(`\`\`\`bash\n${execSync(args.join(' '), { encoding: 'utf-8' })}\`\`\``)
       );
     } catch (error) {
       return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(embedColor)
         .setTitle('Execution Error')
-        .setDescription(error, { code: 'bash' })
+        .setDescription(`\`\`\`bash\n${error}\`\`\``)
       );
     }
   }

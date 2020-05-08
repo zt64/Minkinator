@@ -66,7 +66,7 @@ module.exports = async (client, message) => {
 
   // Write message to data.json
 
-  if (!message.content.startsWith(prefix) && ignore.some(element => message.content.startsWith(element))) {
+  if (!message.content.startsWith(prefix)) {
     const dataProperty = await guildProperties.findByPk('data');
     const data = dataProperty.value;
 
@@ -188,7 +188,9 @@ module.exports = async (client, message) => {
 
     timestamps.set(message.author.id, now);
 
-    setTimeout(() => timestamps.delete(message.author.id), coolDownAmount);
+    await client.functions.sleep(coolDownAmount);
+
+    timestamps.delete(message.author.id);
   }
 
   // Execute the command

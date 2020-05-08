@@ -16,13 +16,13 @@ module.exports = {
       return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(embedColor)
         .setTitle('JS Result')
-        .setDescription(await eval(`(async() => {${args.join(' ')}})()`), { code: 'js' })
+        .setDescription(`\`\`\`js\n${await eval(`(async() => {${args.join(' ')}})()`)}\`\`\``)
       );
     } catch (error) {
       return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(embedColor)
         .setTitle('JS Error')
-        .setDescription(error, { code: 'js' })
+        .setDescription(`\`\`\`js\n${error}\`\`\``)
       );
     }
   }

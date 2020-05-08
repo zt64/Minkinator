@@ -19,7 +19,7 @@ module.exports = {
     const member = message.guild.member(user);
     const [memberData] = await client.database.members.findOrCreate({ where: { id: user.id }, defaults: { name: user.tag } });
 
-    return message.channel.send(new client.Discord.MessageEmbed()
+    const infoEmbed = new client.Discord.MessageEmbed()
       .setColor(embedColor)
       .setAuthor(`Member information: ${member.nickname || user.tag}`, user.avatarURL())
       .addField('Balance:', `${currency}${memberData.balance.toFixed(2).toLocaleString()}`, true)
@@ -27,7 +27,8 @@ module.exports = {
       .addField('Total messages:', memberData.messages.toLocaleString(), true)
       .addField('Total experience:', `${memberData.xpTotal.toLocaleString()} XP`, true)
       .addField('Required experience', `${memberData.xpRequired.toLocaleString()} XP`, true)
-      .addField('Joined:', member.joinedAt.toLocaleDateString(), true)
-    );
+      .addField('Joined:', member.joinedAt.toLocaleDateString(), true);
+
+    return message.channel.send(infoEmbed);
   }
 };

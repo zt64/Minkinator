@@ -44,13 +44,13 @@ module.exports = {
 
     if (!minutes) return;
 
-    setTimeout(() => {
-      message.guild.unban(member.user);
+    await client.functions.sleep(minutes * 60000);
 
-      return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(embedColor)
-        .setAuthor(`${member.user.tag} has been unbanned`, member.user.avatarURL())
-      );
-    }, minutes * 60000);
+    message.guild.unban(member.user);
+
+    return message.channel.send(new client.Discord.MessageEmbed()
+      .setColor(embedColor)
+      .setAuthor(`${member.user.tag} has been unbanned`, member.user.avatarURL())
+    );
   }
 };

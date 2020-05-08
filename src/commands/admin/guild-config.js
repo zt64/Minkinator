@@ -37,7 +37,7 @@ module.exports = {
       .setTitle('Guild Configuration');
 
     for (const [key, value] of Object.entries(guildConfig)) {
-      configEmbed.addField(key, `\`\`\`${JSON.stringify(value, null, 2)}\`\`\``, true);
+      configEmbed.addField(`${key}:`, `\`\`\`${JSON.stringify(value, null, 2)}\`\`\``, true);
     }
 
     return message.channel.send(configEmbed);

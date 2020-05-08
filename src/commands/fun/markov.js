@@ -8,7 +8,8 @@ module.exports = {
 
     const options = {
       maxTries: markovTries,
-      filter: (result) => result.score > markovScore
+      prng: Math.random(),
+      filter: (result) => result.score > markovScore && result.refs.length >= 2 && result.string.length <= 500
     };
 
     try {

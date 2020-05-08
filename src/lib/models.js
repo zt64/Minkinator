@@ -86,20 +86,9 @@ exports.create = async (client, guild) => {
   return database;
 };
 
-exports.populate = async (client, guild, database) => {
+exports.populate = async (guild, database) => {
   const databaseMembers = database.members;
   const databaseProperties = database.properties;
-
-  // Create model if it doesn't exist
-
-  // for (const guildMember of guild.members.cache.array()) {
-  //   const user = guildMember.user;
-  //   const [memberData] = await databaseMembers.findOrCreate({ where: { id: user.id } });
-
-  //   await memberData.update({ name: user.tag });
-  // };
-
-  // Destroy model if the member left
 
   for (const memberData of await databaseMembers.findAll()) {
     try {
