@@ -24,6 +24,8 @@ module.exports = async (client, message) => {
   const embedColor = guildConfig.embedSuccessColor;
   const errorColor = guildConfig.embedErrorColor;
   const errorTimeout = guildConfig.errorTimeout;
+  const markovTries = guildConfig.markovTries;
+  const markovScore = guildConfig.markovScore;
   const currency = guildConfig.currency;
   const prefix = guildConfig.prefix;
   const ignore = guildConfig.ignore;
@@ -64,9 +66,20 @@ module.exports = async (client, message) => {
     }
   }
 
+  if (message.mentions.users.first() === client.user) {
+    const options = {
+      maxTries: markovTries,
+      filter: (result) => result.score > markovScore && result.refs.length >= 2 && result.string.length <= 500
+    };
+
+    const result = await client.database.markov.generateAsync(options);
+
+    return message.channel.send(result.string);
+  }
+
   // Write message to data.json
 
-  if (!message.content.startsWith(prefix)) {
+  if (![prefix, ...ignore].some(x => message.content.startsWith(x))) {
     const dataProperty = await guildProperties.findByPk('data');
     const data = dataProperty.value;
 
@@ -83,9 +96,9 @@ module.exports = async (client, message) => {
 
   if (!command) return;
 
-  if (message.author.id !== client.config.ownerID) {
-    // Check if message author has permission
+  // Check if message author has permission
 
+  if (message.author.id !== client.config.ownerID) {
     if (command.ownerOnly || (!message.member.hasPermission(command.permissions))) {
       const permissionError = await message.channel.send(new client.Discord.MessageEmbed()
         .setColor(errorColor)

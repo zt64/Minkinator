@@ -5,12 +5,12 @@ module.exports = {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
     const embedColor = guildConfig.embedSuccessColor;
 
-    const result = Math.random();
+    const result = Math.random() > 0.5 ? 'Heads' : 'Tails';
 
     return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(embedColor)
       .setTitle('Coin toss')
-      .setDescription(result > 0.5 ? 'Heads' : 'Tails')
+      .setDescription(result)
     );
   }
 };

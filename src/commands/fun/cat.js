@@ -21,6 +21,7 @@ module.exports = {
       const cat = cats[0];
 
       catEmbed.setTitle('Random cat');
+      catEmbed.setURL(cat.url);
       catEmbed.setImage(cat.url);
 
       return message.channel.send(catEmbed);
@@ -37,6 +38,7 @@ module.exports = {
     if (!cat) return message.channel.send(`No images found for \`${search}\`.`);
 
     catEmbed.setTitle(`${breed.name} cat`);
+    catEmbed.setURL(cat.url);
     catEmbed.setImage(cat.url);
 
     return message.channel.send(catEmbed);

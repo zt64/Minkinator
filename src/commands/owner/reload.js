@@ -13,12 +13,16 @@ module.exports = {
     const reloadEmbed = new client.Discord.MessageEmbed()
       .setColor(embedColor)
       .setTitle('Reloading')
-      .setDescription(`Reloading \`${commands.size}\` commands and \`${events.size}\` events`);
+      .setDescription(`Reloading \`${commands.size}\` commands and \`${events.size}\` events.`);
 
     const reloadMessage = await message.channel.send(reloadEmbed);
 
+    // Remove events and commands
+
     client.removeAllListeners();
     client.commands.clear();
+
+    // Load events and commands
 
     try {
       await client.loadEvents();
@@ -31,11 +35,13 @@ module.exports = {
       return message.channel.send('An error has occurred reloading. Please check console.');
     }
 
+    const ms = reloadMessage.createdTimestamp - message.createdTimestamp;
+
     reloadEmbed.setTitle('Finished reloading');
-    reloadEmbed.setDescription(`Reloaded \`${commands.size}\` commands and \`${events.size}\` events in \`${reloadMessage.createdTimestamp - message.createdTimestamp}\` ms`);
+    reloadEmbed.setDescription(`Reloaded \`${commands.size}\` commands and \`${events.size}\` events in \`${ms}\` ms.`);
 
     reloadMessage.edit(reloadEmbed);
 
-    return console.log(`${`(${time})`.green} Finished reloading commands and events`);
+    return console.log(`${`(${time})`.green} Finished reloading commands and events.`);
   }
 };

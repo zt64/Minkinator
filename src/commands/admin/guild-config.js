@@ -11,34 +11,40 @@ module.exports = {
     const key = args[0];
     const value = args.slice(1).join(' ');
 
-    if (key) {
-      if (key in guildConfig) {
-        if (!value) return message.channel.send(`A value is required for \`${key}\`.`);
-
-        try {
-          guildConfig[key] = JSON.parse(value);
-        } catch (error) {
-          guildConfig[key] = value;
-        }
-
-        guildConfigDB.update({ value: guildConfig });
-
-        return message.channel.send(new client.Discord.MessageEmbed()
-          .setColor(embedColor)
-          .setTitle('Guild Configuration')
-          .setDescription(`Successfully set \`${key}\` to \`${value}\`.`));
-      } else {
-        return message.channel.send(`\`${key}\` does not exist in the guild configuration.`);
-      }
-    };
-
     const configEmbed = new client.Discord.MessageEmbed()
       .setColor(embedColor)
       .setTitle('Guild Configuration');
 
-    for (const [key, value] of Object.entries(guildConfig)) {
-      configEmbed.addField(`${key}:`, `\`\`\`${JSON.stringify(value, null, 2)}\`\`\``, true);
+    // Send all configuration properties
+
+    if (!key) {
+      for (const [key, value] of Object.entries(guildConfig)) {
+        configEmbed.addField(`${key}:`, `\`\`\`json\n${JSON.stringify(value, null, 2)}\`\`\``, true);
+      }
+
+      return message.channel.send(configEmbed);
     }
+
+    // Check if arguments are valid
+
+    if (!(key in guildConfig)) return message.channel.send(`\`${key}\` does not exist in the guild configuration.`);
+
+    if (!value) return message.channel.send(`A value is required for \`${key}\`.`);
+
+    // Set property to input
+
+    configEmbed.addField('Old value:', `\`${guildConfig[key]}\``, true);
+
+    try {
+      guildConfig[key] = JSON.parse(value);
+    } catch (error) {
+      guildConfig[key] = value;
+    }
+
+    guildConfigDB.update({ value: guildConfig });
+
+    configEmbed.setDescription(`Successfully set \`${key}\` to \`${value}\`.`);
+    configEmbed.addField('New value:', `\`${value}\``, true);
 
     return message.channel.send(configEmbed);
   }

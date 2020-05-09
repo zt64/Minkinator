@@ -10,9 +10,11 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const messages = args[0];
+    let messages = args[0];
 
-    if (isNaN(messages) || messages < 1) return message.channel.send('Please enter a valid number between 1 and 100');
+    if (isNaN(messages) || messages < 1) return message.channel.send('Please enter a number between 1 and 100');
+
+    if (messages !== 100) messages += 1;
 
     return message.channel.bulkDelete(Math.round(messages));
   }

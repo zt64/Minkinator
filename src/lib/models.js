@@ -123,6 +123,10 @@ exports.populate = async (guild, database) => {
         markovTries: 1000,
         markovScore: 100,
         sellPrice: 0.5,
+        markov: {
+          score: 100,
+          tries: 1000
+        },
         redditNSFW: false,
         levelMention: true,
         ignoreBots: true
