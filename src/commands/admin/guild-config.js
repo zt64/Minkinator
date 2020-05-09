@@ -19,6 +19,7 @@ module.exports = {
 
     if (!key) {
       for (const [key, value] of Object.entries(guildConfig)) {
+        if (typeof (value) === 'object') continue;
         configEmbed.addField(`${key}:`, `\`\`\`json\n${JSON.stringify(value, null, 2)}\`\`\``, true);
       }
 
@@ -27,7 +28,7 @@ module.exports = {
 
     // Check if arguments are valid
 
-    if (!(key in guildConfig)) return message.channel.send(`\`${key}\` does not exist in the guild configuration.`);
+    if (!(key in guildConfig)) return message.channel.send(`\`${key}\` is not a guild property.`);
 
     if (!value) return message.channel.send(`A value is required for \`${key}\`.`);
 

@@ -88,6 +88,8 @@ module.exports = async (client, message) => {
     return dataProperty.update({ value: data });
   }
 
+  if (!message.content.startsWith(prefix)) return;
+
   // Check if command exists
 
   const args = message.content.slice(prefix.length).split(/ +/);
