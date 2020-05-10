@@ -10,7 +10,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    let messages = args[0];
+    let messages = parseInt(args[0]);
 
     if (isNaN(messages) || messages < 1) return message.channel.send('Please enter a number between 1 and 100');
 

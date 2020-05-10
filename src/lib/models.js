@@ -118,7 +118,7 @@ exports.populate = async (guild, database) => {
         currency: '₼',
         embedErrorColor: '#FF0000',
         embedSuccessColor: '#1ED760',
-        ignore: ['!'],
+        ignore: [],
         errorTimeout: 5000,
         markovTries: 1000,
         markovScore: 100,

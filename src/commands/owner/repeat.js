@@ -21,7 +21,7 @@ module.exports = {
     if (!command) return message.channel.send(`Unable to find \`${commandName}\`.`);
 
     for (var i = 0; i < amount; i++) {
-      command.execute(client, message, args.slice(2));
+      await command.execute(client, message, args.slice(2));
     }
   }
 };

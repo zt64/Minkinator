@@ -72,9 +72,11 @@ module.exports = async (client, message) => {
       filter: (result) => result.score > markovScore && result.refs.length >= 2 && result.string.length <= 500
     };
 
-    const result = await client.database.markov.generateAsync(options);
+    try {
+      const result = await client.database.markov.generateAsync(options);
 
-    return message.channel.send(result.string);
+      return message.channel.send(result.string);
+    } catch (error) { }
   }
 
   // Write message to data.json
@@ -203,9 +205,7 @@ module.exports = async (client, message) => {
 
     timestamps.set(message.author.id, now);
 
-    await client.functions.sleep(coolDownAmount);
-
-    timestamps.delete(message.author.id);
+    setTimeout(() => timestamps.delete(message.author.id), coolDownAmount);
   }
 
   // Execute the command

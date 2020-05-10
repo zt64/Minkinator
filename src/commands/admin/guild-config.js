@@ -1,6 +1,15 @@
 module.exports = {
   description: 'Change guild settings.',
   permissions: ['ADMINISTRATOR'],
+  parameters: [
+    {
+      name: 'key',
+      type: String
+    },
+    {
+      name: 'value'
+    }
+  ],
   async execute (client, message, args) {
     const properties = client.database.properties;
 
@@ -19,7 +28,9 @@ module.exports = {
 
     if (!key) {
       for (const [key, value] of Object.entries(guildConfig)) {
-        if (typeof (value) === 'object') continue;
+        if (typeof (value) === 'object') {
+
+        }
         configEmbed.addField(`${key}:`, `\`\`\`json\n${JSON.stringify(value, null, 2)}\`\`\``, true);
       }
 
