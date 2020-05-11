@@ -3,12 +3,12 @@ module.exports = {
   aliases: ['os'],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     const os = require('os');
 
     return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setTitle('OS Information')
       .addField('Platform', os.platform(), true)
       .addField('Architecture', os.arch(), true)

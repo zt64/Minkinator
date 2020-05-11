@@ -23,7 +23,7 @@ module.exports = {
 
     const guildConfig = await properties.findByPk('configuration').then(key => key.value);
     const mutes = await properties.findByPk('mutes').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     const member = message.mentions.members.first();
     const reason = args.slice(2).join(' ');
@@ -37,7 +37,7 @@ module.exports = {
     });
 
     message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setAuthor(`${member.user.tag} has been muted${minutes ? ` for ${client.pluralize('minute', minutes, true)}` : ''}.`, member.user.avatarURL())
       .setDescription(reason || 'No reason provided.')
     );
@@ -47,7 +47,7 @@ module.exports = {
     setTimeout(() => {
       member.removeRole('625385600081592321');
       return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(embedColor)
+        .setColor(successColor)
         .setAuthor(`${member.user.tag} has been unmuted`, member.user.avatarURL)
       );
     }, client.functions.convertTime());

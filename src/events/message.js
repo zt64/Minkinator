@@ -21,8 +21,8 @@ module.exports = async (client, message) => {
   // Set guild constants
 
   const guildConfig = await guildProperties.findByPk('configuration').then(key => key.value);
-  const embedColor = guildConfig.embedSuccessColor;
-  const errorColor = guildConfig.embedErrorColor;
+  const successColor = guildConfig.embedColors.success;
+  const errorColor = guildConfig.embedColors.error;
   const errorTimeout = guildConfig.errorTimeout;
   const markovTries = guildConfig.markovTries;
   const markovScore = guildConfig.markovScore;
@@ -55,7 +55,7 @@ module.exports = async (client, message) => {
     if (guildConfig.levelMention && memberConfig.levelMention) {
       if (!(level % 5)) {
         const levelUpEmbed = new client.Discord.MessageEmbed()
-          .setColor(embedColor)
+          .setColor(successColor)
           .setTitle(`${message.author.username} has levelled up!`)
           .setDescription(`${message.author} is now level ${level.toLocaleString()} and earned ${currency}500 as a reward!`);
 

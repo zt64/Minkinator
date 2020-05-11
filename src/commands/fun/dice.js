@@ -5,12 +5,12 @@ module.exports = {
     const result = client.functions.randomInteger(1, 6);
 
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     // Create embed
 
     const diceEmbed = new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setTitle('Dice roll')
       .setDescription('Rolling...');
 

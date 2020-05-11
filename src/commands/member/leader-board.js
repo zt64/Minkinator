@@ -18,7 +18,7 @@ module.exports = {
     if (!(stat in client.database.members.rawAttributes)) return message.channel.send(`\`${stat}\` is not a member statistic.`);
 
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     const members = await client.database.members.findAll({ order: [[stat, 'DESC']] });
     const leaderBoardEmbed = new client.Discord.MessageEmbed();
@@ -26,7 +26,7 @@ module.exports = {
 
     let page = args[1] || 1;
 
-    leaderBoardEmbed.setColor(embedColor);
+    leaderBoardEmbed.setColor(successColor);
     leaderBoardEmbed.setTitle(`Member ${stat} leader board`);
     leaderBoardEmbed.setFooter(`Page ${page} of ${pages}`);
 

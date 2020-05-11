@@ -15,7 +15,7 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
     const currency = guildConfig.currency;
 
     const amount = parseInt(args[1]);
@@ -34,7 +34,7 @@ module.exports = {
     await targetData.increment('balance', { by: parseInt(amount) });
 
     return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setTitle('Payment Transaction')
       .setDescription(`${message.author} has sent ${currency}${amount} to ${target}`)
       .addField(`${message.author.username}'s new balance:`, `${currency}${(memberData.balance - amount).toLocaleString()}`, true)

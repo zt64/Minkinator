@@ -50,7 +50,7 @@ module.exports = {
     const shopItems = await properties.findByPk('items').then(key => key.value);
     const guildConfig = await properties.findByPk('configuration').then(key => key.value);
 
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
     const currency = guildConfig.currency;
 
     if (subCommand === 'buy') {
@@ -85,7 +85,7 @@ module.exports = {
       memberData.update({ inventory: inventory });
 
       return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(embedColor)
+        .setColor(successColor)
         .setTitle('Transaction Successful')
         .setDescription(`Bought ${client.pluralize(itemName, itemAmount, true)} for ${currency}${shopItemPrice.toLocaleString()}.`)
       );
@@ -118,7 +118,7 @@ module.exports = {
       memberData.update({ balance: balance, inventory: inventory });
 
       return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(embedColor)
+        .setColor(successColor)
         .setTitle('Transaction Successful')
         .setDescription(`Sold ${client.pluralize(itemName, itemAmount, true)} for ${currency}${sellPrice.toFixed(2)}`)
       );
@@ -137,7 +137,7 @@ module.exports = {
       if (page > pages || page < 1 || isNaN(page)) return message.channel.send(`Page \`${page}\` does not exist.`);
 
       const shopEmbed = new client.Discord.MessageEmbed()
-        .setColor(embedColor)
+        .setColor(successColor)
         .setTitle(`${message.guild.name} shop`)
         .setDescription(`Buy items using \`${prefix}shop buy [item] [amount]\` \n Sell items using \`${prefix}shop sell [item] [amount] [price]\``)
         .setFooter(`Page ${page} of ${pages}`);

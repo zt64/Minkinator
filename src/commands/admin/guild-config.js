@@ -15,25 +15,19 @@ module.exports = {
 
     const guildConfigDB = await properties.findByPk('configuration');
     const guildConfig = guildConfigDB.value;
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     const key = args[0];
     const value = args.slice(1).join(' ');
 
     const configEmbed = new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setTitle('Guild Configuration');
 
     // Send all configuration properties
 
     if (!key) {
       for (const [key, value] of Object.entries(guildConfig)) {
-        if (typeof (value) === 'object') {
-          configEmbed.addField(`${key}:`, `\`\`\`json\n${JSON.stringify(value, null, 2)}\`\`\``, true);
-
-          continue;
-        }
-
         configEmbed.addField(`${key}:`, `\`\`\`json\n${JSON.stringify(value, null, 2)}\`\`\``, true);
       }
 

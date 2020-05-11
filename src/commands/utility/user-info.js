@@ -3,7 +3,7 @@ module.exports = {
   async execute (client, message, args) {
     const user = message.mentions.users.first() || message.author;
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     const platforms = [];
 
@@ -12,7 +12,7 @@ module.exports = {
     if (user.presence.clientStatus.desktop) platforms.push('Desktop');
 
     const infoEmbed = new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setAuthor(`User information: ${user.tag}`, user.avatarURL())
       .addField('ID:', user.id)
       .addField('Created:', user.createdAt.toLocaleDateString(), true)

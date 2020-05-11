@@ -1,5 +1,5 @@
 module.exports = {
-  description: 'Executes in terminal.',
+  description: 'Executes a command.',
   parameters: [
     {
       name: 'input',
@@ -9,22 +9,37 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
+    const input = args.join(' ');
 
-    const execSync = require('child_process').execSync;
+    const { exec } = require('child_process');
 
-    try {
-      return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(embedColor)
-        .setTitle('Execution Result')
-        .setDescription(`\`\`\`bash\n${execSync(args.join(' '), { encoding: 'utf-8' })}\`\`\``)
-      );
-    } catch (error) {
-      return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(embedColor)
-        .setTitle('Execution Error')
-        .setDescription(`\`\`\`bash\n${error}\`\`\``)
-      );
-    }
+    const ls = exec(input, function (error, stdout, stderr) {
+      if (error) {
+        console.log(error.stack);
+        console.log('Error code: ' + error.code);
+        console.log('Signal received: ' + error.signal);
+      }
+      console.log('Child Process STDOUT: ' + stdout);
+      console.log('Child Process STDERR: ' + stderr);
+    });
+
+    ls.on('exit', function (code) {
+      console.log('Child process exited with exit code ' + code);
+    });
+
+    const execEmbed = new client.Discord.MessageEmbed()
+      .setColor(successColor)
+      .setTitle('Exec')
+      .setDescription(`\`\`\`bash\n${input}\`\`\``);
+
+    const execMessage = await message.channel.send(execEmbed);
+
+    const command = exec(input);
+
+    for await (const data of command.stdout) {
+      execEmbed.description += data.toString();
+      execMessage.edit(execEmbed);
+    };
   }
 };

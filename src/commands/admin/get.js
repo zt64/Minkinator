@@ -14,7 +14,7 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     const modelDataEmbed = new client.Discord.MessageEmbed();
     const objectDataEmbed = new client.Discord.MessageEmbed();
@@ -22,7 +22,7 @@ module.exports = {
     const modelName = args[0];
     const objectName = args[1];
 
-    var page = 1;
+    let page = 1;
 
     // Check if model exists
 
@@ -38,7 +38,7 @@ module.exports = {
       const primaryKey = model.primaryKeyAttributes[0];
 
       modelDataEmbed.setTitle(`${modelName}`);
-      modelDataEmbed.setColor(embedColor);
+      modelDataEmbed.setColor(successColor);
 
       await model.findAll().map(object => modelDataEmbed.addField(object[primaryKey], '\u200b', true));
 
@@ -56,7 +56,7 @@ module.exports = {
     // Set embed properties
 
     objectDataEmbed.setTitle(`${modelName}: ${objectName}`);
-    objectDataEmbed.setColor(embedColor);
+    objectDataEmbed.setColor(successColor);
 
     for (const [key, value] of Object.entries(object.dataValues)) {
       objectDataEmbed.addField(`${key}:`, JSON.stringify(value, null, 2), true);

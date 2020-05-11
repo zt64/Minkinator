@@ -16,7 +16,7 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     const latitude = args[0];
     const longitude = args[1];
@@ -28,7 +28,7 @@ module.exports = {
     const temp = currently.temperature;
 
     const weatherEmbed = new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setTitle(`Weather for ${latitude}, ${longitude}`)
       .setURL(`https://darksky.net/forecast/${latitude},${longitude}`)
       .setDescription(`${currently.summary}.`)

@@ -14,7 +14,7 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     const member = message.mentions.members.first();
     const reason = args.slice(1).join(' ');
@@ -24,7 +24,7 @@ module.exports = {
     message.guild.member(member).kick();
 
     return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setTitle(`${member.user.tag} has been kicked`)
       .setDescription(reason || 'No reason provided.')
     );

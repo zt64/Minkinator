@@ -1,17 +1,3 @@
-// import fs from 'fs';
-// import GifEncoder from 'gif-encoder';
-// import colors from 'colors';
-// import qr from 'qrcode';
-// import moment from 'moment';
-// import Sequelize from 'sequelize';
-// import canvas from 'canvas';
-// import fetch from 'node-fetch';
-// import discord from 'discord.js';
-
-// import functions from './lib/functions.js';
-// import models from './lib/models.js';
-// const config = JSON.parse(fs.readFileSync('./config/config.json'));
-
 const functions = require('./lib/functions.js');
 const config = require('./config/config.json');
 const tokens = require('./config/tokens.json');
@@ -27,6 +13,7 @@ const moment = require('moment');
 const canvas = require('canvas');
 const colors = require('colors');
 const qr = require('qrcode');
+const ms = require('ms');
 const fs = require('fs');
 
 const client = new Discord.Client(config.clientOptions);
@@ -47,6 +34,7 @@ client.canvas = canvas;
 client.colors = colors;
 client.fetch = fetch;
 client.qr = qr;
+client.ms = ms;
 client.fs = fs;
 
 client.functions = functions;
@@ -55,7 +43,7 @@ client.config = config;
 client.tokens = tokens;
 
 client.loadEvents = function loadEvents () {
-  fs.readdirSync('./events/').forEach(eventName => {
+  fs.readdirSync('./events/').forEach(async eventName => {
     delete require.cache[require.resolve(`./events/${eventName}`)];
 
     const eventFile = require(`./events/${eventName}`);

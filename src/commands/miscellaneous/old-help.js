@@ -10,9 +10,9 @@ module.exports = {
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
     const prefix = guildConfig.prefix;
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
     const embed = new client.Discord.MessageEmbed()
-      .setColor(embedColor);
+      .setColor(successColor);
 
     if (!args.length) {
       embed.setTitle('You have summoned I, the Minkinator. What shall I do today?');
@@ -32,7 +32,7 @@ module.exports = {
 
     if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
       return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(embedColor)
+        .setColor(successColor)
         .setTitle('Invalid Command')
         .setDescription(`\`${name}\` is not a valid command.`));
     }

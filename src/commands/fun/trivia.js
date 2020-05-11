@@ -11,7 +11,7 @@ module.exports = {
     const entities = require('entities');
 
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     // Fetch questions
 
@@ -30,7 +30,7 @@ module.exports = {
     // Create embed
 
     const questionEmbed = new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setTitle(`${response.category} question`)
       .setDescription(question);
 
@@ -57,7 +57,7 @@ module.exports = {
 
     collector.on('end', collected => {
       message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(embedColor)
+        .setColor(successColor)
         .setTitle('Trivia Answer')
         .setDescription(`The correct answer was ${answer}, \n Good job`)
       );

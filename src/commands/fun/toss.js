@@ -3,12 +3,12 @@ module.exports = {
   aliases: ['flip', 'coin'],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     const result = Math.random() > 0.5 ? 'Heads' : 'Tails';
 
     return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setTitle('Coin toss')
       .setDescription(result)
     );

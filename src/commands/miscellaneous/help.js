@@ -9,7 +9,7 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
     const prefix = guildConfig.prefix;
 
     if (args[0]) {
@@ -18,13 +18,13 @@ module.exports = {
 
       if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
         return message.channel.send(new client.Discord.MessageEmbed()
-          .setColor(embedColor)
+          .setColor(successColor)
           .setTitle('Invalid Command')
           .setDescription(`\`${commandName}\` is not a valid command.`));
       }
 
       const helpEmbed = new client.Discord.MessageEmbed()
-        .setColor(embedColor)
+        .setColor(successColor)
         .addField('Command:', command.name, true)
         .addField('Category:', command.category, true)
         .addField('Description:', command.description)
@@ -50,7 +50,7 @@ module.exports = {
     }
 
     const helpEmbed = new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setTitle('Home page')
       .setDescription(`There is a total of 5 command categories. For information on a specific command, run: \`${prefix}help <command>\``)
       .addField('Fun', 'Fun commands to play around with.')

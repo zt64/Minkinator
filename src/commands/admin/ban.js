@@ -23,7 +23,7 @@ module.exports = {
 
     const guildConfig = await properties.findByPk('configuration').then(key => key.value);
     const bans = await properties.findByPk('bans').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     const member = message.mentions.users.first();
     const reason = args.slice(2).join(' ');
@@ -37,7 +37,7 @@ module.exports = {
     });
 
     message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setAuthor(`${member.user.tag} has been banned${minutes ? ` for ${client.pluralize('minute', minutes, true)}` : ''}.`, member.user.avatarURL())
       .setDescription(reason || 'No reason provided.')
     );
@@ -49,7 +49,7 @@ module.exports = {
     message.guild.unban(member.user);
 
     return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setAuthor(`${member.user.tag} has been unbanned`, member.user.avatarURL())
     );
   }

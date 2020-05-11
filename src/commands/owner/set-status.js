@@ -16,7 +16,7 @@ module.exports = {
     const config = client.config;
 
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     const activityType = args[0].toUpperCase();
     const activityName = args.slice(1).join(' ');
@@ -29,7 +29,7 @@ module.exports = {
     await client.user.setActivity(activityName, { type: activityType });
 
     return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setTitle('Successfully changed status')
       .setDescription(`Set status to \`${activityType.toLowerCase()} ${activityName}\`.`)
     );

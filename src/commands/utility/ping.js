@@ -1,11 +1,11 @@
-const pms = require('pretty-ms');
+const ms = require('ms');
 
 module.exports = {
   description: 'Returns ping and web socket information.',
   aliases: ['ws'],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const successColor = guildConfig.embedColors.success;
 
     const ws = client.ws;
     const connections = ['READY', 'CONNECTING', 'RECONNECTING', 'IDLE', 'NEARLY', 'DISCONNECTED'];
@@ -21,11 +21,11 @@ module.exports = {
     const gateway = ws.gateway;
 
     return m.edit(new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(successColor)
       .setTitle('Ping')
       .addField('API Ping:', `\`${apiPing}ms\``, true)
-      .addField('Response Time:', `\`${pms(Number(end - now) / 1000000, { formatSubMilliseconds: true })}\``, true)
-      .addField('Connection Ping:', `\`${pms(Number(ender - nower) / 1000000, { formatSubMilliseconds: true })}\``, true)
+      .addField('Response Time:', `\`${ms(Number(end - now))}\``, true)
+      .addField('Connection Ping:', `\`${ms(Number(ender - nower))}\``, true)
       .addField('Connection Status:', `\`${connectionStatus}\``, true)
       .addField('Gateway:', `\`${gateway}\``, true)
     );
