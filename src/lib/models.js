@@ -118,7 +118,7 @@ exports.populate = async (client, guild, database) => {
     where: { key: 'configuration' },
     defaults: {
       value: {
-        embedColors: {
+        colors: {
           success: '#1ED760',
           error: '#FF0000'
         },

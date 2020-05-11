@@ -11,9 +11,7 @@ module.exports = {
       .setColor(successColor)
       .setTitle(`Watching ${client.pluralize('guild', guilds.size, true)} and ${client.users.cache.size} users`);
 
-    guilds.map(guild => {
-      guildsEmbed.addField(`${guild.name}`, `Members: ${guild.memberCount} \n ID: ${guild.id}`);
-    });
+    guilds.map(guild => guildsEmbed.addField(`${guild.name}`, `Members: ${guild.memberCount} \n ID: ${guild.id}`));
 
     return message.channel.send(guildsEmbed);
   }

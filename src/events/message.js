@@ -44,12 +44,12 @@ module.exports = async (client, message) => {
   const xpTotal = memberData.xpTotal + Math.round(Math.random() * (level / 0.5));
   const xpRequired = memberData.xpRequired;
 
-  memberData.update({ xpTotal: xpTotal, messages: memberData.messages + 1 });
+  memberData.update({ xpTotal: xpTotal, messages: memberData.messages++ });
 
   // Check if message author can level up
 
   if (xpTotal >= xpRequired) {
-    memberData.update({ level: level + 1, xpRequired: Math.round(xpRequired * 1.5) });
+    memberData.update({ level: level++, xpRequired: Math.round(xpRequired * 1.5) });
     level++;
 
     if (guildConfig.levelMention && memberConfig.levelMention) {

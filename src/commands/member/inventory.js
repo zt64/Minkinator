@@ -19,13 +19,9 @@ module.exports = {
       .setColor(successColor)
       .setTitle(`Inventory of ${member.displayName}`);
 
-    inventory.map(item => {
-      inventoryEmbed.addField(item.name, item.amount, true);
-    });
+    inventory.map(item => inventoryEmbed.addField(item.name, item.amount, true));
 
-    if (!inventoryEmbed.fields.length) {
-      inventoryEmbed.setDescription('No items present.');
-    }
+    if (!inventoryEmbed.fields.length) inventoryEmbed.setDescription('No items present.');
 
     return message.channel.send(inventoryEmbed);
   }

@@ -13,9 +13,9 @@
     "gif-encoder": "^0.7.2",
     "markov-strings": "^2.1.1",
     "momentjs": "^2.0.0",
-    "ms": "^2.1.2",
     "node-fetch": "^2.6.0",
     "pluralize": "^8.0.0",
+    "pretty-ms": "^7.0.0",
     "qrcode": "^1.4.4",
     "sequelize": "^5.21.4",
     "sodium": "^3.0.2",
@@ -35,7 +35,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Litleck/Minkinator.git"
+    "url": "https://github.com/Litleck/Minkinator.git"
   },
   "keywords": [
     "discord"

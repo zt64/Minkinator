@@ -12,8 +12,8 @@ const fetch = require('node-fetch');
 const moment = require('moment');
 const canvas = require('canvas');
 const colors = require('colors');
+const pms = require('pretty-ms');
 const qr = require('qrcode');
-const ms = require('ms');
 const fs = require('fs');
 
 const client = new Discord.Client(config.clientOptions);
@@ -33,8 +33,8 @@ client.moment = moment;
 client.canvas = canvas;
 client.colors = colors;
 client.fetch = fetch;
+client.pms = pms;
 client.qr = qr;
-client.ms = ms;
 client.fs = fs;
 
 client.functions = functions;
