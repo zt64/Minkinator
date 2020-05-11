@@ -26,6 +26,7 @@ module.exports = {
     const modelName = args[0];
     const objectName = args[1];
     const propertyName = args[2];
+
     try {
       var model = client.database.sequelize.model(modelName);
     } catch (e) {
