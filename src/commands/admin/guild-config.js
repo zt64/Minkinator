@@ -29,8 +29,11 @@ module.exports = {
     if (!key) {
       for (const [key, value] of Object.entries(guildConfig)) {
         if (typeof (value) === 'object') {
+          configEmbed.addField(`${key}:`, `\`\`\`json\n${JSON.stringify(value, null, 2)}\`\`\``, true);
 
+          continue;
         }
+
         configEmbed.addField(`${key}:`, `\`\`\`json\n${JSON.stringify(value, null, 2)}\`\`\``, true);
       }
 
@@ -45,18 +48,18 @@ module.exports = {
 
     // Set property to input
 
-    configEmbed.addField('Old value:', `\`${guildConfig[key]}\``, true);
+    configEmbed.addField('Old value:', `\`\`\`js\n${JSON.stringify(guildConfig[key], null, 2)}\`\`\``, true);
 
     try {
       guildConfig[key] = JSON.parse(value);
     } catch (error) {
-      guildConfig[key] = value;
+      return message.channel.send(`Unable to parse \`${value}\` for \`${key}\`.`);
     }
 
     guildConfigDB.update({ value: guildConfig });
 
     configEmbed.setDescription(`Successfully set \`${key}\` to \`${value}\`.`);
-    configEmbed.addField('New value:', `\`${value}\``, true);
+    configEmbed.addField('New value:', `\`\`\`js\n${value}\`\`\``, true);
 
     return message.channel.send(configEmbed);
   }

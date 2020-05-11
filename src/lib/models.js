@@ -10,6 +10,8 @@ exports.create = async (client, guild) => {
 
   const database = {};
 
+  database.sequelize = sequelize;
+
   // Define database members
 
   database.members = sequelize.define('members', {
@@ -79,26 +81,28 @@ exports.create = async (client, guild) => {
     timestamps: false
   });
 
-  database.sequelize = sequelize;
-
   await sequelize.sync();
 
   return database;
 };
 
-exports.populate = async (guild, database) => {
+exports.populate = async (client, guild, database) => {
   const databaseMembers = database.members;
   const databaseProperties = database.properties;
 
-  for (const memberData of await databaseMembers.findAll()) {
-    try {
-      await guild.members.fetch(memberData.id);
-    } catch (error) {
-      await memberData.destroy();
+  const time = client.moment().format('HH:mm M/D/Y');
 
-      console.log(`${memberData.name} destroyed.`);
-    }
-  };
+  if (databaseMembers) {
+    for (const memberData of await databaseMembers.findAll()) {
+      try {
+        await guild.members.fetch(memberData.id);
+      } catch (error) {
+        await memberData.destroy();
+
+        console.log(`${`(${time})`.green} Destroyed ${memberData.name}.`);
+      }
+    };
+  }
 
   // Set guild properties
 
@@ -114,19 +118,19 @@ exports.populate = async (guild, database) => {
     where: { key: 'configuration' },
     defaults: {
       value: {
-        prefix: '!',
-        currency: '₼',
-        embedErrorColor: '#FF0000',
-        embedSuccessColor: '#1ED760',
-        ignore: [],
-        errorTimeout: 5000,
-        markovTries: 1000,
-        markovScore: 100,
-        sellPrice: 0.5,
+        embedColors: {
+          success: '#1ED760',
+          error: '#FF0000'
+        },
         markov: {
           score: 100,
           tries: 1000
         },
+        ignore: [],
+        prefix: '!',
+        currency: '₼',
+        errorTimeout: 5000,
+        sellPrice: 0.5,
         redditNSFW: false,
         levelMention: true,
         ignoreBots: true
