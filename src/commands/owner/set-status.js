@@ -16,7 +16,7 @@ module.exports = {
     const config = client.config;
 
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const successColor = guildConfig.embedColors.success;
+    const successColor = guildConfig.colors.success;
 
     const activityType = args[0].toUpperCase();
     const activityName = args.slice(1).join(' ');

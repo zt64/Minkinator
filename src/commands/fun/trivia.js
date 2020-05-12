@@ -11,7 +11,7 @@ module.exports = {
     const entities = require('entities');
 
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const successColor = guildConfig.embedColors.success;
+    const successColor = guildConfig.colors.success;
 
     // Fetch questions
 

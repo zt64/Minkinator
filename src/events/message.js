@@ -21,8 +21,8 @@ module.exports = async (client, message) => {
   // Set guild constants
 
   const guildConfig = await guildProperties.findByPk('configuration').then(key => key.value);
-  const successColor = guildConfig.embedColors.success;
-  const errorColor = guildConfig.embedColors.error;
+  const successColor = guildConfig.colors.success;
+  const errorColor = guildConfig.colors.error;
   const errorTimeout = guildConfig.errorTimeout;
   const markovTries = guildConfig.markovTries;
   const markovScore = guildConfig.markovScore;
@@ -222,7 +222,7 @@ module.exports = async (client, message) => {
     await message.channel.send(new client.Discord.MessageEmbed()
       .setColor(errorColor)
       .setTitle('An error has occurred')
-      .setDescription(error, { code: 'js' })
+      .setDescription(`\`\`\`js\n${error}\`\`\``)
       .setFooter('See console for more information')
     );
   }

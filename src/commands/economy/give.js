@@ -15,7 +15,7 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const successColor = guildConfig.embedColors.success;
+    const successColor = guildConfig.colors.success;
     const currency = guildConfig.currency;
 
     const amount = parseInt(args[1]);

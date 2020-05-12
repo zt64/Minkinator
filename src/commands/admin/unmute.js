@@ -15,7 +15,7 @@ module.exports = {
   async execute (client, message, args) {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const successColor = guildConfig.embedColors.success;
+    const successColor = guildConfig.colors.success;
 
     const member = message.mentions.members.first();
 

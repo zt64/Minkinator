@@ -5,7 +5,7 @@ module.exports = {
     const result = client.functions.randomInteger(1, 6);
 
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const successColor = guildConfig.embedColors.success;
+    const successColor = guildConfig.colors.success;
 
     // Create embed
 

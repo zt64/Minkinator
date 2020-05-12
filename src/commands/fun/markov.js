@@ -3,7 +3,7 @@ module.exports = {
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
     const data = await client.database.properties.findByPk('data').then(key => key.value);
-    const successColor = guildConfig.embedColors.success;
+    const successColor = guildConfig.colors.success;
     const markovTries = guildConfig.markovTries;
     const markovScore = guildConfig.markovScore;
 
@@ -23,7 +23,7 @@ module.exports = {
       return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(successColor)
         .setTitle('Markov generation unsuccessful')
-        .setDescription(`An error has occurred or the guild does not have enough data. Contact a server administrator to change \`markovScore\` and \`markovTries\` in the guild config. \nCurrently there are: \`${data.length.toLocaleString()}\` strings of data.`)
+        .setDescription(`An error has occurred or the guild does not have enough data. Contact a server administrator to change \`markov.score\` and \`markov.tries\` in the guild config. \nCurrently there are: \`${data.length.toLocaleString()}\` strings of data.`)
       );
     }
   }

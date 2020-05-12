@@ -50,7 +50,7 @@ module.exports = {
     const shopItems = await properties.findByPk('items').then(key => key.value);
     const guildConfig = await properties.findByPk('configuration').then(key => key.value);
 
-    const successColor = guildConfig.embedColors.success;
+    const successColor = guildConfig.colors.success;
     const currency = guildConfig.currency;
 
     if (subCommand === 'buy') {

@@ -23,7 +23,7 @@ module.exports = {
 
     const guildConfig = await properties.findByPk('configuration').then(key => key.value);
     const bans = await properties.findByPk('bans').then(key => key.value);
-    const successColor = guildConfig.embedColors.success;
+    const successColor = guildConfig.colors.success;
 
     const member = message.mentions.users.first();
     const reason = args.slice(2).join(' ');

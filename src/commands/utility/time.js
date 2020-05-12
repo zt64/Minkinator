@@ -3,7 +3,7 @@ module.exports = {
   async execute (client, message, args) {
     const moment = client.moment;
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const successColor = guildConfig.embedColors.success;
+    const successColor = guildConfig.colors.success;
 
     const timeEmbed = new client.Discord.MessageEmbed()
       .setColor(successColor)
