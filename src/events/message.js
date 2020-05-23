@@ -36,7 +36,7 @@ module.exports = async (client, message) => {
 
   // Set member constants;
 
-  const [memberData] = await guildMembers.findOrCreate({ where: { id: message.author.id }, defaults: { name: message.author.tag } });
+  const [memberData] = await guildMembers.findOrCreate({ where: { member_id: message.author.id }, defaults: { name: message.author.tag } });
   const memberConfig = memberData.configuration;
 
   let level = memberData.level;

@@ -14,7 +14,7 @@ module.exports = {
     const redditNSFW = guildConfig.redditNSFW;
 
     const subreddit = args[0];
-    const body = await client.fetch(`https://www.reddit.com/r/${subreddit}/top/.json?limit=256`).then(response => response.json());
+    const body = await client.fetch(`https://api.reddit.com/r/${subreddit}/hot?limit=64`).then(response => response.json());
 
     if (!body.data) return message.channel.send(`Subreddit \`r/${subreddit}\` does not exist.`);
 

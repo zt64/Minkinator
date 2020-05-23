@@ -1,6 +1,7 @@
 module.exports = {
   description: 'Change guild settings.',
   permissions: ['ADMINISTRATOR'],
+  aliases: ['gc'],
   parameters: [
     {
       name: 'key',

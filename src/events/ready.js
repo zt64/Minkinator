@@ -1,9 +1,7 @@
 module.exports = async (client) => {
   const time = client.moment().format('HH:mm M/D/Y');
 
-  if (!client.fs.existsSync('./data/')) {
-    client.fs.mkdirSync('./data/');
-  }
+  if (!client.fs.existsSync('./data/')) client.fs.mkdirSync('./data/');
 
   for (const guild of client.guilds.cache.array()) {
     const database = await client.databases.create(client, guild);

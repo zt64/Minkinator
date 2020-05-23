@@ -10,78 +10,51 @@ exports.create = async (client, guild) => {
 
   const database = {};
 
-  database.sequelize = sequelize;
+  const Guild = sequelize.import('../models/Guild.js');
+  const Property = sequelize.import('../models/Property.js');
+  const Member = sequelize.import('../models/Member.js');
 
-  // Define database members
+  const memberIDs = [];
 
-  database.members = sequelize.define('members', {
-    id: {
-      type: Sequelize.TEXT,
-      primaryKey: true,
-      unique: true
-    },
-    name: {
-      type: Sequelize.TEXT
-    },
-    balance: {
-      type: Sequelize.FLOAT,
-      allowNull: false,
-      defaultValue: 0.00
-    },
-    level: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      defaultValue: 1
-    },
-    xpTotal: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      defaultValue: 0
-    },
-    xpRequired: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      defaultValue: 50
-    },
-    messages: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      defaultValue: 0
-    },
-    inventory: {
-      type: Sequelize.JSON,
-      allowNull: false,
-      defaultValue: []
-    },
-    configuration: {
-      type: Sequelize.JSON,
-      allowNull: false,
-      defaultValue: {
-        measurement: 'metric',
-        levelMention: true
-      }
-    }
-  }, {
-    timestamps: false
-  });
-
-  // Define database properties
-
-  database.properties = sequelize.define('properties', {
-    key: {
-      type: Sequelize.TEXT,
-      primaryKey: true
-    },
-    value: {
-      type: Sequelize.JSON,
-      defaultValue: 0,
-      allowNull: false
-    }
-  }, {
-    timestamps: false
-  });
+  Guild.hasMany(Member);
 
   await sequelize.sync();
+
+  // for (const memberToInsert of guild.members.cache.array()) {
+  //   const member = await Member.findOrCreate({
+  //     where: { member_id: memberToInsert.user.id },
+  //     defaults: { name: memberToInsert.user.tag }
+  //   });
+  //   memberIDs.push(member.id);
+  // }
+
+  await Guild.create({
+    name: 'test',
+    members: [
+      { member_id: 534534, name: 'test' }
+    ]
+  }, {
+    include: [Member]
+  });
+
+  // await Guild.findOrCreate({
+  //   where: { name: guild.name },
+  //   defaults: {
+  //     members: [
+  //       { member_id: 534534, name: 'test' }
+  //     ]
+  //   }
+  // });
+
+  // await Guild.findOrCreate({
+  //   where: { name: guild.name },
+  //   defaults: { members: memberIDs }
+  // });
+
+  database.sequelize = sequelize;
+  database.guilds = Guild;
+  database.members = Member;
+  database.properties = Property;
 
   return database;
 };
@@ -99,7 +72,7 @@ exports.populate = async (client, guild, database) => {
       } catch (error) {
         await memberData.destroy();
 
-        console.log(`${`(${time})`.green} Destroyed ${memberData.name}.`);
+        console.log(`${`(${time})`.green} Deleted ${memberData.name} from ${guild.name}.`);
       }
     };
   }
@@ -124,7 +97,8 @@ exports.populate = async (client, guild, database) => {
         },
         markov: {
           score: 100,
-          tries: 1000
+          tries: 1000,
+          mention: true
         },
         ignore: [],
         prefix: '!',
