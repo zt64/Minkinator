@@ -19,6 +19,8 @@ module.exports = {
     const member = message.guild.member(user);
     const [memberData] = await client.database.members.findOrCreate({ where: { id: user.id }, defaults: { name: user.tag } });
 
+    // Create info embed
+
     const infoEmbed = new client.Discord.MessageEmbed()
       .setColor(successColor)
       .setAuthor(`Member information: ${member.nickname || user.tag}`, user.avatarURL())

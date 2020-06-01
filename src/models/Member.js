@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('member', {
-    member_id: {
+    id: {
       type: DataTypes.TEXT,
       primaryKey: true,
       unique: true
@@ -18,12 +18,12 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: 1
     },
-    xp_total: {
+    xpTotal: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0
     },
-    xp_required: {
+    xpRequired: {
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 50
@@ -39,6 +39,7 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: []
     }
   }, {
-    timestamps: false
+    timestamps: false,
+    underscored: true
   });
 };

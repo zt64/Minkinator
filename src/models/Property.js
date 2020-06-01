@@ -6,10 +6,10 @@ module.exports = (sequelize, DataTypes) => {
     },
     value: {
       type: DataTypes.JSON,
-      allowNull: false,
-      defaultValue: 0
+      allowNull: false
     }
   }, {
-    timestamps: false
+    timestamps: false,
+    underscored: true
   });
 };

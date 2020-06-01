@@ -36,7 +36,7 @@ module.exports = async (client, message) => {
 
   // Set member constants;
 
-  const [memberData] = await guildMembers.findOrCreate({ where: { member_id: message.author.id }, defaults: { name: message.author.tag } });
+  const [memberData] = await guildMembers.findOrCreate({ where: { id: message.author.id }, defaults: { name: message.author.tag } });
   const memberConfig = memberData.configuration;
 
   let level = memberData.level;
@@ -44,7 +44,7 @@ module.exports = async (client, message) => {
   const xpTotal = memberData.xpTotal + Math.round(Math.random() * (level / 0.5));
   const xpRequired = memberData.xpRequired;
 
-  memberData.update({ xpTotal: xpTotal, messages: memberData.messages++ });
+  memberData.update({ xpTotal: xpTotal, messages: memberData.messages + 1 });
 
   // Check if message author can level up
 
@@ -99,6 +99,10 @@ module.exports = async (client, message) => {
   const command = client.commands.get(commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 
   if (!command) return;
+
+  const disabledCommands = await guildProperties.findByPk('commands').then(key => key.value);
+
+  if (disabledCommands.includes(commandName)) return;
 
   // Check if message author has permission
 
@@ -210,22 +214,18 @@ module.exports = async (client, message) => {
 
   // Execute the command
 
-  message.channel.startTyping();
-
   console.log(`${`(${time})`.green} ${`(${message.guild.name} #${message.channel.name})`.cyan}`, message.author.tag.yellow, message.content);
 
   try {
-    await command.execute(client, message, args);
+    return command.execute(client, message, args);
   } catch (error) {
     console.error(error);
 
-    await message.channel.send(new client.Discord.MessageEmbed()
+    return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(errorColor)
       .setTitle('An error has occurred')
       .setDescription(`\`\`\`js\n${error}\`\`\``)
       .setFooter('See console for more information')
     );
   }
-
-  return message.channel.stopTyping();
 };

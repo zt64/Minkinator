@@ -1,8 +1,12 @@
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define('guild', {
-    name: {
-      type: DataTypes.STRING,
+    id: {
+      type: DataTypes.TEXT,
+      primaryKey: true,
       unique: true
+    },
+    name: {
+      type: DataTypes.STRING
     }
   }, {
     timestamps: false,

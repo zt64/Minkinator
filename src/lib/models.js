@@ -10,46 +10,33 @@ exports.create = async (client, guild) => {
 
   const database = {};
 
+  // Import models
+
   const Guild = sequelize.import('../models/Guild.js');
   const Property = sequelize.import('../models/Property.js');
   const Member = sequelize.import('../models/Member.js');
+  const ShopItem = sequelize.import('../models/ShopItem.js');
+  const UserItem = sequelize.import('../models/UserItem.js');
 
-  const memberIDs = [];
+  // Setup relations
 
   Guild.hasMany(Member);
+  Guild.hasMany(ShopItem);
+  Guild.hasMany(Property);
+
+  Member.hasMany(UserItem);
 
   await sequelize.sync();
 
-  // for (const memberToInsert of guild.members.cache.array()) {
-  //   const member = await Member.findOrCreate({
-  //     where: { member_id: memberToInsert.user.id },
-  //     defaults: { name: memberToInsert.user.tag }
-  //   });
-  //   memberIDs.push(member.id);
-  // }
-
-  await Guild.create({
-    name: 'test',
-    members: [
-      { member_id: 534534, name: 'test' }
-    ]
-  }, {
-    include: [Member]
+  await Guild.findOrCreate({
+    where: { id: guild.id },
+    defaults: {
+      id: guild.id,
+      name: guild.name
+    }
   });
 
-  // await Guild.findOrCreate({
-  //   where: { name: guild.name },
-  //   defaults: {
-  //     members: [
-  //       { member_id: 534534, name: 'test' }
-  //     ]
-  //   }
-  // });
-
-  // await Guild.findOrCreate({
-  //   where: { name: guild.name },
-  //   defaults: { members: memberIDs }
-  // });
+  // Link to the database
 
   database.sequelize = sequelize;
   database.guilds = Guild;
@@ -83,6 +70,7 @@ exports.populate = async (client, guild, database) => {
   await databaseProperties.findOrCreate({ where: { key: 'name' }, defaults: { value: guild.name } });
   await databaseProperties.findOrCreate({ where: { key: 'data' }, defaults: { value: [] } });
   await databaseProperties.findOrCreate({ where: { key: 'items' }, defaults: { value: [] } });
+  await databaseProperties.findOrCreate({ where: { key: 'commands' }, defaults: { value: [] } });
   await databaseProperties.findOrCreate({ where: { key: 'mutes' }, defaults: { value: [] } });
   await databaseProperties.findOrCreate({ where: { key: 'bans' }, defaults: { value: [] } });
   await databaseProperties.findOrCreate({ where: { key: 'coolDowns' }, defaults: { value: [] } });
