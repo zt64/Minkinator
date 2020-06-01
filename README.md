@@ -6,10 +6,9 @@
 
 ## Requirements
 
-* Node v12.16 or newer
-* NPM v6.14 or newer
-* Discord bot token
-* DarkSky API key
+* [Node v12.16 or newer](https://nodejs.org/en/download/)
+* [Discord bot token](https://discord.com/developers/applications)
+* [DarkSky API key](https://darksky.net/dev)
 
 ## Setup
 
