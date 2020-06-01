@@ -6,15 +6,16 @@
 
 ## Requirements
 
-* Node v12.16 or newer
-* NPM v6.14 or newer
-* Discord bot token
-* DarkSky API key
+* [Node v12.16 or newer](https://nodejs.org/en/download/)
+* [Discord bot token](https://discord.com/developers/applications)
+* [DarkSky API key](https://darksky.net/dev)
 
 ## Setup
 
 To get started, clone this repository using `git clone https://github.com/Litleck/Minkinator.git`.
 After cloning run `npm install` in your terminal before starting the bot.
+It can be difficult getting some packages such as [Sodium](https://www.npmjs.com/package/sodium), [Canvas](https://www.npmjs.com/package/canvas), and [SQLite3](https://www.npmjs.com/package/sqlite3). It's best to follow the guides for installing them on their npm pages as it varies between operating system.
+
 You will also need a bot token and a DarkSky API key.
 
 Create a file called `tokens.json` in the `/src/config/`, and paste the tokens in their respective places.
