@@ -27,7 +27,12 @@ module.exports = {
         console.log('Signal received: ' + error.signal);
       }
 
-      execEmbed.setDescription(`\`\`\`bash\n${stdout}\`\`\``);
+      if (stdout.length >= 6000) {
+        execEmbed.setDescription('Stdout exceeds Discords API embed limit of 6,000 characters.');
+      } else {
+        execEmbed.setDescription(`\`\`\`bash\n${stdout}\`\`\``);
+      }
+
       execMessage.edit(execEmbed);
 
       console.log('Child Process STDERR: ' + stderr);

@@ -11,7 +11,7 @@ module.exports = {
     const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
     const successColor = guildConfig.colors.success;
 
-    const user = message.mentions.users.first() || message.author;
+    const user = await client.functions.getUser(client, message, args[0]);
 
     return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(successColor)

@@ -25,10 +25,14 @@ module.exports = {
     if (!message.mentions.members.first()) return message.reply(`\`${target}\` is not a valid member.`);
     if (amount < 1 || isNaN(amount)) return message.channel.send(`\`${amount}\` is not a valid amount.`);
 
+    // Get data for the sender and receiver
+
     const [targetData] = await client.database.members.findOrCreate({ where: { id: target.user.id }, defaults: { name: target.user.tag } });
     const memberData = await client.database.members.findByPk(message.author.id);
 
     if (memberData.balance - amount < 0) return message.reply(`You are missing the additional ${currency}${Math.abs(amount - memberData.balance)}.`);
+
+    // Adjust balances
 
     await memberData.decrement('balance', { by: parseInt(amount) });
     await targetData.increment('balance', { by: parseInt(amount) });

@@ -21,24 +21,14 @@ exports.randomInteger = (min, max) => {
   return Math.round(Math.random() * (max - min) + min);
 };
 
-exports.getUser = async (client, message, string) => {
-  try {
-    console.log(await client.users.fetch(string));
-  } catch (error) {
-    console.log(error);
-  };
+exports.getUser = async (client, message, idArg) => {
+  if (message.mentions.users.size >= 1) return message.mentions.users.first();
 
   try {
-    console.log(message.mentions.first());
+    return client.users.fetch(idArg);
   } catch (error) {
-    console.log(error);
-  };
-
-  try {
-    console.log(message.author);
-  } catch (error) {
-    console.log(error);
-  };
+    return message.author;
+  }
 };
 
 exports.fToC = (f) => {

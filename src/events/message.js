@@ -90,6 +90,8 @@ module.exports = async (client, message) => {
     return dataProperty.update({ value: data });
   }
 
+  if (memberData.botBan) return;
+
   if (!message.content.startsWith(prefix)) return;
 
   // Check if command exists
