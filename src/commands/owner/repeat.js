@@ -1,13 +1,13 @@
 module.exports = {
-  description: 'Repeat a command.',
+  description: "Repeat a command.",
   parameters: [
     {
-      name: 'amount',
+      name: "amount",
       type: Number,
       required: true
     },
     {
-      name: 'command',
+      name: "command",
       type: String,
       required: true
     }

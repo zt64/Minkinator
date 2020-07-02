@@ -1,8 +1,8 @@
 module.exports = {
-  description: 'Change the bots avatar.',
+  description: "Change the bots avatar.",
   parameters: [
     {
-      name: 'avatar',
+      name: "avatar",
       type: String,
       required: true
     }
@@ -12,6 +12,6 @@ module.exports = {
 
     await client.user.setAvatar(avatar);
 
-    return message.channel.send('Successfully changed bot avatar.');
+    return message.channel.send("Successfully changed bot avatar.");
   }
 };

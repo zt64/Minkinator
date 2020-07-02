@@ -1,17 +1,17 @@
 module.exports = {
-  description: 'Play a game of trivia.',
-  aliases: ['quiz'],
+  description: "Play a game of trivia.",
+  aliases: ["quiz"],
   async execute (client, message, args) {
     const functions = client.functions;
-    const entities = require('entities');
+    const entities = require("entities");
 
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;
     const currency = guildConfig.currency;
 
     // Fetch question
 
-    const responses = await client.fetch('https://opentdb.com/api.php?amount=1').then(res => res.json());
+    const responses = await client.fetch("https://opentdb.com/api.php?amount=1").then(res => res.json());
     const response = responses.results[0];
 
     const question = entities.decodeHTML(response.question);
@@ -24,7 +24,7 @@ module.exports = {
 
     answers.splice(correctIndex, 0, correctAnswer);
 
-    const letters = ['A', 'B', 'C', 'D'];
+    const letters = ["A", "B", "C", "D"];
 
     const reward = functions.randomInteger(20, 50);
 
@@ -36,19 +36,19 @@ module.exports = {
       .setDescription(question)
       .setFooter(`This question is worth ${currency}${reward}`);
 
-    if (response.type === 'multiple') {
+    if (response.type === "multiple") {
       answers.map((answer, index) => questionEmbed.addField(letters[index], answer, true));
     } else {
-      questionEmbed.addField('A', 'True');
-      questionEmbed.addField('B', 'False');
+      questionEmbed.addField("A", "True");
+      questionEmbed.addField("B", "False");
     }
 
     const questionMessage = await message.channel.send(questionEmbed);
 
-    if (response.type === 'multiple') {
-      ['🇦', '🇧', '🇨', '🇩'].map(reaction => questionMessage.react(reaction));
+    if (response.type === "multiple") {
+      ["🇦", "🇧", "🇨", "🇩"].map(reaction => questionMessage.react(reaction));
     } else {
-      ['🇦', '🇧'].map(reaction => questionMessage.react(reaction));
+      ["🇦", "🇧"].map(reaction => questionMessage.react(reaction));
     }
 
     await functions.sleep(15000);
@@ -72,7 +72,7 @@ module.exports = {
 
     const answerEmbed = new client.Discord.MessageEmbed()
       .setColor(successColor)
-      .setTitle('Trivia Answer');
+      .setTitle("Trivia Answer");
 
     if (users.length) {
       answerEmbed.setDescription(`The correct answer was ${letters[correctIndex]}: \`${correctAnswer}\`, \n ${currency}${reward} has been sent to ${users}.`);

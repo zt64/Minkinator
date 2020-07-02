@@ -1,7 +1,7 @@
 module.exports = {
-  description: 'Reset the guild database.',
-  aliases: ['reset-db', 'r-db'],
-  permissions: ['ADMINISTRATOR'],
+  description: "Reset the guild database.",
+  aliases: ["reset-db", "r-db"],
+  permissions: ["ADMINISTRATOR"],
   async execute (client, message, args) {
     const guildModel = client.database;
     const sequelize = guildModel.sequelize;

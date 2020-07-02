@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define('guild', {
+  return sequelize.define("guild", {
     id: {
       type: DataTypes.TEXT,
       primaryKey: true,

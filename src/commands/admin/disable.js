@@ -1,15 +1,15 @@
 module.exports = {
-  description: 'Disable a command.',
-  permissions: ['ADMINISTRATOR'],
+  description: "Disable a command.",
+  permissions: ["ADMINISTRATOR"],
   parameters: [
     {
-      name: 'command',
+      name: "command",
       type: String,
       required: true
     }
   ],
   async execute (client, message, args) {
-    const commandsKey = await client.database.properties.findByPk('commands');
+    const commandsKey = await client.database.properties.findByPk("commands");
     const commandsArray = commandsKey.value;
     const commandName = args[0];
 

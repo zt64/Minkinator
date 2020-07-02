@@ -1,8 +1,8 @@
 module.exports = {
-  description: 'Generates a QR code based on an input string.',
+  description: "Generates a QR code based on an input string.",
   parameters: [
     {
-      name: 'string',
+      name: "string",
       type: String,
       required: true
     }
@@ -10,7 +10,7 @@ module.exports = {
   async execute (client, message, args) {
     const canvas = client.canvas.createCanvas(512, 512);
 
-    await client.qr.toCanvas(canvas, args.join(' '), { margin: 2 });
+    await client.qr.toCanvas(canvas, args.join(" "), { margin: 2 });
 
     return message.channel.send(new client.Discord.MessageAttachment(canvas.toBuffer()));
   }

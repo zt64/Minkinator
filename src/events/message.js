@@ -1,12 +1,12 @@
 module.exports = async (client, message) => {
-  const time = client.moment().format('HH:mm M/D/Y');
+  const time = client.moment().format("HH:mm M/D/Y");
 
   // Return if in DM channel
 
-  if (message.channel.type === 'dm') {
+  if (message.channel.type === "dm") {
     if (message.author.bot) return;
 
-    return message.channel.send('Commands cannot be run inside DMs.');
+    return message.channel.send("Commands cannot be run inside DMs.");
   }
 
   // Set constants
@@ -20,7 +20,7 @@ module.exports = async (client, message) => {
 
   // Set guild constants
 
-  const guildConfig = await guildProperties.findByPk('configuration').then(key => key.value);
+  const guildConfig = await guildProperties.findByPk("configuration").then(key => key.value);
   const successColor = guildConfig.colors.success;
   const errorColor = guildConfig.colors.error;
   const errorTimeout = guildConfig.errorTimeout;
@@ -36,7 +36,7 @@ module.exports = async (client, message) => {
 
   // Set member constants;
 
-  const [memberData] = await guildMembers.findOrCreate({ where: { id: message.author.id }, defaults: { name: message.author.tag } });
+  const [memberData] = await guildMembers.findOrCreate({ where: { id: message.author.id } });
   const memberConfig = memberData.configuration;
 
   let level = memberData.level;
@@ -59,7 +59,7 @@ module.exports = async (client, message) => {
           .setTitle(`${message.author.username} has levelled up!`)
           .setDescription(`${message.author} is now level ${level.toLocaleString()} and earned ${currency}500 as a reward!`);
 
-        memberData.increment('balance', { by: 500 });
+        memberData.increment("balance", { by: 500 });
 
         message.channel.send(levelUpEmbed);
       }
@@ -82,7 +82,7 @@ module.exports = async (client, message) => {
   // Write message to data.json
 
   if (![prefix, ...ignore].some(x => message.content.startsWith(x))) {
-    const dataProperty = await guildProperties.findByPk('data');
+    const dataProperty = await guildProperties.findByPk("data");
     const data = dataProperty.value;
 
     data.push(message.content);
@@ -102,7 +102,7 @@ module.exports = async (client, message) => {
 
   if (!command) return;
 
-  const disabledCommands = await guildProperties.findByPk('commands').then(key => key.value);
+  const disabledCommands = await guildProperties.findByPk("commands").then(key => key.value);
 
   if (disabledCommands.includes(commandName)) return;
 
@@ -112,8 +112,8 @@ module.exports = async (client, message) => {
     if (command.ownerOnly || (!message.member.hasPermission(command.permissions))) {
       const permissionError = await message.channel.send(new client.Discord.MessageEmbed()
         .setColor(errorColor)
-        .setTitle('Missing Permissions')
-        .addField('You are missing one of the following permissions:', command.permissions ? command.permissions.join(', ') : 'Bot owner only')
+        .setTitle("Missing Permissions")
+        .addField("You are missing one of the following permissions:", command.permissions ? command.permissions.join(", ") : "Bot owner only")
       );
 
       return permissionError.delete({ timeout: errorTimeout });
@@ -127,7 +127,7 @@ module.exports = async (client, message) => {
       .setColor(errorColor)
       .setTitle(`Improper usage of ${commandName}`)
       .setDescription(command.description)
-      .addField('Proper usage', `${prefix}${commandName} `);
+      .addField("Proper usage", `${prefix}${commandName} `);
 
     for (const parameter of command.parameters) {
       const i = command.parameters.indexOf(parameter);
@@ -155,7 +155,7 @@ module.exports = async (client, message) => {
         .setColor(errorColor)
         .setTitle(`Improper usage of ${commandName}`)
         .setDescription(command.description)
-        .addField('Proper usage', `${prefix}${commandName} ${subCommand.name} `);
+        .addField("Proper usage", `${prefix}${commandName} ${subCommand.name} `);
 
       for (const parameter of subCommand.parameters) {
         const i = subCommand.parameters.indexOf(parameter);
@@ -201,8 +201,8 @@ module.exports = async (client, message) => {
 
         const coolDownError = await message.channel.send(new client.Discord.MessageEmbed()
           .setColor(errorColor)
-          .setTitle('Cool down active')
-          .setDescription(`Please wait, a cool down of ${client.pluralize('second', timeLeft.toFixed(1), true)} is remaining.`)
+          .setTitle("Cool down active")
+          .setDescription(`Please wait, a cool down of ${client.pluralize("second", timeLeft.toFixed(1), true)} is remaining.`)
         );
 
         return coolDownError.delete({ timeout: errorTimeout });
@@ -225,9 +225,9 @@ module.exports = async (client, message) => {
 
     return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(errorColor)
-      .setTitle('An error has occurred')
+      .setTitle("An error has occurred")
       .setDescription(`\`\`\`js\n${error}\`\`\``)
-      .setFooter('See console for more information')
+      .setFooter("See console for more information")
     );
   }
 };

@@ -1,21 +1,21 @@
 module.exports = {
-  description: 'Get weather forecast for a location.',
+  description: "Get weather forecast for a location.",
   parameters: [
     {
-      name: 'latitude',
+      name: "latitude",
       type: Number,
       range: [-90, 90],
       required: true
     },
     {
-      name: 'longitude',
+      name: "longitude",
       type: Number,
       range: [-180, 180],
       required: true
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;
 
     const latitude = args[0];
@@ -32,10 +32,10 @@ module.exports = {
       .setTitle(`Weather for ${latitude}, ${longitude}`)
       .setURL(`https://darksky.net/forecast/${latitude},${longitude}`)
       .setDescription(`${currently.summary}.`)
-      .addField('Temperature:', `${temp} °F (${client.functions.fToC(temp).toFixed(2)} °C)`, true)
-      .addField('Humidity:', `${currently.humidity * 100}%`, true)
-      .addField('Pressure:', `${currently.pressure} hPa`, true)
-      .setFooter('Powered by Dark Sky');
+      .addField("Temperature:", `${temp} °F (${client.functions.fToC(temp).toFixed(2)} °C)`, true)
+      .addField("Humidity:", `${currently.humidity * 100}%`, true)
+      .addField("Pressure:", `${currently.pressure} hPa`, true)
+      .setFooter("Powered by Dark Sky");
 
     return message.channel.send(weatherEmbed);
   }

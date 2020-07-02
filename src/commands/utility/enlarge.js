@@ -1,20 +1,20 @@
 module.exports = {
-  description: 'Get a scaled up version of emojis.',
+  description: "Get a scaled up version of emojis.",
   parameters: [
     {
-      name: 'emoji',
+      name: "emoji",
       type: String,
       required: true
     },
     {
-      name: 'scale',
+      name: "scale",
       type: Number
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;
-    const twemoji = require('twemoji');
+    const twemoji = require("twemoji");
     const messageEmoji = args[0];
 
     let url;
@@ -37,7 +37,7 @@ module.exports = {
 
     const emojiEmbed = new client.Discord.MessageEmbed()
       .setColor(successColor)
-      .setTitle('Scaled emoji')
+      .setTitle("Scaled emoji")
       .setURL(url)
       .setImage(url);
 

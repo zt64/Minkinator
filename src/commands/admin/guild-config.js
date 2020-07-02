@@ -1,23 +1,23 @@
 module.exports = {
-  description: 'Change guild settings.',
-  permissions: ['ADMINISTRATOR'],
-  aliases: ['gc'],
+  description: "Change guild settings.",
+  permissions: ["ADMINISTRATOR"],
+  aliases: ["gc"],
   parameters: [
     {
-      name: 'key',
+      name: "key",
       type: String
     },
     {
-      name: 'value | key'
+      name: "value | key"
     },
     {
-      name: 'value'
+      name: "value"
     }
   ],
   async execute (client, message, args) {
     const properties = client.database.properties;
 
-    const guildConfigDB = await properties.findByPk('configuration');
+    const guildConfigDB = await properties.findByPk("configuration");
     const guildConfig = guildConfigDB.value;
     const successColor = guildConfig.colors.success;
 
@@ -25,7 +25,7 @@ module.exports = {
 
     const configEmbed = new client.Discord.MessageEmbed()
       .setColor(successColor)
-      .setTitle('Guild Configuration');
+      .setTitle("Guild Configuration");
 
     if (!key) {
       for (const [key, value] of Object.entries(guildConfig)) {
@@ -37,7 +37,7 @@ module.exports = {
 
     if (!(key in guildConfig)) return message.channel.send(`\`${key}\` is not a guild property.`);
 
-    if (typeof (guildConfig[key]) === 'object') {
+    if (typeof (guildConfig[key]) === "object") {
       const object = guildConfig[key];
       const objectKey = args[1];
       const value = args[2];

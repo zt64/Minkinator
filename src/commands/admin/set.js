@@ -1,24 +1,24 @@
 module.exports = {
-  description: 'Manipulate guild database properties.',
-  permissions: ['ADMINISTRATOR'],
+  description: "Manipulate guild database properties.",
+  permissions: ["ADMINISTRATOR"],
   parameters: [
     {
-      name: 'model',
+      name: "model",
       type: String,
       required: true
     },
     {
-      name: 'object',
+      name: "object",
       // type: String,
       required: true
     },
     {
-      name: 'property',
+      name: "property",
       type: String,
       required: true
     },
     {
-      name: 'value'
+      name: "value"
       // type: String
     }
   ],
@@ -40,8 +40,8 @@ module.exports = {
     }
 
     try {
-      await object.update({ [propertyName]: JSON.parse(args.slice(3).join(' ')) });
-      return message.channel.send(`Set ${modelName}: ${objectName}.${propertyName} to \`${args.slice(3).join(' ')}\`.`);
+      await object.update({ [propertyName]: JSON.parse(args.slice(3).join(" ")) });
+      return message.channel.send(`Set ${modelName}: ${objectName}.${propertyName} to \`${args.slice(3).join(" ")}\`.`);
     } catch (e) {
       return message.channel.send(`Property: ${propertyName}, does not exist.`);
     }

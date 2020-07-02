@@ -1,25 +1,25 @@
 module.exports = {
-  description: 'Revokes a members mute.',
-  permissions: ['MANAGE_CHANNELS'],
+  description: "Revokes a members mute.",
+  permissions: ["MANAGE_CHANNELS"],
   parameters: [
     {
-      name: 'member',
+      name: "member",
       type: String,
       required: true
     },
     {
-      name: 'reason',
+      name: "reason",
       type: String
     }
   ],
   async execute (client, message, args) {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;
 
     const member = message.mentions.members.first();
 
-    member.roles.remove('671902495726895127');
+    member.roles.remove("671902495726895127");
 
     return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(successColor)

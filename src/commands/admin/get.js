@@ -1,19 +1,19 @@
 module.exports = {
-  description: 'Gets a value from a database.',
-  permissions: ['ADMINISTRATOR'],
+  description: "Gets a value from a database.",
+  permissions: ["ADMINISTRATOR"],
   parameters: [
     {
-      name: 'model',
+      name: "model",
       type: String,
       required: true
     },
     {
-      name: 'object',
+      name: "object",
       type: String
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;
 
     const modelDataEmbed = new client.Discord.MessageEmbed();
@@ -40,7 +40,7 @@ module.exports = {
       modelDataEmbed.setTitle(`${modelName}`);
       modelDataEmbed.setColor(successColor);
 
-      await model.findAll().map(object => modelDataEmbed.addField(object[primaryKey], '\u200b', true));
+      await model.findAll().map(object => modelDataEmbed.addField(object[primaryKey], "\u200b", true));
 
       return message.channel.send(modelDataEmbed);
     }

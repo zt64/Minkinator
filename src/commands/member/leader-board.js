@@ -1,14 +1,14 @@
 module.exports = {
-  description: 'Leader board for user stats',
-  aliases: ['lb'],
+  description: "Leader board for user stats",
+  aliases: ["lb"],
   parameters: [
     {
-      name: 'stat',
+      name: "stat",
       type: String,
       required: true
     },
     {
-      name: 'page',
+      name: "page",
       type: Number
     }
   ],
@@ -17,10 +17,10 @@ module.exports = {
 
     if (!(stat in client.database.members.rawAttributes)) return message.channel.send(`\`${stat}\` is not a member statistic.`);
 
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;
 
-    const members = await client.database.members.findAll({ order: [[stat, 'DESC']] });
+    const members = await client.database.members.findAll({ order: [[stat, "DESC"]] });
     const leaderBoardEmbed = new client.Discord.MessageEmbed();
     const pages = Math.ceil(members.length / 10);
 
@@ -38,52 +38,52 @@ module.exports = {
 
     const leaderBoardMessage = await message.channel.send(leaderBoardEmbed);
 
-    if (pages > 1) leaderBoardMessage.react('➡️');
+    if (pages > 1) leaderBoardMessage.react("➡️");
 
-    leaderBoardMessage.react('❌');
+    leaderBoardMessage.react("❌");
 
     const filter = (reaction, user) => user.id === message.author.id && (
-      ['🏠', '⬅️', '➡️', '❌'].map(emoji => reaction.emoji.name === emoji)
+      ["🏠", "⬅️", "➡️", "❌"].map(emoji => reaction.emoji.name === emoji)
     );
 
     const collector = leaderBoardMessage.createReactionCollector(filter);
 
-    collector.on('collect', async reaction => {
+    collector.on("collect", async reaction => {
       const emoji = reaction.emoji.name;
 
       switch (emoji) {
-        case '🏠':
+        case "🏠":
           page = 1;
 
           leaderBoardMessage.reactions.removeAll();
 
-          if (pages > 1) leaderBoardMessage.react('➡️');
+          if (pages > 1) leaderBoardMessage.react("➡️");
 
-          leaderBoardMessage.react('❌');
+          leaderBoardMessage.react("❌");
           break;
-        case '⬅️':
+        case "⬅️":
           page--;
 
           leaderBoardMessage.reactions.removeAll();
 
-          if (page !== 1) leaderBoardMessage.react('🏠');
+          if (page !== 1) leaderBoardMessage.react("🏠");
 
-          leaderBoardMessage.react('➡️');
-          leaderBoardMessage.react('❌');
+          leaderBoardMessage.react("➡️");
+          leaderBoardMessage.react("❌");
           break;
-        case '➡️':
+        case "➡️":
           page++;
 
           leaderBoardMessage.reactions.removeAll();
 
-          leaderBoardMessage.react('🏠');
-          leaderBoardMessage.react('⬅️');
+          leaderBoardMessage.react("🏠");
+          leaderBoardMessage.react("⬅️");
 
-          if (pages > page) leaderBoardMessage.react('➡️');
+          if (pages > page) leaderBoardMessage.react("➡️");
 
-          leaderBoardMessage.react('❌');
+          leaderBoardMessage.react("❌");
           break;
-        case '❌':
+        case "❌":
           return leaderBoardMessage.delete();
       }
 

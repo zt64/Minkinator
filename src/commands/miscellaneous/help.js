@@ -1,14 +1,14 @@
 module.exports = {
-  description: 'View available commands and their information.',
-  aliases: ['commands'],
+  description: "View available commands and their information.",
+  aliases: ["commands"],
   parameters: [
     {
-      name: 'command name',
+      name: "command name",
       type: String
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;
     const prefix = guildConfig.prefix;
 
@@ -19,23 +19,23 @@ module.exports = {
       if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
         return message.channel.send(new client.Discord.MessageEmbed()
           .setColor(successColor)
-          .setTitle('Invalid Command')
+          .setTitle("Invalid Command")
           .setDescription(`\`${commandName}\` is not a valid command.`));
       }
 
       const helpEmbed = new client.Discord.MessageEmbed()
         .setColor(successColor)
-        .addField('Command:', command.name, true)
-        .addField('Category:', command.category, true)
-        .addField('Description:', command.description)
-        .addField('Cool down:', client.pluralize('second', command.coolDown || 3, true), true)
-        .addField('Permissions:', command.permissions ? command.permissions.join(', ') : 'Everyone', true)
+        .addField("Command:", command.name, true)
+        .addField("Category:", command.category, true)
+        .addField("Description:", command.description)
+        .addField("Cool down:", client.pluralize("second", command.coolDown || 3, true), true)
+        .addField("Permissions:", command.permissions ? command.permissions.join(", ") : "Everyone", true)
         .setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
 
-      if (command.aliases) helpEmbed.addField('Aliases:', command.aliases.join(', '), true);
+      if (command.aliases) helpEmbed.addField("Aliases:", command.aliases.join(", "), true);
 
       if (command.parameters) {
-        let parameters = '';
+        let parameters = "";
 
         command.parameters.map(parameter => {
           parameter.required ? parameters += `[${parameter.name}] ` : parameters += `<${parameter.name}> `;
@@ -44,19 +44,19 @@ module.exports = {
         var usage = `\`${prefix}${command.name} ${parameters}\``;
       }
 
-      helpEmbed.addField('Usage:', usage);
+      helpEmbed.addField("Usage:", usage);
 
       return message.channel.send(helpEmbed);
     }
 
     const helpEmbed = new client.Discord.MessageEmbed()
       .setColor(successColor)
-      .setTitle('Home page')
+      .setTitle("Home page")
       .setDescription(`There is a total of 5 command categories. For information on a specific command, run: \`${prefix}help <command>\``)
-      .addField('Fun', 'Fun commands to play around with.')
-      .addField('Utility', 'Tools for the more technical.')
-      .addField('Admin', 'Take control of a guild.')
-      .addField('Economy', 'Buy, sell, and make a profit.')
+      .addField("Fun", "Fun commands to play around with.")
+      .addField("Utility", "Tools for the more technical.")
+      .addField("Admin", "Take control of a guild.")
+      .addField("Economy", "Buy, sell, and make a profit.")
       .setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
 
     const helpMessage = await message.channel.send(helpEmbed);
@@ -65,7 +65,7 @@ module.exports = {
       client.commands.map((command, index) => {
         if (command.category !== category) return;
 
-        helpEmbed.addField(`\`${prefix}${command.name}\``, command.description || '\u200b');
+        helpEmbed.addField(`\`${prefix}${command.name}\``, command.description || "\u200b");
       });
     }
 
@@ -73,123 +73,123 @@ module.exports = {
       await reactions.map(reaction => helpMessage.react(reaction));
     }
 
-    await react(['🥳', '💵', '👤', '🖌️', '🛠️', '🔒', '❔', '❌']);
+    await react(["🥳", "💵", "👤", "🖌️", "🛠️", "🔒", "❔", "❌"]);
 
     // Create reaction collector
 
     const filter = (reaction, user) => user.id === message.author.id && (
-      ['🏠', '🛠️', '🥳', '🔒', '❌'].map(emoji => reaction.emoji.name === emoji)
+      ["🏠", "🛠️", "🥳", "🔒", "❌"].map(emoji => reaction.emoji.name === emoji)
     );
 
     const collector = helpMessage.createReactionCollector(filter);
 
-    collector.on('collect', async reaction => {
+    collector.on("collect", async reaction => {
       const emoji = reaction.emoji.name;
 
       switch (emoji) {
-        case '🏠':
-          helpEmbed.setTitle('Home page');
-          helpEmbed.setDescription('There is a total of 3 command categories ');
+        case "🏠":
+          helpEmbed.setTitle("Home page");
+          helpEmbed.setDescription("There is a total of 3 command categories ");
 
           helpEmbed.fields = [];
 
           helpMessage.reactions.removeAll();
 
-          await react(['🥳', '💵', '👤', '🖌️', '🛠️', '🔒', '❔', '❌']);
+          await react(["🥳", "💵", "👤", "🖌️", "🛠️", "🔒", "❔", "❌"]);
 
           break;
-        case '🥳':
-          helpEmbed.setTitle('Fun commands');
+        case "🥳":
+          helpEmbed.setTitle("Fun commands");
           helpEmbed.setDescription(`You can send \`${prefix}help <command name>\` to get info on a specific command.`);
 
           helpEmbed.fields = [];
 
-          populate('fun');
+          populate("fun");
 
           helpMessage.reactions.removeAll();
 
-          react(['🏠', '❌']);
+          react(["🏠", "❌"]);
 
           break;
-        case '💵':
-          helpEmbed.setTitle('Economy commands');
+        case "💵":
+          helpEmbed.setTitle("Economy commands");
           helpEmbed.setDescription(`For more information on a certain command you can type \`${prefix}help <command name>\``);
 
           helpEmbed.fields = [];
 
-          populate('economy');
+          populate("economy");
 
           helpMessage.reactions.removeAll();
 
-          react(['🏠', '❌']);
+          react(["🏠", "❌"]);
 
           break;
-        case '👤':
-          helpEmbed.setTitle('Member commands');
+        case "👤":
+          helpEmbed.setTitle("Member commands");
           helpEmbed.setDescription(`For more information on a certain command you can type \`${prefix}help <command name>\``);
 
           helpEmbed.fields = [];
 
-          populate('member');
+          populate("member");
 
           helpMessage.reactions.removeAll();
 
-          react(['🏠', '❌']);
+          react(["🏠", "❌"]);
 
           break;
-        case '🖌️':
-          helpEmbed.setTitle('Canvas commands');
+        case "🖌️":
+          helpEmbed.setTitle("Canvas commands");
           helpEmbed.setDescription(`For more information on a certain command you can type \`${prefix}help <command name>\``);
 
           helpEmbed.fields = [];
 
-          populate('canvas');
+          populate("canvas");
 
           helpMessage.reactions.removeAll();
 
-          react(['🏠', '❌']);
+          react(["🏠", "❌"]);
 
           break;
-        case '🛠️':
-          helpEmbed.setTitle('Utility commands');
+        case "🛠️":
+          helpEmbed.setTitle("Utility commands");
           helpEmbed.setDescription(`For more information on a certain command you can type \`${prefix}help <command name>\``);
 
           helpEmbed.fields = [];
 
-          populate('utility');
+          populate("utility");
 
           helpMessage.reactions.removeAll();
 
-          react(['🏠', '❌']);
+          react(["🏠", "❌"]);
 
           break;
-        case '🔒':
-          helpEmbed.setTitle('Admin commands');
+        case "🔒":
+          helpEmbed.setTitle("Admin commands");
           helpEmbed.setDescription(`You can send \`${prefix}help <command name>\` to get info on a specific command.`);
 
           helpEmbed.fields = [];
 
-          populate('admin');
+          populate("admin");
 
           helpMessage.reactions.removeAll();
 
-          react(['🏠', '❌']);
+          react(["🏠", "❌"]);
 
           break;
-        case '❔':
-          helpEmbed.setTitle('Miscellaneous commands');
+        case "❔":
+          helpEmbed.setTitle("Miscellaneous commands");
           helpEmbed.setDescription(`You can send \`${prefix}help <command name>\` to get info on a specific command.`);
 
           helpEmbed.fields = [];
 
-          populate('miscellaneous');
+          populate("miscellaneous");
 
           helpMessage.reactions.removeAll();
 
-          react(['🏠', '❌']);
+          react(["🏠", "❌"]);
 
           break;
-        case '❌':
+        case "❌":
           return helpMessage.delete();
       }
 

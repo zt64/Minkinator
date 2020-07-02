@@ -1,12 +1,9 @@
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define('member', {
+  return sequelize.define("member", {
     id: {
       type: DataTypes.TEXT,
       primaryKey: true,
       unique: true
-    },
-    name: {
-      type: DataTypes.TEXT
     },
     balance: {
       type: DataTypes.FLOAT,
@@ -33,14 +30,22 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: 0
     },
+    botBan: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    configuration: {
+      type: DataTypes.JSON,
+      allowNull: false,
+      defaultValue: {
+        measurement: "metric",
+        levelMention: true
+      }
+    },
     inventory: {
       type: DataTypes.JSON,
       allowNull: false,
       defaultValue: []
-    },
-    botBan: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
     }
   }, {
     timestamps: false,

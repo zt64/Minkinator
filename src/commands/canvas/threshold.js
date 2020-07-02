@@ -1,14 +1,14 @@
 module.exports = {
-  description: 'Filters an images RGB channels according to a threshold.',
-  aliases: ['t'],
+  description: "Filters an images RGB channels according to a threshold.",
+  aliases: ["t"],
   parameters: [
     {
-      name: 'url',
+      name: "url",
       type: String,
       required: true
     },
     {
-      name: 'factor',
+      name: "factor",
       type: Number,
       required: true
     }
@@ -18,7 +18,7 @@ module.exports = {
     const image = await client.canvas.loadImage(imageURL);
 
     const canvas = client.canvas.createCanvas(image.width, image.height);
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext("2d");
 
     context.drawImage(image, 0, 0);
 

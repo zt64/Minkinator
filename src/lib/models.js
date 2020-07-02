@@ -1,9 +1,9 @@
 exports.create = async (client, guild) => {
   const Sequelize = client.Sequelize;
 
-  const sequelize = new Sequelize('database', 'user', 'password', {
-    host: 'localhost',
-    dialect: 'sqlite',
+  const sequelize = new Sequelize("database", "user", "password", {
+    host: "localhost",
+    dialect: "sqlite",
     storage: `./data/${guild.id}.sqlite`,
     logging: false
   });
@@ -12,11 +12,11 @@ exports.create = async (client, guild) => {
 
   // Import models
 
-  const Guild = sequelize.import('../models/Guild.js');
-  const Property = sequelize.import('../models/Property.js');
-  const Member = sequelize.import('../models/Member.js');
-  const ShopItem = sequelize.import('../models/ShopItem.js');
-  const UserItem = sequelize.import('../models/UserItem.js');
+  const Guild = sequelize.import("../models/Guild.js");
+  const Property = sequelize.import("../models/Property.js");
+  const Member = sequelize.import("../models/Member.js");
+  const ShopItem = sequelize.import("../models/ShopItem.js");
+  const UserItem = sequelize.import("../models/UserItem.js");
 
   // Setup relations
 
@@ -50,7 +50,7 @@ exports.populate = async (client, guild, database) => {
   const databaseMembers = database.members;
   const databaseProperties = database.properties;
 
-  const time = client.moment().format('HH:mm M/D/Y');
+  const time = client.moment().format("HH:mm M/D/Y");
 
   if (databaseMembers) {
     for (const memberData of await databaseMembers.findAll()) {
@@ -66,22 +66,22 @@ exports.populate = async (client, guild, database) => {
 
   // Set guild properties
 
-  await databaseProperties.findOrCreate({ where: { key: 'id' }, defaults: { value: guild.id } });
-  await databaseProperties.findOrCreate({ where: { key: 'name' }, defaults: { value: guild.name } });
-  await databaseProperties.findOrCreate({ where: { key: 'data' }, defaults: { value: [] } });
-  await databaseProperties.findOrCreate({ where: { key: 'items' }, defaults: { value: [] } });
-  await databaseProperties.findOrCreate({ where: { key: 'commands' }, defaults: { value: [] } });
-  await databaseProperties.findOrCreate({ where: { key: 'mutes' }, defaults: { value: [] } });
-  await databaseProperties.findOrCreate({ where: { key: 'bans' }, defaults: { value: [] } });
-  await databaseProperties.findOrCreate({ where: { key: 'coolDowns' }, defaults: { value: [] } });
+  await databaseProperties.findOrCreate({ where: { key: "id" }, defaults: { value: guild.id } });
+  await databaseProperties.findOrCreate({ where: { key: "name" }, defaults: { value: guild.name } });
+  await databaseProperties.findOrCreate({ where: { key: "data" }, defaults: { value: [] } });
+  await databaseProperties.findOrCreate({ where: { key: "items" }, defaults: { value: [] } });
+  await databaseProperties.findOrCreate({ where: { key: "commands" }, defaults: { value: [] } });
+  await databaseProperties.findOrCreate({ where: { key: "mutes" }, defaults: { value: [] } });
+  await databaseProperties.findOrCreate({ where: { key: "bans" }, defaults: { value: [] } });
+  await databaseProperties.findOrCreate({ where: { key: "coolDowns" }, defaults: { value: [] } });
 
   await databaseProperties.findOrCreate({
-    where: { key: 'configuration' },
+    where: { key: "configuration" },
     defaults: {
       value: {
         colors: {
-          success: '#1ED760',
-          error: '#FF0000'
+          success: "#1ED760",
+          error: "#FF0000"
         },
         markov: {
           score: 100,
@@ -89,8 +89,8 @@ exports.populate = async (client, guild, database) => {
           mention: true
         },
         ignore: [],
-        prefix: '!',
-        currency: '₼',
+        prefix: "!",
+        currency: "₼",
         errorTimeout: 5000,
         sellPrice: 0.5,
         redditNSFW: false,

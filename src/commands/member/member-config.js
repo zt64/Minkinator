@@ -1,10 +1,10 @@
 module.exports = {
-  description: 'Change your settings.',
+  description: "Change your settings.",
   async execute (client, message, args) {
     const memberData = await client.database.members.findByPk(message.author.id);
     const memberConfig = memberData.configuration;
 
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;
 
     const key = args[0];
@@ -26,7 +26,7 @@ module.exports = {
 
     const configEmbed = new client.Discord.MessageEmbed()
       .setColor(successColor)
-      .setTitle('Member Configuration');
+      .setTitle("Member Configuration");
 
     for (const [key, value] of Object.entries(memberConfig)) {
       configEmbed.addField(key, value);

@@ -1,8 +1,8 @@
 module.exports = {
-  description: 'Inverts an images RGB channels.',
+  description: "Inverts an images RGB channels.",
   parameters: [
     {
-      name: 'url',
+      name: "url",
       type: String
     }
   ],
@@ -11,7 +11,7 @@ module.exports = {
     const image = await client.canvas.loadImage(imageURL);
 
     const canvas = client.canvas.createCanvas(image.width, image.height);
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext("2d");
 
     context.drawImage(image, 0, 0);
 

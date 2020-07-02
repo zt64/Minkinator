@@ -1,8 +1,8 @@
 module.exports = {
-  description: 'Says a string of text.',
+  description: "Says a string of text.",
   parameters: [
     {
-      name: 'string',
+      name: "string",
       type: String,
       required: true
     }
@@ -10,6 +10,6 @@ module.exports = {
   async execute (client, message, args) {
     await message.delete();
 
-    return message.channel.send(args.join(' '));
+    return message.channel.send(args.join(" "));
   }
 };

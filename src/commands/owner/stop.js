@@ -1,9 +1,9 @@
 module.exports = {
-  description: 'Stops the bot.',
-  aliases: ['stop', 'exit', 'quit'],
+  description: "Stops the bot.",
+  aliases: ["stop", "exit", "quit"],
   parameters: [
     {
-      name: 'seconds',
+      name: "seconds",
       type: Number
     }
   ],
@@ -15,8 +15,8 @@ module.exports = {
       await sleep(args[0] * 1000);
     }
 
-    await console.log('Shutting down.');
-    await message.channel.send('Shutting down.');
+    await console.log("Shutting down.");
+    await message.channel.send("Shutting down.");
 
     client.destroy();
     process.exit();

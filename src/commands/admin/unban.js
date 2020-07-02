@@ -1,21 +1,21 @@
 module.exports = {
-  description: 'Revokes a members ban.',
-  permissions: ['BAN_MEMBERS'],
+  description: "Revokes a members ban.",
+  permissions: ["BAN_MEMBERS"],
   parameters: [
     {
-      name: 'member',
+      name: "member",
       type: String,
       required: true
     },
     {
-      name: 'reason',
+      name: "reason",
       type: String
     }
   ],
   async execute (client, message, args) {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
 
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;
 
     const member = message.mentions.members.first();

@@ -1,27 +1,27 @@
 module.exports = {
-  description: 'Creates an image from text.',
+  description: "Creates an image from text.",
   parameters: [
     {
-      name: 'font',
+      name: "font",
       type: String,
       required: true
     },
     {
-      name: 'size',
+      name: "size",
       type: Number,
       required: true
     },
     {
-      name: 'string',
+      name: "string",
       type: String,
       required: true
     }
   ],
   async execute (client, message, args) {
     const canvas = client.canvas.createCanvas(1024, 1024);
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
 
-    const text = args.slice(2).join(' ');
+    const text = args.slice(2).join(" ");
     const font = args[0];
     const size = parseInt(args[1]);
 
@@ -29,8 +29,8 @@ module.exports = {
     canvas.height = size * 2;
 
     ctx.font = `${size}px ${font}`;
-    ctx.fillStyle = 'white';
-    ctx.textAlign = 'center';
+    ctx.fillStyle = "white";
+    ctx.textAlign = "center";
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
     const attachment = new client.Discord.MessageAttachment(canvas.toBuffer());

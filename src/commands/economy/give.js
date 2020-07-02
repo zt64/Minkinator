@@ -1,20 +1,20 @@
 module.exports = {
-  description: 'Send money to another member.',
-  aliases: ['send', 'pay'],
+  description: "Send money to another member.",
+  aliases: ["send", "pay"],
   parameters: [
     {
-      name: 'member',
+      name: "member",
       type: String,
       required: true
     },
     {
-      name: 'amount',
+      name: "amount",
       type: Number,
       required: true
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;
     const currency = guildConfig.currency;
 
@@ -34,15 +34,15 @@ module.exports = {
 
     // Adjust balances
 
-    await memberData.decrement('balance', { by: parseInt(amount) });
-    await targetData.increment('balance', { by: parseInt(amount) });
+    await memberData.decrement("balance", { by: parseInt(amount) });
+    await targetData.increment("balance", { by: parseInt(amount) });
 
     return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(successColor)
-      .setTitle('Payment Transaction')
+      .setTitle("Payment Transaction")
       .setDescription(`${message.author} has sent ${currency}${amount} to ${target}`)
-      .addField(`${message.author.username}'s new balance:`, `${currency}${(memberData.balance - amount).toLocaleString()}`, true)
-      .addField(`${target.user.username}'s new balance:`, `${currency}${targetData.balance + amount}`, true)
+      .addField(`${message.author.username}"s new balance:`, `${currency}${(memberData.balance - amount).toLocaleString()}`, true)
+      .addField(`${target.user.username}"s new balance:`, `${currency}${targetData.balance + amount}`, true)
     );
   }
 };

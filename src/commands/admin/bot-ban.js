@@ -1,8 +1,8 @@
 module.exports = {
-  description: 'Toggle a members ability to use Minkinator.',
+  description: "Toggle a members ability to use Minkinator.",
   parameters: [
     {
-      name: 'member',
+      name: "member",
       type: String,
       required: true
     }
@@ -11,7 +11,7 @@ module.exports = {
     const user = await client.functions.getUser(client, message, args[0]);
     const memberData = await client.database.members.findByPk(user.id);
 
-    const state = memberData.botBan ? 'unbanned' : 'banned';
+    const state = memberData.botBan ? "unbanned" : "banned";
 
     memberData.update({ botBan: !memberData.botBan });
 

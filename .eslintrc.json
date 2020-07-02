@@ -15,6 +15,7 @@
         "sourceType": "module"
     },
     "rules": {
+        "quotes": ["error", "double"],
         "semi": [2, "always"],
         "eol-last": 0,
         "no-eval": 0

@@ -1,10 +1,10 @@
 module.exports = {
-  description: 'Resets a members data.',
-  permissions: ['ADMINISTRATOR'],
-  aliases: ['demolish', 'destroy', 'obliterate', 'disintegrate'],
+  description: "Resets a members data.",
+  permissions: ["ADMINISTRATOR"],
+  aliases: ["demolish", "destroy", "obliterate", "disintegrate"],
   parameters: [
     {
-      name: 'member',
+      name: "member",
       type: String,
       required: true
     }
@@ -16,6 +16,6 @@ module.exports = {
     await data.destroy();
     await client.database.members.create({ name: member.tag, id: member.id });
 
-    return message.channel.send(`${member.tag}'s data has been reset.`);
+    return message.channel.send(`${member.tag}"s data has been reset.`);
   }
 };

@@ -1,44 +1,44 @@
 module.exports = {
-  description: 'Buy, sell, and see what products are available.',
-  aliases: ['s'],
+  description: "Buy, sell, and see what products are available.",
+  aliases: ["s"],
   subCommands: [
     {
-      name: 'buy',
+      name: "buy",
       parameters: [
         {
-          name: 'item',
+          name: "item",
           type: String,
           required: true
         },
         {
-          name: 'amount',
+          name: "amount",
           type: Number,
           required: true
         }
       ]
     },
     {
-      name: 'sell',
+      name: "sell",
       parameters: [
         {
-          name: 'item',
+          name: "item",
           type: String,
           required: true
         },
         {
-          name: 'amount',
+          name: "amount",
           type: Number,
           required: true
         }
       ]
     },
     {
-      name: 'list'
+      name: "list"
     }
   ],
   parameters: [
     {
-      name: 'buy | sell | list',
+      name: "buy | sell | list",
       type: String,
       required: true
     }
@@ -47,13 +47,13 @@ module.exports = {
     const subCommand = args[0];
 
     const properties = client.database.properties;
-    const shopItems = await properties.findByPk('items').then(key => key.value);
-    const guildConfig = await properties.findByPk('configuration').then(key => key.value);
+    const shopItems = await properties.findByPk("items").then(key => key.value);
+    const guildConfig = await properties.findByPk("configuration").then(key => key.value);
 
     const successColor = guildConfig.colors.success;
     const currency = guildConfig.currency;
 
-    if (subCommand === 'buy') {
+    if (subCommand === "buy") {
       const memberData = await client.database.members.findByPk(message.author.id);
       const inventory = memberData.inventory;
       const balance = memberData.balance;
@@ -81,17 +81,17 @@ module.exports = {
         );
       }
 
-      memberData.decrement('balance', { by: shopItemPrice });
+      memberData.decrement("balance", { by: shopItemPrice });
       memberData.update({ inventory: inventory });
 
       return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(successColor)
-        .setTitle('Transaction Successful')
+        .setTitle("Transaction Successful")
         .setDescription(`Bought ${client.pluralize(itemName, itemAmount, true)} for ${currency}${shopItemPrice.toLocaleString()}.`)
       );
     }
 
-    if (subCommand === 'sell') {
+    if (subCommand === "sell") {
       // Set member properties
 
       const memberData = await client.database.members.findByPk(message.author.id);
@@ -119,18 +119,18 @@ module.exports = {
 
       return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(successColor)
-        .setTitle('Transaction Successful')
+        .setTitle("Transaction Successful")
         .setDescription(`Sold ${client.pluralize(itemName, itemAmount, true)} for ${currency}${sellPrice.toFixed(2)}`)
       );
     }
 
-    if (subCommand === 'list') {
+    if (subCommand === "list") {
       const currency = guildConfig.currency;
       const prefix = guildConfig.prefix;
 
       const pages = Math.ceil(shopItems.length / 10);
 
-      if (!pages) return message.channel.send('The shop is currently empty.');
+      if (!pages) return message.channel.send("The shop is currently empty.");
 
       let page = args[1] || 1;
 
@@ -148,53 +148,53 @@ module.exports = {
 
       const shopMessage = await message.channel.send(shopEmbed);
 
-      if (pages > 1) shopMessage.react('➡️');
+      if (pages > 1) shopMessage.react("➡️");
 
-      shopMessage.react('❌');
+      shopMessage.react("❌");
 
       const filter = (reaction, user) => user.id === message.author.id && (
-        ['🏠', '⬅️', '➡️', '❌'].map(emoji => reaction.emoji.name === emoji)
+        ["🏠", "⬅️", "➡️", "❌"].map(emoji => reaction.emoji.name === emoji)
       );
 
       const collector = shopMessage.createReactionCollector(filter);
 
-      collector.on('collect', async reaction => {
+      collector.on("collect", async reaction => {
         const emoji = reaction.emoji.name;
 
         switch (emoji) {
-          case '🏠':
+          case "🏠":
             page = 1;
 
             shopMessage.reactions.removeAll();
 
-            if (pages > 1) shopMessage.react('➡️');
+            if (pages > 1) shopMessage.react("➡️");
 
-            shopMessage.react('❌');
+            shopMessage.react("❌");
             break;
-          case '⬅️':
+          case "⬅️":
             page--;
 
             shopMessage.reactions.removeAll();
 
-            if (page !== 1) shopMessage.react('🏠');
+            if (page !== 1) shopMessage.react("🏠");
 
-            shopMessage.react('➡️');
-            shopMessage.react('❌');
+            shopMessage.react("➡️");
+            shopMessage.react("❌");
             break;
-          case '➡️':
+          case "➡️":
             page++;
 
             shopMessage.reactions.removeAll();
 
-            shopMessage.react('🏠');
+            shopMessage.react("🏠");
 
-            if (pages > 2) shopMessage.react('⬅️');
+            if (pages > 2) shopMessage.react("⬅️");
 
-            if (pages > page) shopMessage.react('➡️');
+            if (pages > page) shopMessage.react("➡️");
 
-            shopMessage.react('❌');
+            shopMessage.react("❌");
             break;
-          case '❌':
+          case "❌":
             return shopMessage.delete();
         }
 

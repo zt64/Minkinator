@@ -1,23 +1,23 @@
 module.exports = {
-  description: 'Kicks a member.',
-  permissions: ['KICK_MEMBERS'],
+  description: "Kicks a member.",
+  permissions: ["KICK_MEMBERS"],
   parameters: [
     {
-      name: 'member',
+      name: "member",
       type: String,
       required: true
     },
     {
-      name: 'reason',
+      name: "reason",
       type: String
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
+    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;
 
     const member = message.mentions.members.first();
-    const reason = args.slice(1).join(' ');
+    const reason = args.slice(1).join(" ");
 
     if (!member) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
 
@@ -26,7 +26,7 @@ module.exports = {
     return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(successColor)
       .setTitle(`${member.user.tag} has been kicked`)
-      .setDescription(reason || 'No reason provided.')
+      .setDescription(reason || "No reason provided.")
     );
   }
 };

@@ -1,18 +1,18 @@
 module.exports = {
-  description: 'Bans a member.',
-  permissions: ['BAN_MEMBERS'],
+  description: "Bans a member.",
+  permissions: ["BAN_MEMBERS"],
   parameters: [
     {
-      name: 'member',
+      name: "member",
       type: String,
       required: true
     },
     {
-      name: 'minutes',
+      name: "minutes",
       type: Number
     },
     {
-      name: 'reason',
+      name: "reason",
       type: String
     }
   ],
@@ -21,12 +21,12 @@ module.exports = {
 
     const properties = client.database.properties;
 
-    const guildConfig = await properties.findByPk('configuration').then(key => key.value);
-    const bans = await properties.findByPk('bans').then(key => key.value);
+    const guildConfig = await properties.findByPk("configuration").then(key => key.value);
+    const bans = await properties.findByPk("bans").then(key => key.value);
     const successColor = guildConfig.colors.success;
 
     const member = message.mentions.users.first();
-    const reason = args.slice(2).join(' ');
+    const reason = args.slice(2).join(" ");
     const minutes = args[1];
 
     await member.ban({ reason: reason });
@@ -38,8 +38,8 @@ module.exports = {
 
     message.channel.send(new client.Discord.MessageEmbed()
       .setColor(successColor)
-      .setAuthor(`${member.user.tag} has been banned${minutes ? ` for ${client.pluralize('minute', minutes, true)}` : ''}.`, member.user.avatarURL())
-      .setDescription(reason || 'No reason provided.')
+      .setAuthor(`${member.user.tag} has been banned${minutes ? ` for ${client.pluralize("minute", minutes, true)}` : ""}.`, member.user.avatarURL())
+      .setDescription(reason || "No reason provided.")
     );
 
     if (!minutes) return;

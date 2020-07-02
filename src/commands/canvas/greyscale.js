@@ -1,9 +1,9 @@
 module.exports = {
-  description: 'Modifys an images RGB channels to be black and white.',
-  aliases: ['monochrome', 'grey', 'bw'],
+  description: "Modifys an images RGB channels to be black and white.",
+  aliases: ["monochrome", "grey", "bw"],
   parameters: [
     {
-      name: 'url',
+      name: "url",
       type: String
     }
   ],
@@ -12,7 +12,7 @@ module.exports = {
     const image = await client.canvas.loadImage(imageURL);
 
     const canvas = client.canvas.createCanvas(image.width, image.height);
-    const context = canvas.getContext('2d');
+    const context = canvas.getContext("2d");
 
     context.drawImage(image, 0, 0);
 

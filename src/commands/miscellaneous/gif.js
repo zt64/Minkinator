@@ -1,12 +1,12 @@
 module.exports = {
-  description: 'Generates a gif',
+  description: "Generates a gif",
   async execute (client, message, args) {
     const gif = new client.GifEncoder(512, 512, { highWaterMark: 6.4e+7 });
     const { randomInteger } = client.functions;
 
     const frames = 16;
 
-    gif.pipe(client.fs.createWriteStream('img.gif'));
+    gif.pipe(client.fs.createWriteStream("img.gif"));
 
     gif.setRepeat(0);
 
