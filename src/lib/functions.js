@@ -22,13 +22,15 @@ exports.randomInteger = (min, max) => {
 };
 
 exports.getUser = async (client, message, idArg) => {
-  if (message.mentions.users.size >= 1) return message.mentions.users.first();
+  // if (message.mentions.users) return message.mentions.users.first();
 
-  try {
-    return client.users.fetch(idArg);
-  } catch (error) {
-    return message.author;
+  if (idArg) {
+    try {
+      return client.users.fetch(idArg);
+    } catch (error) { }
   }
+
+  return message.author;
 };
 
 exports.fToC = (f) => {

@@ -122,12 +122,13 @@ module.exports = async (client, message) => {
 
   // Check if parameters are correct
 
+  const usageEmbed = new client.Discord.MessageEmbed()
+    .setColor(errorColor)
+    .setTitle(`Improper usage of ${commandName}`)
+    .setDescription(command.description);
+
   if (command.parameters) {
-    var usageEmbed = new client.Discord.MessageEmbed()
-      .setColor(errorColor)
-      .setTitle(`Improper usage of ${commandName}`)
-      .setDescription(command.description)
-      .addField("Proper usage", `${prefix}${commandName} `);
+    usageEmbed.addField("Proper usage", `${prefix}${commandName} `);
 
     for (const parameter of command.parameters) {
       const i = command.parameters.indexOf(parameter);
@@ -151,11 +152,7 @@ module.exports = async (client, message) => {
     if (!subCommand) return message.channel.send(`${args[0]} is not a sub-command.`);
 
     if (subCommand.parameters) {
-      var usageEmbed = new client.Discord.MessageEmbed()
-        .setColor(errorColor)
-        .setTitle(`Improper usage of ${commandName}`)
-        .setDescription(command.description)
-        .addField("Proper usage", `${prefix}${commandName} ${subCommand.name} `);
+      usageEmbed.addField("Proper usage", `${prefix}${commandName} ${subCommand.name} `);
 
       for (const parameter of subCommand.parameters) {
         const i = subCommand.parameters.indexOf(parameter);

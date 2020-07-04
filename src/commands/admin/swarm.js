@@ -1,5 +1,5 @@
 module.exports = {
-  description: "Sends a message using a swarm.",
+  description: "Sends a message a certain amount of times using random members from the guilds Minkinator is in.",
   permissions: ["MANAGE_WEBHOOKS"],
   parameters: [
     {
@@ -31,10 +31,12 @@ module.exports = {
     for (let i = 0; i < amount; i++) {
       const user = users[Math.floor(Math.random() * users.length)];
       await webhook.send(string, { username: user.username, avatarURL: user.avatarURL() });
+
+      await client.functions.sleep(500);
     }
 
     // Delete webhook
 
-    webhook.delete();
+    return webhook.delete();
   }
 };

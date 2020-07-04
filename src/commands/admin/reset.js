@@ -1,5 +1,5 @@
 module.exports = {
-  description: "Resets a members data.",
+  description: "Reset a members data.",
   permissions: ["ADMINISTRATOR"],
   aliases: ["demolish", "destroy", "obliterate", "disintegrate"],
   parameters: [

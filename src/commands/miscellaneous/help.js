@@ -12,6 +12,10 @@ module.exports = {
     const successColor = guildConfig.colors.success;
     const prefix = guildConfig.prefix;
 
+    const helpEmbed = new client.Discord.MessageEmbed()
+      .setColor(successColor)
+      .setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
+
     if (args[0]) {
       const commandName = args[0].toLowerCase();
       const command = client.commands.get(commandName) || client.commands.find(c => c.aliases && c.aliases.includes(commandName));
@@ -23,14 +27,12 @@ module.exports = {
           .setDescription(`\`${commandName}\` is not a valid command.`));
       }
 
-      const helpEmbed = new client.Discord.MessageEmbed()
-        .setColor(successColor)
-        .addField("Command:", command.name, true)
-        .addField("Category:", command.category, true)
-        .addField("Description:", command.description)
-        .addField("Cool down:", client.pluralize("second", command.coolDown || 3, true), true)
-        .addField("Permissions:", command.permissions ? command.permissions.join(", ") : "Everyone", true)
-        .setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
+      helpEmbed.setColor(successColor);
+      helpEmbed.addField("Command:", command.name, true);
+      helpEmbed.addField("Category:", command.category, true);
+      helpEmbed.addField("Description:", command.description);
+      helpEmbed.addField("Cool down:", client.pluralize("second", command.coolDown || 3, true), true);
+      helpEmbed.addField("Permissions:", command.permissions ? command.permissions.join(", ") : "Everyone", true);
 
       if (command.aliases) helpEmbed.addField("Aliases:", command.aliases.join(", "), true);
 
@@ -49,15 +51,12 @@ module.exports = {
       return message.channel.send(helpEmbed);
     }
 
-    const helpEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
-      .setTitle("Home page")
-      .setDescription(`There is a total of 5 command categories. For information on a specific command, run: \`${prefix}help <command>\``)
-      .addField("Fun", "Fun commands to play around with.")
-      .addField("Utility", "Tools for the more technical.")
-      .addField("Admin", "Take control of a guild.")
-      .addField("Economy", "Buy, sell, and make a profit.")
-      .setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
+    helpEmbed.setTitle("Home page");
+    helpEmbed.setDescription(`There is a total of 5 command categories. For information on a specific command, run: \`${prefix}help <command>\``);
+    helpEmbed.addField("Fun", "Fun commands to play around with.");
+    helpEmbed.addField("Utility", "Tools for the more technical.");
+    helpEmbed.addField("Admin", "Take control of a guild.");
+    helpEmbed.addField("Economy", "Buy, sell, and make a profit.");
 
     const helpMessage = await message.channel.send(helpEmbed);
 
@@ -70,7 +69,10 @@ module.exports = {
     }
 
     async function react (reactions) {
-      await reactions.map(reaction => helpMessage.react(reaction));
+      await reactions.map(async reaction => {
+        helpMessage.react(reaction);
+        await client.functions.sleep(200);
+      });
     }
 
     await react(["🥳", "💵", "👤", "🖌️", "🛠️", "🔒", "❔", "❌"]);

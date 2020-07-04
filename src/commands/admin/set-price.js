@@ -1,5 +1,5 @@
 module.exports = {
-  description: "Set the price of an item in the shop.",
+  description: "Set the inputPrice of an item in the shop.",
   parameters: [
     {
       name: "item",
@@ -13,20 +13,19 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const itemName = args[0];
-    const price = args[1];
+    const inputName = args[0];
+    const inputPrice = args[1];
 
-    if (isNaN(price) || price <= 0) return message.channel.send(`\`${price}\` is not a valid amount.`);
+    if (isNaN(inputPrice) || inputPrice <= 0) return message.channel.send(`\`${inputPrice}\` is not a valid amount.`);
 
     const items = await client.database.properties.findByPk("items");
-    const item = items.value.filter(item => item.name === itemName);
+    const item = items.value.filter(item => item.name === inputName);
 
-    if (!item) return message.channel.send(`\`${itemName}\` does not exist in the guild shop.`);
+    if (!item) return message.channel.send(`\`${inputName}\` does not exist in the guild shop.`);
 
-    item.price = price;
-
+    item.price = inputPrice;
     items.update({ value: items });
 
-    return message.channel.send(`Successfully set the price of \`${itemName}\` to \`${price}\``);
+    return message.channel.send(`Successfully set the inputPrice of \`${inputName}\` to \`${inputPrice}\``);
   }
 };

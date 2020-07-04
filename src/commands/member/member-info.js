@@ -17,7 +17,7 @@ module.exports = {
     if (!user) return message.channel.send("Please specify a valid member.");
 
     const member = message.guild.member(user);
-    const [memberData] = await client.database.members.findOrCreate({ where: { id: user.id }, defaults: { name: user.tag } });
+    const [memberData] = await client.database.members.findByPk(user.id);
 
     // Create info embed
 

@@ -1,6 +1,6 @@
 module.exports = {
   description: "Stops the bot.",
-  aliases: ["stop", "exit", "quit"],
+  aliases: ["exit", "quit"],
   parameters: [
     {
       name: "seconds",

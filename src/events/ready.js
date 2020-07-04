@@ -3,6 +3,8 @@ module.exports = async (client) => {
 
   if (!client.fs.existsSync("./data/")) client.fs.mkdirSync("./data/");
 
+  // Create and populate the databases for each guild
+
   for (const guild of client.guilds.cache.array()) {
     const database = await client.databases.create(client, guild);
 
@@ -12,7 +14,9 @@ module.exports = async (client) => {
 
     const data = await database.properties.findByPk("data").then(key => key.value);
 
-    if (data.length !== 0) {
+    // Build markov corpus
+
+    if (data.length > 0) {
       const markov = new client.Markov(data, { stateSize: 2 });
 
       markov.buildCorpus();
@@ -23,7 +27,14 @@ module.exports = async (client) => {
     console.log(`${`(${time})`.green} Initialized database for: ${guild.name} (${guild.id}).`);
   };
 
-  client.user.setActivity(`${client.users.cache.size} users.`, { type: "WATCHING" });
+  // Set the bot activity
+
+  const pluralize = client.pluralize;
+
+  const users = pluralize("user", client.users.cache.size, true);
+  const guilds = pluralize("guild", client.guilds.cache.size, true);
+
+  client.user.setActivity(`${users} in ${guilds}.`, { type: "WATCHING" });
 
   return console.log(`${`(${time})`.green} Minkinator is now online.`);
 };

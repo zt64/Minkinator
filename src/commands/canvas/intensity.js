@@ -1,5 +1,5 @@
 module.exports = {
-  description: "Modifys an images intensity.",
+  description: "Modifies an images intensity.",
   parameters: [
     {
       name: "url",

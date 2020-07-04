@@ -13,6 +13,7 @@ module.exports = {
     const input = args.join(" ");
 
     const { exec } = require("child_process");
+    const os = require("os");
 
     const execEmbed = new client.Discord.MessageEmbed()
       .setColor(successColor)
@@ -30,7 +31,11 @@ module.exports = {
       if (stdout.length >= 6000) {
         execEmbed.setDescription("Stdout exceeds Discords API embed limit of 6,000 characters.");
       } else {
-        execEmbed.setDescription(`\`\`\`bash\n${stdout}\`\`\``);
+        if (os.platform() === "linux") {
+          execEmbed.setDescription(`\`\`\`sh\n${stdout}\`\`\``);
+        } else {
+          execEmbed.setDescription(`\`\`\`cmd\n${stdout}\`\`\``);
+        }
       }
 
       execMessage.edit(execEmbed);
