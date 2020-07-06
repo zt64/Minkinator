@@ -17,7 +17,7 @@ module.exports = {
     const amount = args[0];
     const string = args.slice(1).join(" ");
 
-    const users = client.users.cache.array();
+    const users = message.guild.users.cache.array();
 
     if (amount < 1) return message.channel.send("Enter an amount above one.");
 
