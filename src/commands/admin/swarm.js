@@ -9,7 +9,6 @@ module.exports = {
     },
     {
       name: "message",
-      type: String,
       required: true
     }
   ],
@@ -17,7 +16,7 @@ module.exports = {
     const amount = args[0];
     const string = args.slice(1).join(" ");
 
-    const users = message.guild.users.cache.array();
+    const members = message.guild.members.cache.array();
 
     if (amount < 1) return message.channel.send("Enter an amount above one.");
 
@@ -29,7 +28,7 @@ module.exports = {
     // Send messages
 
     for (let i = 0; i < amount; i++) {
-      const user = users[Math.floor(Math.random() * users.length)];
+      const user = members[Math.floor(Math.random() * members.length)].user;
       await webhook.send(string, { username: user.username, avatarURL: user.avatarURL() });
 
       await client.functions.sleep(500);
