@@ -53,6 +53,8 @@ module.exports = {
     const successColor = guildConfig.colors.success;
     const currency = guildConfig.currency;
 
+    const { formatNumber } = client.functions;
+
     if (subCommand === "buy") {
       const memberData = await client.database.members.findByPk(message.author.id);
       const inventory = memberData.inventory;
@@ -87,7 +89,7 @@ module.exports = {
       return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(successColor)
         .setTitle("Transaction Successful")
-        .setDescription(`Bought ${client.pluralize(itemName, itemAmount, true)} for ${currency}${shopItemPrice.toLocaleString()}.`)
+        .setDescription(`Bought ${client.pluralize(itemName, itemAmount, true)} for ${currency}${formatNumber(shopItemPrice, 2)}.`)
       );
     }
 
@@ -143,7 +145,7 @@ module.exports = {
         .setFooter(`Page ${page} of ${pages}`);
 
       shopItems.slice((page - 1) * 10, page * 10).map((item, index) => {
-        shopEmbed.addField(item.name, `${currency}${item.price.toLocaleString()}`, true);
+        shopEmbed.addField(item.name, `${currency}${formatNumber(item.price, 2)}`, true);
       });
 
       const shopMessage = await message.channel.send(shopEmbed);
@@ -201,7 +203,7 @@ module.exports = {
         shopEmbed.fields = [];
 
         shopItems.slice((page - 1) * 10, page * 10).map((item, index) => {
-          shopEmbed.addField(item.name, `${currency}${item.price.toLocaleString()}`, true);
+          shopEmbed.addField(item.name, `${currency}${formatNumber(item.price, 2)}`, true);
         });
 
         shopEmbed.setFooter(`Page ${page} of ${pages}`);

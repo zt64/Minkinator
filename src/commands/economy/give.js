@@ -18,6 +18,8 @@ module.exports = {
     const successColor = guildConfig.colors.success;
     const currency = guildConfig.currency;
 
+    const { formatNumber } = client.functions;
+
     const amount = parseInt(args[1]);
 
     const target = message.mentions.members.first();
@@ -41,8 +43,8 @@ module.exports = {
       .setColor(successColor)
       .setTitle("Payment Transaction")
       .setDescription(`${message.author} has sent ${currency}${amount} to ${target}`)
-      .addField(`${message.author.username}"s new balance:`, `${currency}${(memberData.balance - amount).toLocaleString()}`, true)
-      .addField(`${target.user.username}"s new balance:`, `${currency}${targetData.balance + amount}`, true)
+      .addField(`${message.author.username}"s new balance:`, `${currency}${formatNumber(memberData.balance - amount, 2)}`, true)
+      .addField(`${target.user.username}"s new balance:`, `${currency}${formatNumber(targetData.balance + amount, 2)}`, true)
     );
   }
 };

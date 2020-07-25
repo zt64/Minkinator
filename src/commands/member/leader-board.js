@@ -16,6 +16,8 @@ module.exports = {
     const leaderBoardEmbed = new client.Discord.MessageEmbed();
     const pages = Math.ceil(members.length / 10);
 
+    const { formatNumber } = client.functions;
+
     let page = args[0] || 1;
 
     leaderBoardEmbed.setColor(successColor);
@@ -26,7 +28,7 @@ module.exports = {
 
     function populateLeaderBoard () {
       members.slice((page - 1) * 10, page * 10).map((member, index) => {
-        leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${client.users.cache.get(member.id).username}:`, `${currency}${member.balance.toLocaleString()}`);
+        leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${client.users.cache.get(member.id).username}:`, `${currency}${formatNumber(member.balance, 2)}`);
       });
     }
 

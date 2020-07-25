@@ -14,6 +14,8 @@ module.exports = {
     const successColor = guildConfig.colors.success;
     const currency = guildConfig.currency;
 
+    const { formatNumber } = client.functions;
+
     const guess = Math.floor(args[0]);
 
     const value = Math.round(Math.random() * 100);
@@ -25,8 +27,8 @@ module.exports = {
 
     return message.channel.send(new client.Discord.MessageEmbed()
       .setColor(successColor)
-      .setTitle("Number Guessing Game")
-      .setDescription(`You guessed ${guess}, and the number was ${value}. \n Earning you ${currency}${earn} puts your balance at ${currency}${newBalance}.`)
+      .setTitle("Guessing Game")
+      .setDescription(`You guessed ${guess}, and the number was ${value}. \n Earning you ${currency}${earn} puts your balance at ${currency}${formatNumber(newBalance, 2)}.`)
     );
   }
 };

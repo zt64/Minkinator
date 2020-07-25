@@ -2,7 +2,6 @@ module.exports = async (client, message) => {
   const time = client.moment().format("HH:mm M/D/Y");
 
   // Return if in DM channel
-
   if (message.channel.type === "dm") {
     if (message.author.bot) return;
 
@@ -10,6 +9,7 @@ module.exports = async (client, message) => {
   }
 
   // Set constants
+  const { formatNumber } = client.functions;
 
   const guildDatabase = await client.databases[message.guild.name];
 
@@ -19,7 +19,6 @@ module.exports = async (client, message) => {
   client.database = guildDatabase;
 
   // Set guild constants
-
   const guildConfig = await guildProperties.findByPk("configuration").then(key => key.value);
   const successColor = guildConfig.colors.success;
   const errorColor = guildConfig.colors.error;
@@ -31,11 +30,9 @@ module.exports = async (client, message) => {
   const ignore = guildConfig.ignore;
 
   // Return if ignoreBots is true and author is bot
-
   if (guildConfig.ignoreBots && message.author.bot) return;
 
   // Set member constants;
-
   const [memberData] = await guildMembers.findOrCreate({ where: { id: message.author.id } });
   const memberConfig = memberData.configuration;
 
@@ -47,7 +44,6 @@ module.exports = async (client, message) => {
   memberData.update({ xpTotal: xpTotal, messages: memberData.messages + 1 });
 
   // Check if message author can level up
-
   if (xpTotal >= xpRequired) {
     memberData.update({ level: level++, xpRequired: Math.round(xpRequired * 1.5) });
     level++;
@@ -57,7 +53,7 @@ module.exports = async (client, message) => {
         const levelUpEmbed = new client.Discord.MessageEmbed()
           .setColor(successColor)
           .setTitle(`${message.author.username} has levelled up!`)
-          .setDescription(`${message.author} is now level ${level.toLocaleString()} and earned ${currency}500 as a reward!`);
+          .setDescription(`${message.author} is now level ${formatNumber(level)} and earned ${currency}500 as a reward!`);
 
         memberData.increment("balance", { by: 500 });
 

@@ -11,6 +11,7 @@ module.exports = {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;
     const currency = guildConfig.currency;
+    const formatNumber = client.functions.formatNumber;
 
     const user = message.mentions.users.first() || message.author;
 
@@ -24,11 +25,11 @@ module.exports = {
     const infoEmbed = new client.Discord.MessageEmbed()
       .setColor(successColor)
       .setAuthor(`Member information: ${member.nickname || user.tag}`, user.avatarURL())
-      .addField("Balance:", `${currency}${memberData.balance.toFixed(2).toLocaleString()}`, true)
-      .addField("Level:", memberData.level.toLocaleString(), true)
-      .addField("Total messages:", memberData.messages.toLocaleString(), true)
-      .addField("Total experience:", `${memberData.xpTotal.toLocaleString()} XP`, true)
-      .addField("Required experience", `${memberData.xpRequired.toLocaleString()} XP`, true)
+      .addField("Balance:", `${currency}${formatNumber(memberData.balance, 2)}`, true)
+      .addField("Level:", formatNumber(memberData.level), true)
+      .addField("Total messages:", formatNumber(memberData.messages), true)
+      .addField("Total experience:", `${formatNumber(memberData.xpTotal)} XP`, true)
+      .addField("Required experience", `${formatNumber(memberData.xpRequired)} XP`, true)
       .addField("Joined:", member.joinedAt.toLocaleDateString(), true);
 
     return message.channel.send(infoEmbed);

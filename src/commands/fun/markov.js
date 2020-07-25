@@ -7,6 +7,8 @@ module.exports = {
     const markovTries = guildConfig.markovTries;
     const markovScore = guildConfig.markovScore;
 
+    const { formatNumber } = client.functions;
+
     const options = {
       maxTries: markovTries,
       prng: Math.random(),
@@ -23,7 +25,7 @@ module.exports = {
       return message.channel.send(new client.Discord.MessageEmbed()
         .setColor(successColor)
         .setTitle("Markov generation unsuccessful")
-        .setDescription(`An error has occurred or the guild does not have enough data. Contact a server administrator to change \`markov.score\` and \`markov.tries\` in the guild config. \nCurrently there are: \`${data.length.toLocaleString()}\` strings of data.`)
+        .setDescription(`An error has occurred or the guild does not have enough data. Contact a server administrator to change \`markov.score\` and \`markov.tries\` in the guild config. \nCurrently there are: \`${formatNumber(data.length)}\` strings of data.`)
       );
     }
   }
