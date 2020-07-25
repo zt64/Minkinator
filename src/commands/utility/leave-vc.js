@@ -1,8 +1,8 @@
 module.exports = {
   description: "Join voice chat.",
   async execute (client, message, args) {
-    if (message.member.voice.channel) {
-      const connection = await message.member.voice.channel.leave();
+    if (client.voice.connections.size >= 1) {
+      await client.voice.connections.first().channel.leave();
     }
   }
 };

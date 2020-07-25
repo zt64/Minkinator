@@ -9,7 +9,11 @@ module.exports = {
 
     const connections = ["READY", "CONNECTING", "RECONNECTING", "IDLE", "NEARLY", "DISCONNECTED"];
 
-    const pingMessage = await message.channel.send("Pinging...");
+    const pingEmbed = new client.Discord.MessageEmbed()
+      .setColor(successColor)
+      .setTitle("Pinging...");
+
+    const pingMessage = await message.channel.send(pingEmbed);
 
     const apiPing = Math.round(ws.ping);
 
@@ -18,17 +22,16 @@ module.exports = {
     const end = process.hrtime.bigint();
 
     const connectionPing = pms(Number(end - start) / 1e+6);
-
     const connectionStatus = connections[ws.status];
     const gateway = ws.gateway;
 
-    return pingMessage.edit(new client.Discord.MessageEmbed()
-      .setColor(successColor)
-      .setTitle("Ping")
-      .addField("API Ping:", `\`${apiPing}ms\``, true)
-      .addField("Connection Ping:", `\`${connectionPing}\``, true)
-      .addField("Connection Status:", `\`${connectionStatus}\``, true)
-      .addField("Gateway:", `\`${gateway}\``, true)
-    );
+    pingEmbed.setTitle("Ping");
+
+    pingEmbed.addField("API Ping:", `\`${apiPing}ms\``, true);
+    pingEmbed.addField("Connection Ping:", `\`${connectionPing}\``, true);
+    pingEmbed.addField("Connection Status:", `\`${connectionStatus}\``, true);
+    pingEmbed.addField("Gateway:", `\`${gateway}\``, true);
+
+    return pingMessage.edit(pingEmbed);
   }
 };
