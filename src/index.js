@@ -1,6 +1,6 @@
 const functions = require("./lib/functions.js");
 const config = require("./config/config.json");
-const tokens = require("./config/tokens.json");
+const auth = require("./config/auth.json");
 const models = require("./lib/models.js");
 
 const Markov = require("markov-strings").default;
@@ -40,7 +40,7 @@ client.fs = fs;
 client.functions = functions;
 client.databases = models;
 client.config = config;
-client.tokens = tokens;
+client.auth = auth;
 
 client.loadEvents = function loadEvents () {
   fs.readdirSync("./events/").forEach(async eventName => {
@@ -82,7 +82,7 @@ client.loadCommands = function loadCommands () {
 client.loadEvents();
 client.loadCommands();
 
-client.login(tokens.token);
+client.login(auth.discord);
 
 process.on("unhandledRejection", error => console.error("Unhandled Promise Rejection at:", error));
 

@@ -1,5 +1,5 @@
 vscode
 node_modules
 data
-tokens.json
+auth.json
 .eslintrc.json

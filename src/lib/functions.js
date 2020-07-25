@@ -45,3 +45,7 @@ exports.capitalize = (string) => {
 exports.sleep = (ms) => {
   return new Promise(resolve => setTimeout(resolve, ms));
 };
+
+exports.formatNumber = (number, places) => {
+  return (number).toFixed(places).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+};

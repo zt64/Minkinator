@@ -3,38 +3,34 @@ module.exports = {
   aliases: ["lb"],
   parameters: [
     {
-      name: "stat",
-      type: String,
-      required: true
-    },
-    {
       name: "page",
       type: Number
     }
   ],
   async execute (client, message, args) {
-    const stat = args[0];
-
-    if (!(stat in client.database.members.rawAttributes)) return message.channel.send(`\`${stat}\` is not a member statistic.`);
-
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;
+    const currency = guildConfig.currency;
 
-    const members = await client.database.members.findAll({ order: [[stat, "DESC"]] });
+    const members = await client.database.members.findAll({ order: [["balance", "DESC"]] });
     const leaderBoardEmbed = new client.Discord.MessageEmbed();
     const pages = Math.ceil(members.length / 10);
 
-    let page = args[1] || 1;
+    let page = args[0] || 1;
 
     leaderBoardEmbed.setColor(successColor);
-    leaderBoardEmbed.setTitle(`Member ${stat} leader board`);
+    leaderBoardEmbed.setTitle("Leader board");
     leaderBoardEmbed.setFooter(`Page ${page} of ${pages}`);
 
     if (page > pages || page < 1 || isNaN(page)) return message.channel.send(`Page \`${page}\` does not exist.`);
 
-    members.slice((page - 1) * 10, page * 10).map((member, index) => {
-      leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${member.name}:`, member[stat].toLocaleString());
-    });
+    function populateLeaderBoard () {
+      members.slice((page - 1) * 10, page * 10).map((member, index) => {
+        leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${client.users.cache.get(member.id).username}:`, `${currency}${member.balance.toLocaleString()}`);
+      });
+    }
+
+    populateLeaderBoard();
 
     const leaderBoardMessage = await message.channel.send(leaderBoardEmbed);
 
@@ -89,9 +85,7 @@ module.exports = {
 
       leaderBoardEmbed.fields = [];
 
-      members.slice((page - 1) * 10, page * 10).map((member, index) => {
-        leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${member.name}:`, member[stat].toLocaleString());
-      });
+      populateLeaderBoard();
 
       leaderBoardEmbed.setFooter(`Page ${page} of ${pages}`);
 

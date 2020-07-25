@@ -18,12 +18,12 @@ It can be difficult getting some packages such as [Sodium](https://www.npmjs.com
 
 You will also need a bot token and a DarkSky API key.
 
-Create a file called `tokens.json` in the `/src/config/`, and paste the tokens in their respective places.
+Create a file called `auth.json` in the `/src/config/`, and paste the tokens in their respective places.
 **Do not** share these keys with anyone, it can be a severe vulnerability.
 
 ```json
 {
-  "token": "botToken",
+  "discord": "botToken",
   "darkSky": "darkSkyToken"
 }
 ```

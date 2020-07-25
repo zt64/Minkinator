@@ -2,7 +2,7 @@ module.exports = {
   description: "Play a game of trivia.",
   aliases: ["quiz"],
   async execute (client, message, args) {
-    const functions = client.functions;
+    const { randomInteger, sleep } = client.functions;
     const entities = require("entities");
 
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
@@ -20,13 +20,13 @@ module.exports = {
     const incorrectAnswers = response.incorrect_answers;
     const answers = incorrectAnswers;
 
-    const correctIndex = functions.randomInteger(0, 3);
+    const correctIndex = randomInteger(0, 3);
 
     answers.splice(correctIndex, 0, correctAnswer);
 
     const letters = ["A", "B", "C", "D"];
 
-    const reward = functions.randomInteger(20, 50);
+    const reward = randomInteger(20, 50);
 
     // Create embed
 
@@ -51,7 +51,7 @@ module.exports = {
       ["🇦", "🇧"].map(reaction => questionMessage.react(reaction));
     }
 
-    await functions.sleep(15000);
+    await sleep(15000);
 
     const users = [];
 

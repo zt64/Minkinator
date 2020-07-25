@@ -60,7 +60,7 @@ module.exports = {
     // Check if model exists
 
     try {
-      var model = client.database.sequelize.model("members");
+      var model = client.database.sequelize[modelName];
       console.log(model);
     } catch (e) {
       return message.channel.send(`Model \`${modelName}\` does not exist.`);
@@ -122,6 +122,14 @@ module.exports = {
       } catch (e) {
         return message.channel.send(`Property \`${propertyName}\` does not exist.`);
       }
+    }
+
+    if (subCommand === "info") {
+      const infoEmbed = new client.Discord.MessageEmbed()
+        .setColor(successColor)
+        .setTitle("Database Information");
+
+      return message.channel.send(infoEmbed);
     }
   }
 };
