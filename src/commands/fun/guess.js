@@ -21,7 +21,7 @@ module.exports = {
     const value = Math.round(Math.random() * 100);
     const earn = value === guess ? 1000 : (50 / Math.abs(value - guess) * 4).toFixed(2);
 
-    const newBalance = (memberData.balance + parseFloat(earn)).toFixed(2);
+    const newBalance = memberData.balance + parseFloat(earn);
 
     await memberData.update({ balance: newBalance });
 

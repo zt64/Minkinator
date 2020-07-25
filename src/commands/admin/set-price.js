@@ -26,6 +26,6 @@ module.exports = {
     item.price = inputPrice;
     items.update({ value: items });
 
-    return message.channel.send(`Successfully set the inputPrice of \`${inputName}\` to \`${inputPrice}\``);
+    return message.channel.send(`Successfully set the price of \`${inputName}\` to \`${inputPrice}\``);
   }
 };
