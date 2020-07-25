@@ -40,7 +40,7 @@ module.exports = {
         let parameters = "";
 
         command.parameters.map(parameter => {
-          parameter.required ? parameters += `[${parameter.name}] ` : parameters += `<${parameter.name}> `;
+          parameter.required ? parameters += `[${parameter.name}]` : parameters += ` <${parameter.name}>`;
         });
 
         var usage = `\`${prefix}${command.name} ${parameters}\``;
@@ -51,12 +51,18 @@ module.exports = {
       return message.channel.send(helpEmbed);
     }
 
-    helpEmbed.setTitle("Home page");
-    helpEmbed.setDescription(`There is a total of 5 command categories. For information on a specific command, run: \`${prefix}help <command>\``);
-    helpEmbed.addField("Fun", "Fun commands to play around with.");
-    helpEmbed.addField("Utility", "Tools for the more technical.");
-    helpEmbed.addField("Admin", "Take control of a guild.");
-    helpEmbed.addField("Economy", "Buy, sell, and make a profit.");
+    function addCategories () {
+      helpEmbed.setTitle("Home page");
+      helpEmbed.setDescription(`There is a total of 5 command categories. For information on a specific command, run: \`${prefix}help <command>\``);
+      helpEmbed.addField("Fun", "Fun commands to play around with.");
+      helpEmbed.addField("Economy", "Buy, sell, and make a profit.");
+      helpEmbed.addField("Member", "Member related commands.");
+      helpEmbed.addField("Canvas", "Manipulate an image as you desire.");
+      helpEmbed.addField("Utility", "Tools for the more technical.");
+      helpEmbed.addField("Admin", "Take control of a server.");
+    }
+
+    addCategories();
 
     const helpMessage = await message.channel.send(helpEmbed);
 
@@ -69,19 +75,17 @@ module.exports = {
     }
 
     async function react (reactions) {
-      await reactions.map(async reaction => {
+      reactions.map(async reaction => {
         helpMessage.react(reaction);
         await client.functions.sleep(200);
       });
     }
 
-    await react(["🥳", "💵", "👤", "🖌️", "🛠️", "🔒", "❔", "❌"]);
+    await react(["🥳", "💵", "👤", "🖌️", "🛠️", "🔒", "❌"]);
 
     // Create reaction collector
 
-    const filter = (reaction, user) => user.id === message.author.id && (
-      ["🏠", "🛠️", "🥳", "🔒", "❌"].map(emoji => reaction.emoji.name === emoji)
-    );
+    const filter = (reaction, user) => user.id === message.author.id;
 
     const collector = helpMessage.createReactionCollector(filter);
 
@@ -91,11 +95,13 @@ module.exports = {
       switch (emoji) {
         case "🏠":
           helpEmbed.setTitle("Home page");
-          helpEmbed.setDescription("There is a total of 3 command categories ");
+          helpEmbed.setDescription("There is a total of 6 command categories ");
 
           helpEmbed.fields = [];
 
           helpMessage.reactions.removeAll();
+
+          addCategories();
 
           await react(["🥳", "💵", "👤", "🖌️", "🛠️", "🔒", "❔", "❌"]);
 
@@ -172,19 +178,6 @@ module.exports = {
           helpEmbed.fields = [];
 
           populate("admin");
-
-          helpMessage.reactions.removeAll();
-
-          react(["🏠", "❌"]);
-
-          break;
-        case "❔":
-          helpEmbed.setTitle("Miscellaneous commands");
-          helpEmbed.setDescription(`You can send \`${prefix}help <command name>\` to get info on a specific command.`);
-
-          helpEmbed.fields = [];
-
-          populate("miscellaneous");
 
           helpMessage.reactions.removeAll();
 
