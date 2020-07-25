@@ -45,7 +45,7 @@ module.exports = async (client, message) => {
 
   // Check if message author can level up
   if (xpTotal >= xpRequired) {
-    memberData.update({ level: level++, xpRequired: Math.round(xpRequired * 1.5) });
+    memberData.update({ level: ++level, xpRequired: Math.round(xpRequired * 1.5) });
     level++;
 
     if (guildConfig.levelMention && memberConfig.levelMention) {
