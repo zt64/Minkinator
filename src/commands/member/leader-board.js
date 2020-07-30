@@ -28,7 +28,7 @@ module.exports = {
 
     function populateLeaderBoard () {
       members.slice((page - 1) * 10, page * 10).map((member, index) => {
-        leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${client.users.cache.get(member.id).username}:`, `${currency}${formatNumber(member.balance, 2)}`);
+        leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${client.users.cache.get(member.id).tag}:`, `${currency}${formatNumber(member.balance, 2)}`);
       });
     }
 

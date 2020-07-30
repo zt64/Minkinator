@@ -9,6 +9,8 @@ module.exports = {
     const successColor = guildConfig.colors.success;
     const currency = guildConfig.currency;
 
+    let correctIndex = 0;
+
     // Fetch question
 
     const responses = await client.fetch("https://opentdb.com/api.php?amount=1").then(res => res.json());
@@ -20,9 +22,11 @@ module.exports = {
     const incorrectAnswers = response.incorrect_answers;
     const answers = incorrectAnswers;
 
-    const correctIndex = randomInteger(0, 3);
+    if (response.type === "multiple") {
+      correctIndex = randomInteger(0, 3);
 
-    answers.splice(correctIndex, 0, correctAnswer);
+      answers.splice(correctIndex, 0, correctAnswer);
+    }
 
     const letters = ["A", "B", "C", "D"];
 
@@ -37,10 +41,10 @@ module.exports = {
       .setFooter(`This question is worth ${currency}${reward}`);
 
     if (response.type === "multiple") {
-      answers.map((answer, index) => questionEmbed.addField(letters[index], answer, true));
+      answers.map((answer, index) => questionEmbed.addField(letters[index], entities.decodeHTML(answer), true));
     } else {
-      questionEmbed.addField("A", "True");
-      questionEmbed.addField("B", "False");
+      questionEmbed.addField("A", "True", true);
+      questionEmbed.addField("B", "False", true);
     }
 
     const questionMessage = await message.channel.send(questionEmbed);
