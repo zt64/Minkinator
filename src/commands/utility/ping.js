@@ -25,7 +25,7 @@ module.exports = {
     const connectionStatus = connections[ws.status];
     const gateway = ws.gateway;
 
-    pingEmbed.setTitle("Ping");
+    pingEmbed.setTitle("Ping Information");
 
     pingEmbed.addField("API Ping:", `\`${apiPing}ms\``, true);
     pingEmbed.addField("Connection Ping:", `\`${connectionPing}\``, true);

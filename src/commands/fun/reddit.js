@@ -13,6 +13,8 @@ module.exports = {
     const successColor = guildConfig.colors.success;
     const redditNSFW = guildConfig.redditNSFW;
 
+    const entities = require("entities");
+
     const subreddit = args[0];
     const body = await client.fetch(`https://api.reddit.com/r/${subreddit}/hot?limit=64`).then(response => response.json());
 
@@ -28,10 +30,10 @@ module.exports = {
       .setColor(successColor)
       .setTitle(`r/${subreddit} ${post.title}`)
       .setURL(`https://reddit.com${post.permalink}`)
-      .setDescription(post.selftext ? post.selftext : "\u200b")
       .addField("Author:", `\`${post.author}\``, true)
       .addField("Score:", post.score, true);
 
+    if (post.selftext) embed.setDescription(entities.decodeHTML(post.selftext));
     if (post.url.endsWith(".jpg") || post.url.endsWith(".png")) embed.setImage(post.url);
 
     return message.channel.send(embed);

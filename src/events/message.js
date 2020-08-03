@@ -92,7 +92,7 @@ module.exports = async (client, message) => {
 
   // Check if command exists
 
-  const args = message.content.slice(prefix.length).split(/ +/);
+  const args = message.content.slice(prefix.length).split(/ +/g);
   const commandName = args.shift().toLowerCase();
   const command = client.commands.get(commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 
@@ -129,11 +129,11 @@ module.exports = async (client, message) => {
     for (const parameter of command.parameters) {
       const i = command.parameters.indexOf(parameter);
 
-      if (!parameter.required || !parameter.type) continue;
+      if (!parameter.required) continue;
       if (!args[i]) return error(command);
 
       try {
-        if (JSON.parse(args[i]).constructor !== parameter.type) return error(command);
+        if (parameter.type && JSON.parse(args[i]).constructor !== parameter.type) return error(command);
       } catch (e) {
         if (parameter.type !== String) return error(command);
       }

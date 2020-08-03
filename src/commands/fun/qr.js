@@ -1,9 +1,8 @@
 module.exports = {
-  description: "Generates a QR code based on an input string.",
+  description: "Generates a QR code using the input.",
   parameters: [
     {
-      name: "string",
-      type: String,
+      name: "input",
       required: true
     }
   ],

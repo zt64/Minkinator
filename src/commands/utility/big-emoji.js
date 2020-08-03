@@ -1,5 +1,6 @@
 module.exports = {
   description: "Get a scaled up version of emojis.",
+  aliases: ["emoji", "scale"],
   parameters: [
     {
       name: "emoji",

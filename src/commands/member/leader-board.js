@@ -38,11 +38,7 @@ module.exports = {
 
     if (pages > 1) leaderBoardMessage.react("➡️");
 
-    leaderBoardMessage.react("❌");
-
-    const filter = (reaction, user) => user.id === message.author.id && (
-      ["🏠", "⬅️", "➡️", "❌"].map(emoji => reaction.emoji.name === emoji)
-    );
+    const filter = (reaction, user) => user.id === message.author.id;
 
     const collector = leaderBoardMessage.createReactionCollector(filter);
 
@@ -56,8 +52,6 @@ module.exports = {
           leaderBoardMessage.reactions.removeAll();
 
           if (pages > 1) leaderBoardMessage.react("➡️");
-
-          leaderBoardMessage.react("❌");
           break;
         case "⬅️":
           page--;
@@ -67,7 +61,6 @@ module.exports = {
           if (page !== 1) leaderBoardMessage.react("🏠");
 
           leaderBoardMessage.react("➡️");
-          leaderBoardMessage.react("❌");
           break;
         case "➡️":
           page++;
@@ -78,11 +71,7 @@ module.exports = {
           leaderBoardMessage.react("⬅️");
 
           if (pages > page) leaderBoardMessage.react("➡️");
-
-          leaderBoardMessage.react("❌");
           break;
-        case "❌":
-          return leaderBoardMessage.delete();
       }
 
       leaderBoardEmbed.fields = [];

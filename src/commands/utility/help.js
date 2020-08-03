@@ -81,7 +81,7 @@ module.exports = {
       });
     }
 
-    await react(["🥳", "💵", "👤", "🖌️", "🛠️", "🔒", "❌"]);
+    await react(["🏠", "🥳", "💵", "👤", "🖌️", "🛠️", "🔒", "❌"]);
 
     // Create reaction collector
 
@@ -99,12 +99,7 @@ module.exports = {
 
           helpEmbed.fields = [];
 
-          helpMessage.reactions.removeAll();
-
           addCategories();
-
-          await react(["🥳", "💵", "👤", "🖌️", "🛠️", "🔒", "❔", "❌"]);
-
           break;
         case "🥳":
           helpEmbed.setTitle("Fun commands");
@@ -113,11 +108,6 @@ module.exports = {
           helpEmbed.fields = [];
 
           populate("fun");
-
-          helpMessage.reactions.removeAll();
-
-          react(["🏠", "❌"]);
-
           break;
         case "💵":
           helpEmbed.setTitle("Economy commands");
@@ -126,11 +116,6 @@ module.exports = {
           helpEmbed.fields = [];
 
           populate("economy");
-
-          helpMessage.reactions.removeAll();
-
-          react(["🏠", "❌"]);
-
           break;
         case "👤":
           helpEmbed.setTitle("Member commands");
@@ -139,11 +124,6 @@ module.exports = {
           helpEmbed.fields = [];
 
           populate("member");
-
-          helpMessage.reactions.removeAll();
-
-          react(["🏠", "❌"]);
-
           break;
         case "🖌️":
           helpEmbed.setTitle("Canvas commands");
@@ -152,11 +132,6 @@ module.exports = {
           helpEmbed.fields = [];
 
           populate("canvas");
-
-          helpMessage.reactions.removeAll();
-
-          react(["🏠", "❌"]);
-
           break;
         case "🛠️":
           helpEmbed.setTitle("Utility commands");
@@ -165,11 +140,6 @@ module.exports = {
           helpEmbed.fields = [];
 
           populate("utility");
-
-          helpMessage.reactions.removeAll();
-
-          react(["🏠", "❌"]);
-
           break;
         case "🔒":
           helpEmbed.setTitle("Admin commands");
@@ -178,11 +148,6 @@ module.exports = {
           helpEmbed.fields = [];
 
           populate("admin");
-
-          helpMessage.reactions.removeAll();
-
-          react(["🏠", "❌"]);
-
           break;
         case "❌":
           return helpMessage.delete();

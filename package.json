@@ -19,7 +19,6 @@
     "pretty-ms": "^7.0.0",
     "qrcode": "^1.4.4",
     "sequelize": "^5.22.3",
-    "sodium": "^3.0.2",
     "sqlite3": "^4.2.0",
     "twemoji": "^12.1.6"
   },
