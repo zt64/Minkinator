@@ -22,7 +22,7 @@ module.exports = {
 
     const posts = redditNSFW ? body.data.children : body.data.children.filter(post => !post.data.over_18);
 
-    if (!posts.length) return message.channel.send(`No posts found in \`r/${subreddit}.\``);
+    if (!posts.length) return message.channel.send(`No posts found in \`r/${subreddit}\`.`);
 
     const post = posts[Math.floor(Math.random() * posts.length)].data;
 
