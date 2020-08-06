@@ -105,11 +105,12 @@ module.exports = async (client, message) => {
   // Check if message author has permission
 
   if (message.author.id !== client.config.ownerID) {
-    if (command.ownerOnly || (!message.member.hasPermission(command.permissions))) {
+    if (command.ownerOnly) return;
+    if (!message.member.hasPermission(command.permissions)) {
       const permissionError = await message.channel.send(new client.Discord.MessageEmbed()
         .setColor(errorColor)
         .setTitle("Missing Permissions")
-        .addField("You are missing one of the following permissions:", command.permissions ? command.permissions.join(", ") : "Bot owner only")
+        .addField("You are missing one of the following permissions:", command.permissions.join(", "))
       );
 
       return permissionError.delete({ timeout: errorTimeout });

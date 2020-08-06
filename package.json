@@ -19,7 +19,7 @@
     "pretty-ms": "^7.0.0",
     "qrcode": "^1.4.4",
     "sequelize": "^5.22.3",
-    "sqlite3": "^4.2.0",
+    "sqlite3": "^5.0.0",
     "twemoji": "^12.1.6"
   },
   "devDependencies": {
