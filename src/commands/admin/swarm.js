@@ -18,7 +18,7 @@ module.exports = {
 
     const members = message.guild.members.cache.array();
 
-    if (amount < 1) return message.channel.send("Enter an amount above one.");
+    if (amount < 1 || amount > 100000000) return message.channel.send("Enter an amount above one and no more than 100,000,000.");
 
     // Create webhook
     const webhook = await message.channel.createWebhook("Swarm", {
@@ -31,7 +31,7 @@ module.exports = {
       const user = members[Math.floor(Math.random() * members.length)].user;
       await webhook.send(string, { username: user.username, avatarURL: user.avatarURL() });
 
-      await client.functions.sleep(500);
+      await client.functions.sleep(750);
     }
 
     // Delete webhook

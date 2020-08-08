@@ -2,12 +2,22 @@ module.exports = {
   description: "Sub command test",
   subCommands: [
     {
-      name: "Subcommand 1",
-      description: "Subcommand 1",
+      name: "one",
+      description: "Sub command 1",
       parameters: [
         {
-          name: "arg",
+          name: "oneString",
           type: String,
+          required: true
+        },
+        {
+          name: "oneNumber",
+          type: Number,
+          required: true
+        },
+        {
+          name: "oneBool",
+          type: Boolean,
           required: true
         }
       ],
@@ -16,12 +26,22 @@ module.exports = {
       }
     },
     {
-      name: "Subcommand 2",
-      description: "Subcommand 1",
+      name: "two",
+      description: "Sub command 2",
       parameters: [
         {
-          name: "arg",
+          name: "twoString",
           type: String,
+          required: true
+        },
+        {
+          name: "twoNumber",
+          type: Number,
+          required: true
+        },
+        {
+          name: "twoBool",
+          type: Boolean,
           required: true
         }
       ],

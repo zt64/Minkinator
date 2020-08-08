@@ -14,6 +14,6 @@ module.exports = {
       packageEmbed.addField(key, value, true);
     }
 
-    message.channel.send(packageEmbed);
+    return message.channel.send(packageEmbed);
   }
 };

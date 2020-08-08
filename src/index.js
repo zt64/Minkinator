@@ -42,6 +42,7 @@ client.databases = models;
 client.config = config;
 client.auth = auth;
 
+// Set up event handler
 client.loadEvents = function loadEvents () {
   fs.readdirSync("./events/").forEach(async eventName => {
     delete require.cache[require.resolve(`./events/${eventName}`)];
@@ -57,6 +58,7 @@ client.loadEvents = function loadEvents () {
   console.log(`${`(${time})`.green} Successfully loaded ${client.events.size} events.`);
 };
 
+// Set up command handler
 client.loadCommands = function loadCommands () {
   fs.readdirSync("./commands/").forEach(category => {
     fs.readdirSync(`./commands/${category}`).forEach(async commandName => {
@@ -84,8 +86,10 @@ client.loadCommands();
 
 client.login(auth.discord);
 
+// Handle promise rejections
 process.on("unhandledRejection", error => console.error("Unhandled Promise Rejection at:", error));
 
+// Take input from stdin
 process.stdin.on("data", async data => {
   try {
     console.log(await eval(`(async()=>{${data.toString()}})()`));

@@ -4,7 +4,6 @@ module.exports = async (client) => {
   if (!client.fs.existsSync("./data/")) client.fs.mkdirSync("./data/");
 
   // Create and populate the databases for each guild
-
   for (const guild of client.guilds.cache.array()) {
     const database = await client.databases.create(client, guild);
 
@@ -15,7 +14,6 @@ module.exports = async (client) => {
     const data = await database.properties.findByPk("data").then(key => key.value);
 
     // Build markov corpus
-
     if (data.length > 0) {
       const markov = new client.Markov(data, { stateSize: 2 });
 
@@ -28,7 +26,6 @@ module.exports = async (client) => {
   };
 
   // Set the bot activity
-
   const pluralize = client.pluralize;
 
   const users = pluralize("user", client.users.cache.size, true);
