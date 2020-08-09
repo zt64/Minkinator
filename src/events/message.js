@@ -1,3 +1,5 @@
+const { sleep } = require("../lib/functions");
+
 module.exports = async (client, message) => {
   const time = client.moment().format("HH:mm M/D/Y");
 
@@ -76,7 +78,6 @@ module.exports = async (client, message) => {
   }
 
   // Write message to data.json
-
   if (![prefix, ...ignore].some(x => message.content.startsWith(x))) {
     const dataProperty = await guildProperties.findByPk("data");
     const data = dataProperty.value;
@@ -91,10 +92,9 @@ module.exports = async (client, message) => {
   if (!message.content.startsWith(prefix)) return;
 
   // Check if command exists
-
   const args = message.content.slice(prefix.length).split(/ +/g);
   const commandName = args.shift().toLowerCase();
-  const command = client.commands.get(commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
+  let command = client.commands.get(commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
 
   if (!command) return;
 
@@ -103,7 +103,6 @@ module.exports = async (client, message) => {
   if (disabledCommands.includes(commandName)) return;
 
   // Check if message author has permission
-
   if (message.author.id !== client.config.ownerID) {
     if (command.ownerOnly) return;
     if (!message.member.hasPermission(command.permissions)) {
@@ -118,15 +117,12 @@ module.exports = async (client, message) => {
   }
 
   // Check if parameters are correct
-
   const usageEmbed = new client.Discord.MessageEmbed()
     .setColor(errorColor)
     .setTitle(`Improper usage of ${commandName}`)
     .setDescription(command.description);
 
   if (command.parameters) {
-    usageEmbed.addField("Proper usage", `${prefix}${commandName} `);
-
     for (const parameter of command.parameters) {
       const i = command.parameters.indexOf(parameter);
 
@@ -139,39 +135,41 @@ module.exports = async (client, message) => {
         if (parameter.type !== String) return error(command);
       }
     };
-  };
-
-  // Check sub commands
-
-  if (command.subCommands) {
+  } else if (command.subCommands) {
     const subCommand = command.subCommands.find(subCommand => subCommand.name === args[0]);
 
-    if (!subCommand) return message.channel.send(`${args[0]} is not a sub-command.`);
+    if (!subCommand) {
+      const name = command.subCommands.map(subCommand => subCommand.name);
+
+      usageEmbed.addField("Sub commands:", `\`[${name.join(" | ")}]\``);
+
+      return message.channel.send(usageEmbed);
+    }
+
+    args.shift();
 
     if (subCommand.parameters) {
-      usageEmbed.addField("Proper usage", `${prefix}${commandName} ${subCommand.name} `);
-
       for (const parameter of subCommand.parameters) {
         const i = subCommand.parameters.indexOf(parameter);
 
-        if (!parameter.required || !parameter.type) continue;
-        if (!args[i + 1]) return error(subCommand);
+        if (!parameter.required) continue;
+        if (!args[i]) return error(subCommand, subCommand.name);
 
         try {
-          if (JSON.parse(args[i + 1]).constructor !== parameter.type) return error(subCommand);
+          if (parameter.type && JSON.parse(args[i]).constructor !== parameter.type) return error(subCommand, subCommand.name);
         } catch (e) {
-          if (parameter.type !== String) return error(subCommand);
+          if (parameter.type !== String) return error(subCommand, subCommand.name);
         }
       }
     }
+
+    command = subCommand;
   }
 
-  async function error (command) {
-    command.parameters.map(parameter => {
-      const field = usageEmbed.fields[0];
+  async function error (command, name) {
+    const array = command.parameters.map(parameter => parameter.required ? `[${parameter.name}]` : `<${parameter.name}>`);
 
-      parameter.required ? field.value += `[${parameter.name}] ` : field.value += `<${parameter.name}> `;
-    });
+    usageEmbed.addField("Proper usage", `\`${prefix}${commandName} ${name || ""} ${array.join(" ")}\``);
 
     const usageMessage = await message.channel.send(usageEmbed);
 
@@ -179,37 +177,37 @@ module.exports = async (client, message) => {
   }
 
   // Check if command cool down exists
-
   if (message.author.id !== client.config.ownerID) {
     if (!client.coolDowns.has(commandName)) client.coolDowns.set(commandName, new client.Discord.Collection());
 
     const now = Date.now();
     const timestamps = client.coolDowns.get(commandName);
-    const coolDownAmount = (command.coolDown || 3) * 1000;
+    const coolDownLength = (command.coolDown || 3) * 1000;
 
     if (timestamps.has(message.author.id)) {
-      const expirationTime = timestamps.get(message.author.id) + coolDownAmount;
+      const expirationTime = timestamps.get(message.author.id) + coolDownLength;
 
       if (now < expirationTime) {
         const timeLeft = (expirationTime - now) / 1000;
 
-        const coolDownError = await message.channel.send(new client.Discord.MessageEmbed()
+        const coolDownEmbed = await message.channel.send(new client.Discord.MessageEmbed()
           .setColor(errorColor)
           .setTitle("Cool down active")
           .setDescription(`Please wait, a cool down of ${client.pluralize("second", timeLeft.toFixed(1), true)} is remaining.`)
         );
 
-        return coolDownError.delete({ timeout: errorTimeout });
+        return coolDownEmbed.delete({ timeout: errorTimeout });
       }
     }
 
     timestamps.set(message.author.id, now);
 
-    setTimeout(() => timestamps.delete(message.author.id), coolDownAmount);
+    await sleep(coolDownLength);
+
+    timestamps.delete(message.author.id);
   }
 
   // Execute the command
-
   console.log(`${`(${time})`.green} ${`(${message.guild.name} #${message.channel.name})`.cyan}`, message.author.tag.yellow, message.content);
 
   try {

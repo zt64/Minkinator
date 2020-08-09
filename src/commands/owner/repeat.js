@@ -22,6 +22,8 @@ module.exports = {
 
     for (var i = 0; i < amount; i++) {
       await command.execute(client, message, args.slice(2));
+
+      await client.functions.sleep(1000);
     }
   }
 };

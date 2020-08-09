@@ -1,5 +1,5 @@
 module.exports = {
-  description: "Filters an images RGB channels according to a threshold.",
+  description: "Filters an images RGB channels according to a threshold. Does not support .webp images.",
   aliases: ["t"],
   parameters: [
     {
@@ -15,7 +15,13 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const imageURL = args[0];
-    const image = await client.canvas.loadImage(imageURL);
+    let image;
+
+    try {
+      image = await client.canvas.loadImage(imageURL);
+    } catch (error) {
+      return message.channel.send("An error has occured, the URL cannot end in .webp.");
+    }
 
     const canvas = client.canvas.createCanvas(image.width, image.height);
     const context = canvas.getContext("2d");

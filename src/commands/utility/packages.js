@@ -1,5 +1,6 @@
 module.exports = {
   description: "Shows all the packages that Minkinator is using.",
+  aliases: ["pkg", "pkgs"],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const successColor = guildConfig.colors.success;

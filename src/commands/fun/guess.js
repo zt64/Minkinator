@@ -1,6 +1,6 @@
 module.exports = {
   description: "Guess a number 1 - 100 to earn a reward.",
-  coolDown: 120,
+  coolDown: 30,
   parameters: [
     {
       name: "guess",
@@ -9,26 +9,44 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const memberData = await client.database.members.findByPk(message.author.id);
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+    const memberData = await client.database.members.findByPk(message.author.id);
+
+    const guess = Math.round(args[0]);
+
+    if (guess < 1 || guess > 100) return message.channel.send("Guess must be 1 - 100, inclusive.");
+
+    // Set guild constants
     const successColor = guildConfig.colors.success;
     const currency = guildConfig.currency;
 
-    const { formatNumber } = client.functions;
+    const { formatNumber, randomInteger } = client.functions;
 
-    const guess = Math.floor(args[0]);
+    let balance = memberData.balance;
+    let earn;
 
-    const value = Math.round(Math.random() * 100);
-    const earn = value === guess ? 1000 : (50 / Math.abs(value - guess) * 4).toFixed(2);
+    const value = randomInteger(1, 100);
 
-    const newBalance = memberData.balance + parseFloat(earn);
+    const embed = new client.Discord.MessageEmbed();
 
-    await memberData.update({ balance: newBalance });
+    if (value === guess) {
+      embed.setColor("#F0B27A");
+      embed.setTitle("Jackpot!");
 
-    return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(successColor)
-      .setTitle("Guessing Game")
-      .setDescription(`You guessed ${guess}, and the number was ${value}. \n Earning you ${currency}${earn} puts your balance at ${currency}${formatNumber(newBalance, 2)}.`)
-    );
+      earn = 1000;
+    } else {
+      embed.setColor(successColor);
+      embed.setTitle("Guessing Game");
+
+      earn = 50 / Math.abs(value - guess) * 4;
+    }
+
+    balance += earn;
+
+    await memberData.update({ balance: balance });
+
+    embed.setDescription(`You guessed ${guess}, and the number was ${value}. \n Earning you ${currency}${formatNumber(earn, 2)} puts your balance at ${currency}${formatNumber(balance, 2)}.`);
+
+    return message.channel.send(embed);
   }
 };
