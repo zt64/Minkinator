@@ -169,7 +169,7 @@ module.exports = async (client, message) => {
   async function error (command, name) {
     const array = command.parameters.map(parameter => parameter.required ? `[${parameter.name}]` : `<${parameter.name}>`);
 
-    usageEmbed.addField("Proper usage", `\`${prefix}${commandName} ${name || ""} ${array.join(" ")}\``);
+    usageEmbed.addField("Proper usage", `\`${prefix}${commandName}${name ? ` ${name} ` : " "}${array.join(" ")}\``);
 
     const usageMessage = await message.channel.send(usageEmbed);
 
