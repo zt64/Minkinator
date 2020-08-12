@@ -1,8 +1,7 @@
 {
   "name": "minkinator",
-  "version": "2.7.0",
-  "description": "A discord bot",
-  "main": "index.js",
+  "author": "Litleck",
+  "license": "MIT",
   "dependencies": {
     "@discordjs/opus": "^0.1.0",
     "canvas": "^2.6.1",
@@ -27,21 +26,5 @@
     "eslint-plugin-node": "^11.0.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1"
-  },
-  "scripts": {
-    "start": "node ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Litleck/Minkinator.git"
-  },
-  "keywords": [
-    "discord"
-  ],
-  "author": "Litleck",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Litleck/Minkinator/issues"
-  },
-  "homepage": "https://github.com/Litleck/Minkinator"
+  }
 }
