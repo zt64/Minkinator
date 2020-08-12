@@ -15,13 +15,23 @@ module.exports = {
     
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const defaultColor = guildConfig.colors.default;
-
+    
     const embed = new client.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Rock Paper Scissors")
 
     const { randomInteger, capitalize } = client.functions;
     const computerChoice = choices[randomInteger(0, 2)];
+
+    function sendEmbed (lose) {
+      if (lose) {
+        embed.setDescription(`${capitalize(computerChoice)} beats ${capitalize(playerChoice)}`);
+      } else {
+        embed.setDescription(`${capitalize(playerChoice)} beats ${capitalize(computerChoice)}`);
+      }
+    
+      return message.channel.send(embed);
+    }
 
     if (playerChoice === "rock") {
       if (computerChoice === "paper") return sendEmbed(true);
@@ -39,13 +49,3 @@ module.exports = {
     return message.channel.send(embed);
   }
 };
-
-function sendEmbed (lose) {
-  if (lose) {
-    embed.setDescription(`${capitalize(computerChoice)} beats ${capitalize(playerChoice)}`);
-  } else {
-    embed.setDescription(`${capitalize(playerChoice)} beats ${capitalize(computerChoice)}`);
-  }
-
-  return message.channel.send(embed);
-}
