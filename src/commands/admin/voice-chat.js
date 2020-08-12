@@ -34,8 +34,10 @@ module.exports = {
       async execute (client, message, args) {
         if (client.voice.connections.size >= 1) {
           const connection = client.voice.connections.first();
+          const url = args[0];
 
-          const dispatcher = connection.play(args[0]);
+          // Play URL
+          const dispatcher = connection.play(url);
 
           dispatcher.on("error", console.error);
         } else {

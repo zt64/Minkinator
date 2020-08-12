@@ -8,16 +8,15 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
 
     const search = args.join(" ");
 
     const catEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setFooter("Source: https://api.thecatapi.com");
 
     // Fetch a random image if unspecified
-
     if (!search) {
       const cats = await client.fetch("https://api.thecatapi.com/v1/images/search").then(res => res.json());
       const cat = cats[0];
@@ -30,7 +29,6 @@ module.exports = {
     }
 
     // Check if a breed exists and fetch an image for it
-
     const breeds = await client.fetch(`https://api.thecatapi.com/v1/breeds/search?q=${search}`).then(res => res.json());
     const breed = breeds[0];
 

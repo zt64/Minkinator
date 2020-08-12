@@ -23,6 +23,7 @@ module.exports = {
 
     if (!item) return message.channel.send(`\`${inputName}\` does not exist in the guild shop.`);
 
+    // Update item price
     item.price = inputPrice;
     items.update({ value: items });
 

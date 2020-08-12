@@ -19,6 +19,7 @@ module.exports = {
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
 
+    // Change pixels to be greyscale
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
       const g = data[i + 1];

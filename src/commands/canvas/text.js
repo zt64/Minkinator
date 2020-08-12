@@ -27,7 +27,8 @@ module.exports = {
 
     canvas.width = ctx.measureText(text).width * 3;
     canvas.height = size * 2;
-
+    
+    // Set ctx properties
     ctx.font = `${size}px ${font}`;
     ctx.fillStyle = "white";
     ctx.textAlign = "center";

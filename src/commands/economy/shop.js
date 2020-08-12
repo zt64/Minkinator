@@ -24,7 +24,7 @@ module.exports = {
         const { formatNumber } = client.functions;
 
         // Set guild constants
-        const successColor = guildConfig.colors.success;
+        const defaultColor = guildConfig.colors.default;
         const currency = guildConfig.currency;
 
         // Set member constants
@@ -59,7 +59,7 @@ module.exports = {
         memberData.update({ inventory: inventory });
 
         return message.channel.send(new client.Discord.MessageEmbed()
-          .setColor(successColor)
+          .setColor(defaultColor)
           .setTitle("Transaction Successful")
           .setDescription(`Bought ${client.pluralize(itemName, itemAmount, true)} for ${currency}${formatNumber(shopItemPrice, 2)}.`)
         );
@@ -86,7 +86,7 @@ module.exports = {
         const memberData = await client.database.members.findByPk(message.author.id);
 
         // Set guild constants
-        const successColor = guildConfig.colors.success;
+        const defaultColor = guildConfig.colors.default;
         const currency = guildConfig.currency;
 
         // Set member constants
@@ -103,7 +103,6 @@ module.exports = {
         const sellPrice = (itemAmount * shopItem.price) / 2;
 
         // Check if possible to sell
-
         if (!inventoryItem) return message.channel.send(`You do not have: \`${itemName}\``);
         if (itemAmount > inventoryItem.amount) return message.channel.send(`You are missing the additional: \`${itemAmount - inventoryItem.amount}\` ${itemName}.`);
 
@@ -114,7 +113,7 @@ module.exports = {
         memberData.update({ balance: balance, inventory: inventory });
 
         return message.channel.send(new client.Discord.MessageEmbed()
-          .setColor(successColor)
+          .setColor(defaultColor)
           .setTitle("Transaction Successful")
           .setDescription(`Sold ${client.pluralize(itemName, itemAmount, true)} for ${currency}${sellPrice.toFixed(2)}`)
         );
@@ -136,10 +135,11 @@ module.exports = {
         const { formatNumber } = client.functions;
 
         // Set guild constants
-        const successColor = guildConfig.colors.success;
+        const defaultColor = guildConfig.colors.default;
         const currency = guildConfig.currency;
         const prefix = guildConfig.prefix;
 
+        // Setup pages
         const pages = Math.ceil(shopItems.length / 10);
 
         if (!pages) return message.channel.send("The shop is currently empty.");
@@ -148,8 +148,9 @@ module.exports = {
 
         if (page > pages || page < 1 || isNaN(page)) return message.channel.send(`Page \`${page}\` does not exist.`);
 
+        // Create embed
         const shopEmbed = new client.Discord.MessageEmbed()
-          .setColor(successColor)
+          .setColor(defaultColor)
           .setTitle(`${message.guild.name} shop`)
           .setDescription(`Buy items using \`${prefix}shop buy [item] [amount]\` \n Sell items using \`${prefix}shop sell [item] [amount] [price]\``)
           .setFooter(`Page ${page} of ${pages}`);
@@ -170,6 +171,7 @@ module.exports = {
 
         const collector = shopMessage.createReactionCollector(filter);
 
+        // Functions for each reaction
         collector.on("collect", async reaction => {
           const emoji = reaction.emoji.name;
 

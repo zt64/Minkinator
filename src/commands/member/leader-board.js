@@ -9,22 +9,24 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
-
-    const members = await client.database.members.findAll({ order: [["balance", "DESC"]] });
-    const leaderBoardEmbed = new client.Discord.MessageEmbed();
-    const pages = Math.ceil(members.length / 10);
 
     const { formatNumber } = client.functions;
 
+    // Set members const and sort by balance
+    const members = await client.database.members.findAll({ order: [["balance", "DESC"]] });
+
+    const pages = Math.ceil(members.length / 10);
     let page = args[0] || 1;
 
-    leaderBoardEmbed.setColor(successColor);
-    leaderBoardEmbed.setTitle("Leader board");
-    leaderBoardEmbed.setFooter(`Page ${page} of ${pages}`);
+    // Create embed
+    const leaderBoardEmbed = new client.Discord.MessageEmbed()
+      .setColor(defaultColor)
+      .setTitle("Leader board")
+      .setFooter(`Page ${page} of ${pages}`);
 
-    if (page > pages || page < 1 || isNaN(page)) return message.channel.send(`Page \`${page}\` does not exist.`);
+    if (page > pages || page < 1) return message.channel.send(`Page \`${page}\` does not exist.`);
 
     function populateLeaderBoard () {
       members.slice((page - 1) * 10, page * 10).map((member, index) => {

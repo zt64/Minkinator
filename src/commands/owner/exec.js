@@ -9,18 +9,19 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
     const input = args.join(" ");
 
     const { exec } = require("child_process");
-    const os = require("os");
+    const os = client.os
 
     const execEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setTitle(input);
 
     const execMessage = await message.channel.send(execEmbed);
 
+    // Execute command
     const command = exec(input, function (error, stdout, stderr) {
       if (error) {
         console.log(error.stack);

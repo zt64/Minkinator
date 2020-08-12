@@ -3,7 +3,7 @@ module.exports = {
   aliases: ["restart", "reboot", "r"],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
 
     const time = client.moment().format("HH:mm M/D/Y");
 
@@ -11,19 +11,17 @@ module.exports = {
     const events = client.events;
 
     const reloadEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setTitle("Reloading")
       .setDescription(`Reloading \`${commands.size}\` commands and \`${events.size}\` events.`);
 
     const reloadMessage = await message.channel.send(reloadEmbed);
 
     // Remove events and commands
-
     client.removeAllListeners();
     client.commands.clear();
 
     // Load events and commands
-
     try {
       await client.loadEvents();
       await client.loadCommands();

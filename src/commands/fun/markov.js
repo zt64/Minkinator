@@ -3,18 +3,20 @@ module.exports = {
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const data = await client.database.properties.findByPk("data").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
     const markovTries = guildConfig.markovTries;
     const markovScore = guildConfig.markovScore;
 
     const { formatNumber } = client.functions;
 
+    // Set options for generator
     const options = {
       maxTries: markovTries,
       prng: Math.random(),
       filter: (result) => result.score > markovScore && result.refs.length >= 2 && result.string.length <= 500
     };
 
+    // Generates the markov chain
     try {
       const result = await client.database.markov.generateAsync(options);
 
@@ -23,7 +25,7 @@ module.exports = {
       return message.channel.send(result.string);
     } catch (error) {
       return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(successColor)
+        .setColor(defaultColor)
         .setTitle("Markov generation unsuccessful")
         .setDescription(`An error has occurred or the guild does not have enough data. Contact a server administrator to change \`markov.score\` and \`markov.tries\` in the guild config. \nCurrently there are: \`${formatNumber(data.length)}\` strings of data.`)
       );

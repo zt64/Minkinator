@@ -9,16 +9,18 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
 
     const user = message.mentions.users.first() || message.author;
     const member = message.guild.member(user);
     const inventory = (await client.database.members.findByPk(user.id)).inventory;
 
+    // Create embed
     const inventoryEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setTitle(`Inventory of ${member.displayName}`);
-
+      
+    // Add items to embed
     inventory.map(item => inventoryEmbed.addField(item.name, item.amount, true));
 
     if (!inventoryEmbed.fields.length) inventoryEmbed.setDescription("No items present.");

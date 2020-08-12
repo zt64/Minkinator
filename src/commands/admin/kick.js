@@ -14,17 +14,19 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
 
     const member = message.mentions.members.first();
     const reason = args.slice(1).join(" ");
 
     if (!member) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
 
+    // Kick member from guild
     message.guild.member(member).kick();
 
+    // Send embed
     return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setTitle(`${member.user.tag} has been kicked`)
       .setDescription(reason || "No reason provided.")
     );

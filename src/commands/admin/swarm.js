@@ -26,7 +26,6 @@ module.exports = {
     });
 
     // Send messages
-
     for (let i = 0; i < amount; i++) {
       const user = members[Math.floor(Math.random() * members.length)].user;
       await webhook.send(string, { username: user.username, avatarURL: user.avatarURL() });
@@ -35,7 +34,6 @@ module.exports = {
     }
 
     // Delete webhook
-
     return webhook.delete();
   }
 };

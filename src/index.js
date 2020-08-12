@@ -15,15 +15,18 @@ const colors = require("colors");
 const pms = require("pretty-ms");
 const qr = require("qrcode");
 const fs = require("fs");
+const os = require("os");
 
 const client = new Discord.Client(config.clientOptions);
 
 const time = moment().format("HH:mm M/D/Y");
 
+// Create collections
 client.coolDowns = new Discord.Collection();
 client.commands = new Discord.Collection();
 client.events = new Discord.Collection();
 
+// Set client properties
 client.GifEncoder = GifEncoder;
 client.Sequelize = Sequelize;
 client.pluralize = pluralize;
@@ -36,6 +39,7 @@ client.fetch = fetch;
 client.pms = pms;
 client.qr = qr;
 client.fs = fs;
+client.os = os;
 
 client.functions = functions;
 client.databases = models;
@@ -51,8 +55,10 @@ client.loadEvents = function loadEvents () {
 
     eventName = eventName.replace(".js", "");
 
+    // Add event to events collection
     client.events.set(eventName, eventFile);
 
+    // Bind event file to run on event
     client.on(eventName, eventFile.bind(null, client));
   });
   console.log(`${`(${time})`.green} Successfully loaded ${client.events.size} events.`);
@@ -68,10 +74,12 @@ client.loadCommands = function loadCommands () {
 
       commandName = commandName.replace(".js", "");
 
+      // Add command to commands collection
       client.commands.set(commandName, commandFile);
 
       const command = client.commands.get(commandName);
 
+      // Set command properties
       command.name = commandName;
       command.category = category;
 
@@ -81,9 +89,11 @@ client.loadCommands = function loadCommands () {
   console.log(`${`(${time})`.green} Successfully loaded ${client.commands.size} commands.`);
 };
 
+// Load commands and events
 client.loadEvents();
 client.loadCommands();
 
+// Login to Discord API
 client.login(auth.discord);
 
 // Handle promise rejections

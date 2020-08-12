@@ -13,10 +13,12 @@ module.exports = {
     const commandsArray = commandsKey.value;
     const commandName = args[0];
 
+    // Make sure command exists in array
     if (!commandsArray.includes(commandName)) {
       return message.channel.send(`\`${commandName}\` is either non-existent or already enabled.`);
     }
 
+    // Update commands in database
     commandsKey.update({ value: commandsArray.filter(element => element !== commandName) });
 
     return message.channel.send(`Enabled \`${commandName}\`.`);

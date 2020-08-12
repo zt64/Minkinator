@@ -13,7 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: {
         colors: {
-          success: "#1ED760",
+          default: "#1ED760",
           error: "#FF0000"
         },
         markov: {

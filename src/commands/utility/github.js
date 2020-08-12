@@ -6,33 +6,35 @@ module.exports = {
       description: "Get information on a GitHub repository.",
       parameters: [
         {
-          name: "name",
+          name: "owner",
           type: String,
           required: true
         },
         {
-          name: "repo",
+          name: "name",
           type: String,
           required: true
         }
       ],
       async execute (client, message, args) {
         const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-        const successColor = guildConfig.colors.success;
+        const defaultColor = guildConfig.colors.default;
 
         const owner = args[0];
-        const repo = args[1];
+        const name = args[1];
 
         const fetchJson = async url => await (await client.fetch(url)).json();
 
-        const json = await fetchJson(`https://api.github.com/repos/${owner}/${repo}`);
-        const commits = await fetchJson(`https://api.github.com/repos/${owner}/${repo}/commits`);
-        const pulls = await fetchJson(`https://api.github.com/repos/${owner}/${repo}/pulls`);
+        // Fetch JSON results
+        const json = await fetchJson(`https://api.github.com/repos/${owner}/${name}`);
+        const commits = await fetchJson(`https://api.github.com/repos/${owner}/${name}/commits`);
+        const pulls = await fetchJson(`https://api.github.com/repos/${owner}/${name}/pulls`);
 
         if (json.message === "Not Found") return message.channel.send("Could not find repository.");
 
+        // Create embed
         const embed = new client.Discord.MessageEmbed()
-          .setColor(successColor)
+          .setColor(defaultColor)
           .setTitle(json.full_name)
           .setURL(json.html_url)
           .addField("ID:", json.id, true)
@@ -64,7 +66,7 @@ module.exports = {
       ],
       async execute (client, message, args) {
         const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-        const successColor = guildConfig.colors.success;
+        const defaultColor = guildConfig.colors.default;
         const user = args[0];
 
         const fetchJson = async url => await (await client.fetch(url)).json();
@@ -73,8 +75,9 @@ module.exports = {
 
         if (json.message === "Not Found") return message.channel.send("Could not find user.");
 
+        // Create embed
         const embed = new client.Discord.MessageEmbed()
-          .setColor(successColor)
+          .setColor(defaultColor)
           .setTitle(json.login)
           .setURL(json.html_url)
           .addField("Location:", json.location, true)
@@ -91,8 +94,6 @@ module.exports = {
         if (json.name) embed.addField("Name:", json.name, true);
         if (json.company) embed.addField("Company:", json.company, true);
         if (json.blog) embed.addField("Website:", json.blog, true);
-
-        console.log(json);
 
         return message.channel.send(embed);
       }

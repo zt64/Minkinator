@@ -17,7 +17,7 @@ module.exports = {
     if (guess < 1 || guess > 100) return message.channel.send("Guess must be 1 - 100, inclusive.");
 
     // Set guild constants
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
 
     const { formatNumber, randomInteger } = client.functions;
@@ -25,6 +25,7 @@ module.exports = {
     let balance = memberData.balance;
     let earn;
 
+    // Generate random value
     const value = randomInteger(1, 100);
 
     const embed = new client.Discord.MessageEmbed();
@@ -35,12 +36,13 @@ module.exports = {
 
       earn = 1000;
     } else {
-      embed.setColor(successColor);
+      embed.setColor(defaultColor);
       embed.setTitle("Guessing Game");
 
       earn = 50 / Math.abs(value - guess) * 4;
     }
 
+    // Update balance
     balance += earn;
 
     await memberData.update({ balance: balance });

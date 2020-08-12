@@ -10,10 +10,12 @@ module.exports = {
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const prefix = guildConfig.prefix;
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
     const embed = new client.Discord.MessageEmbed()
-      .setColor(successColor);
+      .setColor(defaultColor)
+      .setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
 
+    // Send entire command list
     if (!args.length) {
       embed.setTitle("You have summoned I, the Minkinator. What shall I do today?");
       embed.setDescription(`You can send \`${prefix}help <command name>\` to get info on a specific command.`);
@@ -22,7 +24,6 @@ module.exports = {
           if (command.permissions && !message.member.hasPermission(command.permissions)) return;
           return command.name;
         }).filter(Boolean).join(", ")}`);
-      embed.setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
 
       return message.channel.send(embed);
     }
@@ -32,7 +33,7 @@ module.exports = {
 
     if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
       return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(successColor)
+        .setColor(defaultColor)
         .setTitle("Invalid Command")
         .setDescription(`\`${name}\` is not a valid command.`));
     }
@@ -45,8 +46,6 @@ module.exports = {
 
     embed.addField("**Cool down**:", client.pluralize("second", command.coolDown || 3, true), true);
     embed.addField("**Permissions**:", command.permissions ? command.permissions.join(", ") : "Everyone", true);
-
-    embed.setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
 
     return message.channel.send(embed);
   }

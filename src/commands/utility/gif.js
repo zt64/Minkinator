@@ -12,6 +12,7 @@ module.exports = {
 
     gif.writeHeader();
 
+    // Set pixel data
     for (let i = 0; i < frames; i++) {
       const r = randomInteger(0, 255);
       const g = randomInteger(0, 255);

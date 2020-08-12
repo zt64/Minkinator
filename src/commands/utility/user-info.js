@@ -3,16 +3,18 @@ module.exports = {
   async execute (client, message, args) {
     const user = message.mentions.users.first() || message.author;
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
 
     const platforms = [];
 
+    // Add platforms
     if (user.presence.clientStatus.web) platforms.push("Web");
     if (user.presence.clientStatus.mobile) platforms.push("Mobile");
     if (user.presence.clientStatus.desktop) platforms.push("Desktop");
 
+    // Create embed
     const infoEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setAuthor(`User information: ${user.tag}`, user.avatarURL())
       .addField("ID:", user.id)
       .addField("Created:", user.createdAt.toLocaleDateString(), true)

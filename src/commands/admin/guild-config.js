@@ -19,12 +19,13 @@ module.exports = {
 
     const guildConfigDB = await properties.findByPk("configuration");
     const guildConfig = guildConfigDB.value;
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
 
     const key = args[0];
 
+    // Create embed
     const configEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setTitle("Guild Configuration");
 
     if (!key) {
@@ -35,6 +36,7 @@ module.exports = {
       return message.channel.send(configEmbed);
     }
 
+    // Make sure property exists
     if (!(key in guildConfig)) return message.channel.send(`\`${key}\` is not a guild property.`);
 
     if (typeof (guildConfig[key]) === "object") {

@@ -13,12 +13,14 @@ module.exports = {
     const commandsArray = commandsKey.value;
     const commandName = args[0];
 
+    // Check if command can be disabled
     if (!client.commands.get(commandName)) {
       return message.channel.send(`\`${commandName}\` is not a valid command.`);
     } else if (commandsArray.includes(commandName)) {
       return message.channel.send(`\`${commandName}\` is already disabled.`);
     }
 
+    // Add command to database
     commandsArray.push(commandName);
     commandsKey.update({ value: commandsArray });
 

@@ -5,7 +5,7 @@ module.exports = {
     const memberConfig = memberData.configuration;
 
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
 
     const key = args[0];
     const value = args[1];
@@ -24,8 +24,9 @@ module.exports = {
       }
     };
 
+    // Create embed
     const configEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setTitle("Member Configuration");
 
     for (const [key, value] of Object.entries(memberConfig)) {

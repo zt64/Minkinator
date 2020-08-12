@@ -9,25 +9,25 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
     const prefix = guildConfig.prefix;
 
+    const commandName = args[0].toLowerCase();
+
     const helpEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
 
-    if (args[0]) {
-      const commandName = args[0].toLowerCase();
+    if (commandName) {
       const command = client.commands.get(commandName) || client.commands.find(c => c.aliases && c.aliases.includes(commandName));
 
       if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
         return message.channel.send(new client.Discord.MessageEmbed()
-          .setColor(successColor)
+          .setColor(defaultColor)
           .setTitle("Invalid Command")
           .setDescription(`\`${commandName}\` is not a valid command.`));
       }
 
-      helpEmbed.setColor(successColor);
       helpEmbed.addField("Command:", command.name, true);
       helpEmbed.addField("Category:", command.category, true);
       helpEmbed.addField("Description:", command.description);
@@ -50,6 +50,8 @@ module.exports = {
 
       return message.channel.send(helpEmbed);
     }
+
+    helpEmbed.setDescription(`For more information on a certain command you can type \`${prefix}help <command name>\``);
 
     function addCategories () {
       helpEmbed.setTitle("Home page");
@@ -84,7 +86,6 @@ module.exports = {
     await react(["🏠", "🥳", "💵", "👤", "🖌️", "🛠️", "🔒", "❌"]);
 
     // Create reaction collector
-
     const filter = (reaction, user) => user.id === message.author.id;
 
     const collector = helpMessage.createReactionCollector(filter);
@@ -103,7 +104,6 @@ module.exports = {
           break;
         case "🥳":
           helpEmbed.setTitle("Fun commands");
-          helpEmbed.setDescription(`You can send \`${prefix}help <command name>\` to get info on a specific command.`);
 
           helpEmbed.fields = [];
 
@@ -111,7 +111,6 @@ module.exports = {
           break;
         case "💵":
           helpEmbed.setTitle("Economy commands");
-          helpEmbed.setDescription(`For more information on a certain command you can type \`${prefix}help <command name>\``);
 
           helpEmbed.fields = [];
 
@@ -119,7 +118,6 @@ module.exports = {
           break;
         case "👤":
           helpEmbed.setTitle("Member commands");
-          helpEmbed.setDescription(`For more information on a certain command you can type \`${prefix}help <command name>\``);
 
           helpEmbed.fields = [];
 
@@ -127,7 +125,6 @@ module.exports = {
           break;
         case "🖌️":
           helpEmbed.setTitle("Canvas commands");
-          helpEmbed.setDescription(`For more information on a certain command you can type \`${prefix}help <command name>\``);
 
           helpEmbed.fields = [];
 
@@ -135,7 +132,6 @@ module.exports = {
           break;
         case "🛠️":
           helpEmbed.setTitle("Utility commands");
-          helpEmbed.setDescription(`For more information on a certain command you can type \`${prefix}help <command name>\``);
 
           helpEmbed.fields = [];
 
@@ -143,7 +139,6 @@ module.exports = {
           break;
         case "🔒":
           helpEmbed.setTitle("Admin commands");
-          helpEmbed.setDescription(`You can send \`${prefix}help <command name>\` to get info on a specific command.`);
 
           helpEmbed.fields = [];
 

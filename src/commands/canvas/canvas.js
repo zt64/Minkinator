@@ -26,6 +26,7 @@ module.exports = {
       return Math.abs(Math.round(curr - prev));
     }
 
+    // Modify pixels with new values
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
       const g = data[i + 1];

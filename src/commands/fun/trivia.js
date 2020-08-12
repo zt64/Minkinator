@@ -6,13 +6,12 @@ module.exports = {
     const entities = require("entities");
 
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
 
     let correctIndex = 0;
 
     // Fetch question
-
     const responses = await client.fetch("https://opentdb.com/api.php?amount=1").then(res => res.json());
     const response = responses.results[0];
 
@@ -33,9 +32,8 @@ module.exports = {
     const reward = randomInteger(20, 50);
 
     // Create embed
-
     const questionEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setTitle(`${response.category} question`)
       .setDescription(question)
       .setFooter(`This question is worth ${currency}${reward}`);
@@ -61,12 +59,14 @@ module.exports = {
 
     const reactions = questionMessage.reactions.cache.array();
 
+    // Check for correct answer
     for (const user of reactions[correctIndex].users.cache.array()) {
       if (user.id === client.user.id) continue;
 
       users.push(user);
     }
 
+    // Update balances
     for (const user of users) {
       const data = await client.database.members.findByPk(user.id);
       const balance = data.balance + reward;
@@ -75,7 +75,7 @@ module.exports = {
     }
 
     const answerEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setTitle("Trivia Answer");
 
     if (users.length) {

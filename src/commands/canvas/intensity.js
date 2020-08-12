@@ -26,6 +26,7 @@ module.exports = {
 
     const factor = parseInt(args[1]);
 
+    // Modify pixel intensity
     for (let i = 0; i < data.length; i += 4) {
       data[i] += factor;
       data[i + 1] += factor;

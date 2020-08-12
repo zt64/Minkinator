@@ -33,6 +33,7 @@ module.exports = {
 
     const threshold = parseInt(args[1]);
 
+    // Modify pixel data
     for (let i = 0; i < data.length; i += 4) {
       var r = data[i];
       var g = data[i + 1];

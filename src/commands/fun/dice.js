@@ -9,7 +9,7 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
     const { randomInteger, sleep } = client.functions;
 
     const sides = !isNaN(args[0]) ? args[0] : 6;
@@ -19,7 +19,7 @@ module.exports = {
 
     // Create embed
     const diceEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setTitle("Dice roll")
       .setDescription("Rolling...");
 
@@ -28,6 +28,7 @@ module.exports = {
 
     await sleep(1000);
 
+    // Edit embed
     diceEmbed.setDescription(result);
     diceMessage.edit(diceEmbed);
   }

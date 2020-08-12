@@ -11,8 +11,10 @@ module.exports = {
     const user = await client.functions.getUser(client, message, args[0]);
     const memberData = await client.database.members.findByPk(user.id);
 
+    // Toggle state on a member
     const state = memberData.botBan ? "unbanned" : "banned";
 
+    // Update member data
     memberData.update({ botBan: !memberData.botBan });
 
     return message.channel.send(`${user} has been ${state} from using Minkinator.`);

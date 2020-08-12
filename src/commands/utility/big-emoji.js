@@ -14,14 +14,13 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
     const twemoji = require("twemoji");
     const messageEmoji = args[0];
 
     let url;
 
-    // Test if emoji is a guild emoji
-
+    // Check if emoji is a guild emoji
     if (messageEmoji.match(/:/)) {
       const match = messageEmoji.match(/\d+/);
 
@@ -37,7 +36,7 @@ module.exports = {
     }
 
     const emojiEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setTitle("Scaled emoji")
       .setURL(url)
       .setImage(url);

@@ -22,7 +22,7 @@ module.exports = async (client, message) => {
 
   // Set guild constants
   const guildConfig = await guildProperties.findByPk("configuration").then(key => key.value);
-  const successColor = guildConfig.colors.success;
+  const defaultColor = guildConfig.colors.default;
   const errorColor = guildConfig.colors.error;
   const errorTimeout = guildConfig.errorTimeout;
   const markovTries = guildConfig.markovTries;
@@ -50,10 +50,11 @@ module.exports = async (client, message) => {
     memberData.update({ level: ++level, xpRequired: Math.round(xpRequired * 1.5) });
     level++;
 
+    // Check if level mention is enabled
     if (guildConfig.levelMention && memberConfig.levelMention) {
       if (!(level % 5)) {
         const levelUpEmbed = new client.Discord.MessageEmbed()
-          .setColor(successColor)
+          .setColor(defaultColor)
           .setTitle(`${message.author.username} has levelled up!`)
           .setDescription(`${message.author} is now level ${formatNumber(level)} and earned ${currency}500 as a reward!`);
 
@@ -64,6 +65,7 @@ module.exports = async (client, message) => {
     }
   }
 
+  // Generate markov on mention of self
   if (message.mentions.users.first() === client.user) {
     const options = {
       maxTries: markovTries,
@@ -98,8 +100,8 @@ module.exports = async (client, message) => {
 
   if (!command) return;
 
+  // Check that command isn't disabled
   const disabledCommands = await guildProperties.findByPk("commands").then(key => key.value);
-
   if (disabledCommands.includes(commandName)) return;
 
   // Check if message author has permission
@@ -200,10 +202,12 @@ module.exports = async (client, message) => {
       }
     }
 
+    // Set cool down for command
     timestamps.set(message.author.id, now);
 
     await sleep(coolDownLength);
 
+    // Delete cool down for command
     timestamps.delete(message.author.id);
   }
 

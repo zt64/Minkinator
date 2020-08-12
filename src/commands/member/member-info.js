@@ -9,7 +9,7 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
     const formatNumber = client.functions.formatNumber;
 
@@ -21,9 +21,8 @@ module.exports = {
     const memberData = await client.database.members.findByPk(user.id);
 
     // Create info embed
-
     const infoEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setAuthor(`Member information: ${member.nickname || user.tag}`, user.avatarURL())
       .addField("Balance:", `${currency}${formatNumber(memberData.balance, 2)}`, true)
       .addField("Level:", formatNumber(memberData.level), true)

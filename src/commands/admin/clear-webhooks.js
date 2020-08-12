@@ -5,6 +5,7 @@ module.exports = {
   async execute (client, message, args) {
     const webhooks = await message.guild.fetchWebhooks();
 
+    // Delete all webhooks
     webhooks.map(async webhook => {
       await client.fetchWebhook(webhook.id).then(webhook => webhook.delete());
     });

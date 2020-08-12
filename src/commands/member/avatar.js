@@ -9,15 +9,18 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
 
+    // Get user
     const user = await client.functions.getUser(client, message, args[0]);
+    const avatar = user.displayAvatarURL({ format: "png", dynamic: true, size: 256 })
 
+    // Send embed
     return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setTitle(`Avatar of ${user.tag}`)
-      .setURL(user.displayAvatarURL({ format: "png", dynamic: true, size: 256 }))
-      .setImage(user.displayAvatarURL({ format: "png", dynamic: true, size: 256 }))
+      .setURL(avatar)
+      .setImage(avatar)
       .setFooter(`User ID: ${user.id}`)
     );
   }

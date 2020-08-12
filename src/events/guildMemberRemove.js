@@ -4,6 +4,7 @@ module.exports = async (client, member) => {
   const time = client.moment().format("HH:mm M/D/Y");
   const pluralize = client.pluralize;
 
+  // Set count values
   const users = pluralize("user", client.users.cache.size, true);
   const guilds = pluralize("guild", client.guilds.cache.size, true);
 
@@ -11,6 +12,7 @@ module.exports = async (client, member) => {
 
   console.log(`${`(${time})`.green} ${member.user.tag} has left ${member.guild.name}.`);
 
+  // Destroy member data
   await database.members.findByPk(member.id).then(data => data.destroy());
 
   if (channel) {

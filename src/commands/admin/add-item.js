@@ -22,6 +22,7 @@ module.exports = {
 
     if (isNaN(itemPrice) || itemPrice <= 0) return message.channel.send(`Item price must be a number above ${currency}0.`);
 
+    // Add item to guild shop
     const itemsProperty = await properties.findByPk("items");
     const array = itemsProperty.value;
 

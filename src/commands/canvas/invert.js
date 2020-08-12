@@ -18,6 +18,7 @@ module.exports = {
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
 
+    // Invert pixels
     for (let i = 0; i < data.length; i += 4) {
       data[i] = data[i] ^ 255;
       data[i + 1] = data[i + 1] ^ 255;

@@ -3,14 +3,16 @@ module.exports = {
   aliases: ["pkg", "pkgs"],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
 
     const { dependencies } = require("../../../package.json");
 
+    // Create embed
     const packageEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setTitle("Packages");
 
+    // Add packages to embed
     for (const [key, value] of Object.entries(dependencies)) {
       packageEmbed.addField(key, value, true);
     }

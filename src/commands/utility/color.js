@@ -10,13 +10,15 @@ module.exports = {
   async execute (client, message, args) {
     const canvas = client.canvas.createCanvas(512, 512);
     const ctx = canvas.getContext("2d");
+    const hex = args[0];
 
-    ctx.fillStyle = args[0];
+    // Set ctx properties
+    ctx.fillStyle = hex;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     return message.channel.send(new client.Discord.MessageEmbed()
       .setTitle("Color")
-      .setColor(args[0])
+      .setColor(hex)
       .setImage(canvas.toDataURL())
     );
   }

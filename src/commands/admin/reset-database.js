@@ -3,6 +3,8 @@ module.exports = {
   aliases: ["reset-db", "r-db"],
   permissions: ["ADMINISTRATOR"],
   async execute (client, message, args) {
+    if (args[0] !== "confirm") return message.channel.send("**Warning**, this command will reset the database for the current guild. To do so add `confirm` as an argument.");
+    
     const guildModel = client.database;
     const sequelize = guildModel.sequelize;
     const guild = message.guild;

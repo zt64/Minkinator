@@ -18,7 +18,7 @@ module.exports = {
       ],
       async execute (client, message, args) {
         const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-        const successColor = guildConfig.colors.success;
+        const defaultColor = guildConfig.colors.default;
 
         const modelDataEmbed = new client.Discord.MessageEmbed();
         const objectDataEmbed = new client.Discord.MessageEmbed();
@@ -37,7 +37,7 @@ module.exports = {
           const primaryKey = model.primaryKeyAttributes[0];
 
           modelDataEmbed.setTitle(`${modelName}`);
-          modelDataEmbed.setColor(successColor);
+          modelDataEmbed.setColor(defaultColor);
 
           await model.findAll().map(object => modelDataEmbed.addField(object[primaryKey], "\u200b", true));
 
@@ -53,7 +53,7 @@ module.exports = {
 
         // Set embed properties
         objectDataEmbed.setTitle(`${modelName}: ${objectName}`);
-        objectDataEmbed.setColor(successColor);
+        objectDataEmbed.setColor(defaultColor);
 
         for (const [key, value] of Object.entries(object.dataValues)) {
           objectDataEmbed.addField(`${key}:`, JSON.stringify(value, null, 2), true);
@@ -90,18 +90,21 @@ module.exports = {
         const objectName = args[1];
         const propertyName = args[2];
 
+        // Check if model exists
         try {
           var model = client.database.sequelize[modelName];
         } catch (e) {
           return message.channel.send(`Model \`${modelName}\` does not exist.`);
         }
 
+        // Check if object exists
         try {
           var object = await model.findByPk(objectName);
         } catch (e) {
           return message.channel.send(`Object \`${objectName}\` does not exist.`);
         }
 
+        // Check if property exists
         try {
           await object.update({ [propertyName]: JSON.parse(args.slice(3).join(" ")) });
           return message.channel.send(`Set ${modelName}: ${objectName}.${propertyName} to \`${args.slice(3).join(" ")}\`.`);
@@ -115,10 +118,11 @@ module.exports = {
       description: "Shows information about the database.",
       async execute (client, message, args) {
         const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-        const successColor = guildConfig.colors.success;
+        const defaultColor = guildConfig.colors.default;
 
+        // Create embed
         const infoEmbed = new client.Discord.MessageEmbed()
-          .setColor(successColor)
+          .setColor(defaultColor)
           .setTitle("Database Information");
 
         return message.channel.send(infoEmbed);

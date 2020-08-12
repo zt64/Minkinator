@@ -16,14 +16,16 @@ module.exports = {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
 
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
 
     const member = message.mentions.members.first();
 
+    // Un-ban member
     message.guild.unban(member.user);
 
+    // Send embed
     return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setAuthor(`${member.user.tag} has been unbanned`, member.user.avatarURL)
       .setFooter(member.id)
     );

@@ -3,7 +3,7 @@ module.exports = {
   aliases: ["servers"],
   async execute (client, message, args) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const successColor = guildConfig.colors.success;
+    const defaultColor = guildConfig.colors.default;
 
     const guilds = client.guilds.cache;
     const pages = Math.ceil(guilds.size / 10);
@@ -11,7 +11,7 @@ module.exports = {
     let page = args[0] || 1;
 
     const guildsEmbed = new client.Discord.MessageEmbed()
-      .setColor(successColor)
+      .setColor(defaultColor)
       .setTitle(`Watching ${client.pluralize("guild", guilds.size, true)} and ${client.users.cache.size} users`)
       .setFooter(`Page ${page} of ${pages}`);
 
@@ -21,8 +21,9 @@ module.exports = {
 
     if (pages > 1) guildsMessage.react("➡️");
 
+    // Set up reaction collector
     const filter = (reaction, user) => user.id === message.author.id;
-
+   
     const collector = guildsMessage.createReactionCollector(filter);
 
     collector.on("collect", async reaction => {
