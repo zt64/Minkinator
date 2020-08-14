@@ -1,5 +1,6 @@
 exports.create = async (client, guild) => {
   const Sequelize = client.Sequelize;
+  const DataTypes = Sequelize.DataTypes;
 
   const sequelize = new Sequelize("database", "user", "password", {
     host: "localhost",
@@ -8,23 +9,109 @@ exports.create = async (client, guild) => {
     logging: false
   });
 
-  const database = {};
+  const Guild = sequelize.define("guild", {
+    id: {
+      type: DataTypes.TEXT,
+      primaryKey: true,
+      unique: true
+    },
+    name: {
+      type: DataTypes.STRING
+    },
+    configuration: {
+      type: DataTypes.JSON,
+      allowNull: false,
+      defaultValue: {
+        colors: {
+          default: "#1ED760",
+          error: "#FF0000"
+        },
+        markov: {
+          score: 100,
+          tries: 1000,
+          mention: true
+        },
+        ignore: [],
+        prefix: "!",
+        currency: "₼",
+        errorTimeout: 5000,
+        sellPrice: 0.5,
+        redditNSFW: false,
+        levelMention: true,
+        ignoreBots: true
+      }
+    }
+  }, {
+    timestamps: false,
+    underscored: true
+  });
 
-  // Import models
+  const Member = sequelize.define("member", {
+    id: {
+      type: DataTypes.TEXT,
+      primaryKey: true,
+      unique: true
+    },
+    balance: {
+      type: DataTypes.FLOAT,
+      allowNull: false,
+      defaultValue: 0.00
+    },
+    level: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 1
+    },
+    xpTotal: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
+    xpRequired: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 50
+    },
+    messages: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0
+    },
+    botBan: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    configuration: {
+      type: DataTypes.JSON,
+      allowNull: false,
+      defaultValue: {
+        measurement: "metric",
+        levelMention: true
+      }
+    },
+    inventory: {
+      type: DataTypes.JSON,
+      allowNull: false,
+      defaultValue: []
+    }
+  }, {
+    timestamps: false,
+    underscored: true
+  });
 
-  const Guild = sequelize.import("../models/Guild.js");
-  const Property = sequelize.import("../models/Property.js");
-  const Member = sequelize.import("../models/Member.js");
-  const ShopItem = sequelize.import("../models/ShopItem.js");
-  const UserItem = sequelize.import("../models/UserItem.js");
-
-  // Setup relations
-
-  Guild.hasMany(Member);
-  Guild.hasMany(ShopItem);
-  Guild.hasMany(Property);
-
-  Member.hasMany(UserItem);
+  const Property = sequelize.define("property", {
+    key: {
+      type: DataTypes.STRING,
+      primaryKey: true
+    },
+    value: {
+      type: DataTypes.JSON,
+      allowNull: false
+    }
+  }, {
+    timestamps: false,
+    underscored: true
+  });
 
   await sequelize.sync();
 
@@ -37,6 +124,7 @@ exports.create = async (client, guild) => {
   });
 
   // Link to the database
+  const database = {};
 
   database.sequelize = sequelize;
   database.guilds = Guild;
@@ -57,6 +145,7 @@ exports.populate = async (client, guild, database) => {
       try {
         await guild.members.fetch(memberData.id);
       } catch (error) {
+        // Delete data for members that no longer exist
         await memberData.destroy();
 
         console.log(`${`(${time})`.green} Deleted ${memberData.name} from ${guild.name}.`);
@@ -65,7 +154,6 @@ exports.populate = async (client, guild, database) => {
   }
 
   // Set guild properties
-
   await databaseProperties.findOrCreate({ where: { key: "id" }, defaults: { value: guild.id } });
   await databaseProperties.findOrCreate({ where: { key: "name" }, defaults: { value: guild.name } });
   await databaseProperties.findOrCreate({ where: { key: "data" }, defaults: { value: [] } });
@@ -80,7 +168,7 @@ exports.populate = async (client, guild, database) => {
     defaults: {
       value: {
         colors: {
-          success: "#1ED760",
+          default: "#1ED760",
           error: "#FF0000"
         },
         markov: {

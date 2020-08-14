@@ -12,7 +12,7 @@ module.exports = {
           required: true
         },
         {
-          name: "object",
+          name: "instance",
           type: String
         }
       ],
@@ -26,11 +26,8 @@ module.exports = {
         const modelName = args[0];
         const objectName = args[1];
 
-        try {
-          var model = client.database.sequelize[modelName];
-        } catch (e) {
-          return message.channel.send(`Model \`${modelName}\` does not exist.`);
-        }
+        const model = client.database[modelName]
+        if (!model) return message.channel.send(`Model \`${modelName}\` does not exist.`);
 
         // If no object provided, show all objects
         if (!objectName) {
@@ -39,7 +36,8 @@ module.exports = {
           modelDataEmbed.setTitle(`${modelName}`);
           modelDataEmbed.setColor(defaultColor);
 
-          await model.findAll().map(object => modelDataEmbed.addField(object[primaryKey], "\u200b", true));
+          const instances = await model.findAll()
+          instances.map(object => modelDataEmbed.addField(object[primaryKey], "\u200b", true));
 
           return message.channel.send(modelDataEmbed);
         }
@@ -73,7 +71,7 @@ module.exports = {
           required: true
         },
         {
-          name: "object",
+          name: "instance",
           required: true
         },
         {
@@ -123,7 +121,10 @@ module.exports = {
         // Create embed
         const infoEmbed = new client.Discord.MessageEmbed()
           .setColor(defaultColor)
-          .setTitle("Database Information");
+          .setTitle("Database Information")
+          .addField("Sequelize Version:", "placeholder")
+          .addField("Sqlite3 Version:", "placeholder")
+          .addField("Database Size:", "placeholder")
 
         return message.channel.send(infoEmbed);
       }
