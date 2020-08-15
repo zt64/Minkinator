@@ -48,32 +48,32 @@ module.exports = {
       const emoji = reaction.emoji.name;
 
       switch (emoji) {
-        case "🏠":
-          page = 1;
+      case "🏠":
+        page = 1;
 
-          leaderBoardMessage.reactions.removeAll();
+        leaderBoardMessage.reactions.removeAll();
 
-          if (pages > 1) leaderBoardMessage.react("➡️");
-          break;
-        case "⬅️":
-          page--;
+        if (pages > 1) leaderBoardMessage.react("➡️");
+        break;
+      case "⬅️":
+        page--;
 
-          leaderBoardMessage.reactions.removeAll();
+        leaderBoardMessage.reactions.removeAll();
 
-          if (page !== 1) leaderBoardMessage.react("🏠");
+        if (page !== 1) leaderBoardMessage.react("🏠");
 
-          leaderBoardMessage.react("➡️");
-          break;
-        case "➡️":
-          page++;
+        leaderBoardMessage.react("➡️");
+        break;
+      case "➡️":
+        page++;
 
-          leaderBoardMessage.reactions.removeAll();
+        leaderBoardMessage.reactions.removeAll();
 
-          leaderBoardMessage.react("🏠");
-          leaderBoardMessage.react("⬅️");
+        leaderBoardMessage.react("🏠");
+        leaderBoardMessage.react("⬅️");
 
-          if (pages > page) leaderBoardMessage.react("➡️");
-          break;
+        if (pages > page) leaderBoardMessage.react("➡️");
+        break;
       }
 
       leaderBoardEmbed.fields = [];

@@ -24,7 +24,7 @@ module.exports = async (client) => {
     }
 
     console.log(`${`(${time})`.green} Initialized database for: ${guild.name} (${guild.id}).`);
-  };
+  }
 
   const pluralize = client.pluralize;
 

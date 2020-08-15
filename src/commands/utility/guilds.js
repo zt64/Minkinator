@@ -30,32 +30,32 @@ module.exports = {
       const emoji = reaction.emoji.name;
 
       switch (emoji) {
-        case "🏠":
-          page = 1;
+      case "🏠":
+        page = 1;
 
-          guildsMessage.reactions.removeAll();
+        guildsMessage.reactions.removeAll();
 
-          if (pages > 1) guildsMessage.react("➡️");
-          break;
-        case "⬅️":
-          page--;
+        if (pages > 1) guildsMessage.react("➡️");
+        break;
+      case "⬅️":
+        page--;
 
-          guildsMessage.reactions.removeAll();
+        guildsMessage.reactions.removeAll();
 
-          if (page !== 1) guildsMessage.react("🏠");
+        if (page !== 1) guildsMessage.react("🏠");
 
-          guildsMessage.react("➡️");
-          break;
-        case "➡️":
-          page++;
+        guildsMessage.react("➡️");
+        break;
+      case "➡️":
+        page++;
 
-          guildsMessage.reactions.removeAll();
+        guildsMessage.reactions.removeAll();
 
-          guildsMessage.react("🏠");
-          guildsMessage.react("⬅️");
+        guildsMessage.react("🏠");
+        guildsMessage.react("⬅️");
 
-          if (pages > page) guildsMessage.react("➡️");
-          break;
+        if (pages > page) guildsMessage.react("➡️");
+        break;
       }
 
       guildsEmbed.fields = [];

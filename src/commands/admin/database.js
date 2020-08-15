@@ -26,7 +26,7 @@ module.exports = {
         const modelName = args[0];
         const objectName = args[1];
 
-        const model = client.database[modelName]
+        const model = client.database[modelName];
         if (!model) return message.channel.send(`Model \`${modelName}\` does not exist.`);
 
         // If no object provided, show all objects
@@ -36,7 +36,7 @@ module.exports = {
           modelDataEmbed.setTitle(`${modelName}`);
           modelDataEmbed.setColor(defaultColor);
 
-          const instances = await model.findAll()
+          const instances = await model.findAll();
           instances.map(object => modelDataEmbed.addField(object[primaryKey], "\u200b", true));
 
           return message.channel.send(modelDataEmbed);
@@ -105,6 +105,7 @@ module.exports = {
         // Check if property exists
         try {
           await object.update({ [propertyName]: JSON.parse(args.slice(3).join(" ")) });
+          
           return message.channel.send(`Set ${modelName}: ${objectName}.${propertyName} to \`${args.slice(3).join(" ")}\`.`);
         } catch (e) {
           return message.channel.send(`Property \`${propertyName}\` does not exist.`);
@@ -114,7 +115,7 @@ module.exports = {
     {
       name: "info",
       description: "Shows information about the database.",
-      async execute (client, message, args) {
+      async execute (client, message) {
         const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
         const defaultColor = guildConfig.colors.default;
 
@@ -124,7 +125,7 @@ module.exports = {
           .setTitle("Database Information")
           .addField("Sequelize Version:", "placeholder")
           .addField("Sqlite3 Version:", "placeholder")
-          .addField("Database Size:", "placeholder")
+          .addField("Database Size:", "placeholder");
 
         return message.channel.send(infoEmbed);
       }

@@ -21,9 +21,9 @@ module.exports = {
       embed.setDescription(`You can send \`${prefix}help <command name>\` to get info on a specific command.`);
       embed.setAuthor("List of commands", client.user.avatarURL());
       embed.addField("**Commands**", `${client.commands.map(command => {
-          if (command.permissions && !message.member.hasPermission(command.permissions)) return;
-          return command.name;
-        }).filter(Boolean).join(", ")}`);
+        if (command.permissions && !message.member.hasPermission(command.permissions)) return;
+        return command.name;
+      }).filter(Boolean).join(", ")}`);
 
       return message.channel.send(embed);
     }

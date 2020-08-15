@@ -94,58 +94,58 @@ module.exports = {
       const emoji = reaction.emoji.name;
 
       switch (emoji) {
-        case "🏠":
-          helpEmbed.setTitle("Home page");
-          helpEmbed.setDescription("There is a total of 6 command categories ");
+      case "🏠":
+        helpEmbed.setTitle("Home page");
+        helpEmbed.setDescription("There is a total of 6 command categories ");
 
-          helpEmbed.fields = [];
+        helpEmbed.fields = [];
 
-          addCategories();
-          break;
-        case "🥳":
-          helpEmbed.setTitle("Fun commands");
+        addCategories();
+        break;
+      case "🥳":
+        helpEmbed.setTitle("Fun commands");
 
-          helpEmbed.fields = [];
+        helpEmbed.fields = [];
 
-          populate("fun");
-          break;
-        case "💵":
-          helpEmbed.setTitle("Economy commands");
+        populate("fun");
+        break;
+      case "💵":
+        helpEmbed.setTitle("Economy commands");
 
-          helpEmbed.fields = [];
+        helpEmbed.fields = [];
 
-          populate("economy");
-          break;
-        case "👤":
-          helpEmbed.setTitle("Member commands");
+        populate("economy");
+        break;
+      case "👤":
+        helpEmbed.setTitle("Member commands");
 
-          helpEmbed.fields = [];
+        helpEmbed.fields = [];
 
-          populate("member");
-          break;
-        case "🖌️":
-          helpEmbed.setTitle("Canvas commands");
+        populate("member");
+        break;
+      case "🖌️":
+        helpEmbed.setTitle("Canvas commands");
 
-          helpEmbed.fields = [];
+        helpEmbed.fields = [];
 
-          populate("canvas");
-          break;
-        case "🛠️":
-          helpEmbed.setTitle("Utility commands");
+        populate("canvas");
+        break;
+      case "🛠️":
+        helpEmbed.setTitle("Utility commands");
 
-          helpEmbed.fields = [];
+        helpEmbed.fields = [];
 
-          populate("utility");
-          break;
-        case "🔒":
-          helpEmbed.setTitle("Admin commands");
+        populate("utility");
+        break;
+      case "🔒":
+        helpEmbed.setTitle("Admin commands");
 
-          helpEmbed.fields = [];
+        helpEmbed.fields = [];
 
-          populate("admin");
-          break;
-        case "❌":
-          return helpMessage.delete();
+        populate("admin");
+        break;
+      case "❌":
+        return helpMessage.delete();
       }
 
       await helpMessage.edit(helpEmbed);

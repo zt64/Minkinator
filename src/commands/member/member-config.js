@@ -22,7 +22,7 @@ module.exports = {
       } else {
         return message.channel.send(`\`${key}\` does not exist in the member configuration.`);
       }
-    };
+    }
 
     // Create embed
     const configEmbed = new client.Discord.MessageEmbed()

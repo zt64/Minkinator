@@ -150,7 +150,7 @@ exports.populate = async (client, guild, database) => {
 
         console.log(`${`(${time})`.green} Deleted ${memberData.name} from ${guild.name}.`);
       }
-    };
+    }
   }
 
   // Set guild properties

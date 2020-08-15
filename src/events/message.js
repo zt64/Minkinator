@@ -136,7 +136,7 @@ module.exports = async (client, message) => {
       } catch (e) {
         if (parameter.type !== String) return error(command);
       }
-    };
+    }
   } else if (command.subCommands) {
     const subCommand = command.subCommands.find(subCommand => subCommand.name === args[0]);
 

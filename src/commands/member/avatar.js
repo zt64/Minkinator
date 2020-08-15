@@ -13,7 +13,7 @@ module.exports = {
 
     // Get user
     const user = await client.functions.getUser(client, message, args[0]);
-    const avatar = user.displayAvatarURL({ format: "png", dynamic: true, size: 256 })
+    const avatar = user.displayAvatarURL({ format: "png", dynamic: true, size: 256 });
 
     // Send embed
     return message.channel.send(new client.Discord.MessageEmbed()

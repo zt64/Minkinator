@@ -18,7 +18,7 @@ module.exports = {
     
     const embed = new client.Discord.MessageEmbed()
       .setColor(defaultColor)
-      .setTitle("Rock Paper Scissors")
+      .setTitle("Rock Paper Scissors");
 
     const { randomInteger, capitalize } = client.functions;
     const computerChoice = choices[randomInteger(0, 2)];
@@ -38,7 +38,7 @@ module.exports = {
       if (computerChoice === "scissors") return sendEmbed(false);
     } else if (playerChoice === "paper") {
       if (computerChoice === "rock") return sendEmbed(false);
-      if (computerChoice === "scissors") return sendEmbed(true)
+      if (computerChoice === "scissors") return sendEmbed(true);
     } else if (playerChoice === "scissors") {
       if (computerChoice === "rock") return sendEmbed(true);
       if (computerChoice === "paper") return sendEmbed(false);

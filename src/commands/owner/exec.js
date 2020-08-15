@@ -13,7 +13,7 @@ module.exports = {
     const input = args.join(" ");
 
     const { exec } = require("child_process");
-    const os = client.os
+    const os = client.os;
 
     const execEmbed = new client.Discord.MessageEmbed()
       .setColor(defaultColor)

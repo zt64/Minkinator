@@ -176,40 +176,40 @@ module.exports = {
           const emoji = reaction.emoji.name;
 
           switch (emoji) {
-            case "🏠":
-              page = 1;
+          case "🏠":
+            page = 1;
 
-              shopMessage.reactions.removeAll();
+            shopMessage.reactions.removeAll();
 
-              if (pages > 1) shopMessage.react("➡️");
+            if (pages > 1) shopMessage.react("➡️");
 
-              shopMessage.react("❌");
-              break;
-            case "⬅️":
-              page--;
+            shopMessage.react("❌");
+            break;
+          case "⬅️":
+            page--;
 
-              shopMessage.reactions.removeAll();
+            shopMessage.reactions.removeAll();
 
-              if (page !== 1) shopMessage.react("🏠");
+            if (page !== 1) shopMessage.react("🏠");
 
-              shopMessage.react("➡️");
-              shopMessage.react("❌");
-              break;
-            case "➡️":
-              page++;
+            shopMessage.react("➡️");
+            shopMessage.react("❌");
+            break;
+          case "➡️":
+            page++;
 
-              shopMessage.reactions.removeAll();
+            shopMessage.reactions.removeAll();
 
-              shopMessage.react("🏠");
+            shopMessage.react("🏠");
 
-              if (pages > 2) shopMessage.react("⬅️");
+            if (pages > 2) shopMessage.react("⬅️");
 
-              if (pages > page) shopMessage.react("➡️");
+            if (pages > page) shopMessage.react("➡️");
 
-              shopMessage.react("❌");
-              break;
-            case "❌":
-              return shopMessage.delete();
+            shopMessage.react("❌");
+            break;
+          case "❌":
+            return shopMessage.delete();
           }
 
           shopEmbed.fields = [];
