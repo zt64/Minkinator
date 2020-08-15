@@ -1,5 +1,6 @@
-.vscode
-node_modules
-data
+# Dependencies and collected data
+node_modules/
+data/
+
+# Authentication file
 auth.json
-.eslintrc.json
