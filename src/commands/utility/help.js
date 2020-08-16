@@ -43,10 +43,8 @@ module.exports = {
           parameter.required ? parameters += `[${parameter.name}]` : parameters += ` <${parameter.name}>`;
         });
 
-        var usage = `\`${prefix}${command.name} ${parameters}\``;
+        helpEmbed.addField("Usage:", `\`${prefix}${command.name} ${parameters}\``);
       }
-
-      helpEmbed.addField("Usage:", usage);
 
       return message.channel.send(helpEmbed);
     }

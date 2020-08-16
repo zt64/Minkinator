@@ -13,8 +13,9 @@ module.exports = {
     const input = args.join(" ");
 
     const { exec } = require("child_process");
-    const os = client.os;
 
+    let description = "";
+  
     const execEmbed = new client.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle(input);
@@ -22,30 +23,36 @@ module.exports = {
     const execMessage = await message.channel.send(execEmbed);
 
     // Execute command
-    const command = exec(input, function (error, stdout, stderr) {
-      if (error) {
-        console.log(error.stack);
-        console.log("Error code: " + error.code);
-        console.log("Signal received: " + error.signal);
-      }
+    const command = exec(input);
 
-      if (stdout.length >= 6000) {
-        execEmbed.setDescription("Stdout exceeds Discords API embed limit of 6,000 characters.");
-      } else {
-        if (os.platform() === "linux") {
-          execEmbed.setDescription(`\`\`\`sh\n${stdout}\`\`\``);
-        } else {
-          execEmbed.setDescription(`\`\`\`cmd\n${stdout}\`\`\``);
-        }
-      }
-
-      execMessage.edit(execEmbed);
-
-      console.log("Child Process STDERR: " + stderr);
+    // Handle stdout data
+    command.stdout.on("data", function (data) {
+      description += `[stdout] ${data.toString()}\n`;
+      updateEmbed();
     });
 
+    // Handle stderr data
+    command.stderr.on("data", function (data) {
+      description += `[stderr] ${data.toString()}\n`;
+      updateEmbed();
+    });
+
+    // Handle error data
+    command.on("error", function (data) {
+      description += `[error] ${data.toString()}\n`;
+      updateEmbed();
+    });
+
+    // Handle exit code
     command.on("exit", function (code) {
-      console.log("Child process exited with exit code " + code);
+      description += "[status] Return code " + code.toString();
+      updateEmbed();
     });
+
+    // Helper function to shorten command
+    function updateEmbed() {
+      execEmbed.setDescription(`\`\`\`sh\n${description}\`\`\``);
+      execMessage.edit(execEmbed);
+    }
   }
 };
