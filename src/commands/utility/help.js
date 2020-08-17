@@ -12,14 +12,14 @@ module.exports = {
     const defaultColor = guildConfig.colors.default;
     const prefix = guildConfig.prefix;
 
-    const commandName = args[0].toLowerCase();
+    const commandName = args[0];
 
     const helpEmbed = new client.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
 
     if (commandName) {
-      const command = client.commands.get(commandName) || client.commands.find(c => c.aliases && c.aliases.includes(commandName));
+      const command = client.commands.get(commandName.toLowerCase()) || client.commands.find(c => c.aliases && c.aliases.includes(commandName.toLowerCase()));
 
       if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
         return message.channel.send(new client.Discord.MessageEmbed()

@@ -119,13 +119,24 @@ module.exports = {
         const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
         const defaultColor = guildConfig.colors.default;
 
+        const fs = client.fs;
+
+        const dependencies = require("../../../package.json").dependencies;
+        const prettyBytes = require("pretty-bytes");
+        
+        const sequelizeVersion = dependencies.sequelize;
+        const sqlite3Version = dependencies.sqlite3;
+
+        const stats = fs.statSync(`./data/${message.guild.id}.sqlite`);
+        const size = prettyBytes(stats.size);
+
         // Create embed
         const infoEmbed = new client.Discord.MessageEmbed()
           .setColor(defaultColor)
           .setTitle("Database Information")
-          .addField("Sequelize Version:", "placeholder")
-          .addField("Sqlite3 Version:", "placeholder")
-          .addField("Database Size:", "placeholder");
+          .addField("Sequelize Version:", sequelizeVersion)
+          .addField("Sqlite3 Version:", sqlite3Version)
+          .addField("Database Size:", size);
 
         return message.channel.send(infoEmbed);
       }
