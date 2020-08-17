@@ -15,6 +15,17 @@ module.exports = {
     const { exec } = require("child_process");
 
     let description = "";
+
+    // Helper function to shorten command
+    function updateEmbed() {
+      if (description.length > 6000) {
+        execEmbed.setDescription("```Data exceeds Discord API limit of 6,000 characters.```");
+        return execMessage.edit(execEmbed);
+      }
+
+      execEmbed.setDescription(`\`\`\`sh\n${description}\`\`\``);
+      execMessage.edit(execEmbed);
+    }
   
     const execEmbed = new client.Discord.MessageEmbed()
       .setColor(defaultColor)
@@ -45,14 +56,8 @@ module.exports = {
 
     // Handle exit code
     command.on("exit", function (code) {
-      description += "[status] Return code " + code.toString();
+      description += code === null ? "" : "[status] Return code " + code.toString();
       updateEmbed();
     });
-
-    // Helper function to shorten command
-    function updateEmbed() {
-      execEmbed.setDescription(`\`\`\`sh\n${description}\`\`\``);
-      execMessage.edit(execEmbed);
-    }
   }
 };

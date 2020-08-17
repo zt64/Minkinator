@@ -76,7 +76,9 @@ module.exports = async (client, message) => {
       const result = await client.database.markov.generateAsync(options);
 
       return message.channel.send(result.string);
-    } catch (error) { }
+    } catch (error) { 
+      return;
+    }
   }
 
   // Write message to data.json

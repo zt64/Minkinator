@@ -67,7 +67,7 @@ module.exports = {
     const helpMessage = await message.channel.send(helpEmbed);
 
     function populate (category) {
-      client.commands.map((command, index) => {
+      client.commands.map(command => {
         if (command.category !== category) return;
 
         helpEmbed.addField(`\`${prefix}${command.name}\``, command.description || "\u200b");
