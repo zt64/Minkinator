@@ -81,7 +81,7 @@ module.exports = {
       });
     }
 
-    await react(["🏠", "🥳", "💵", "👤", "🖌️", "🛠️", "🔒", "❌"]);
+    await react(["🥳", "💵", "👤", "🖌️", "🛠️", "🔒"]);
 
     // Create reaction collector
     const filter = (reaction, user) => user.id === message.author.id;
@@ -142,8 +142,6 @@ module.exports = {
 
         populate("admin");
         break;
-      case "❌":
-        return helpMessage.delete();
       }
 
       await helpMessage.edit(helpEmbed);
