@@ -1,12 +1,14 @@
 module.exports = {
   description: "Returns information about the host OS.",
   aliases: ["os"],
-  async execute (client, message, args) {
+  async execute (client, message) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const defaultColor = guildConfig.colors.default;
 
     const pms = client.pms;
     const os = client.os;
+
+    const prettyBytes = require("pretty-bytes");
 
     // Create and send embed
     return message.channel.send(new client.Discord.MessageEmbed()
@@ -17,11 +19,11 @@ module.exports = {
       .addField("Release:", os.release(), true)
       .addField("Hostname:", os.hostname(), true)
       .addField("Home Directory:", os.homedir(), true)
-      .addField("Free Memory:", `${(os.freemem() / 1e+9).toFixed(2)} GB`, true)
-      .addField("Total Memory:", `${(os.totalmem() / 1e+9).toFixed(2)} GB`, true)
+      .addField("Free Memory:", prettyBytes(os.freemem()), true)
+      .addField("Total Memory:", prettyBytes(os.totalmem()), true)
       .addField("System Uptime:", pms(os.uptime() * 1000), true)
       .addField("CPU:", os.cpus()[0].model)
-      .addField("Discord.js Version:", require("discord.js").version, true)
+      .addField("Discord.js Version:", `v${require("discord.js").version}`, true)
       .addField("Node Version:", process.version, true)
       .addField("Node Uptime:", pms(process.uptime() * 1000), true)
     );
