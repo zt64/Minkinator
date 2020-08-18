@@ -27,7 +27,9 @@ exports.getUser = async (client, message, idArg) => {
   if (idArg) {
     try {
       return client.users.fetch(idArg);
-    } catch (error) { }
+    } catch (error) {
+      return;
+    }
   }
 
   return message.author;
@@ -48,4 +50,9 @@ exports.sleep = (ms) => {
 
 exports.formatNumber = (number, places = 0) => {
   return (number).toFixed(places).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+};
+
+exports.fetchJSON = async (url) => {
+  const fetch = require("node-fetch");
+  return fetch(url).then(response => response.json());
 };
