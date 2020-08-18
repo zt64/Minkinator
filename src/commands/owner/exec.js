@@ -14,7 +14,7 @@ module.exports = {
 
     const { exec } = require("child_process");
 
-    let description = "";
+    let description = `> ${input}\n\n`;
 
     // Helper function to shorten command
     function updateEmbed() {
@@ -28,8 +28,7 @@ module.exports = {
     }
   
     const execEmbed = new client.Discord.MessageEmbed()
-      .setColor(defaultColor)
-      .setTitle(input);
+      .setColor(defaultColor);
 
     const execMessage = await message.channel.send(execEmbed);
 
@@ -38,7 +37,7 @@ module.exports = {
 
     // Handle stdout data
     command.stdout.on("data", function (data) {
-      description += `[stdout] ${data.toString()}\n`;
+      description += `${data.toString()}\n`;
       updateEmbed();
     });
 
