@@ -35,6 +35,18 @@ exports.getUser = async (client, message, idArg) => {
   return message.author;
 };
 
+exports.kToC = (k) => {
+  return (k - 273.15).toFixed(2);
+};
+
+exports.cToK = (c) => {
+  return c + 273.15;
+};
+
+exports.cToF = (c) => {
+  return (c * 1.8) + 32;
+};
+
 exports.fToC = (f) => {
   return (f - 32) / 1.8;
 };
