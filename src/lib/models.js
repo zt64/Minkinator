@@ -148,7 +148,7 @@ exports.populate = async (client, guild, database) => {
         // Delete data for members that no longer exist
         await memberData.destroy();
 
-        console.log(`${`(${time})`.green} Deleted ${memberData.name} from ${guild.name}.`);
+        console.log(`${`(${time})`.green} Deleted ${memberData.id} from ${guild.name}.`);
       }
     }
   }
