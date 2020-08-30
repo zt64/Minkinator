@@ -18,12 +18,12 @@ module.exports = {
     let image;
 
     try {
-      image = await client.canvas.loadImage(imageURL);
+      image = await global.canvas.loadImage(imageURL);
     } catch (error) {
       return message.channel.send("An error has occured, the URL cannot end in .webp.");
     }
 
-    const canvas = client.canvas.createCanvas(image.width, image.height);
+    const canvas = global.canvas.createCanvas(image.width, image.height);
     const context = canvas.getContext("2d");
 
     context.drawImage(image, 0, 0);
@@ -50,6 +50,6 @@ module.exports = {
 
     context.putImageData(imageData, 0, 0);
 
-    return message.channel.send(new client.Discord.MessageAttachment(canvas.toBuffer()));
+    return message.channel.send(new global.Discord.MessageAttachment(canvas.toBuffer()));
   }
 };

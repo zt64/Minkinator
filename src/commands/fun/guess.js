@@ -20,7 +20,7 @@ module.exports = {
     const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
 
-    const { formatNumber, randomInteger } = client.functions;
+    const { formatNumber, randomInteger } = global.functions;
 
     let balance = memberData.balance;
     let earn;
@@ -28,7 +28,7 @@ module.exports = {
     // Generate random value
     const value = randomInteger(1, 100);
 
-    const embed = new client.Discord.MessageEmbed();
+    const embed = new global.Discord.MessageEmbed();
 
     if (value === guess) {
       embed.setColor("#F0B27A");

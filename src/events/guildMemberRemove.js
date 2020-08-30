@@ -5,9 +5,9 @@ module.exports = async (client, member) => {
   if (!channel) return;
 
   const database = client.databases[guild.name];
-  const pluralize = client.pluralize;
+  const pluralize = global.pluralize;
 
-  const time = client.moment().format("HH:mm M/D/Y");
+  const time = global.Moment().format("HH:mm M/D/Y");
 
   const guildConfig = await database.properties.findByPk("configuration").then(key => key.value);
   const defaultColor = guildConfig.colors.default;
@@ -25,7 +25,7 @@ module.exports = async (client, member) => {
   await database.members.findByPk(member.id).then(data => data.destroy());
 
   // Send embed
-  return channel.send(new client.Discord.MessageEmbed()
+  return channel.send(new global.Discord.MessageEmbed()
     .setColor(defaultColor)
     .setAuthor(`${member.user.tag} (${member.id})`, member.user.displayAvatarURL())
     .setFooter("User left")

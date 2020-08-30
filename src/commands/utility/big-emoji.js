@@ -35,7 +35,7 @@ module.exports = {
       url = emoji.match(/http.+png/)[0];
     }
 
-    const emojiEmbed = new client.Discord.MessageEmbed()
+    const emojiEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Scaled emoji")
       .setURL(url)

@@ -7,11 +7,11 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const canvas = client.canvas.createCanvas(512, 512);
+    const canvas = global.canvas.createCanvas(512, 512);
 
     // Generate QR code
-    await client.qr.toCanvas(canvas, args.join(" "), { margin: 2 });
+    await global.qr.toCanvas(canvas, args.join(" "), { margin: 2 });
 
-    return message.channel.send(new client.Discord.MessageAttachment(canvas.toBuffer()));
+    return message.channel.send(new global.Discord.MessageAttachment(canvas.toBuffer()));
   }
 };

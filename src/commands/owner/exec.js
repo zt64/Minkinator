@@ -27,7 +27,7 @@ module.exports = {
       execMessage.edit(execEmbed);
     }
   
-    const execEmbed = new client.Discord.MessageEmbed()
+    const execEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor);
 
     const execMessage = await message.channel.send(execEmbed);

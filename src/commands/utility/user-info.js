@@ -13,12 +13,12 @@ module.exports = {
     if (user.presence.clientStatus.desktop) platforms.push("Desktop");
 
     // Create embed
-    const infoEmbed = new client.Discord.MessageEmbed()
+    const infoEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setAuthor(`User information: ${user.tag}`, user.avatarURL())
       .addField("ID:", user.id)
       .addField("Created:", user.createdAt.toLocaleDateString(), true)
-      .addField("Status:", user.presence.status === "dnd" ? "DND" : client.functions.capitalize(user.presence.status), true);
+      .addField("Status:", user.presence.status === "dnd" ? "DND" : global.functions.capitalize(user.presence.status), true);
 
     if (platforms.length !== 0) infoEmbed.addField("Platforms:", platforms.join(", "), true);
 

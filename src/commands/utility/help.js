@@ -14,7 +14,7 @@ module.exports = {
 
     const commandName = args[0];
 
-    const helpEmbed = new client.Discord.MessageEmbed()
+    const helpEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
 
@@ -22,7 +22,7 @@ module.exports = {
       const command = client.commands.get(commandName.toLowerCase()) || client.commands.find(c => c.aliases && c.aliases.includes(commandName.toLowerCase()));
 
       if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
-        return message.channel.send(new client.Discord.MessageEmbed()
+        return message.channel.send(new global.Discord.MessageEmbed()
           .setColor(defaultColor)
           .setTitle("Invalid Command")
           .setDescription(`\`${commandName}\` is not a valid command.`));
@@ -31,7 +31,7 @@ module.exports = {
       helpEmbed.addField("Command:", command.name, true);
       helpEmbed.addField("Category:", command.category, true);
       helpEmbed.addField("Description:", command.description);
-      helpEmbed.addField("Cool down:", client.pluralize("second", command.coolDown || 3, true), true);
+      helpEmbed.addField("Cool down:", global.pluralize("second", command.coolDown || 3, true), true);
       helpEmbed.addField("Permissions:", command.permissions ? command.permissions.join(", ") : "Everyone", true);
 
       if (command.aliases) helpEmbed.addField("Aliases:", command.aliases.join(", "), true);
@@ -77,7 +77,7 @@ module.exports = {
     async function react (reactions) {
       reactions.map(async reaction => {
         helpMessage.react(reaction);
-        await client.functions.sleep(200);
+        await global.functions.sleep(200);
       });
     }
 

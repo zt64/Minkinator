@@ -11,7 +11,7 @@ module.exports = {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
-    const formatNumber = client.functions.formatNumber;
+    const formatNumber = global.functions.formatNumber;
 
     const user = message.mentions.users.first() || message.author;
 
@@ -21,7 +21,7 @@ module.exports = {
     const memberData = await client.database.members.findByPk(user.id);
 
     // Create info embed
-    const infoEmbed = new client.Discord.MessageEmbed()
+    const infoEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setAuthor(`Member information: ${member.nickname || user.tag}`, user.avatarURL())
       .addField("Balance:", `${currency}${formatNumber(memberData.balance, 2)}`, true)

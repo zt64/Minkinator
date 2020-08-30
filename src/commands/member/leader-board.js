@@ -12,7 +12,7 @@ module.exports = {
     const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
 
-    const { formatNumber } = client.functions;
+    const { formatNumber } = global.functions;
 
     // Set members const and sort by balance
     const members = await client.database.members.findAll({ order: [["balance", "DESC"]] });
@@ -21,7 +21,7 @@ module.exports = {
     let page = args[0] || 1;
 
     // Create embed
-    const leaderBoardEmbed = new client.Discord.MessageEmbed()
+    const leaderBoardEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Leader board")
       .setFooter(`Page ${page} of ${pages}`);

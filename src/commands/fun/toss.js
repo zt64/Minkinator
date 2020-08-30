@@ -9,7 +9,7 @@ module.exports = {
     const result = Math.random() > 0.5 ? "Heads" : "Tails";
     
     // Send embed
-    return message.channel.send(new client.Discord.MessageEmbed()
+    return message.channel.send(new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Coin toss")
       .setDescription(result)

@@ -18,7 +18,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const canvas = client.canvas.createCanvas(1024, 1024);
+    const canvas = global.canvas.createCanvas(1024, 1024);
     const ctx = canvas.getContext("2d");
 
     const text = args.slice(2).join(" ");
@@ -34,7 +34,7 @@ module.exports = {
     ctx.textAlign = "center";
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
-    const attachment = new client.Discord.MessageAttachment(canvas.toBuffer());
+    const attachment = new global.Discord.MessageAttachment(canvas.toBuffer());
     return message.channel.send(attachment);
   }
 };

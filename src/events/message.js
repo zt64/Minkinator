@@ -1,7 +1,7 @@
 const { sleep } = require("../lib/functions");
 
 module.exports = async (client, message) => {
-  const time = client.moment().format("HH:mm M/D/Y");
+  const time = global.Moment().format("HH:mm M/D/Y");
 
   // Return if in DM channel
   if (message.channel.type === "dm") {
@@ -11,7 +11,7 @@ module.exports = async (client, message) => {
   }
 
   // Set constants
-  const { formatNumber } = client.functions;
+  const { formatNumber } = global.functions;
 
   const guildDatabase = await client.databases[message.guild.name];
 
@@ -53,7 +53,7 @@ module.exports = async (client, message) => {
     // Check if level mention is enabled
     if (guildConfig.levelMention && memberConfig.levelMention) {
       if (!(level % 5)) {
-        const levelUpEmbed = new client.Discord.MessageEmbed()
+        const levelUpEmbed = new global.Discord.MessageEmbed()
           .setColor(defaultColor)
           .setTitle(`${message.author.username} has levelled up!`)
           .setDescription(`${message.author} is now level ${formatNumber(level)} and earned ${currency}500 as a reward!`);
@@ -110,7 +110,7 @@ module.exports = async (client, message) => {
   if (message.author.id !== client.config.ownerID) {
     if (command.ownerOnly) return;
     if (!message.member.hasPermission(command.permissions)) {
-      const permissionError = await message.channel.send(new client.Discord.MessageEmbed()
+      const permissionError = await message.channel.send(new global.Discord.MessageEmbed()
         .setColor(errorColor)
         .setTitle("Missing Permissions")
         .addField("You are missing one of the following permissions:", command.permissions.join(", "))
@@ -121,7 +121,7 @@ module.exports = async (client, message) => {
   }
 
   // Check if parameters are correct
-  const usageEmbed = new client.Discord.MessageEmbed()
+  const usageEmbed = new global.Discord.MessageEmbed()
     .setColor(errorColor)
     .setTitle(`Improper usage of ${commandName}`)
     .setDescription(command.description);
@@ -182,7 +182,7 @@ module.exports = async (client, message) => {
 
   // Check if command cool down exists
   if (message.author.id !== client.config.ownerID) {
-    if (!client.coolDowns.has(commandName)) client.coolDowns.set(commandName, new client.Discord.Collection());
+    if (!client.coolDowns.has(commandName)) client.coolDowns.set(commandName, new global.Discord.Collection());
 
     const now = Date.now();
     const timestamps = client.coolDowns.get(commandName);
@@ -194,10 +194,10 @@ module.exports = async (client, message) => {
       if (now < expirationTime) {
         const timeLeft = (expirationTime - now) / 1000;
 
-        const coolDownEmbed = await message.channel.send(new client.Discord.MessageEmbed()
+        const coolDownEmbed = await message.channel.send(new global.Discord.MessageEmbed()
           .setColor(errorColor)
           .setTitle("Cool down active")
-          .setDescription(`Please wait, a cool down of ${client.pluralize("second", timeLeft.toFixed(1), true)} is remaining.`)
+          .setDescription(`Please wait, a cool down of ${global.pluralize("second", timeLeft.toFixed(1), true)} is remaining.`)
         );
 
         return coolDownEmbed.delete({ timeout: errorTimeout });
@@ -221,7 +221,7 @@ module.exports = async (client, message) => {
   } catch (error) {
     console.error(error);
 
-    return message.channel.send(new client.Discord.MessageEmbed()
+    return message.channel.send(new global.Discord.MessageEmbed()
       .setColor(errorColor)
       .setTitle("An error has occurred")
       .setDescription(`\`\`\`js\n${error}\`\`\``)

@@ -36,9 +36,9 @@ module.exports = {
       epoch: Date.now()
     });
 
-    return message.channel.send(new client.Discord.MessageEmbed()
+    return message.channel.send(new global.Discord.MessageEmbed()
       .setColor(defaultColor)
-      .setAuthor(`${member.user.tag} has been muted${minutes ? ` for ${client.pluralize("minute", minutes, true)}` : ""}.`, member.user.avatarURL())
+      .setAuthor(`${member.user.tag} has been muted${minutes ? ` for ${global.pluralize("minute", minutes, true)}` : ""}.`, member.user.avatarURL())
       .setDescription(reason || "No reason provided.")
     );
   }

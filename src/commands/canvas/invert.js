@@ -8,9 +8,9 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const imageURL = message.attachments.first() ? message.attachments.first().url : args[0];
-    const image = await client.canvas.loadImage(imageURL);
+    const image = await global.canvas.loadImage(imageURL);
 
-    const canvas = client.canvas.createCanvas(image.width, image.height);
+    const canvas = global.canvas.createCanvas(image.width, image.height);
     const context = canvas.getContext("2d");
 
     context.drawImage(image, 0, 0);
@@ -27,6 +27,6 @@ module.exports = {
 
     context.putImageData(imageData, 0, 0);
 
-    return message.channel.send(new client.Discord.MessageAttachment(canvas.toBuffer()));
+    return message.channel.send(new global.Discord.MessageAttachment(canvas.toBuffer()));
   }
 };

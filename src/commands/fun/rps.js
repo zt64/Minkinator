@@ -16,11 +16,11 @@ module.exports = {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const defaultColor = guildConfig.colors.default;
     
-    const embed = new client.Discord.MessageEmbed()
+    const embed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Rock Paper Scissors");
 
-    const { randomInteger, capitalize } = client.functions;
+    const { randomInteger, capitalize } = global.functions;
     const computerChoice = choices[randomInteger(0, 2)];
 
     function sendEmbed (lose) {

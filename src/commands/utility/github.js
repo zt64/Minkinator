@@ -23,7 +23,7 @@ module.exports = {
         const owner = args[0];
         const name = args[1];
 
-        const fetchJson = async url => await (await client.fetch(url)).json();
+        const fetchJson = async url => await (await global.fetch(url)).json();
 
         // Fetch JSON results
         const json = await fetchJson(`https://api.github.com/repos/${owner}/${name}`);
@@ -33,7 +33,7 @@ module.exports = {
         if (json.message === "Not Found") return message.channel.send("Could not find repository.");
 
         // Create embed
-        const embed = new client.Discord.MessageEmbed()
+        const embed = new global.Discord.MessageEmbed()
           .setColor(defaultColor)
           .setTitle(json.full_name)
           .setURL(json.html_url)
@@ -46,8 +46,8 @@ module.exports = {
           .addField("Issues:", json.open_issues, true)
           .addField("Commits:", commits.length)
           .addField("License:", json.license.name)
-          .addField("Created:", client.moment(json.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a"))
-          .addField("Updated:", client.moment(json.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+          .addField("Created:", global.Moment(json.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a"))
+          .addField("Updated:", global.Moment(json.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 
         if (json.description) embed.setDescription(json.description);
 
@@ -69,14 +69,14 @@ module.exports = {
         const defaultColor = guildConfig.colors.default;
         const user = args[0];
 
-        const fetchJson = async url => await (await client.fetch(url)).json();
+        const fetchJson = async url => await (await global.fetch(url)).json();
 
         const json = await fetchJson(`https://api.github.com/users/${user}`);
 
         if (json.message === "Not Found") return message.channel.send("Could not find user.");
 
         // Create embed
-        const embed = new client.Discord.MessageEmbed()
+        const embed = new global.Discord.MessageEmbed()
           .setColor(defaultColor)
           .setTitle(json.login)
           .setURL(json.html_url)
@@ -86,8 +86,8 @@ module.exports = {
           .addField("Public Gists:", json.public_gists, true)
           .addField("Followers:", json.followers)
           .addField("Following:", json.following, true)
-          .addField("Created:", client.moment(json.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a"))
-          .addField("Updated:", client.moment(json.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+          .addField("Created:", global.Moment(json.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a"))
+          .addField("Updated:", global.Moment(json.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 
         if (json.bio) embed.setDescription(json.bio);
 

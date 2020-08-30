@@ -25,7 +25,7 @@ module.exports = {
     }
 
     // Create embed
-    const configEmbed = new client.Discord.MessageEmbed()
+    const configEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Member Configuration");
 

@@ -8,7 +8,7 @@ module.exports = {
     const { dependencies } = require("../../../package.json");
 
     // Create embed
-    const packageEmbed = new client.Discord.MessageEmbed()
+    const packageEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Packages");
 

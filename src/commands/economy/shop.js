@@ -21,7 +21,7 @@ module.exports = {
         const shopItems = await client.database.properties.findByPk("items").then(key => key.value);
         const memberData = await client.database.members.findByPk(message.author.id);
 
-        const { formatNumber } = client.functions;
+        const { formatNumber } = global.functions;
 
         // Set guild constants
         const defaultColor = guildConfig.colors.default;
@@ -40,7 +40,7 @@ module.exports = {
         const shopItem = shopItems.find(x => x.name === itemName);
         const shopItemPrice = itemAmount * shopItem.price;
 
-        if (balance < shopItemPrice) return message.channel.send(`You cannot afford ${client.pluralize(itemName, itemAmount, true)}.`);
+        if (balance < shopItemPrice) return message.channel.send(`You cannot afford ${global.pluralize(itemName, itemAmount, true)}.`);
 
         const inventoryItem = inventory.find(item => item.name === itemName);
 
@@ -58,10 +58,10 @@ module.exports = {
         memberData.decrement("balance", { by: shopItemPrice });
         memberData.update({ inventory: inventory });
 
-        return message.channel.send(new client.Discord.MessageEmbed()
+        return message.channel.send(new global.Discord.MessageEmbed()
           .setColor(defaultColor)
           .setTitle("Transaction Successful")
-          .setDescription(`Bought ${client.pluralize(itemName, itemAmount, true)} for ${currency}${formatNumber(shopItemPrice, 2)}.`)
+          .setDescription(`Bought ${global.pluralize(itemName, itemAmount, true)} for ${currency}${formatNumber(shopItemPrice, 2)}.`)
         );
       }
     },
@@ -112,10 +112,10 @@ module.exports = {
 
         memberData.update({ balance: balance, inventory: inventory });
 
-        return message.channel.send(new client.Discord.MessageEmbed()
+        return message.channel.send(new global.Discord.MessageEmbed()
           .setColor(defaultColor)
           .setTitle("Transaction Successful")
-          .setDescription(`Sold ${client.pluralize(itemName, itemAmount, true)} for ${currency}${sellPrice.toFixed(2)}`)
+          .setDescription(`Sold ${global.pluralize(itemName, itemAmount, true)} for ${currency}${sellPrice.toFixed(2)}`)
         );
       }
     },
@@ -132,7 +132,7 @@ module.exports = {
         const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
         const shopItems = await client.database.properties.findByPk("items").then(key => key.value);
 
-        const { formatNumber } = client.functions;
+        const { formatNumber } = global.functions;
 
         // Set guild constants
         const defaultColor = guildConfig.colors.default;
@@ -149,7 +149,7 @@ module.exports = {
         if (page > pages || page < 1 || isNaN(page)) return message.channel.send(`Page \`${page}\` does not exist.`);
 
         // Create embed
-        const shopEmbed = new client.Discord.MessageEmbed()
+        const shopEmbed = new global.Discord.MessageEmbed()
           .setColor(defaultColor)
           .setTitle(`${message.guild.name} shop`)
           .setDescription(`Buy items using \`${prefix}shop buy [item] [amount]\` \n Sell items using \`${prefix}shop sell [item] [amount] [price]\``)

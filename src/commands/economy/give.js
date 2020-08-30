@@ -18,7 +18,7 @@ module.exports = {
     const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
 
-    const { formatNumber } = client.functions;
+    const { formatNumber } = global.functions;
 
     const amount = parseInt(args[1]);
 
@@ -37,7 +37,7 @@ module.exports = {
     await memberData.decrement("balance", { by: parseInt(amount) });
     await targetData.increment("balance", { by: parseInt(amount) });
 
-    return message.channel.send(new client.Discord.MessageEmbed()
+    return message.channel.send(new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Payment Transaction")
       .setDescription(`${message.author} has sent ${currency}${amount} to ${target}`)

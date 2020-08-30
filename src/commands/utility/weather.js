@@ -11,12 +11,12 @@ module.exports = {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const defaultColor = guildConfig.colors.default;
 
-    const { fetchJSON, kToC, formatNumber} = client.functions;
+    const { fetchJSON, kToC, formatNumber} = global.functions;
 
     const cityName = args[0];
 
     // Fetch data from API
-    const data = await fetchJSON(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${client.auth.openWeatherMap}`);
+    const data = await fetchJSON(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${global.auth.openWeatherMap}`);
 
     console.log(data);
 
@@ -25,7 +25,7 @@ module.exports = {
     const weather = data.weather;
     const main = data.main;
 
-    const embed = new client.Discord.MessageEmbed()
+    const embed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle(`Weather for ${data.name}`)
       .addField("Longitude:", data.coord.lon, true)

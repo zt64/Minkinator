@@ -1,5 +1,5 @@
 exports.create = async (client, guild) => {
-  const Sequelize = client.Sequelize;
+  const Sequelize = global.Sequelize;
   const DataTypes = Sequelize.DataTypes;
 
   const sequelize = new Sequelize("database", "user", "password", {
@@ -138,7 +138,7 @@ exports.populate = async (client, guild, database) => {
   const databaseMembers = database.members;
   const databaseProperties = database.properties;
 
-  const time = client.moment().format("HH:mm M/D/Y");
+  const time = global.Moment().format("HH:mm M/D/Y");
 
   if (databaseMembers) {
     for (const memberData of await databaseMembers.findAll()) {

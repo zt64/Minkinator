@@ -6,7 +6,7 @@ module.exports = {
     const owner = await client.users.fetch(client.config.ownerID);
 
     // Send embed
-    return message.channel.send(new client.Discord.MessageEmbed()
+    return message.channel.send(new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setThumbnail(client.user.displayAvatarURL())
       .setTitle("Minkinator Information")

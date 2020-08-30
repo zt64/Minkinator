@@ -20,8 +20,8 @@ module.exports = {
         const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
         const defaultColor = guildConfig.colors.default;
 
-        const modelDataEmbed = new client.Discord.MessageEmbed();
-        const objectDataEmbed = new client.Discord.MessageEmbed();
+        const modelDataEmbed = new global.Discord.MessageEmbed();
+        const objectDataEmbed = new global.Discord.MessageEmbed();
 
         const modelName = args[0];
         const objectName = args[1];
@@ -119,7 +119,7 @@ module.exports = {
         const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
         const defaultColor = guildConfig.colors.default;
 
-        const fs = client.fs;
+        const fs = global.fs;
 
         const dependencies = require("../../../package.json").dependencies;
         const prettyBytes = require("pretty-bytes");
@@ -131,7 +131,7 @@ module.exports = {
         const size = prettyBytes(stats.size);
 
         // Create embed
-        const infoEmbed = new client.Discord.MessageEmbed()
+        const infoEmbed = new global.Discord.MessageEmbed()
           .setColor(defaultColor)
           .setTitle("Database Information")
           .addField("Sequelize Version:", sequelizeVersion)

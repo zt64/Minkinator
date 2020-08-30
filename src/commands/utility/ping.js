@@ -5,12 +5,12 @@ module.exports = {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const defaultColor = guildConfig.colors.default;
     
-    const pms = client.pms;
+    const pms = global.pms;
     const ws = client.ws;
 
     const connections = ["READY", "CONNECTING", "RECONNECTING", "IDLE", "NEARLY", "DISCONNECTED"];
 
-    const pingEmbed = new client.Discord.MessageEmbed()
+    const pingEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Pinging...");
 
@@ -20,7 +20,7 @@ module.exports = {
 
     // Check connection ping
     const start = process.hrtime.bigint();
-    await client.fetch("https://www.google.com");
+    await global.fetch("https://www.google.com");
     const end = process.hrtime.bigint();
 
     const connectionPing = pms(Number(end - start) / 1e+6);

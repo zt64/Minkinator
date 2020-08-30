@@ -16,7 +16,7 @@ module.exports = {
     const inventory = (await client.database.members.findByPk(user.id)).inventory;
 
     // Create embed
-    const inventoryEmbed = new client.Discord.MessageEmbed()
+    const inventoryEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle(`Inventory of ${member.displayName}`);
       

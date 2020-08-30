@@ -16,7 +16,7 @@ module.exports = {
     const entities = require("entities");
 
     const subreddit = args[0];
-    const body = await client.fetch(`https://api.reddit.com/r/${subreddit}/hot?limit=64`).then(response => response.json());
+    const body = await global.fetch(`https://api.reddit.com/r/${subreddit}/hot?limit=64`).then(response => response.json());
 
     // Check if subreddit exists and has posts
     if (!body.data) return message.channel.send(`Subreddit \`r/${subreddit}\` does not exist.`);
@@ -30,7 +30,7 @@ module.exports = {
     const post = posts[Math.floor(Math.random() * posts.length)].data;
 
     // Create embed
-    const embed = new client.Discord.MessageEmbed()
+    const embed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle(`r/${subreddit} ${post.title}`)
       .setURL(`https://reddit.com${post.permalink}`)

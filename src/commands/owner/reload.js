@@ -5,12 +5,12 @@ module.exports = {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const defaultColor = guildConfig.colors.default;
 
-    const time = client.moment().format("HH:mm M/D/Y");
+    const time = global.Moment().format("HH:mm M/D/Y");
 
     const commands = client.commands;
     const events = client.events;
 
-    const reloadEmbed = new client.Discord.MessageEmbed()
+    const reloadEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Reloading")
       .setDescription(`Reloading \`${commands.size}\` commands and \`${events.size}\` events.`);

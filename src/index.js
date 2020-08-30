@@ -1,50 +1,38 @@
-const functions = require("./lib/functions.js");
 const config = require("./config/config.json");
 const auth = require("./config/auth.json");
 const models = require("./lib/models.js");
 
-const Markov = require("markov-strings").default;
-const GifEncoder = require("gif-encoder");
-const Sequelize = require("sequelize");
-const pluralize = require("pluralize");
 const Discord = require("discord.js");
-const fetch = require("node-fetch");
 const moment = require("moment");
-const canvas = require("canvas");
 const colors = require("colors");
-const pms = require("pretty-ms");
-const qr = require("qrcode");
 const fs = require("fs");
-const os = require("os");
 
 const client = new Discord.Client(config.clientOptions);
-
 const time = moment().format("HH:mm M/D/Y");
 
-// Create collections
+global.Markov = require("markov-strings").default;
+global.functions = require("./lib/functions.js");
+global.GifEncoder = require("gif-encoder");
+global.Sequelize = require("sequelize");
+global.pluralize = require("pluralize");
+global.fetch = require("node-fetch");
+global.pms = require("pretty-ms");
+global.canvas = require("canvas");
+global.qr = require("qrcode");
+global.os = require("os");
+
+// Set client properties
 client.coolDowns = new Discord.Collection();
 client.commands = new Discord.Collection();
 client.events = new Discord.Collection();
-
-// Set client properties
-client.GifEncoder = GifEncoder;
-client.Sequelize = Sequelize;
-client.pluralize = pluralize;
-client.Discord = Discord;
-client.Markov = Markov;
-client.moment = moment;
-client.canvas = canvas;
-client.colors = colors;
-client.fetch = fetch;
-client.pms = pms;
-client.qr = qr;
-client.fs = fs;
-client.os = os;
-
-client.functions = functions;
 client.databases = models;
 client.config = config;
-client.auth = auth;
+
+global.Discord = Discord;
+global.Moment = moment;
+global.colors = colors;
+global.auth = auth;
+global.fs = fs;
 
 // Set up event handler
 client.loadEvents = function loadEvents () {

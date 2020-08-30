@@ -30,7 +30,7 @@ module.exports = {
       const user = members[Math.floor(Math.random() * members.length)].user;
       await webhook.send(string, { username: user.username, avatarURL: user.avatarURL() });
 
-      await client.functions.sleep(750);
+      await global.functions.sleep(750);
     }
 
     // Delete webhook

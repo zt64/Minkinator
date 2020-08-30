@@ -5,13 +5,13 @@ module.exports = {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const defaultColor = guildConfig.colors.default;
 
-    const pms = client.pms;
-    const os = client.os;
+    const pms = global.pms;
+    const os = global.os;
 
     const prettyBytes = require("pretty-bytes");
 
     // Create and send embed
-    return message.channel.send(new client.Discord.MessageEmbed()
+    return message.channel.send(new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("OS Information")
       .addField("Platform:", os.platform(), true)

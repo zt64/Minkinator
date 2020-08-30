@@ -23,7 +23,7 @@ module.exports = {
     member.roles.remove("671902495726895127");
 
     // Send embed
-    return message.channel.send(new client.Discord.MessageEmbed()
+    return message.channel.send(new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setAuthor(`${member.user.tag} has been unmuted`, member.user.avatarURL())
       .setFooter(member.id)

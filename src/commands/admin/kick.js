@@ -25,7 +25,7 @@ module.exports = {
     message.guild.member(member).kick();
 
     // Send embed
-    return message.channel.send(new client.Discord.MessageEmbed()
+    return message.channel.send(new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle(`${member.user.tag} has been kicked`)
       .setDescription(reason || "No reason provided.")

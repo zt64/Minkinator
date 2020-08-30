@@ -10,9 +10,9 @@ module.exports = {
 
     let page = args[0] || 1;
 
-    const guildsEmbed = new client.Discord.MessageEmbed()
+    const guildsEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
-      .setTitle(`Watching ${client.pluralize("guild", guilds.size, true)} and ${client.users.cache.size} users`)
+      .setTitle(`Watching ${global.pluralize("guild", guilds.size, true)} and ${client.users.cache.size} users`)
       .setFooter(`Page ${page} of ${pages}`);
 
     guilds.map(guild => guildsEmbed.addField(`${guild.name}`, `Members: ${guild.memberCount} \n ID: ${guild.id}`));

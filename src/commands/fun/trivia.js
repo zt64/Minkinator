@@ -1,8 +1,8 @@
 module.exports = {
   description: "Play a game of trivia.",
   aliases: ["quiz"],
-  async execute (client, message, args) {
-    const { randomInteger, sleep } = client.functions;
+  async execute (client, message) {
+    const { randomInteger, sleep } = global.functions;
     const entities = require("entities");
 
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
@@ -12,7 +12,7 @@ module.exports = {
     let correctIndex = 0;
 
     // Fetch question
-    const responses = await client.fetch("https://opentdb.com/api.php?amount=1").then(res => res.json());
+    const responses = await global.fetch("https://opentdb.com/api.php?amount=1").then(res => res.json());
     const response = responses.results[0];
 
     const question = entities.decodeHTML(response.question);
@@ -32,7 +32,7 @@ module.exports = {
     const reward = randomInteger(20, 50);
 
     // Create embed
-    const questionEmbed = new client.Discord.MessageEmbed()
+    const questionEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle(`${response.category} question`)
       .setDescription(question)
@@ -74,7 +74,7 @@ module.exports = {
       await data.update({ balance: balance });
     }
 
-    const answerEmbed = new client.Discord.MessageEmbed()
+    const answerEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Trivia Answer");
 

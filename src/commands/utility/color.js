@@ -8,7 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const canvas = client.canvas.createCanvas(512, 512);
+    const canvas = global.canvas.createCanvas(512, 512);
     const ctx = canvas.getContext("2d");
     const hex = args[0];
 
@@ -16,7 +16,7 @@ module.exports = {
     ctx.fillStyle = hex;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    return message.channel.send(new client.Discord.MessageEmbed()
+    return message.channel.send(new global.Discord.MessageEmbed()
       .setTitle("Color")
       .setColor(hex)
       .setImage(canvas.toDataURL())

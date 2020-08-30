@@ -11,7 +11,7 @@ module.exports = {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const prefix = guildConfig.prefix;
     const defaultColor = guildConfig.colors.default;
-    const embed = new client.Discord.MessageEmbed()
+    const embed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
 
@@ -32,7 +32,7 @@ module.exports = {
     const command = client.commands.get(name) || client.commands.find(c => c.aliases && c.aliases.includes(name));
 
     if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
-      return message.channel.send(new client.Discord.MessageEmbed()
+      return message.channel.send(new global.Discord.MessageEmbed()
         .setColor(defaultColor)
         .setTitle("Invalid Command")
         .setDescription(`\`${name}\` is not a valid command.`));
@@ -44,7 +44,7 @@ module.exports = {
     if (command.description) embed.addField("**Description**:", command.description, true);
     if (command.usage) embed.addField("**Usage**:", command.usage, true);
 
-    embed.addField("**Cool down**:", client.pluralize("second", command.coolDown || 3, true), true);
+    embed.addField("**Cool down**:", global.pluralize("second", command.coolDown || 3, true), true);
     embed.addField("**Permissions**:", command.permissions ? command.permissions.join(", ") : "Everyone", true);
 
     return message.channel.send(embed);

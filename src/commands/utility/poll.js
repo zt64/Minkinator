@@ -6,7 +6,7 @@ module.exports = {
     const options = args;
 
     // Create embed
-    const pollEmbed = new client.Discord.MessageEmbed()
+    const pollEmbed = new global.Discord.MessageEmbed()
       .setColor(embedColor)
       .setTitle("Quick poll");
 

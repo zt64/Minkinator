@@ -1,7 +1,7 @@
 module.exports = async (client) => {
-  const time = client.moment().format("HH:mm M/D/Y");
+  const time = global.Moment().format("HH:mm M/D/Y");
 
-  if (!client.fs.existsSync("./data/")) client.fs.mkdirSync("./data/");
+  if (!global.fs.existsSync("./data/")) global.fs.mkdirSync("./data/");
 
   // Create and populate the databases for each guild
   for (const guild of client.guilds.cache.array()) {
@@ -16,7 +16,7 @@ module.exports = async (client) => {
 
     // Build markov corpus
     if (data.length > 0) {
-      const markov = new client.Markov(data, { stateSize: 2 });
+      const markov = new global.Markov(data, { stateSize: 2 });
 
       markov.buildCorpus();
 
@@ -26,7 +26,7 @@ module.exports = async (client) => {
     console.log(`${`(${time})`.green} Initialized database for: ${guild.name} (${guild.id}).`);
   }
 
-  const pluralize = client.pluralize;
+  const pluralize = global.pluralize;
 
   // Set count values
   const users = pluralize("user", client.users.cache.size, true);
