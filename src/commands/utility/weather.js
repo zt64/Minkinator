@@ -2,15 +2,8 @@ module.exports = {
   description: "Get weather forecast for a location.",
   parameters: [
     {
-      name: "latitude",
-      type: Number,
-      range: [-90, 90],
-      required: true
-    },
-    {
-      name: "longitude",
-      type: Number,
-      range: [-180, 180],
+      name: "city",
+      type: String,
       required: true
     }
   ],
@@ -18,26 +11,39 @@ module.exports = {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const defaultColor = guildConfig.colors.default;
 
-    const latitude = args[0];
-    const longitude = args[1];
+    const { fetchJSON, kToC, formatNumber} = client.functions;
 
-    const key = client.auth.darkSky;
-    const weather = await client.fetch(`https://api.darksky.net/forecast/${key}/${latitude},${longitude}`).then(response => response.json());
+    const cityName = args[0];
 
-    const currently = weather.currently;
-    const temp = currently.temperature;
+    // Fetch data from API
+    const data = await fetchJSON(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${client.auth.openWeatherMap}`);
 
-    // Create embed
-    const weatherEmbed = new client.Discord.MessageEmbed()
+    console.log(data);
+
+    if (data.cod === "404") return message.channel.send("Invalid location.");
+
+    const weather = data.weather;
+    const main = data.main;
+
+    const embed = new client.Discord.MessageEmbed()
       .setColor(defaultColor)
-      .setTitle(`Weather for ${latitude}, ${longitude}`)
-      .setURL(`https://darksky.net/forecast/${latitude},${longitude}`)
-      .setDescription(`${currently.summary}.`)
-      .addField("Temperature:", `${temp} °F (${client.functions.fToC(temp).toFixed(2)} °C)`, true)
-      .addField("Humidity:", `${currently.humidity * 100}%`, true)
-      .addField("Pressure:", `${currently.pressure} hPa`, true)
-      .setFooter("Powered by Dark Sky");
+      .setTitle(`Weather for ${data.name}`)
+      .addField("Longitude:", data.coord.lon, true)
+      .addField("Latitude:", data.coord.lat, true)
+      .addField("Weather:", weather[0].main, true)
+      .addField("Weather Description:", weather[0].description, true)
+      .addField("Temperature:", `${kToC(main.temp)} C`, true)
+      .addField("Feels Like:", `${kToC(main.feels_like)} C`, true)
+      .addField("Minimum Temperature:", `${kToC(main.temp_min)} C`, true)
+      .addField("Maximum Temperature:", `${kToC(main.temp_max)} C`, true)
+      .addField("Pressure:", `${main.pressure}`)
+      .addField("Humidity:", `${main.humidity}`)
+      .addField("Visibility:", `${formatNumber(parseInt(data.visibility))} m`)
+      .addField("Wind Speed:", data.wind.speed, true)
+      .addField("Wind Direction:", data.wind.deg, true)
+      .addField("Clouds:", data.clouds.all)
+      .addField("Country Code:", data.sys.country);
 
-    return message.channel.send(weatherEmbed);
+    return message.channel.send(embed);
   }
 };
