@@ -1,11 +1,9 @@
 module.exports = {
-  description: "Reloads the bot commands.",
-  aliases: ["restart", "reboot", "r"],
-  async execute (client, message, args) {
+  description: "Reloads all the bot events and commands.",
+  aliases: ["restart", "r"],
+  async execute (client, message) {
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const defaultColor = guildConfig.colors.default;
-
-    const time = global.Moment().format("HH:mm M/D/Y");
 
     const commands = client.commands;
     const events = client.events;
@@ -17,29 +15,35 @@ module.exports = {
 
     const reloadMessage = await message.channel.send(reloadEmbed);
 
-    // Remove events and commands
     client.removeAllListeners();
-    client.commands.clear();
 
-    // Load events and commands
+    // Load events
     try {
       await client.loadEvents();
-      await client.loadCommands();
-
-      client.emit("ready");
     } catch (error) {
       console.error(error);
 
-      return message.channel.send("An error has occurred reloading. Please check console.");
+      return message.channel.send("An error has occurred while reloading events.");
+    }
+    
+    client.commands.clear();
+
+    // Load commands
+    try {
+      await client.loadCommands();
+    } catch (error) {
+      console.error(error);
+      
+      return message.channel.send("An error has occurred while reloading commands.");
     }
 
-    const ms = reloadMessage.createdTimestamp - message.createdTimestamp;
+    await client.emit("ready");
+
+    const ms = global.moment.utc() - reloadMessage.createdTimestamp;
 
     reloadEmbed.setTitle("Finished reloading");
     reloadEmbed.setDescription(`Reloaded \`${commands.size}\` commands and \`${events.size}\` events in \`${ms}\` ms.`);
 
-    reloadMessage.edit(reloadEmbed);
-
-    return console.log(`${`(${time})`.green} Finished reloading commands and events.`);
+    return reloadMessage.edit(reloadEmbed);
   }
 };
