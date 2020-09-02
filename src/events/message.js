@@ -1,7 +1,7 @@
 const { sleep } = require("../lib/functions");
 
 module.exports = async (client, message) => {
-  const time = global.Moment().format("HH:mm M/D/Y");
+  const time = global.moment().format("HH:mm M/D/Y");
 
   // Return if in DM channel
   if (message.channel.type === "dm") {
@@ -25,8 +25,6 @@ module.exports = async (client, message) => {
   const defaultColor = guildConfig.colors.default;
   const errorColor = guildConfig.colors.error;
   const errorTimeout = guildConfig.errorTimeout;
-  const markovTries = guildConfig.markovTries;
-  const markovScore = guildConfig.markovScore;
   const currency = guildConfig.currency;
   const prefix = guildConfig.prefix;
   const ignore = guildConfig.ignore;
@@ -67,18 +65,25 @@ module.exports = async (client, message) => {
 
   // Generate markov on mention of self
   if (message.mentions.users.first() === client.user) {
-    const options = {
-      maxTries: markovTries,
-      filter: (result) => result.score > markovScore && result.refs.length >= 2 && result.string.length <= 500
-    };
+    const data = await client.database.properties.findByPk("data").then(key => key.value);
+    const markov = global.Markov(5);
 
-    try {
-      const result = await client.database.markov.generateAsync(options);
+    const limit = global.functions.randomInteger(1, 8);
 
-      return message.channel.send(result.string);
-    } catch (error) { 
-      return;
-    }
+    // Seed the generator
+    markov.seed(data.join("\n"));
+
+    // Get random key
+    const key = markov.pick();
+
+    // Generate chains from key
+    const chains = markov.forward(key);
+
+    // Generate responses based off the chains
+    let responses = markov.respond(chains.join(" "), limit);
+
+    // Send the response
+    message.channel.send(responses.join(" "));
   }
 
   // Write message to data.json
