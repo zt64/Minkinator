@@ -18,7 +18,7 @@ module.exports = {
       .addField("Roles:", guild.roles.cache.size, true)
       .addField("Features:", guild.features.length >= 1 ? guild.features : "None", true)
       .addField("Channels:", guild.channels.cache.size, true)
-      .addField("Created:", global.Moment(guild.createdAt).format("MM/DD/YYYY"), true)
+      .addField("Created:", global.moment(guild.createdAt).format("MM/DD/YYYY"), true)
       .addField("Emojis:", guild.emojis.cache.size, true)
       .addField("Members:", guild.members.cache.size, true)
       .addField("Maximum Members:", guild.maximumMembers || "None", true)

@@ -1,5 +1,5 @@
 module.exports = async (client) => {
-  const time = global.Moment().format("HH:mm M/D/Y");
+  const time = global.moment().format("HH:mm M/D/Y");
 
   if (!global.fs.existsSync("./data/")) global.fs.mkdirSync("./data/");
 
@@ -11,17 +11,6 @@ module.exports = async (client) => {
     await client.databases.populate(client, guild, database);
 
     client.databases[guild.name] = database;
-
-    const data = await database.properties.findByPk("data").then(key => key.value);
-
-    // Build markov corpus
-    if (data.length > 0) {
-      const markov = new global.Markov(data, { stateSize: 2 });
-
-      markov.buildCorpus();
-
-      client.databases[guild.name].markov = markov;
-    }
 
     console.log(`${`(${time})`.green} Initialized database for: ${guild.name} (${guild.id}).`);
   }

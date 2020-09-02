@@ -7,7 +7,7 @@ module.exports = async (client, member) => {
   const database = client.databases[guild.name];
   const pluralize = global.pluralize;
 
-  const time = global.Moment().format("HH:mm M/D/Y");
+  const time = global.moment().format("HH:mm M/D/Y");
 
   const guildConfig = await database.properties.findByPk("configuration").then(key => key.value);
   const defaultColor = guildConfig.colors.default;

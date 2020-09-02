@@ -10,7 +10,7 @@ const fs = require("fs");
 const client = new Discord.Client(config.clientOptions);
 const time = moment().format("HH:mm M/D/Y");
 
-global.Markov = require("markov-strings").default;
+global.Markov = require("markov");
 global.functions = require("./lib/functions.js");
 global.GifEncoder = require("gif-encoder");
 global.Sequelize = require("sequelize");
@@ -29,7 +29,7 @@ client.databases = models;
 client.config = config;
 
 global.Discord = Discord;
-global.Moment = moment;
+global.moment = moment;
 global.colors = colors;
 global.auth = auth;
 global.fs = fs;
@@ -85,7 +85,7 @@ client.loadCommands();
 client.login(auth.discord);
 
 // Handle promise rejections
-process.on("unhandledRejection", error => console.error("Unhandled Promise Rejection at:", error));
+process.on("unhandledRejection", error => console.error(error));
 
 // Take input from stdin
 process.stdin.on("data", async data => {

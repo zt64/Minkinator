@@ -46,8 +46,8 @@ module.exports = {
           .addField("Issues:", json.open_issues, true)
           .addField("Commits:", commits.length)
           .addField("License:", json.license.name)
-          .addField("Created:", global.Moment(json.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a"))
-          .addField("Updated:", global.Moment(json.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+          .addField("Created:", global.moment(json.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a"))
+          .addField("Updated:", global.moment(json.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 
         if (json.description) embed.setDescription(json.description);
 
@@ -84,10 +84,10 @@ module.exports = {
           .addField("Hireable:", json.hireable ? "True" : "False", true)
           .addField("Public Repositories:", json.public_repos, true)
           .addField("Public Gists:", json.public_gists, true)
-          .addField("Followers:", json.followers)
+          .addField("Followers:", json.followers, true)
           .addField("Following:", json.following, true)
-          .addField("Created:", global.Moment(json.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a"))
-          .addField("Updated:", global.Moment(json.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+          .addField("Created:", global.moment(json.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a"))
+          .addField("Updated:", global.moment(json.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 
         if (json.bio) embed.setDescription(json.bio);
 

@@ -138,7 +138,7 @@ exports.populate = async (client, guild, database) => {
   const databaseMembers = database.members;
   const databaseProperties = database.properties;
 
-  const time = global.Moment().format("HH:mm M/D/Y");
+  const time = global.moment().format("HH:mm M/D/Y");
 
   if (databaseMembers) {
     for (const memberData of await databaseMembers.findAll()) {

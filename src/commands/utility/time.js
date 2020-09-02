@@ -1,7 +1,7 @@
 module.exports = {
   description: "Shows the exact time.",
   async execute (client, message, args) {
-    const moment = global.Moment;
+    const moment = global.moment;
     const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
     const defaultColor = guildConfig.colors.default;
 

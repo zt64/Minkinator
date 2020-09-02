@@ -1,5 +1,5 @@
 module.exports = async (client, guild) => {
-  const time = global.Moment().format("HH:mm M/D/Y");
+  const time = global.moment().format("HH:mm M/D/Y");
   const pluralize = global.pluralize;
 
   console.log(`${`(${time})`.green} Minkinator has joined: ${guild.name} (${guild.id}).`);

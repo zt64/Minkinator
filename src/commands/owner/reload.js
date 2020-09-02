@@ -39,7 +39,7 @@ module.exports = {
 
     await client.emit("ready");
 
-    const ms = global.moment.utc() - reloadMessage.createdTimestamp;
+    const ms = Date.now() - reloadMessage.createdTimestamp;
 
     reloadEmbed.setTitle("Finished reloading");
     reloadEmbed.setDescription(`Reloaded \`${commands.size}\` commands and \`${events.size}\` events in \`${ms}\` ms.`);
