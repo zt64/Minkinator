@@ -20,8 +20,8 @@ module.exports = {
         const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
         const defaultColor = guildConfig.colors.default;
 
-        const modelDataEmbed = new global.Discord.MessageEmbed();
-        const objectDataEmbed = new global.Discord.MessageEmbed();
+        const embed = new global.Discord.MessageEmbed()
+          .setColor(defaultColor);
 
         const modelName = args[0];
         const objectName = args[1];
@@ -29,17 +29,17 @@ module.exports = {
         const model = client.database[modelName];
         if (!model) return message.channel.send(`Model \`${modelName}\` does not exist.`);
 
-        // If no object provided, show all objects
+        // If no entity provided, show all entities
         if (!objectName) {
-          const primaryKey = model.primaryKeyAttributes[0];
+          embed.setTitle(`${modelName}`);
 
-          modelDataEmbed.setTitle(`${modelName}`);
-          modelDataEmbed.setColor(defaultColor);
+          const entities = await model.findAll();
 
-          const instances = await model.findAll();
-          instances.map(object => modelDataEmbed.addField(object[primaryKey], "\u200b", true));
+          const array = entities.map(entity => Object.values(entity.dataValues)[0]);
 
-          return message.channel.send(modelDataEmbed);
+          embed.setDescription(`\`\`\`json\n${JSON.stringify(array, null, 2)}\`\`\``);
+
+          return message.channel.send(embed);
         }
 
         // Check if object exists
@@ -50,15 +50,11 @@ module.exports = {
         }
 
         // Set embed properties
-        objectDataEmbed.setTitle(`${modelName}: ${objectName}`);
-        objectDataEmbed.setColor(defaultColor);
+        embed.setTitle(`${modelName}: ${objectName}`);
 
-        for (const [key, value] of Object.entries(object.dataValues)) {
-          objectDataEmbed.addField(`${key}:`, JSON.stringify(value, null, 2), true);
-        }
+        embed.setDescription(`\`\`\`json\n${JSON.stringify(object, null, 2)}\`\`\``);
 
-        // Send embed
-        return message.channel.send(objectDataEmbed);
+        return message.channel.send(embed);
       }
     },
     {
@@ -131,14 +127,14 @@ module.exports = {
         const size = prettyBytes(stats.size);
 
         // Create embed
-        const infoEmbed = new global.Discord.MessageEmbed()
+        const embed = new global.Discord.MessageEmbed()
           .setColor(defaultColor)
           .setTitle("Database Information")
           .addField("Sequelize Version:", sequelizeVersion)
           .addField("Sqlite3 Version:", sqlite3Version)
           .addField("Database Size:", size);
 
-        return message.channel.send(infoEmbed);
+        return message.channel.send(embed);
       }
     }
   ]
