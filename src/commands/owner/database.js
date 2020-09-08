@@ -4,7 +4,7 @@ module.exports = {
   subCommands: [
     {
       name: "get",
-      description: "Get a guild property.",
+      description: "Get a models properties.",
       parameters: [
         {
           name: "model",
@@ -17,20 +17,20 @@ module.exports = {
         }
       ],
       async execute (client, message, args) {
-        global.guildInstance.guildConfig;
+        const guildConfig = global.guildInstance.guildConfig;
         const defaultColor = guildConfig.colors.default;
 
         const embed = new global.Discord.MessageEmbed()
           .setColor(defaultColor);
 
         const modelName = args[0];
-        const objectName = args[1];
+        const instanceName = args[1];
 
-        const model = client.database[modelName];
+        const model = global.sequelize.models[modelName];
         if (!model) return message.channel.send(`Model \`${modelName}\` does not exist.`);
 
         // If no entity provided, show all entities
-        if (!objectName) {
+        if (!instanceName) {
           embed.setTitle(`${modelName}`);
 
           const entities = await model.findAll();
@@ -44,13 +44,13 @@ module.exports = {
 
         // Check if object exists
         try {
-          var object = await model.findByPk(objectName);
+          var object = await model.findByPk(instanceName);
         } catch (e) {
-          return message.channel.send(`Object: ${objectName}, does not exist.`);
+          return message.channel.send(`Object: ${instanceName}, does not exist.`);
         }
 
         // Set embed properties
-        embed.setTitle(`${modelName}: ${objectName}`);
+        embed.setTitle(`${modelName}: ${instanceName}`);
 
         embed.setDescription(`\`\`\`json\n${JSON.stringify(object, null, 2)}\`\`\``);
 
@@ -81,28 +81,28 @@ module.exports = {
       ],
       async execute (client, message, args) {
         const modelName = args[0];
-        const objectName = args[1];
+        const instanceName = args[1];
         const propertyName = args[2];
 
         // Check if model exists
         try {
-          var model = client.database.sequelize[modelName];
+          var model = global.sequelize.models[modelName];
         } catch (e) {
           return message.channel.send(`Model \`${modelName}\` does not exist.`);
         }
 
         // Check if object exists
         try {
-          var object = await model.findByPk(objectName);
+          var object = await model.findByPk(instanceName);
         } catch (e) {
-          return message.channel.send(`Object \`${objectName}\` does not exist.`);
+          return message.channel.send(`Object \`${instanceName}\` does not exist.`);
         }
 
         // Check if property exists
         try {
           await object.update({ [propertyName]: JSON.parse(args.slice(3).join(" ")) });
           
-          return message.channel.send(`Set ${modelName}: ${objectName}.${propertyName} to \`${args.slice(3).join(" ")}\`.`);
+          return message.channel.send(`Set ${modelName}: ${instanceName}.${propertyName} to \`${args.slice(3).join(" ")}\`.`);
         } catch (e) {
           return message.channel.send(`Property \`${propertyName}\` does not exist.`);
         }
@@ -112,7 +112,7 @@ module.exports = {
       name: "info",
       description: "Shows information about the database.",
       async execute (client, message) {
-        global.guildInstance.guildConfig;
+        const guildConfig = global.guildInstance.guildConfig;
         const defaultColor = guildConfig.colors.default;
 
         const fs = global.fs;
