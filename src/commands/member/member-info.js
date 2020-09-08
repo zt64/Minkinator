@@ -7,8 +7,8 @@ module.exports = {
       type: String
     }
   ],
-  async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+  async execute (client, message) {
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
     const formatNumber = global.functions.formatNumber;
@@ -18,7 +18,7 @@ module.exports = {
     if (!user) return message.channel.send("Please specify a valid member.");
 
     const member = message.guild.member(user);
-    const memberData = await client.database.members.findByPk(user.id);
+    const memberData = await global.sequelize.models.member.findByPk(user.id);
 
     // Create info embed
     const infoEmbed = new global.Discord.MessageEmbed()

@@ -9,8 +9,8 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-    const memberData = await client.database.members.findByPk(message.author.id);
+    const guildConfig = global.guildInstance.guildConfig;
+    const memberInstance = global.memberInstance;
 
     const guess = Math.round(args[0]);
 
@@ -22,7 +22,7 @@ module.exports = {
 
     const { formatNumber, randomInteger } = global.functions;
 
-    let balance = memberData.balance;
+    let balance = memberInstance.balance;
     let earn;
 
     // Generate random value
@@ -45,7 +45,7 @@ module.exports = {
     // Update balance
     balance += earn;
 
-    await memberData.update({ balance: balance });
+    await memberInstance.update({ balance: balance });
 
     embed.setDescription(`You guessed ${guess}, and the number was ${value}. \n Earning you ${currency}${formatNumber(earn, 2)} puts your balance at ${currency}${formatNumber(balance, 2)}.`);
 

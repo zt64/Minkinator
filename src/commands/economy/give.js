@@ -14,7 +14,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
 
@@ -28,20 +28,20 @@ module.exports = {
     if (amount < 1 || isNaN(amount)) return message.channel.send(`\`${amount}\` is not a valid amount.`);
 
     // Get data for the sender and receiver
-    const [targetData] = await client.database.members.findOrCreate({ where: { id: target.user.id }, defaults: { name: target.user.tag } });
-    const memberData = await client.database.members.findByPk(message.author.id);
+    const [targetData] = global.sequelize.models.member.findOrCreate({ where: { id: target.user.id, name: target.user.tag } });
+    const memberInstance = global.memberInstance;
 
-    if (memberData.balance - amount < 0) return message.reply(`You are missing the additional ${currency}${Math.abs(amount - memberData.balance)}.`);
+    if (memberInstance.balance - amount < 0) return message.reply(`You are missing the additional ${currency}${Math.abs(amount - memberInstance.balance)}.`);
 
     // Adjust balances
-    await memberData.decrement("balance", { by: parseInt(amount) });
+    await memberInstance.decrement("balance", { by: parseInt(amount) });
     await targetData.increment("balance", { by: parseInt(amount) });
 
     return message.channel.send(new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Payment Transaction")
       .setDescription(`${message.author} has sent ${currency}${amount} to ${target}`)
-      .addField(`${message.author.username}"s new balance:`, `${currency}${formatNumber(memberData.balance - amount, 2)}`, true)
+      .addField(`${message.author.username}"s new balance:`, `${currency}${formatNumber(memberInstance.balance - amount, 2)}`, true)
       .addField(`${target.user.username}"s new balance:`, `${currency}${formatNumber(targetData.balance + amount, 2)}`, true)
     );
   }

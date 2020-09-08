@@ -4,13 +4,13 @@ const models = require("./lib/models.js");
 
 const Discord = require("discord.js");
 const moment = require("moment");
-const colors = require("colors");
+const chalk = require("chalk");
 const fs = require("fs");
 
 const client = new Discord.Client(config.clientOptions);
 const time = moment().format("HH:mm M/D/Y");
 
-global.Markov = require("markov");
+global.MarkovChain = require("purpl-markov-chain");
 global.functions = require("./lib/functions.js");
 global.GifEncoder = require("gif-encoder");
 global.Sequelize = require("sequelize");
@@ -21,18 +21,18 @@ global.canvas = require("canvas");
 global.qr = require("qrcode");
 global.os = require("os");
 
-// Set client properties
-client.coolDowns = new Discord.Collection();
-client.commands = new Discord.Collection();
-client.events = new Discord.Collection();
-client.databases = models;
-client.config = config;
-
 global.Discord = Discord;
+global.config = config;
 global.moment = moment;
-global.colors = colors;
+global.chalk = chalk;
 global.auth = auth;
 global.fs = fs;
+
+// Set client properties
+client.coolDowns = new Map();
+client.commands = new Map();
+client.events = new Map();
+client.databases = models;
 
 // Set up event handler
 client.loadEvents = function loadEvents () {
@@ -43,13 +43,13 @@ client.loadEvents = function loadEvents () {
 
     eventName = eventName.replace(".js", "");
 
-    // Add event to events collection
+    // Add event to events map
     client.events.set(eventName, eventFile);
 
     // Bind event file to run on event
     client.on(eventName, eventFile.bind(null, client));
   });
-  console.log(`${`(${time})`.green} Successfully loaded ${client.events.size} events.`);
+  console.log(chalk.green(`(${time})`), `Successfully loaded ${client.events.size} events.`);
 };
 
 // Set up command handler
@@ -62,7 +62,7 @@ client.loadCommands = function loadCommands () {
 
       commandName = commandName.replace(".js", "");
 
-      // Add command to commands collection
+      // Add command to commands map
       client.commands.set(commandName, commandFile);
 
       const command = client.commands.get(commandName);
@@ -74,7 +74,7 @@ client.loadCommands = function loadCommands () {
       if (category === "owner") command.ownerOnly = true;
     });
   });
-  console.log(`${`(${time})`.green} Successfully loaded ${client.commands.size} commands.`);
+  console.log(chalk.green(`(${time})`), `Successfully loaded ${client.commands.size} commands.`);
 };
 
 // Load commands and events

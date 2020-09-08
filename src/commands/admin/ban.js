@@ -19,10 +19,8 @@ module.exports = {
   async execute (client, message, args) {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
 
-    const properties = client.database.properties;
-
-    const guildConfig = await properties.findByPk("configuration").then(key => key.value);
-    const bans = await properties.findByPk("bans").then(key => key.value);
+    const guildConfig = global.guildInstance.guildConfig;
+    const bans = global.guildInstance.bans;
     const defaultColor = guildConfig.colors.default;
 
     const member = message.mentions.users.first();

@@ -1,8 +1,8 @@
 module.exports = {
   description: "Shows the users information.",
-  async execute (client, message, args) {
+  async execute (client, message) {
     const user = message.mentions.users.first() || message.author;
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
 
     const platforms = [];

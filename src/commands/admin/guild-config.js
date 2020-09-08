@@ -15,11 +15,9 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const properties = client.database.properties;
-
-    const guildConfigDB = await properties.findByPk("configuration");
-    const guildConfig = guildConfigDB.value;
-    const defaultColor = guildConfig.colors.default;
+    const guildInstance = global.guildInstance;
+    const config = await guildInstance.guildConfig;
+    const defaultColor = config.dataValues.colors.default;
 
     const key = args[0];
 
@@ -29,18 +27,16 @@ module.exports = {
       .setTitle("Guild Configuration");
 
     if (!key) {
-      for (const [key, value] of Object.entries(guildConfig)) {
-        configEmbed.addField(`${key}:`, `\`\`\`json\n${JSON.stringify(value, null, 2)}\`\`\``, true);
-      }
+      configEmbed.setDescription(`\`\`\`json\n${JSON.stringify(config.dataValues, null, 2)}\`\`\``);
 
       return message.channel.send(configEmbed);
     }
 
     // Make sure property exists
-    if (!(key in guildConfig)) return message.channel.send(`\`${key}\` is not a guild property.`);
+    if (!(key in config.dataValues)) return message.channel.send(`\`${key}\` is not a guild property.`);
 
-    if (typeof (guildConfig[key]) === "object") {
-      const object = guildConfig[key];
+    if (typeof (config.dataValues[key]) === "object") {
+      const object = config.dataValues[key];
       const objectKey = args[1];
       const value = args[2];
 
@@ -48,7 +44,7 @@ module.exports = {
       if (!value) return message.channel.send(`No value specified for: \`${key}\`.`);
 
       try {
-        guildConfig[key][objectKey] = JSON.parse(value);
+        config.dataValues[key][objectKey] = JSON.parse(value);
       } catch (error) {
         return message.channel.send(`Unable to parse \`${value}\` for \`${objectKey}\`.`);
       }
@@ -60,7 +56,7 @@ module.exports = {
       if (!value) return message.channel.send(`No value specified for: \`${key}\`.`);
 
       try {
-        guildConfig[key] = JSON.parse(value);
+        config.dataValues[key] = JSON.parse(value);
       } catch (error) {
         return message.channel.send(`Unable to parse \`${value}\` for \`${key}\`.`);
       }
@@ -68,7 +64,7 @@ module.exports = {
       configEmbed.setDescription(`Successfully set \`${key}\` to \`${value}\`.`);
     }
 
-    guildConfigDB.update({ value: guildConfig });
+    await guildInstance.setGuildConfig(config);
 
     return message.channel.send(configEmbed);
   }

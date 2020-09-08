@@ -8,22 +8,19 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+    const guildConfig = global.guildInstance.guildConfig;
     const prefix = guildConfig.prefix;
     const defaultColor = guildConfig.colors.default;
     const embed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
-      .setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
+      .setFooter(`Created by Litleck (${await client.users.fetch(global.config.ownerID).then(user => user.tag)})`);
 
     // Send entire command list
     if (!args.length) {
       embed.setTitle("You have summoned I, the Minkinator. What shall I do today?");
       embed.setDescription(`You can send \`${prefix}help <command name>\` to get info on a specific command.`);
       embed.setAuthor("List of commands", client.user.avatarURL());
-      embed.addField("**Commands**", `${client.commands.map(command => {
-        if (command.permissions && !message.member.hasPermission(command.permissions)) return;
-        return command.name;
-      }).filter(Boolean).join(", ")}`);
+      embed.addField("**Commands**", client.commands.forEach(command => command.name));
 
       return message.channel.send(embed);
     }

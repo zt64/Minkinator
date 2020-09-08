@@ -2,7 +2,7 @@ module.exports = {
   description: "Flip a coin.",
   aliases: ["flip", "coin"],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+    global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
     
     // Generate result

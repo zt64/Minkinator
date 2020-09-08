@@ -1,9 +1,5 @@
-const { sleep } = require("../lib/functions");
-
 module.exports = async (client, message) => {
-  const time = global.moment().format("HH:mm M/D/Y");
-
-  // Return if in DM channel
+  // Return if in a DM channel
   if (message.channel.type === "dm") {
     if (message.author.bot) return;
 
@@ -11,52 +7,54 @@ module.exports = async (client, message) => {
   }
 
   // Set constants
-  const { formatNumber } = global.functions;
+  const { formatNumber, sleep } = global.functions;
 
-  const guildDatabase = await client.databases[message.guild.name];
+  const guildInstance = await global.sequelize.models.guild.findOne({
+    where: {
+      id: message.guild.id
+    },
+    include: { all: true, nested: true }
+  });
 
-  const guildProperties = guildDatabase.properties;
-  const guildMembers = guildDatabase.members;
-
-  client.database = guildDatabase;
+  global.guildInstance = guildInstance;
 
   // Set guild constants
-  const guildConfig = await guildProperties.findByPk("configuration").then(key => key.value);
-  const defaultColor = guildConfig.colors.default;
-  const errorColor = guildConfig.colors.error;
-  const errorTimeout = guildConfig.errorTimeout;
-  const currency = guildConfig.currency;
-  const prefix = guildConfig.prefix;
-  const ignore = guildConfig.ignore;
+  const guildConfig = guildInstance.guildConfig;
+
+  const { errorTimeout, currency, prefix, ignore, colors } = guildConfig;
 
   // Return if ignoreBots is true and author is bot
   if (guildConfig.ignoreBots && message.author.bot) return;
 
-  // Set member constants;
-  const [memberData] = await guildMembers.findOrCreate({ where: { id: message.author.id } });
-  const memberConfig = memberData.configuration;
+  let memberInstance = await global.sequelize.models.member.findByPk(message.author.id);
 
-  let level = memberData.level;
+  if (!memberInstance) memberInstance = await guildInstance.createMember({ userId: message.author.id, guildId: message.guild.id });
 
-  const xpTotal = memberData.xpTotal + Math.round(Math.random() * (level / 0.5));
-  const xpRequired = memberData.xpRequired;
+  let memberConfig = await memberInstance.getMemberConfig();
 
-  memberData.update({ xpTotal: xpTotal, messages: memberData.messages + 1 });
+  if (!memberConfig) memberConfig = await memberInstance.createMemberConfig();
 
-  // Check if message author can level up
+  global.memberInstance = memberInstance;
+
+  const level = memberInstance.level;
+  const xpTotal = memberInstance.xpTotal + Math.round(Math.random() * (level / 0.5));
+  const xpRequired = memberInstance.xpRequired;
+
+  memberInstance.update({ xpTotal: xpTotal, messages: memberInstance.messages + 1 });
+
+  // Check if the member can level up
   if (xpTotal >= xpRequired) {
-    memberData.update({ level: ++level, xpRequired: Math.round(xpRequired * 1.5) });
-    level++;
+    memberInstance.update({ level: level + 1, xpRequired: Math.round(xpRequired * 1.5) });
 
     // Check if level mention is enabled
     if (guildConfig.levelMention && memberConfig.levelMention) {
       if (!(level % 5)) {
         const levelUpEmbed = new global.Discord.MessageEmbed()
-          .setColor(defaultColor)
+          .setColor(colors.default)
           .setTitle(`${message.author.username} has levelled up!`)
-          .setDescription(`${message.author} is now level ${formatNumber(level)} and earned ${currency}500 as a reward!`);
+          .setDescription(`${message.author} is now level ${formatNumber(level + 1)} and earned ${currency}500 as a reward!`);
 
-        memberData.increment("balance", { by: 500 });
+        memberInstance.increment("balance", { by: 500 });
 
         message.channel.send(levelUpEmbed);
       }
@@ -66,57 +64,44 @@ module.exports = async (client, message) => {
   // Generate markov on mention of self
   if (message.mentions.users.first() === client.user) {
     const data = await client.database.properties.findByPk("data").then(key => key.value);
-    const markov = global.Markov(5);
+    const TextGenerator = require("node-markov-generator").TextGenerator;
+    const generator = new TextGenerator(data);
+ 
+    const result = generator.generateSentence();
 
-    const limit = global.functions.randomInteger(1, 8);
-
-    // Seed the generator
-    markov.seed(data.join("\n"));
-
-    // Get random key
-    const key = markov.pick();
-
-    // Generate chains from key
-    const chains = markov.forward(key);
-
-    // Generate responses based off the chains
-    let responses = markov.respond(chains.join(" "), limit);
-
-    // Send the response
-    message.channel.send(responses.join(" "));
+    message.channel.send(result);
   }
 
   // Write message to data.json
   if (![prefix, ...ignore].some(x => message.content.startsWith(x))) {
-    const dataProperty = await guildProperties.findByPk("data");
-    const data = dataProperty.value;
+    const data = guildInstance.data;
 
     data.push(message.content);
 
-    return dataProperty.update({ value: data });
+    await guildInstance.update({ data: data });
   }
 
-  if (memberData.botBan) return;
+  if (memberInstance.botBan) return;
 
   if (!message.content.startsWith(prefix)) return;
 
   // Check if command exists
   const args = message.content.slice(prefix.length).split(/ +/g);
   const commandName = args.shift().toLowerCase();
-  let command = client.commands.get(commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
+  let command = client.commands.get(commandName) || [...client.commands.values()].find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
   if (!command) return;
 
   // Check that command isn't disabled
-  const disabledCommands = await guildProperties.findByPk("commands").then(key => key.value);
+  const disabledCommands = guildInstance.commands;
   if (disabledCommands.includes(commandName)) return;
 
   // Check if message author has permission
-  if (message.author.id !== client.config.ownerID) {
+  if (message.author.id !== global.config.ownerID) {
     if (command.ownerOnly) return;
     if (!message.member.hasPermission(command.permissions)) {
       const permissionError = await message.channel.send(new global.Discord.MessageEmbed()
-        .setColor(errorColor)
+        .setColor(colors.error)
         .setTitle("Missing Permissions")
         .addField("You are missing one of the following permissions:", command.permissions.join(", "))
       );
@@ -127,7 +112,7 @@ module.exports = async (client, message) => {
 
   // Check if parameters are correct
   const usageEmbed = new global.Discord.MessageEmbed()
-    .setColor(errorColor)
+    .setColor(colors.error)
     .setTitle(`Improper usage of ${commandName}`)
     .setDescription(command.description);
 
@@ -155,6 +140,7 @@ module.exports = async (client, message) => {
       return message.channel.send(usageEmbed);
     }
 
+    // Remove the sub command from the arguments array
     args.shift();
 
     if (subCommand.parameters) {
@@ -186,8 +172,8 @@ module.exports = async (client, message) => {
   }
 
   // Check if command cool down exists
-  if (message.author.id !== client.config.ownerID) {
-    if (!client.coolDowns.has(commandName)) client.coolDowns.set(commandName, new global.Discord.Collection());
+  if (message.author.id !== global.config.ownerID) {
+    if (!client.coolDowns.has(commandName)) client.coolDowns.set(commandName, new Map());
 
     const now = Date.now();
     const timestamps = client.coolDowns.get(commandName);
@@ -200,7 +186,7 @@ module.exports = async (client, message) => {
         const timeLeft = (expirationTime - now) / 1000;
 
         const coolDownEmbed = await message.channel.send(new global.Discord.MessageEmbed()
-          .setColor(errorColor)
+          .setColor(colors.error)
           .setTitle("Cool down active")
           .setDescription(`Please wait, a cool down of ${global.pluralize("second", timeLeft.toFixed(1), true)} is remaining.`)
         );
@@ -218,8 +204,11 @@ module.exports = async (client, message) => {
     timestamps.delete(message.author.id);
   }
 
+  const time = global.moment().format("HH:mm M/D/Y");
+  const chalk = global.chalk;
+
   // Execute the command
-  console.log(`${`(${time})`.green} ${`(${message.guild.name} #${message.channel.name})`.cyan}`, message.author.tag.yellow, message.content);
+  console.log(chalk.green(`(${time})`), chalk.cyan(`(${message.guild.name} #${message.channel.name})`), chalk.yellow(message.author.tag), message.content);
 
   try {
     return command.execute(client, message, args);
@@ -227,7 +216,7 @@ module.exports = async (client, message) => {
     console.error(error);
 
     return message.channel.send(new global.Discord.MessageEmbed()
-      .setColor(errorColor)
+      .setColor(colors.error)
       .setTitle("An error has occurred")
       .setDescription(`\`\`\`js\n${error}\`\`\``)
       .setFooter("See console for more information")

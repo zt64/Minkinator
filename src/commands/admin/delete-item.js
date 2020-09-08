@@ -11,15 +11,12 @@ module.exports = {
   async execute (client, message, args) {
     const itemName = args[0];
 
-    const itemsProperty = await client.database.properties.findByPk("items");
-    const items = itemsProperty.value.filter(item => item.name === itemName);
+    const shopItem = await global.sequelize.models.shopItem.findByPk(itemName);
 
-    // Check if item exists
-    if (items.length === 0) return message.channel.send(`Item: \`${itemName}\`, does not exist in the guild shop.`);
+    // Make sure item exists
+    if (!shopItem) return message.channel.send(`Item: \`${itemName}\`, does not exist in the guild shop.`);
 
-    const array = itemsProperty.value.filter(item => item.name !== itemName);
-
-    itemsProperty.update({ value: array });
+    await global.guildInstance.removeShopItem(shopItem);
 
     return message.channel.send(`Successfully deleted: \`${itemName}\`, from the guild shop.`);
   }

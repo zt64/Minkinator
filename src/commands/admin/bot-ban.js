@@ -9,7 +9,7 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const user = await global.functions.getUser(client, message, args[0]);
-    const memberData = await client.database.members.findByPk(user.id);
+    const memberData = global.memberInstance;
 
     // Toggle state on a member
     const state = memberData.botBan ? "unbanned" : "banned";

@@ -5,7 +5,7 @@ module.exports = async (client, member) => {
   if (!channel) return;
 
   const database = client.databases[guild.name];
-  const pluralize = global.pluralize;
+  const { pluralize, chalk } = global;
 
   const time = global.moment().format("HH:mm M/D/Y");
 
@@ -19,7 +19,7 @@ module.exports = async (client, member) => {
   // Update bot activity
   client.user.setActivity(`${users} in ${guilds}.`, { type: "WATCHING" });
 
-  console.log(`${`(${time})`.green} ${member.user.tag} has left ${guild.name}.`);
+  console.log(chalk.green(`(${time})`), `${member.user.tag} has left ${guild.name}`);
 
   // Destroy member data
   await database.members.findByPk(member.id).then(data => data.destroy());

@@ -1,38 +1,16 @@
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define("guild", {
     id: {
-      type: DataTypes.TEXT,
-      primaryKey: true,
-      unique: true
+      type: DataTypes.STRING,
+      primaryKey: true
     },
-    name: {
-      type: DataTypes.STRING
-    },
-    configuration: {
+    data: {
       type: DataTypes.JSON,
-      allowNull: false,
-      defaultValue: {
-        colors: {
-          default: "#1ED760",
-          error: "#FF0000"
-        },
-        markov: {
-          score: 100,
-          tries: 1000,
-          mention: true
-        },
-        ignore: [],
-        prefix: "!",
-        currency: "₼",
-        errorTimeout: 5000,
-        sellPrice: 0.5,
-        redditNSFW: false,
-        levelMention: true,
-        ignoreBots: true
-      }
+      defaultValue: []
+    },
+    commands: {
+      type: DataTypes.JSON,
+      defaultValue: []
     }
-  }, {
-    timestamps: false,
-    underscored: true
   });
 };

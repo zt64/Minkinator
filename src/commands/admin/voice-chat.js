@@ -5,7 +5,7 @@ module.exports = {
     {
       name: "join",
       description: "Join the current voice channel of message author.",
-      async execute (client, message, args) {
+      async execute (client, message) {
         if (message.member.voice.channel) {
           await message.member.voice.channel.join();
 
@@ -18,7 +18,7 @@ module.exports = {
     {
       name: "leave",
       description: "Leave the current voice channel.",
-      async execute (client, message, args) {
+      async execute (client, message) {
         if (client.voice.connections.size >= 1) {
           await client.voice.connections.first().channel.leave();
 

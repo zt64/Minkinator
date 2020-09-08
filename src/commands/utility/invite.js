@@ -1,7 +1,7 @@
 module.exports = {
   description: "Generates an invitation link for Minkinator",
   async execute (client, message) {
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
 
     // Generate URL for invite

@@ -1,10 +1,11 @@
 module.exports = {
   description: "Change your settings.",
+  aliases: [ "mc" ],
   async execute (client, message, args) {
-    const memberData = await client.database.members.findByPk(message.author.id);
-    const memberConfig = memberData.configuration;
+    const memberInstance = global.memberInstance;
+    const memberConfig = await memberInstance.getMemberConfig();
 
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
 
     const key = args[0];
@@ -16,7 +17,7 @@ module.exports = {
 
         memberConfig[key] = JSON.parse(value);
 
-        await memberData.update({ configuration: memberConfig });
+        await memberInstance.update({ memberConfig: memberConfig });
 
         return message.channel.send(`Successfully set \`${key}\` to \`${value}\`.`);
       } else {
@@ -25,14 +26,12 @@ module.exports = {
     }
 
     // Create embed
-    const configEmbed = new global.Discord.MessageEmbed()
+    const embed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Member Configuration");
 
-    for (const [key, value] of Object.entries(memberConfig)) {
-      configEmbed.addField(key, value);
-    }
+    embed.setDescription(`\`\`\`json\n${JSON.stringify(memberConfig, null, 2)}\`\`\``);
 
-    return message.channel.send(configEmbed);
+    return message.channel.send(embed);
   }
 };

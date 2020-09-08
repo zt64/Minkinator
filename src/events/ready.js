@@ -1,21 +1,17 @@
 module.exports = async (client) => {
-  const time = global.moment().format("HH:mm M/D/Y");
+  const { moment, chalk, pluralize } = global;
+  const time = moment().format("HH:mm M/D/Y");
 
-  if (!global.fs.existsSync("./data/")) global.fs.mkdirSync("./data/");
+  const sequelize = await client.databases.create();
 
   // Create and populate the databases for each guild
   for (const guild of client.guilds.cache.array()) {
-    const database = await client.databases.create(client, guild);
-
-    // Populate database
-    await client.databases.populate(client, guild, database);
-
-    client.databases[guild.name] = database;
-
-    console.log(`${`(${time})`.green} Initialized database for: ${guild.name} (${guild.id}).`);
+    await client.databases.populate(guild, sequelize);
   }
 
-  const pluralize = global.pluralize;
+  global.sequelize = sequelize;
+
+  console.log(chalk.green(`(${time})`), `Initialized database for ${pluralize("guild", client.guilds.cache.size, true)}.`);
 
   // Set count values
   const users = pluralize("user", client.users.cache.size, true);
@@ -24,5 +20,5 @@ module.exports = async (client) => {
   // Set activity
   client.user.setActivity(`${users} in ${guilds}.`, { type: "WATCHING" });
 
-  return console.log(`${`(${time})`.green} Minkinator is now online.`);
+  return console.log(chalk.green(`(${time})`), "Minkinator is now online.");
 };

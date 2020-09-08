@@ -1,24 +1,25 @@
 module.exports = {
   description: "Generates a markov chain.",
-  async execute (client, message) {
-    const data = await client.database.properties.findByPk("data").then(key => key.value);
-    const markov = global.Markov(4);
+  aliases: [ "mkv" ],
+  async execute (client, message, args) {
+    const data = global.guildInstance.data;
+    const chain = new global.MarkovChain();
 
-    const limit = global.functions.randomInteger(1, 10);
+    // Add data
+    data.map(string => chain.update(string));
 
-    // Seed the generator
-    markov.seed(data.join("\n"));
-
-    // Get random key
-    const key = markov.pick();
-
-    // Generate chains from key
-    const chains = markov.forward(key);
-
-    // Generate responses based off the chains
-    let responses = markov.respond(chains.join(" "), limit);
-
-    // Send the response
-    return message.channel.send(responses.join(" "));
+    const result = (() => {
+      let e = "";
+      while (e.length < 5) {
+        if (args) {
+          e = chain.generate({ from: args.join(" ") });
+        } else {
+          e = chain.generate();
+        }
+      }
+      return e;
+    });
+    
+    return message.channel.send(result());
   }
 };

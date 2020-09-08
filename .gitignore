@@ -1,6 +1,6 @@
 # Dependencies and collected data
 node_modules/
-data/
+database.sqlite
 
 # Authentication file
 auth.json

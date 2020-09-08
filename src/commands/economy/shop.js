@@ -17,7 +17,7 @@ module.exports = {
         }
       ],
       async execute (client, message, args) {
-        const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+        const guildConfig = global.guildInstance.guildConfig;
         const shopItems = await client.database.properties.findByPk("items").then(key => key.value);
         const memberData = await client.database.members.findByPk(message.author.id);
 
@@ -81,7 +81,7 @@ module.exports = {
         }
       ],
       async execute (client, message, args) {
-        const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+        const guildConfig = global.guildInstance.guildConfig;
         const shopItems = await client.database.properties.findByPk("items").then(key => key.value);
         const memberData = await client.database.members.findByPk(message.author.id);
 
@@ -129,8 +129,8 @@ module.exports = {
         }
       ],
       async execute (client, message, args) {
-        const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
-        const shopItems = await client.database.properties.findByPk("items").then(key => key.value);
+        const guildConfig = global.guildInstance.guildConfig;
+        const shopItems = global.guildInstance.shopItems;
 
         const { formatNumber } = global.functions;
 
@@ -155,7 +155,7 @@ module.exports = {
           .setDescription(`Buy items using \`${prefix}shop buy [item] [amount]\` \n Sell items using \`${prefix}shop sell [item] [amount] [price]\``)
           .setFooter(`Page ${page} of ${pages}`);
 
-        shopItems.slice((page - 1) * 10, page * 10).map((item, index) => {
+        shopItems.slice((page - 1) * 10, page * 10).map((item) => {
           shopEmbed.addField(item.name, `${currency}${formatNumber(item.price, 2)}`, true);
         });
 
@@ -163,11 +163,7 @@ module.exports = {
 
         if (pages > 1) shopMessage.react("➡️");
 
-        shopMessage.react("❌");
-
-        const filter = (reaction, user) => user.id === message.author.id && (
-          ["🏠", "⬅️", "➡️", "❌"].map(emoji => reaction.emoji.name === emoji)
-        );
+        const filter = (reaction, user) => user.id === message.author.id;
 
         const collector = shopMessage.createReactionCollector(filter);
 
@@ -208,13 +204,11 @@ module.exports = {
 
             shopMessage.react("❌");
             break;
-          case "❌":
-            return shopMessage.delete();
           }
 
           shopEmbed.fields = [];
 
-          shopItems.slice((page - 1) * 10, page * 10).map((item, index) => {
+          shopItems.slice((page - 1) * 10, page * 10).map((item) => {
             shopEmbed.addField(item.name, `${currency}${formatNumber(item.price, 2)}`, true);
           });
 

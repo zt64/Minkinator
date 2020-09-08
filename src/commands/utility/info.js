@@ -1,9 +1,9 @@
 module.exports = {
   description: "Displays information regarding Minkinator.",
   async execute (client, message) {
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
-    const owner = await client.users.fetch(client.config.ownerID);
+    const owner = await client.users.fetch(global.config.ownerID);
 
     // Send embed
     return message.channel.send(new global.Discord.MessageEmbed()

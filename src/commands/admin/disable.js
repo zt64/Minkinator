@@ -9,7 +9,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const commandsKey = await client.database.properties.findByPk("commands");
+    const commandsKey = global.guildInstance.commands;
     const commandsArray = commandsKey.value;
     const commandName = args[0];
 

@@ -1,8 +1,8 @@
 module.exports = {
   description: "Show guild information.",
   aliases: ["gi", "guildinfo"],
-  async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+  async execute (client, message) {
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
 
     const guild = message.guild;

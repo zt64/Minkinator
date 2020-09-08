@@ -5,7 +5,7 @@ module.exports = {
     const { randomInteger, sleep } = global.functions;
     const entities = require("entities");
 
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
 
@@ -68,7 +68,7 @@ module.exports = {
 
     // Update balances
     for (const user of users) {
-      const data = await client.database.members.findByPk(user.id);
+      const data = global.sequelize.models.member.findByPk(user.id);
       const balance = data.balance + reward;
 
       await data.update({ balance: balance });

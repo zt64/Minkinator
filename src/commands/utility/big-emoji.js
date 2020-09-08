@@ -1,6 +1,6 @@
 module.exports = {
-  description: "Get a scaled up version of emojis.",
-  aliases: ["emoji", "scale"],
+  description: "Get a scaled up version of an emoji.",
+  aliases: ["emoji"],
   parameters: [
     {
       name: "emoji",
@@ -13,10 +13,11 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
-    const twemoji = require("twemoji");
     const messageEmoji = args[0];
+
+    const twemoji = require("twemoji");
 
     let url;
 

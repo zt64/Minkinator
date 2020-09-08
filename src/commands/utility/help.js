@@ -8,7 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
     const prefix = guildConfig.prefix;
 
@@ -16,7 +16,7 @@ module.exports = {
 
     const helpEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
-      .setFooter(`Created by Litleck (${await client.users.fetch(client.config.ownerID).then(user => user.tag)})`);
+      .setFooter(`Created by Litleck (${await client.users.fetch(global.config.ownerID).then(user => user.tag)})`);
 
     if (commandName) {
       const command = client.commands.get(commandName.toLowerCase()) || client.commands.find(c => c.aliases && c.aliases.includes(commandName.toLowerCase()));
@@ -67,7 +67,7 @@ module.exports = {
     const helpMessage = await message.channel.send(helpEmbed);
 
     function populate (category) {
-      client.commands.map(command => {
+      client.commands.forEach(command => {
         if (command.category !== category) return;
 
         helpEmbed.addField(`\`${prefix}${command.name}\``, command.description || "\u200b");

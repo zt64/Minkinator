@@ -18,7 +18,7 @@ module.exports = {
 
     if (isNaN(inputPrice) || inputPrice <= 0) return message.channel.send(`\`${inputPrice}\` is not a valid amount.`);
 
-    const items = await client.database.properties.findByPk("items");
+    const items = global.guildInstance.items;
     const item = items.value.filter(item => item.name === inputName);
 
     if (!item) return message.channel.send(`\`${inputName}\` does not exist in the guild shop.`);

@@ -13,7 +13,7 @@ module.exports = {
 
     if (!choices.includes(playerChoice)) return message.channel.send(`\`${playerChoice}\` is not a valid choice.`);
     
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+    global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
     
     const embed = new global.Discord.MessageEmbed()

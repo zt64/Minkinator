@@ -2,7 +2,7 @@ module.exports = {
   description: "Returns information about the host OS.",
   aliases: ["os"],
   async execute (client, message) {
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
 
     const pms = global.pms;

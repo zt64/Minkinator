@@ -1,9 +1,10 @@
 module.exports = {
-  description: "Shows the exact time.",
-  async execute (client, message, args) {
-    const moment = global.moment;
-    const guildConfig = await client.database.properties.findByPk("configuration").then(key => key.value);
+  description: "Shows the current time.",
+  async execute (client, message) {
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
+
+    const moment = global.moment;
 
     // Create embed
     const timeEmbed = new global.Discord.MessageEmbed()

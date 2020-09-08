@@ -3,7 +3,7 @@ module.exports = {
   permissions: ["ADMINISTRATOR"],
   parameters: [
     {
-      name: "item",
+      name: "name",
       type: String,
       required: true
     },
@@ -14,24 +14,15 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const properties = client.database.properties;
-    const currency = await properties.findByPk("configuration").then(key => key.value.currency);
+    const currency = global.guildInstance.guildConfig.currency;
 
     const itemName = args[0];
     const itemPrice = parseInt(args[1]);
 
+    // Only allow positive integers for price
     if (isNaN(itemPrice) || itemPrice <= 0) return message.channel.send(`Item price must be a number above ${currency}0.`);
 
-    // Add item to guild shop
-    const itemsProperty = await properties.findByPk("items");
-    const array = itemsProperty.value;
-
-    array.push({
-      name: args[0],
-      price: itemPrice
-    });
-
-    await itemsProperty.update({ value: array });
+    global.guildInstance.createShopItem({ name: itemName, price: itemPrice, guildId: message.guild.id });
 
     return message.channel.send(`Successfully added: \`${itemName}\`, to the guild shop for ${currency}${itemPrice}.`);
   }

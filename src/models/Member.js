@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
   return sequelize.define("member", {
-    id: {
+    userId: {
       type: DataTypes.TEXT,
       primaryKey: true,
       unique: true
@@ -23,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     xpRequired: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      defaultValue: 50
+      defaultValue: 32
     },
     messages: {
       type: DataTypes.INTEGER,
@@ -34,21 +34,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
-    configuration: {
-      type: DataTypes.JSON,
-      allowNull: false,
-      defaultValue: {
-        measurement: "metric",
-        levelMention: true
-      }
-    },
     inventory: {
       type: DataTypes.JSON,
       allowNull: false,
       defaultValue: []
     }
-  }, {
-    timestamps: false,
-    underscored: true
   });
 };

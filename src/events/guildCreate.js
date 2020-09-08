@@ -1,8 +1,8 @@
 module.exports = async (client, guild) => {
-  const time = global.moment().format("HH:mm M/D/Y");
-  const pluralize = global.pluralize;
+  const { moment, chalk, pluralize } = global;
+  const time = moment().format("HH:mm M/D/Y");
 
-  console.log(`${`(${time})`.green} Minkinator has joined: ${guild.name} (${guild.id}).`);
+  console.log(chalk.green(`(${time})`), `Minkinator has joined: ${guild.name} (${guild.id}).`);
 
   // Populate database
   await client.databases.populate(client, guild, await client.databases.create(client, guild));

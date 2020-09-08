@@ -9,7 +9,7 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, args) {
+  async execute (client, message) {
     const member = message.mentions.users.first();
     const data = await client.database.members.findByPk(member.id);
 
