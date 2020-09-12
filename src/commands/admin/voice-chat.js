@@ -31,10 +31,9 @@ module.exports = {
     {
       name: "play",
       description: "Play audio from a URL in a voice channel.",
-      async execute (client, message, args) {
+      async execute (client, message, [ url ]) {
         if (client.voice.connections.size >= 1) {
           const connection = client.voice.connections.first();
-          const url = args[0];
 
           // Play URL
           const dispatcher = connection.play(url);

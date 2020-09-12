@@ -7,13 +7,14 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, args) {
-    const playerChoice = args[0].toLowerCase();
+  async execute (client, message, [ playerChoice ]) {
     const choices = ["rock", "paper", "scissors"];
+
+    playerChoice = playerChoice.toLowerCase();
 
     if (!choices.includes(playerChoice)) return message.channel.send(`\`${playerChoice}\` is not a valid choice.`);
     
-    global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
     
     const embed = new global.Discord.MessageEmbed()

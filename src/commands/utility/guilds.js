@@ -1,14 +1,16 @@
 module.exports = {
   description: "Shows the current guilds and members Minkinator is watching.",
   aliases: ["servers"],
-  async execute (client, message, args) {
+  async execute (client, message, [ page ]) {
     const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
 
     const guilds = client.guilds.cache;
     const pages = Math.ceil(guilds.size / 10);
 
-    let page = args[0] || 1;
+    if (!page) page = 1;
+
+    if (page > pages || page < 1) return message.channel.send(`Page \`${page}\` does not exist.`);
 
     const guildsEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)

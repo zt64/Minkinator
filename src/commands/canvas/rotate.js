@@ -12,11 +12,10 @@ module.exports = {
       required: true
     },
   ],
-  async execute (client, message, args) {
-    const imageURL = args[0];
-    const image = await global.canvas.loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); });
+  async execute (client, message, [ imageURL, degrees ]) {
+    const image = await global.canvas.loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); }); 
 
-    const radians = parseFloat(args[1]) * Math.PI / 180;
+    const radians = parseFloat(degrees) * Math.PI / 180;
 
     const canvas = global.canvas.createCanvas(image.width, image.height);
     const context = canvas.getContext("2d");

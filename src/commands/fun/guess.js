@@ -8,11 +8,11 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, args) {
+  async execute (client, message, [ guess ]) {
     const guildConfig = global.guildInstance.guildConfig;
     const memberInstance = global.memberInstance;
 
-    const guess = Math.round(args[0]);
+    guess = Math.round(guess);
 
     if (guess < 1 || guess > 100) return message.channel.send("Guess must be 1 - 100, inclusive.");
 
@@ -42,12 +42,9 @@ module.exports = {
       earn = 50 / Math.abs(value - guess) * 4;
     }
 
-    // Update balance
-    balance += earn;
+    await memberInstance.increment("balance", { by: earn });
 
-    await memberInstance.update({ balance: balance });
-
-    embed.setDescription(`You guessed ${guess}, and the number was ${value}. \n Earning you ${currency}${formatNumber(earn, 2)} puts your balance at ${currency}${formatNumber(balance, 2)}.`);
+    embed.setDescription(`You guessed ${guess}, and the number was ${value}. \nEarning you ${currency}${formatNumber(earn, 2)} puts your balance at ${currency}${formatNumber(balance + earn, 2)}.`);
 
     return message.channel.send(embed);
   }

@@ -8,14 +8,13 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, args) {
-    global.guildInstance.guildConfig;
+  async execute (client, message, [ subreddit ]) {
+    const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
     const redditNSFW = guildConfig.redditNSFW;
 
     const entities = require("entities");
 
-    const subreddit = args[0];
     const body = await global.fetch(`https://api.reddit.com/r/${subreddit}/hot?limit=64`).then(response => response.json());
 
     // Check if subreddit exists and has posts

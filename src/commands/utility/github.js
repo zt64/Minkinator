@@ -16,19 +16,14 @@ module.exports = {
           required: true
         }
       ],
-      async execute (client, message, args) {
+      async execute (client, message, [ owner, name ]) {
         const guildConfig = global.guildInstance.guildConfig;
         const defaultColor = guildConfig.colors.default;
 
-        const owner = args[0];
-        const name = args[1];
-
-        const fetchJson = async url => await (await global.fetch(url)).json();
-
         // Fetch JSON results
-        const json = await fetchJson(`https://api.github.com/repos/${owner}/${name}`);
-        const commits = await fetchJson(`https://api.github.com/repos/${owner}/${name}/commits`);
-        const pulls = await fetchJson(`https://api.github.com/repos/${owner}/${name}/pulls`);
+        const json = await global.functions.fetchJson(`https://api.github.com/repos/${owner}/${name}`);
+        const commits = await global.functions.fetchJson(`https://api.github.com/repos/${owner}/${name}/commits`);
+        const pulls = await global.functions.fetchJson(`https://api.github.com/repos/${owner}/${name}/pulls`);
 
         if (json.message === "Not Found") return message.channel.send("Could not find repository.");
 
@@ -64,14 +59,11 @@ module.exports = {
           required: true
         }
       ],
-      async execute (client, message, args) {
+      async execute (client, message, [ user ]) {
         const guildConfig = global.guildInstance.guildConfig;
         const defaultColor = guildConfig.colors.default;
-        const user = args[0];
 
-        const fetchJson = async url => await (await global.fetch(url)).json();
-
-        const json = await fetchJson(`https://api.github.com/users/${user}`);
+        const json = await global.functions.fetchJson(`https://api.github.com/users/${user}`);
 
         if (json.message === "Not Found") return message.channel.send("Could not find user.");
 

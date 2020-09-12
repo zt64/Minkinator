@@ -6,9 +6,9 @@ module.exports = {
       type: String
     }
   ],
-  async execute (client, message, args) {
-    const imageURL = message.attachments.first() ? message.attachments.first().url : args[0];
-    const image = await global.canvas.loadImage(imageURL);
+  async execute (client, message, [ imageURL ]) {
+    if (!(imageURL || message.attachments.size)) return message.channel.send("No URL or attachment provided.");
+    const image = await global.canvas.loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); }); 
 
     const canvas = global.canvas.createCanvas(image.width, image.height);
     const context = canvas.getContext("2d");

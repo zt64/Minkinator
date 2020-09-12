@@ -3,15 +3,14 @@ module.exports = {
   permissions: ["ADMINISTRATOR"],
   parameters: [
     {
-      name: "command",
+      name: "command name",
       type: String,
       required: true
     }
   ],
-  async execute (client, message, args) {
+  async execute (client, message, [ commandName ]) {
     const commandsKey = global.guildInstance.commands;
     const commandsArray = commandsKey.value;
-    const commandName = args[0];
 
     // Make sure command exists in array
     if (!commandsArray.includes(commandName)) {

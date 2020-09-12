@@ -7,10 +7,9 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, args) {
+  async execute (client, message, [ hex ]) {
     const canvas = global.canvas.createCanvas(512, 512);
     const ctx = canvas.getContext("2d");
-    const hex = args[0];
 
     // Set ctx properties
     ctx.fillStyle = hex;

@@ -3,14 +3,12 @@ module.exports = {
   aliases: ["remove-item", "del-item"],
   parameters: [
     {
-      name: "item",
+      name: "name",
       type: String,
       required: true
     }
   ],
-  async execute (client, message, args) {
-    const itemName = args[0];
-
+  async execute (client, message, [ itemName ]) {
     const shopItem = await global.sequelize.models.shopItem.findByPk(itemName);
 
     // Make sure item exists

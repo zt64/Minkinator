@@ -1,7 +1,7 @@
 module.exports = {
   description: "Deletes all of a guilds web hooks.",
   permissions: ["MANAGE_WEBHOOKS"],
-  aliases: ["delete-webhooks", "del-webhooks", "dwh"],
+  aliases: ["delete-webhooks", "del-webhooks"],
   async execute (client, message) {
     const webhooks = await message.guild.fetchWebhooks();
 

@@ -17,12 +17,11 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, args) {
-    const imageURL = args[0];
-    const image = await global.canvas.loadImage(imageURL);
+  async execute (client, message, [ imageURL, xFactor, yFactor ]) {
+    const image = await global.canvas.loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); }); 
 
-    const xFactor = parseFloat(args[1]);
-    const yFactor = parseFloat(args[2]);
+    xFactor = parseFloat(xFactor);
+    yFactor = parseFloat(yFactor);
 
     const canvas = global.canvas.createCanvas(image.width * xFactor, image.height * yFactor);
     const context = canvas.getContext("2d");

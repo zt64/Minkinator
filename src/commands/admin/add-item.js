@@ -13,16 +13,15 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, args) {
+  async execute (client, message, [ itemName, itemPrice ]) {
     const currency = global.guildInstance.guildConfig.currency;
 
-    const itemName = args[0];
-    const itemPrice = parseInt(args[1]);
+    itemPrice = parseInt(itemPrice);
 
     // Only allow positive integers for price
     if (isNaN(itemPrice) || itemPrice <= 0) return message.channel.send(`Item price must be a number above ${currency}0.`);
 
-    global.guildInstance.createShopItem({ name: itemName, price: itemPrice, guildId: message.guild.id });
+    global.guildInstance.createItem({ name: itemName, price: itemPrice, guildId: message.guild.id });
 
     return message.channel.send(`Successfully added: \`${itemName}\`, to the guild shop for ${currency}${itemPrice}.`);
   }

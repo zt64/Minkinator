@@ -12,10 +12,9 @@ module.exports = {
       type: Number
     }
   ],
-  async execute (client, message, args) {
+  async execute (client, message, [ messageEmoji ]) {
     const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
-    const messageEmoji = args[0];
 
     const twemoji = require("twemoji");
 

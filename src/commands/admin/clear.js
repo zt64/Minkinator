@@ -4,20 +4,20 @@ module.exports = {
   permissions: ["MANAGE_MESSAGES"],
   parameters: [
     {
-      name: "messages",
+      name: "count",
       type: Number,
       required: true
     }
   ],
-  async execute (client, message, args) {
-    let messages = parseInt(args[0]);
+  async execute (client, message, [ count ]) {
+    count = parseInt(count);
 
     // Check if input is valid
-    if (isNaN(messages) || messages < 1) return message.channel.send("Please enter a number between 1 and 100");
+    if (isNaN(count) || count < 1) return message.channel.send("Please enter a number between 1 and 100");
 
     // Ignore command message
-    if (messages !== 100) messages += 1;
+    if (count !== 100) count += 1;
 
-    return message.channel.bulkDelete(Math.round(messages));
+    return message.channel.bulkDelete(Math.round(count));
   }
 };

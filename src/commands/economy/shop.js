@@ -16,10 +16,10 @@ module.exports = {
           required: true
         }
       ],
-      async execute (client, message, args) {
+      async execute (client, message, [ itemName, itemAmount ]) {
         const guildConfig = global.guildInstance.guildConfig;
-        const shopItems = await client.database.properties.findByPk("items").then(key => key.value);
-        const memberData = await client.database.members.findByPk(message.author.id);
+        const shopItems = global.guildInstance.items;
+        const memberData = global.memberInstance;
 
         const { formatNumber } = global.functions;
 
@@ -32,8 +32,7 @@ module.exports = {
         const balance = memberData.balance;
 
         // Set item constants
-        const itemName = args[0];
-        const itemAmount = parseInt(args[1]) || 1;
+        itemAmount = parseInt(itemAmount) || 1;
 
         if (!shopItems.find(x => x.name === itemName)) return message.channel.send(`\`${itemName}\` is not available for sale.`);
 
@@ -55,8 +54,8 @@ module.exports = {
           );
         }
 
-        memberData.decrement("balance", { by: shopItemPrice });
-        memberData.update({ inventory: inventory });
+        await memberData.decrement("balance", { by: shopItemPrice });
+        await memberData.update({ inventory: inventory });
 
         return message.channel.send(new global.Discord.MessageEmbed()
           .setColor(defaultColor)
@@ -80,10 +79,10 @@ module.exports = {
           required: true
         }
       ],
-      async execute (client, message, args) {
+      async execute (client, message, [ itemName, itemAmount ]) {
         const guildConfig = global.guildInstance.guildConfig;
-        const shopItems = await client.database.properties.findByPk("items").then(key => key.value);
-        const memberData = await client.database.members.findByPk(message.author.id);
+        const shopItems = global.guildInstance.items;
+        const memberData = global.memberInstance;
 
         // Set guild constants
         const defaultColor = guildConfig.colors.default;
@@ -94,8 +93,7 @@ module.exports = {
         let balance = memberData.balance;
 
         // Set item constants
-        const itemName = args[0];
-        const itemAmount = parseInt(args[1]) || 1;
+        itemAmount = parseInt(itemAmount) || 1;
 
         const shopItem = shopItems.find(item => item.name === itemName);
         const inventoryItem = inventory.find(item => item.name === itemName);
@@ -110,7 +108,7 @@ module.exports = {
 
         balance += sellPrice;
 
-        memberData.update({ balance: balance, inventory: inventory });
+        await memberData.update({ balance: balance, inventory: inventory });
 
         return message.channel.send(new global.Discord.MessageEmbed()
           .setColor(defaultColor)
@@ -128,9 +126,9 @@ module.exports = {
           type: Number
         }
       ],
-      async execute (client, message, args) {
+      async execute (client, message, [ page ]) {
         const guildConfig = global.guildInstance.guildConfig;
-        const shopItems = global.guildInstance.shopItems;
+        const shopItems = global.guildInstance.items;
 
         const { formatNumber } = global.functions;
 
@@ -144,7 +142,7 @@ module.exports = {
 
         if (!pages) return message.channel.send("The shop is currently empty.");
 
-        let page = args[0] || 1;
+        if (!page) page = 1;
 
         if (page > pages || page < 1 || isNaN(page)) return message.channel.send(`Page \`${page}\` does not exist.`);
 

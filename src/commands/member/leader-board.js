@@ -7,7 +7,7 @@ module.exports = {
       type: Number
     }
   ],
-  async execute (client, message, args) {
+  async execute (client, message, [ page ]) {
     const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
@@ -18,7 +18,7 @@ module.exports = {
     const members = await global.guildInstance.getMembers({ order: [["balance", "DESC"]] });
 
     const pages = Math.ceil(members.length / 10);
-    let page = args[0] || 1;
+    if (!page) page = 1;
 
     // Create embed
     const leaderBoardEmbed = new global.Discord.MessageEmbed()

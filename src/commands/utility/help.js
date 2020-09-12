@@ -7,12 +7,10 @@ module.exports = {
       type: String
     }
   ],
-  async execute (client, message, args) {
+  async execute (client, message, [ commandName ]) {
     const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
     const prefix = guildConfig.prefix;
-
-    const commandName = args[0];
 
     const helpEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
@@ -37,13 +35,9 @@ module.exports = {
       if (command.aliases) helpEmbed.addField("Aliases:", command.aliases.join(", "), true);
 
       if (command.parameters) {
-        let parameters = "";
+        const array = command.parameters.map(parameter => parameter.required ? `[${parameter.name}]` : `<${parameter.name}>`);
 
-        command.parameters.map(parameter => {
-          parameter.required ? parameters += `[${parameter.name}]` : parameters += ` <${parameter.name}>`;
-        });
-
-        helpEmbed.addField("Usage:", `\`${prefix}${command.name} ${parameters}\``);
+        helpEmbed.addField("Proper usage", `\`${prefix}${commandName} ${array.join(" ")}\``);
       }
 
       return message.channel.send(helpEmbed);

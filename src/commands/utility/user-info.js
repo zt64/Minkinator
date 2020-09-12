@@ -1,7 +1,12 @@
 module.exports = {
   description: "Shows the users information.",
-  async execute (client, message) {
-    const user = message.mentions.users.first() || message.author;
+  parameters: [
+    {
+      name: "member"
+    }
+  ],
+  async execute (client, message, [ member ]) {
+    const user = await global.functions.getUser(client, message, member);
     const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
 

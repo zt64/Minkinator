@@ -7,12 +7,12 @@ module.exports = {
       type: Number
     }
   ],
-  async execute (client, message, args) {
+  async execute (client, message, [ sides ]) {
     const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
     const { randomInteger, sleep } = global.functions;
 
-    const sides = !isNaN(args[0]) ? args[0] : 6;
+    if (isNaN(sides)) sides = 6;
 
     // Generate number
     const result = randomInteger(1, sides);

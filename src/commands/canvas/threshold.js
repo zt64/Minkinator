@@ -13,15 +13,8 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, args) {
-    const imageURL = args[0];
-    let image;
-
-    try {
-      image = await global.canvas.loadImage(imageURL);
-    } catch (error) {
-      return message.channel.send("An error has occured, the URL cannot end in .webp.");
-    }
+  async execute (client, message, [ imageURL, threshold ]) {
+    const image = await global.canvas.loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); }); 
 
     const canvas = global.canvas.createCanvas(image.width, image.height);
     const context = canvas.getContext("2d");
@@ -31,7 +24,7 @@ module.exports = {
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
 
-    const threshold = parseInt(args[1]);
+    threshold = parseInt(threshold);
 
     // Modify pixel data
     for (let i = 0; i < data.length; i += 4) {

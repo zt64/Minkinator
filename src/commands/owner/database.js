@@ -16,12 +16,9 @@ module.exports = {
           type: String
         }
       ],
-      async execute (client, message, args) {
+      async execute (client, message, [ modelName, instanceName ]) {
         const guildConfig = global.guildInstance.guildConfig;
         const defaultColor = guildConfig.colors.default;
-
-        const modelName = args[0];
-        const instanceName = args[1];
 
         const embed = new global.Discord.MessageEmbed()
           .setColor(defaultColor);
@@ -78,6 +75,8 @@ module.exports = {
         const instanceName = args[1];
         const propertyName = args[2];
 
+        const value = args.slice(3).join(" ");
+
         // Check if model exists
         const model = global.sequelize.models[modelName];
         if (!model) return message.channel.send(`Model \`${modelName}\` does not exist.`);
@@ -89,9 +88,9 @@ module.exports = {
         // Check if property exists
         if (!object[propertyName]) return message.channel.send(`Property \`${propertyName}\` does not exist.`);
         
-        await object.update({ [propertyName]: JSON.parse(args.slice(3).join(" ")) });
+        await object.update({ [propertyName]: JSON.parse(value) });
           
-        return message.channel.send(`Set ${modelName}: ${instanceName}.${propertyName} to \`${args.slice(3).join(" ")}\`.`);
+        return message.channel.send(`Set ${modelName}: ${instanceName}.${propertyName} to \`${value}\`.`);
       }
     },
     {
@@ -109,7 +108,7 @@ module.exports = {
         const sequelizeVersion = dependencies.sequelize;
         const sqlite3Version = dependencies.sqlite3;
 
-        const stats = fs.statSync(`./data/${message.guild.id}.sqlite`);
+        const stats = fs.statSync("./database.sqlite");
         const size = prettyBytes(stats.size);
 
         // Create embed

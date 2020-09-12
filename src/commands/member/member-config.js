@@ -1,15 +1,12 @@
 module.exports = {
   description: "Change your settings.",
   aliases: [ "mc" ],
-  async execute (client, message, args) {
+  async execute (client, message, [ key, value ]) {
     const memberInstance = global.memberInstance;
     const memberConfig = await memberInstance.getMemberConfig();
 
     const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
-
-    const key = args[0];
-    const value = args[1];
 
     if (key) {
       if (key in memberConfig) {
