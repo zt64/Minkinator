@@ -1,38 +1,30 @@
-const config = require("./config/config.json");
-const auth = require("./config/auth.json");
-const models = require("./lib/models.js");
-
-const Discord = require("discord.js");
-const moment = require("moment");
-const chalk = require("chalk");
-const fs = require("fs");
+const config = global.config = require("./config/config.json");
+const auth = global.auth = require("./config/auth.json");
+const Discord = global.Discord = require("discord.js");
+const moment = global.moment = require("moment");
+const chalk = global.chalk = require("chalk");
+const fs = global.fs = require("fs");
 
 const client = new Discord.Client(config.clientOptions);
 const time = moment().format("HH:mm M/D/Y");
 
-global.MarkovChain = require("purpl-markov-chain");
 global.functions = require("./lib/functions.js");
 global.GifEncoder = require("gif-encoder");
 global.Sequelize = require("sequelize");
 global.pluralize = require("pluralize");
 global.fetch = require("node-fetch");
+global.Chart = require("chart.js");
 global.pms = require("pretty-ms");
 global.canvas = require("canvas");
+global.math = require("mathjs");
 global.qr = require("qrcode");
 global.os = require("os");
 
-global.Discord = Discord;
-global.config = config;
-global.moment = moment;
-global.chalk = chalk;
-global.auth = auth;
-global.fs = fs;
-
 // Set client properties
+client.database = require("./lib/models.js");
 client.coolDowns = new Map();
 client.commands = new Map();
 client.events = new Map();
-client.databases = models;
 
 // Set up event handler
 client.loadEvents = function loadEvents () {
