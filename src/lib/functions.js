@@ -22,7 +22,7 @@ exports.randomInteger = (min, max) => {
 };
 
 exports.getUser = async (client, message, idArg) => {
-  // if (message.mentions.users) return message.mentions.users.first();
+  if (message.mentions.users.size) return message.mentions.users.first();
 
   if (idArg) {
     try {
@@ -65,6 +65,7 @@ exports.formatNumber = (number, places = 0) => {
 };
 
 exports.fetchJSON = async (url) => {
-  const fetch = require("node-fetch");
+  const fetch = global.fetch;
+  
   return fetch(url).then(response => response.json());
 };
