@@ -2,14 +2,19 @@
 	"name": "minkinator",
 	"author": "Litleck",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/Litleck/Minkinator.git"
+	},
 	"dependencies": {
 		"@discordjs/opus": "^0.3.2",
 		"canvas": "^2.6.1",
-		"colors": "^1.4.0",
+		"chalk": "^4.1.0",
+		"chart.js": "^2.9.3",
 		"discord.js": "^12.2.0",
 		"entities": "^2.0.3",
 		"gif-encoder": "^0.7.2",
-		"markov": "github:substack/node-markov",
+		"mathjs": "^7.2.0",
 		"moment": "^2.27.0",
 		"node-fetch": "^2.6.1",
 		"pluralize": "^8.0.0",
