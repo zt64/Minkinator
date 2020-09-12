@@ -6,7 +6,7 @@ module.exports = async (client, guild) => {
   console.log(chalk.green(`(${time})`), `Minkinator has left: ${guild.name} (${guild.id}).`);
 
   // Delete database
-  await client.databases[guild.name].sequelize.drop();
+  await client.database[guild.name].sequelize.drop();
   await global.fs.unlinkSync(`./data/${guild.id}.sqlite`);
 
   // Set count values

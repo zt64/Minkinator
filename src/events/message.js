@@ -1,20 +1,15 @@
 module.exports = async (client, message) => {
-  // Return if in a DM channel
   if (message.channel.type === "dm") {
-    if (message.author.bot) return;
+    const botOwner = await client.users.fetch(global.config.ownerID);
+    const author = message.author;
 
-    return message.channel.send("Commands cannot be run inside DMs.");
+    return botOwner.send(`Message from \`${author.tag} (${author.id})\`:\n${message.content}`);
   }
 
   // Set constants
-  const { formatNumber, sleep } = global.functions;
+  const { formatNumber } = global.functions;
 
-  const guildInstance = await global.sequelize.models.guild.findOne({
-    where: {
-      id: message.guild.id
-    },
-    include: { all: true, nested: true }
-  });
+  const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true, nested: true } });
 
   global.guildInstance = guildInstance;
 
@@ -26,13 +21,11 @@ module.exports = async (client, message) => {
   // Return if ignoreBots is true and author is bot
   if (guildConfig.ignoreBots && message.author.bot) return;
 
-  let memberInstance = await global.sequelize.models.member.findByPk(message.author.id);
+  let memberInstance = await global.sequelize.models.member.findByPk(message.author.id, { include: { all: true, nested: true } });
 
   if (!memberInstance) memberInstance = await guildInstance.createMember({ userId: message.author.id, guildId: message.guild.id });
 
-  let memberConfig = await memberInstance.getMemberConfig();
-
-  if (!memberConfig) memberConfig = await memberInstance.createMemberConfig();
+  if (!memberInstance.memberConfig) var memberConfig = await memberInstance.createMemberConfig();
 
   global.memberInstance = memberInstance;
 
@@ -40,21 +33,21 @@ module.exports = async (client, message) => {
   const xpTotal = memberInstance.xpTotal + Math.round(Math.random() * (level / 0.5));
   const xpRequired = memberInstance.xpRequired;
 
-  memberInstance.update({ xpTotal: xpTotal, messages: memberInstance.messages + 1 });
+  await memberInstance.update({ xpTotal: xpTotal, messages: memberInstance.messages + 1 });
 
   // Check if the member can level up
   if (xpTotal >= xpRequired) {
-    memberInstance.update({ level: level + 1, xpRequired: Math.round(xpRequired * 1.5) });
+    await memberInstance.update({ level: level + 1, xpRequired: Math.round(xpRequired * 1.5) });
 
     // Check if level mention is enabled
     if (guildConfig.levelMention && memberConfig.levelMention) {
-      if (!(level % 5)) {
+      if (!(level + 1 % 5)) {
         const levelUpEmbed = new global.Discord.MessageEmbed()
           .setColor(colors.default)
           .setTitle(`${message.author.username} has levelled up!`)
           .setDescription(`${message.author} is now level ${formatNumber(level + 1)} and earned ${currency}500 as a reward!`);
 
-        memberInstance.increment("balance", { by: 500 });
+        await memberInstance.increment("balance", { by: 500 });
 
         message.channel.send(levelUpEmbed);
       }
@@ -63,22 +56,23 @@ module.exports = async (client, message) => {
 
   // Generate markov on mention of self
   if (message.mentions.users.first() === client.user) {
-    const data = await client.database.properties.findByPk("data").then(key => key.value);
     const TextGenerator = require("node-markov-generator").TextGenerator;
-    const generator = new TextGenerator(data);
- 
-    const result = generator.generateSentence();
+    const generator = new TextGenerator(guildInstance.data);
 
-    message.channel.send(result);
+    message.channel.send(generator.generateSentence());
   }
 
   // Write message to data.json
   if (![prefix, ...ignore].some(x => message.content.startsWith(x))) {
-    const data = guildInstance.data;
+    const array = guildInstance.data;
 
-    data.push(message.content);
+    array.push(message.content);
 
-    await guildInstance.update({ data: data });
+    const g = await global.sequelize.models.guild.findOne({ guildId: message.guild.id });
+    await g.update({ data: array });
+
+    // I honestly have no idea why this won't work
+    // await guildInstance.update({ data: array });
   }
 
   if (memberInstance.botBan) return;
@@ -86,13 +80,13 @@ module.exports = async (client, message) => {
   if (!message.content.startsWith(prefix)) return;
 
   // Check if command exists
-  const args = message.content.slice(prefix.length).split(/ +/g);
-  const commandName = args.shift().toLowerCase();
+  const parameters = message.content.slice(prefix.length).split(/ +/g);
+  const commandName = parameters.shift().toLowerCase();
   let command = client.commands.get(commandName) || [...client.commands.values()].find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
   if (!command) return;
 
-  // Check that command isn't disabled
+  // Check that the command isn't disabled
   const disabledCommands = guildInstance.commands;
   if (disabledCommands.includes(commandName)) return;
 
@@ -121,16 +115,16 @@ module.exports = async (client, message) => {
       const i = command.parameters.indexOf(parameter);
 
       if (!parameter.required) continue;
-      if (!args[i]) return error(command);
+      if (!parameters[i]) return error(command);
 
       try {
-        if (parameter.type && JSON.parse(args[i]).constructor !== parameter.type) return error(command);
+        if (parameter.type && JSON.parse(parameters[i]).constructor !== parameter.type) return error(command);
       } catch (e) {
         if (parameter.type !== String) return error(command);
       }
     }
   } else if (command.subCommands) {
-    const subCommand = command.subCommands.find(subCommand => subCommand.name === args[0]);
+    const subCommand = command.subCommands.find(subCommand => subCommand.name === parameters[0]);
 
     if (!subCommand) {
       const name = command.subCommands.map(subCommand => subCommand.name);
@@ -141,17 +135,17 @@ module.exports = async (client, message) => {
     }
 
     // Remove the sub command from the arguments array
-    args.shift();
+    parameters.shift();
 
     if (subCommand.parameters) {
       for (const parameter of subCommand.parameters) {
         const i = subCommand.parameters.indexOf(parameter);
 
         if (!parameter.required) continue;
-        if (!args[i]) return error(subCommand, subCommand.name);
+        if (!parameters[i]) return error(subCommand, subCommand.name);
 
         try {
-          if (parameter.type && JSON.parse(args[i]).constructor !== parameter.type) return error(subCommand, subCommand.name);
+          if (parameter.type && JSON.parse(parameters[i]).constructor !== parameter.type) return error(subCommand, subCommand.name);
         } catch (e) {
           if (parameter.type !== String) return error(subCommand, subCommand.name);
         }
@@ -191,17 +185,16 @@ module.exports = async (client, message) => {
           .setDescription(`Please wait, a cool down of ${global.pluralize("second", timeLeft.toFixed(1), true)} is remaining.`)
         );
 
-        return coolDownEmbed.delete({ timeout: errorTimeout });
+        coolDownEmbed.delete({ timeout: errorTimeout });
       }
+
+      timestamps.set(message.author.id, now);
+
+      setTimeout(() => timestamps.delete(message.author.id), coolDownLength);
     }
 
-    // Set cool down for command
+    // Set cool down for the command
     timestamps.set(message.author.id, now);
-
-    await sleep(coolDownLength);
-
-    // Delete cool down for command
-    timestamps.delete(message.author.id);
   }
 
   const time = global.moment().format("HH:mm M/D/Y");
@@ -211,7 +204,7 @@ module.exports = async (client, message) => {
   console.log(chalk.green(`(${time})`), chalk.cyan(`(${message.guild.name} #${message.channel.name})`), chalk.yellow(message.author.tag), message.content);
 
   try {
-    return command.execute(client, message, args);
+    return command.execute(client, message, parameters);
   } catch (error) {
     console.error(error);
 

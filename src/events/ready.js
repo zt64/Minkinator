@@ -2,11 +2,11 @@ module.exports = async (client) => {
   const { moment, chalk, pluralize } = global;
   const time = moment().format("HH:mm M/D/Y");
 
-  const sequelize = await client.databases.create();
+  const sequelize = await client.database.create();
 
   // Create and populate the databases for each guild
   for (const guild of client.guilds.cache.array()) {
-    await client.databases.populate(guild, sequelize);
+    await client.database.populate(guild, sequelize);
   }
 
   global.sequelize = sequelize;

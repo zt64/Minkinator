@@ -4,7 +4,7 @@ module.exports = async (client, member) => {
 
   if (!channel) return;
 
-  const database = client.databases[guild.name];
+  const database = client.database[guild.name];
   const { pluralize, chalk } = global;
 
   const time = global.moment().format("HH:mm M/D/Y");
