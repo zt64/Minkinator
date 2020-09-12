@@ -19,23 +19,14 @@ exports.create = async () => {
   const Member = require("../models/Member.js")(sequelize, Sequelize);
   const MemberConfig = require("../models/MemberConfig.js")(sequelize, Sequelize);
   
-  const ShopItem = require("../models/ShopItem.js")(sequelize, Sequelize);
+  const Item = require("../models/Item.js")(sequelize, Sequelize);
 
-  // Guild has one configuration
+  // Setup associations
   Guild.hasOne(GuildConfig);
-  GuildConfig.belongsTo(Guild);
-
-  // Guild has many members
   Guild.hasMany(Member);
-  Member.belongsTo(Guild);
-
-  // Guild has many shop items
-  Guild.hasMany(ShopItem);
-  ShopItem.belongsTo(Guild);
-
-  // Member has one configuration
-  Member.hasOne(MemberConfig);
-  MemberConfig.belongsTo(Member);
+  Guild.hasMany(Item);
+  
+  Member.hasOne(MemberConfig, { foreignKey: "userId"} );
 
   await sequelize.sync();
 
@@ -62,7 +53,6 @@ exports.checkMembers = async (guild, sequelize) => {
       try {
         await guild.members.fetch(memberData.id);
       } catch (error) {
-        // Delete data for members that no longer exist
         await memberData.destroy();
 
         console.log(chalk.green(`(${time})`), `Deleted ${memberData.id} from ${guild.name}.`);
