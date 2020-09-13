@@ -12,19 +12,19 @@ module.exports = {
     const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
 
+    const input = args.join(" ");
+    const embed = new global.Discord.MessageEmbed()
+      .setColor(defaultColor);
+
     // Attempt to run code
     try {
-      return message.channel.send(new global.Discord.MessageEmbed()
-        .setColor(defaultColor)
-        .setTitle("JS Result")
-        .setDescription(`\`\`\`js\n${await eval(`(async() => {${args.join(" ")}})()`)}\`\`\``)
-      );
+      embed.setTitle("JS Result");
+      embed.setDescription(`\`\`\`js\n${await eval(`(async() => {${input}})()`)}\`\`\``);
     } catch (error) {
-      return message.channel.send(new global.Discord.MessageEmbed()
-        .setColor(defaultColor)
-        .setTitle("JS Error")
-        .setDescription(`\`\`\`js\n${error}\`\`\``)
-      );
+      embed.setTitle("Error");
+      embed.setDescription(`\`\`\`js\n${error}\`\`\``);
     }
+
+    return message.channel.send(embed);
   }
 };
