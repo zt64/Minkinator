@@ -1,37 +1,28 @@
 module.exports = async (client, message) => {
   if (message.channel.type === "dm") {
+    if (message.author === client.user) return;
+    
     const botOwner = await client.users.fetch(global.config.ownerID);
     const author = message.author;
 
     return botOwner.send(`Message from \`${author.tag} (${author.id})\`:\n${message.content}`);
   }
 
-  // Set constants
-  const { formatNumber } = global.functions;
-
-  const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true, nested: true } });
-
-  global.guildInstance = guildInstance;
-
-  // Set guild constants
+  const guildInstance = global.guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true, nested: true } });
   const guildConfig = guildInstance.guildConfig;
 
-  const { errorTimeout, currency, prefix, ignore, colors } = guildConfig;
-
-  // Return if ignoreBots is true and author is bot
   if (guildConfig.ignoreBots && message.author.bot) return;
 
-  let memberInstance = await global.sequelize.models.member.findByPk(message.author.id, { include: { all: true, nested: true } });
-
+  const { errorTimeout, currency, prefix, ignore, colors } = guildConfig;
+  
+  let memberInstance = global.memberInstance = await global.sequelize.models.member.findByPk(message.author.id, { include: { all: true, nested: true } });
+  
   if (!memberInstance) memberInstance = await guildInstance.createMember({ userId: message.author.id, guildId: message.guild.id });
-
   if (!memberInstance.memberConfig) var memberConfig = await memberInstance.createMemberConfig();
 
-  global.memberInstance = memberInstance;
+  const { level, xpTotal, xpRequired } = memberInstance;
 
-  const level = memberInstance.level;
-  const xpTotal = memberInstance.xpTotal + Math.round(Math.random() * (level / 0.5));
-  const xpRequired = memberInstance.xpRequired;
+  xpTotal + Math.round(Math.random() * (level / 0.5));
 
   await memberInstance.update({ xpTotal: xpTotal, messages: memberInstance.messages + 1 });
 
@@ -45,7 +36,7 @@ module.exports = async (client, message) => {
         const levelUpEmbed = new global.Discord.MessageEmbed()
           .setColor(colors.default)
           .setTitle(`${message.author.username} has levelled up!`)
-          .setDescription(`${message.author} is now level ${formatNumber(level + 1)} and earned ${currency}500 as a reward!`);
+          .setDescription(`${message.author} is now level ${global.functions.formatNumber(level + 1)} and earned ${currency}500 as a reward!`);
 
         await memberInstance.increment("balance", { by: 500 });
 
@@ -76,7 +67,6 @@ module.exports = async (client, message) => {
   }
 
   if (memberInstance.botBan) return;
-
   if (!message.content.startsWith(prefix)) return;
 
   // Check if command exists
@@ -200,9 +190,9 @@ module.exports = async (client, message) => {
   const time = global.moment().format("HH:mm M/D/Y");
   const chalk = global.chalk;
 
-  // Execute the command
   console.log(chalk.green(`(${time})`), chalk.cyan(`(${message.guild.name} #${message.channel.name})`), chalk.yellow(message.author.tag), message.content);
 
+  // Execute the command
   try {
     return command.execute(client, message, parameters);
   } catch (error) {
