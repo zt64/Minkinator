@@ -8,7 +8,7 @@ module.exports = {
     const pms = global.pms;
     const os = global.os;
 
-    const prettyBytes = require("pretty-bytes");
+    const prettyBytes = global.pbs;
 
     // Create and send embed
     return message.channel.send(new global.Discord.MessageEmbed()
@@ -23,7 +23,7 @@ module.exports = {
       .addField("Total Memory:", prettyBytes(os.totalmem()), true)
       .addField("System Uptime:", pms(os.uptime() * 1000), true)
       .addField("CPU:", os.cpus()[0].model)
-      .addField("Discord.js Version:", `v${require("discord.js").version}`, true)
+      .addField("Discord.js Version:", `v${global.Discord.version}`, true)
       .addField("Node Version:", process.version, true)
       .addField("Node Uptime:", pms(process.uptime() * 1000), true)
     );

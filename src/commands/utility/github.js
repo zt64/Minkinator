@@ -20,12 +20,12 @@ module.exports = {
         const guildConfig = global.guildInstance.guildConfig;
         const defaultColor = guildConfig.colors.default;
 
-        // Fetch JSON results
         const json = await global.functions.fetchJson(`https://api.github.com/repos/${owner}/${name}`);
+        
+        if (json.message === "Not Found") return message.channel.send("Could not find repository.");
+
         const commits = await global.functions.fetchJson(`https://api.github.com/repos/${owner}/${name}/commits`);
         const pulls = await global.functions.fetchJson(`https://api.github.com/repos/${owner}/${name}/pulls`);
-
-        if (json.message === "Not Found") return message.channel.send("Could not find repository.");
 
         // Create embed
         const embed = new global.Discord.MessageEmbed()
@@ -82,7 +82,6 @@ module.exports = {
           .addField("Updated:", global.moment(json.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a"));
 
         if (json.bio) embed.setDescription(json.bio);
-
         if (json.name) embed.addField("Name:", json.name, true);
         if (json.company) embed.addField("Company:", json.company, true);
         if (json.blog) embed.addField("Website:", json.blog, true);

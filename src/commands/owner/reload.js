@@ -1,6 +1,6 @@
 module.exports = {
   description: "Reloads all the bot events and commands.",
-  aliases: ["restart", "r"],
+  aliases: ["r"],
   async execute (client, message) {
     const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;
@@ -26,8 +26,6 @@ module.exports = {
       return message.channel.send("An error has occurred while reloading events.");
     }
     
-    client.commands.clear();
-
     // Load commands
     try {
       await client.loadCommands();
@@ -42,7 +40,7 @@ module.exports = {
     const ms = Date.now() - reloadMessage.createdTimestamp;
 
     reloadEmbed.setTitle("Finished reloading");
-    reloadEmbed.setDescription(`Reloaded \`${commands.size}\` commands and \`${events.size}\` events in \`${ms}\` ms.`);
+    reloadEmbed.setDescription(`Reloaded \`${commands.length}\` commands and \`${events.length}\` events in \`${ms}\` ms.`);
 
     return reloadMessage.edit(reloadEmbed);
   }

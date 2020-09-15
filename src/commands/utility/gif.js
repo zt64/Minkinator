@@ -1,15 +1,13 @@
 module.exports = {
   description: "Generates a gif",
-  async execute (client, message, args) {
+  async execute () {
     const gif = new global.GifEncoder(512, 512, { highWaterMark: 6.4e+7 });
     const { randomInteger } = global.functions;
 
     const frames = 16;
 
     gif.pipe(global.fs.createWriteStream("img.gif"));
-
     gif.setRepeat(0);
-
     gif.writeHeader();
 
     // Set pixel data

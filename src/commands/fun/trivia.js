@@ -3,7 +3,7 @@ module.exports = {
   aliases: ["quiz"],
   async execute (client, message) {
     const { randomInteger, sleep } = global.functions;
-    const entities = require("entities");
+    const entities = global.entities;
 
     const guildConfig = global.guildInstance.guildConfig;
     const defaultColor = guildConfig.colors.default;

@@ -1,5 +1,3 @@
-const { execute } = require("../fun/markov");
-
 module.exports = {
   description: "Draw a mathematical equation.",
   async execute (client, message, args) {

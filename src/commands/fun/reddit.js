@@ -13,7 +13,7 @@ module.exports = {
     const defaultColor = guildConfig.colors.default;
     const redditNSFW = guildConfig.redditNSFW;
 
-    const entities = require("entities");
+    const entities = global.entities;
 
     const body = await global.fetch(`https://api.reddit.com/r/${subreddit}/hot?limit=64`).then(response => response.json());
 

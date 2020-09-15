@@ -100,16 +100,15 @@ module.exports = {
         const guildConfig = global.guildInstance.guildConfig;
         const defaultColor = guildConfig.colors.default;
 
-        const fs = global.fs;
-
-        const dependencies = require("../../../package.json").dependencies;
-        const prettyBytes = require("pretty-bytes");
+        const { dependencies } = require("../../../package.json");
         
         const sequelizeVersion = dependencies.sequelize;
         const sqlite3Version = dependencies.sqlite3;
 
+        const { pbs, fs } = global;
+
         const stats = fs.statSync("./database.sqlite");
-        const size = prettyBytes(stats.size);
+        const size = pbs(stats.size);
 
         // Create embed
         const embed = new global.Discord.MessageEmbed()

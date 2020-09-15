@@ -18,8 +18,10 @@ module.exports = {
 
     // Attempt to run code
     try {
-      embed.setTitle("JS Result");
-      embed.setDescription(`\`\`\`js\n${await eval(`(async() => {${input}})()`)}\`\`\``);
+      const result = await eval(`(async() => {${input}})()`);
+
+      embed.setTitle("Result");
+      embed.setDescription(`\`\`\`js\n${result}\`\`\``);
     } catch (error) {
       embed.setTitle("Error");
       embed.setDescription(`\`\`\`js\n${error}\`\`\``);
