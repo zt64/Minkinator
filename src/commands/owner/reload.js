@@ -11,7 +11,7 @@ module.exports = {
     const reloadEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Reloading")
-      .setDescription(`Reloading \`${commands.size}\` commands and \`${events.size}\` events.`);
+      .setDescription(`Reloading \`${commands.length}\` commands and \`${events.length}\` events.`);
 
     const reloadMessage = await message.channel.send(reloadEmbed);
 
