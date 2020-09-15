@@ -72,7 +72,7 @@ module.exports = async (client, message) => {
   // Check if command exists
   const parameters = message.content.slice(prefix.length).split(/ +/g);
   const commandName = parameters.shift().toLowerCase();
-  let command = client.commands.get(commandName) || [...client.commands.values()].find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
+  let command = client.commands.find(command => command.aliases.find(alias => alias === commandName));
 
   if (!command) return;
 

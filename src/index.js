@@ -12,7 +12,10 @@ global.functions = require("./lib/functions.js");
 global.GifEncoder = require("gif-encoder");
 global.Sequelize = require("sequelize");
 global.pluralize = require("pluralize");
+global.entities = require("entities");
 global.fetch = require("node-fetch");
+global.pbs = require("pretty-bytes");
+global.twemoji = require("twemoji");
 global.Chart = require("chart.js");
 global.pms = require("pretty-ms");
 global.canvas = require("canvas");
@@ -23,53 +26,50 @@ global.os = require("os");
 // Set client properties
 client.database = require("./lib/models.js");
 client.coolDowns = new Map();
-client.commands = new Map();
-client.events = new Map();
 
 // Set up event handler
-client.loadEvents = function loadEvents () {
-  fs.readdirSync("./events/").forEach(async eventName => {
+client.loadEvents = async () => {
+  client.events = [];
+
+  fs.readdirSync("./events/").forEach(eventName => {
     delete require.cache[require.resolve(`./events/${eventName}`)];
 
-    const eventFile = require(`./events/${eventName}`);
+    const event = require(`./events/${eventName}`);
 
-    eventName = eventName.replace(".js", "");
+    client.events.push(event);
 
-    // Add event to events map
-    client.events.set(eventName, eventFile);
-
-    // Bind event file to run on event
-    client.on(eventName, eventFile.bind(null, client));
+    client.on(eventName.replace(".js", ""), event.bind(null, client));
   });
-  console.log(chalk.green(`(${time})`), `Successfully loaded ${client.events.size} events.`);
+
+  console.log(chalk.green(`(${time})`), `Successfully loaded ${client.events.length} events.`);
 };
 
 // Set up command handler
-client.loadCommands = function loadCommands () {
+client.loadCommands = async () => {
+  client.commands = [];
+
   fs.readdirSync("./commands/").forEach(category => {
-    fs.readdirSync(`./commands/${category}`).forEach(async commandName => {
+    fs.readdirSync(`./commands/${category}`).forEach(commandName => {
       delete require.cache[require.resolve(`./commands/${category}/${commandName}`)];
 
-      const commandFile = require(`./commands/${category}/${commandName}`);
-
-      commandName = commandName.replace(".js", "");
-
-      // Add command to commands map
-      client.commands.set(commandName, commandFile);
-
-      const command = client.commands.get(commandName);
-
-      // Set command properties
-      command.name = commandName;
-      command.category = category;
+      const command = require(`./commands/${category}/${commandName}`);
 
       if (category === "owner") command.ownerOnly = true;
+
+      if (!command.aliases) command.aliases = [];
+
+      command.aliases.push(commandName.replace(".js", ""));
+      // command.name = commandName.replace(".js", "");
+      command.category = category;
+
+      client.commands.push(command);
     });
   });
-  console.log(chalk.green(`(${time})`), `Successfully loaded ${client.commands.size} commands.`);
+
+  console.log(chalk.green(`(${time})`), `Successfully loaded ${client.commands.length} commands.`);
 };
 
-// Load commands and events
+// Load events and commands
 client.loadEvents();
 client.loadCommands();
 
