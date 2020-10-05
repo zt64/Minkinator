@@ -1,104 +1,86 @@
-// import fs from 'fs';
-// import GifEncoder from 'gif-encoder';
-// import colors from 'colors';
-// import qr from 'qrcode';
-// import moment from 'moment';
-// import Sequelize from 'sequelize';
-// import canvas from 'canvas';
-// import fetch from 'node-fetch';
-// import discord from 'discord.js';
-
-// import functions from './lib/functions.js';
-// import models from './lib/models.js';
-// const config = JSON.parse(fs.readFileSync('./config/config.json'));
-
-const functions = require('./lib/functions.js');
-const config = require('./config/config.json');
-const tokens = require('./config/tokens.json');
-const models = require('./lib/models.js');
-
-const Markov = require('markov-strings').default;
-const GifEncoder = require('gif-encoder');
-const Sequelize = require('sequelize');
-const pluralize = require('pluralize');
-const Discord = require('discord.js');
-const fetch = require('node-fetch');
-const moment = require('moment');
-const canvas = require('canvas');
-const colors = require('colors');
-const qr = require('qrcode');
-const fs = require('fs');
+const config = global.config = require("./config/config.json");
+const auth = global.auth = require("./config/auth.json");
+const Discord = global.Discord = require("discord.js");
+const moment = global.moment = require("moment");
+const chalk = global.chalk = require("chalk");
+const fs = global.fs = require("fs");
 
 const client = new Discord.Client(config.clientOptions);
+const time = moment().format("HH:mm M/D/Y");
 
-const time = moment().format('HH:mm M/D/Y');
+global.functions = require("./lib/functions.js");
+global.GifEncoder = require("gif-encoder");
+global.Sequelize = require("sequelize");
+global.pluralize = require("pluralize");
+global.entities = require("entities");
+global.fetch = require("node-fetch");
+global.pbs = require("pretty-bytes");
+global.twemoji = require("twemoji");
+global.Chart = require("chart.js");
+global.pms = require("pretty-ms");
+global.canvas = require("canvas");
+global.math = require("mathjs");
+global.qr = require("qrcode");
+global.os = require("os");
 
-client.coolDowns = new Discord.Collection();
-client.commands = new Discord.Collection();
-client.events = new Discord.Collection();
+// Set client properties
+client.database = require("./lib/models.js");
+client.coolDowns = new Map();
 
-client.GifEncoder = GifEncoder;
-client.Sequelize = Sequelize;
-client.pluralize = pluralize;
-client.Discord = Discord;
-client.Markov = Markov;
-client.moment = moment;
-client.canvas = canvas;
-client.colors = colors;
-client.fetch = fetch;
-client.qr = qr;
-client.fs = fs;
+// Set up event handler
+client.loadEvents = async () => {
+  client.events = [];
 
-client.functions = functions;
-client.databases = models;
-client.config = config;
-client.tokens = tokens;
-
-client.loadEvents = function loadEvents () {
-  fs.readdirSync('./events/').forEach(eventName => {
+  fs.readdirSync("./events/").forEach(eventName => {
     delete require.cache[require.resolve(`./events/${eventName}`)];
 
-    const eventFile = require(`./events/${eventName}`);
+    const event = require(`./events/${eventName}`);
 
-    eventName = eventName.replace('.js', '');
+    client.events.push(event);
 
-    client.events.set(eventName, eventFile);
-
-    client.on(eventName, eventFile.bind(null, client));
+    client.on(eventName.replace(".js", ""), event.bind(null, client));
   });
-  console.log(`${`(${time})`.green} Successfully loaded ${client.events.size} events.`);
+
+  console.log(chalk.green(`(${time})`), `Successfully loaded ${client.events.length} events.`);
 };
 
-client.loadCommands = function loadCommands () {
-  fs.readdirSync('./commands/').forEach(category => {
-    fs.readdirSync(`./commands/${category}`).forEach(async commandName => {
+// Set up command handler
+client.loadCommands = async () => {
+  client.commands = [];
+
+  fs.readdirSync("./commands/").forEach(category => {
+    fs.readdirSync(`./commands/${category}`).forEach(commandName => {
       delete require.cache[require.resolve(`./commands/${category}/${commandName}`)];
 
-      const commandFile = require(`./commands/${category}/${commandName}`);
+      const command = require(`./commands/${category}/${commandName}`);
 
-      commandName = commandName.replace('.js', '');
+      if (category === "owner") command.ownerOnly = true;
 
-      client.commands.set(commandName, commandFile);
+      if (!command.aliases) command.aliases = [];
 
-      const command = client.commands.get(commandName);
-
-      command.name = commandName;
+      command.aliases.push(commandName.replace(".js", ""));
+      // command.name = commandName.replace(".js", "");
       command.category = category;
 
-      if (category === 'owner') command.ownerOnly = true;
+      client.commands.push(command);
     });
   });
-  console.log(`${`(${time})`.green} Successfully loaded ${client.commands.size} commands.`);
+
+  console.log(chalk.green(`(${time})`), `Successfully loaded ${client.commands.length} commands.`);
 };
 
+// Load events and commands
 client.loadEvents();
 client.loadCommands();
 
-client.login(tokens.token);
+// Login to Discord API
+client.login(auth.discord);
 
-process.on('unhandledRejection', error => console.error('Unhandled Promise Rejection at:', error));
+// Handle promise rejections
+process.on("unhandledRejection", error => console.error(error));
 
-process.stdin.on('data', async data => {
+// Take input from stdin
+process.stdin.on("data", async data => {
   try {
     console.log(await eval(`(async()=>{${data.toString()}})()`));
   } catch (error) {

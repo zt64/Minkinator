@@ -1,67 +1,89 @@
 module.exports = {
-  description: 'Play a game of trivia',
-  aliases: ['quiz'],
-  parameters: [
-    {
-      name: 'category',
-      type: String
-    }
-  ],
-  async execute (client, message, args) {
-    const entities = require('entities');
+  description: "Play a game of trivia.",
+  aliases: ["quiz"],
+  async execute (client, message) {
+    const { randomInteger, sleep } = global.functions;
+    const entities = global.entities;
 
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const guildConfig = global.guildInstance.guildConfig;
+    const defaultColor = guildConfig.colors.default;
+    const currency = guildConfig.currency;
 
-    // Fetch questions
+    let correctIndex = 0;
 
-    const responses = await client.fetch('https://opentdb.com/api.php?amount=10').then(res => res.json());
+    // Fetch question
+    const responses = await global.fetch("https://opentdb.com/api.php?amount=1").then(res => res.json());
     const response = responses.results[0];
 
     const question = entities.decodeHTML(response.question);
 
     const correctAnswer = response.correct_answer;
     const incorrectAnswers = response.incorrect_answers;
+    const answers = incorrectAnswers;
 
-    const answers = incorrectAnswers.push(correctAnswer);
+    if (response.type === "multiple") {
+      correctIndex = randomInteger(0, 3);
 
-    const letters = ['A', 'B', 'C', 'D'];
+      answers.splice(correctIndex, 0, correctAnswer);
+    }
+
+    const letters = ["A", "B", "C", "D"];
+
+    const reward = randomInteger(20, 50);
 
     // Create embed
-
-    const questionEmbed = new client.Discord.MessageEmbed()
-      .setColor(embedColor)
+    const questionEmbed = new global.Discord.MessageEmbed()
+      .setColor(defaultColor)
       .setTitle(`${response.category} question`)
-      .setDescription(question);
+      .setDescription(question)
+      .setFooter(`This question is worth ${currency}${reward}`);
 
-    if (response.type === 'multiple') {
-      answers.map((answer, index) => questionEmbed.addField(letters[index], answer));
+    if (response.type === "multiple") {
+      answers.map((answer, index) => questionEmbed.addField(letters[index], entities.decodeHTML(answer), true));
     } else {
-      questionEmbed.addField('A', 'True');
-      questionEmbed.addField('B', 'False');
+      questionEmbed.addField("A", "True", true);
+      questionEmbed.addField("B", "False", true);
     }
 
     const questionMessage = await message.channel.send(questionEmbed);
 
-    if (response.type === 'multiple') {
-      ['🇦', '🇧', '🇨', '🇩'].map(reaction => questionMessage.react(reaction));
+    if (response.type === "multiple") {
+      ["🇦", "🇧", "🇨", "🇩"].map(reaction => questionMessage.react(reaction));
     } else {
-      ['🇦', '🇧'].map(reaction => questionMessage.react(reaction));
+      ["🇦", "🇧"].map(reaction => questionMessage.react(reaction));
     }
 
-    // Setup reaction collector
+    await sleep(15000);
 
-    const filter = (reaction, user) => ['🇦', '🇧', '🇨', '🇩'].map(emoji => reaction.emoji.name === emoji);
+    const users = [];
 
-    const collector = questionMessage.createReactionCollector;
+    const reactions = questionMessage.reactions.cache.array();
 
-    collector.on('end', collected => {
-      message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(embedColor)
-        .setTitle('Trivia Answer')
-        .setDescription(`The correct answer was ${answer}, \n Good job`)
-      );
+    // Check for correct answer
+    for (const user of reactions[correctIndex].users.cache.array()) {
+      if (user.id === client.user.id) continue;
+
+      users.push(user);
     }
-    );
+
+    // Update balances
+    for (const user of users) {
+      const data = global.sequelize.models.member.findByPk(user.id);
+      const balance = data.balance + reward;
+
+      await data.update({ balance: balance });
+    }
+
+    const answerEmbed = new global.Discord.MessageEmbed()
+      .setColor(defaultColor)
+      .setTitle("Trivia Answer");
+
+    if (users.length) {
+      answerEmbed.setDescription(`The correct answer was ${letters[correctIndex]}: \`${correctAnswer}\`, \n ${currency}${reward} has been sent to ${users}.`);
+    } else {
+      answerEmbed.setDescription(`The correct answer was ${letters[correctIndex]}: \`${correctAnswer}\`. No one got it this round.`);
+    }
+
+    return message.channel.send(answerEmbed);
   }
 };

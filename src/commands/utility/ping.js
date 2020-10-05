@@ -1,33 +1,40 @@
-const pms = require('pretty-ms');
-
 module.exports = {
-  description: 'Returns ping and web socket information.',
-  aliases: ['ws'],
-  async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
-
+  description: "Returns ping and web socket information.",
+  aliases: ["ws"],
+  async execute (client, message) {
+    const guildConfig = global.guildInstance.guildConfig;
+    const defaultColor = guildConfig.colors.default;
+    
+    const pms = global.pms;
     const ws = client.ws;
-    const connections = ['READY', 'CONNECTING', 'RECONNECTING', 'IDLE', 'NEARLY', 'DISCONNECTED'];
+
+    const connections = ["READY", "CONNECTING", "RECONNECTING", "IDLE", "NEARLY", "DISCONNECTED"];
+
+    const pingEmbed = new global.Discord.MessageEmbed()
+      .setColor(defaultColor)
+      .setTitle("Pinging...");
+
+    const pingMessage = await message.channel.send(pingEmbed);
 
     const apiPing = Math.round(ws.ping);
-    const now = process.hrtime.bigint();
-    const m = await message.channel.send('Pinging...');
+
+    // Check connection ping
+    const start = process.hrtime.bigint();
+    await global.fetch("https://www.google.com");
     const end = process.hrtime.bigint();
-    const nower = process.hrtime.bigint();
-    await client.fetch('https://google.com');
-    const ender = process.hrtime.bigint();
+
+    const connectionPing = pms(Number(end - start) / 1e+6);
     const connectionStatus = connections[ws.status];
     const gateway = ws.gateway;
 
-    return m.edit(new client.Discord.MessageEmbed()
-      .setColor(embedColor)
-      .setTitle('Ping')
-      .addField('API Ping:', `\`${apiPing}ms\``, true)
-      .addField('Response Time:', `\`${pms(Number(end - now) / 1000000, { formatSubMilliseconds: true })}\``, true)
-      .addField('Connection Ping:', `\`${pms(Number(ender - nower) / 1000000, { formatSubMilliseconds: true })}\``, true)
-      .addField('Connection Status:', `\`${connectionStatus}\``, true)
-      .addField('Gateway:', `\`${gateway}\``, true)
-    );
+    // Edit embed
+    pingEmbed.setTitle("Ping Information");
+
+    pingEmbed.addField("API Ping:", `\`${apiPing}ms\``, true);
+    pingEmbed.addField("Connection Ping:", `\`${connectionPing}\``, true);
+    pingEmbed.addField("Connection Status:", `\`${connectionStatus}\``, true);
+    pingEmbed.addField("Gateway:", `\`${gateway}\``, true);
+
+    return pingMessage.edit(pingEmbed);
   }
 };

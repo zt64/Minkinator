@@ -1,41 +1,47 @@
 module.exports = {
-  description: 'Reloads the bot commands.',
-  aliases: ['restart', 'reboot', 'r'],
-  async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
-
-    const time = client.moment().format('HH:mm M/D/Y');
+  description: "Reloads all the bot events and commands.",
+  aliases: ["r"],
+  async execute (client, message) {
+    const guildConfig = global.guildInstance.guildConfig;
+    const defaultColor = guildConfig.colors.default;
 
     const commands = client.commands;
     const events = client.events;
 
-    const reloadEmbed = new client.Discord.MessageEmbed()
-      .setColor(embedColor)
-      .setTitle('Reloading')
-      .setDescription(`Reloading \`${commands.size}\` commands and \`${events.size}\` events`);
+    const reloadEmbed = new global.Discord.MessageEmbed()
+      .setColor(defaultColor)
+      .setTitle("Reloading")
+      .setDescription(`Reloading \`${commands.length}\` commands and \`${events.length}\` events.`);
 
     const reloadMessage = await message.channel.send(reloadEmbed);
 
     client.removeAllListeners();
-    client.commands.clear();
 
+    // Load events
     try {
       await client.loadEvents();
-      await client.loadCommands();
-
-      client.emit('ready');
     } catch (error) {
       console.error(error);
 
-      return message.channel.send('An error has occurred reloading. Please check console.');
+      return message.channel.send("An error has occurred while reloading events.");
+    }
+    
+    // Load commands
+    try {
+      await client.loadCommands();
+    } catch (error) {
+      console.error(error);
+      
+      return message.channel.send("An error has occurred while reloading commands.");
     }
 
-    reloadEmbed.setTitle('Finished reloading');
-    reloadEmbed.setDescription(`Reloaded \`${commands.size}\` commands and \`${events.size}\` events in \`${reloadMessage.createdTimestamp - message.createdTimestamp}\` ms`);
+    await client.emit("ready");
 
-    reloadMessage.edit(reloadEmbed);
+    const ms = Date.now() - reloadMessage.createdTimestamp;
 
-    return console.log(`${`(${time})`.green} Finished reloading commands and events`);
+    reloadEmbed.setTitle("Finished reloading");
+    reloadEmbed.setDescription(`Reloaded \`${commands.length}\` commands and \`${events.length}\` events in \`${ms}\` ms.`);
+
+    return reloadMessage.edit(reloadEmbed);
   }
 };

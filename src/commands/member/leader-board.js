@@ -1,97 +1,84 @@
 module.exports = {
-  description: 'Leader board for user stats',
-  aliases: ['lb'],
+  description: "Leader board for user stats",
+  aliases: ["lb"],
   parameters: [
     {
-      name: 'stat',
-      type: String,
-      required: true
-    },
-    {
-      name: 'page',
+      name: "page",
       type: Number
     }
   ],
-  async execute (client, message, args) {
-    const stat = args[0];
+  async execute (client, message, [ page ]) {
+    const guildConfig = global.guildInstance.guildConfig;
+    const defaultColor = guildConfig.colors.default;
+    const currency = guildConfig.currency;
 
-    if (!(stat in client.database.members.rawAttributes)) return message.channel.send(`\`${stat}\` is not a member statistic.`);
+    const { formatNumber } = global.functions;
 
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    // Set members const and sort by balance
+    const members = await global.guildInstance.getMembers({ order: [["balance", "DESC"]] });
 
-    const members = await client.database.members.findAll({ order: [[stat, 'DESC']] });
-    const leaderBoardEmbed = new client.Discord.MessageEmbed();
     const pages = Math.ceil(members.length / 10);
+    if (!page) page = 1;
 
-    let page = args[1] || 1;
+    // Create embed
+    const leaderBoardEmbed = new global.Discord.MessageEmbed()
+      .setColor(defaultColor)
+      .setTitle("Leader board")
+      .setFooter(`Page ${page} of ${pages}`);
 
-    leaderBoardEmbed.setColor(embedColor);
-    leaderBoardEmbed.setTitle(`Member ${stat} leader board`);
-    leaderBoardEmbed.setFooter(`Page ${page} of ${pages}`);
+    if (page > pages || page < 1) return message.channel.send(`Page \`${page}\` does not exist.`);
 
-    if (page > pages || page < 1 || isNaN(page)) return message.channel.send(`Page \`${page}\` does not exist.`);
+    function populateLeaderBoard () {
+      members.slice((page - 1) * 10, page * 10).map((member, index) => {
+        leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${client.users.cache.get(member.userId).tag}:`, `${currency}${formatNumber(member.balance, 2)}`);
+      });
+    }
 
-    members.slice((page - 1) * 10, page * 10).map((member, index) => {
-      leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${member.name}:`, member[stat].toLocaleString());
-    });
+    populateLeaderBoard();
 
     const leaderBoardMessage = await message.channel.send(leaderBoardEmbed);
 
-    if (pages > 1) leaderBoardMessage.react('➡️');
+    if (pages > 1) leaderBoardMessage.react("➡️");
 
-    leaderBoardMessage.react('❌');
-
-    const filter = (reaction, user) => user.id === message.author.id && (
-      ['🏠', '⬅️', '➡️', '❌'].map(emoji => reaction.emoji.name === emoji)
-    );
+    const filter = (reaction, user) => user.id === message.author.id;
 
     const collector = leaderBoardMessage.createReactionCollector(filter);
 
-    collector.on('collect', async reaction => {
+    collector.on("collect", async reaction => {
       const emoji = reaction.emoji.name;
 
       switch (emoji) {
-        case '🏠':
-          page = 1;
+      case "🏠":
+        page = 1;
 
-          leaderBoardMessage.reactions.removeAll();
+        leaderBoardMessage.reactions.removeAll();
 
-          if (pages > 1) leaderBoardMessage.react('➡️');
+        if (pages > 1) leaderBoardMessage.react("➡️");
+        break;
+      case "⬅️":
+        page--;
 
-          leaderBoardMessage.react('❌');
-          break;
-        case '⬅️':
-          page--;
+        leaderBoardMessage.reactions.removeAll();
 
-          leaderBoardMessage.reactions.removeAll();
+        if (page !== 1) leaderBoardMessage.react("🏠");
 
-          if (page !== 1) leaderBoardMessage.react('🏠');
+        leaderBoardMessage.react("➡️");
+        break;
+      case "➡️":
+        page++;
 
-          leaderBoardMessage.react('➡️');
-          leaderBoardMessage.react('❌');
-          break;
-        case '➡️':
-          page++;
+        leaderBoardMessage.reactions.removeAll();
 
-          leaderBoardMessage.reactions.removeAll();
+        leaderBoardMessage.react("🏠");
+        leaderBoardMessage.react("⬅️");
 
-          leaderBoardMessage.react('🏠');
-          leaderBoardMessage.react('⬅️');
-
-          if (pages > page) leaderBoardMessage.react('➡️');
-
-          leaderBoardMessage.react('❌');
-          break;
-        case '❌':
-          return leaderBoardMessage.delete();
+        if (pages > page) leaderBoardMessage.react("➡️");
+        break;
       }
 
       leaderBoardEmbed.fields = [];
 
-      members.slice((page - 1) * 10, page * 10).map((member, index) => {
-        leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${member.name}:`, member[stat].toLocaleString());
-      });
+      populateLeaderBoard();
 
       leaderBoardEmbed.setFooter(`Page ${page} of ${pages}`);
 

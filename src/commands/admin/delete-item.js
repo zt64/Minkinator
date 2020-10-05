@@ -1,24 +1,20 @@
 module.exports = {
-  description: 'Delete an item from the guild shop.',
-  aliases: ['remove-item', 'del-item'],
+  description: "Delete an item from the guild shop.",
+  aliases: ["remove-item", "del-item"],
   parameters: [
     {
-      name: 'item',
+      name: "name",
       type: String,
       required: true
     }
   ],
-  async execute (client, message, args) {
-    const itemName = args[0];
+  async execute (client, message, [ itemName ]) {
+    const shopItem = await global.sequelize.models.shopItem.findByPk(itemName);
 
-    const itemsProperty = await client.database.properties.findByPk('items');
-    const item = itemsProperty.value.filter(item => item.name === itemName);
+    // Make sure item exists
+    if (!shopItem) return message.channel.send(`Item: \`${itemName}\`, does not exist in the guild shop.`);
 
-    if (item.length === 0) return message.channel.send(`Item: \`${itemName}\`, does not exist in the guild shop.`);
-
-    const array = itemsProperty.value.filter(item => item.name !== itemName);
-
-    itemsProperty.update({ value: array });
+    await global.guildInstance.removeShopItem(shopItem);
 
     return message.channel.send(`Successfully deleted: \`${itemName}\`, from the guild shop.`);
   }

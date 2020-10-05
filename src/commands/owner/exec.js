@@ -1,30 +1,62 @@
 module.exports = {
-  description: 'Executes in terminal.',
+  description: "Executes a command.",
   parameters: [
     {
-      name: 'input',
+      name: "input",
       type: String,
       required: true
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    const guildConfig = global.guildInstance.guildConfig;
+    const defaultColor = guildConfig.colors.default;
+    const input = args.join(" ");
 
-    const execSync = require('child_process').execSync;
+    const { exec } = require("child_process");
 
-    try {
-      return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(embedColor)
-        .setTitle('Execution Result')
-        .setDescription(execSync(args.join(' '), { encoding: 'utf-8' }), { code: 'bash' })
-      );
-    } catch (error) {
-      return message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(embedColor)
-        .setTitle('Execution Error')
-        .setDescription(error, { code: 'bash' })
-      );
+    let description = `> ${input}\n\n`;
+
+    // Helper function to shorten command
+    function updateEmbed() {
+      if (description.length > 6000) {
+        execEmbed.setDescription("```Data exceeds Discord API limit of 6,000 characters.```");
+        return execMessage.edit(execEmbed);
+      }
+
+      execEmbed.setDescription(`\`\`\`sh\n${description}\`\`\``);
+      execMessage.edit(execEmbed);
     }
+  
+    const execEmbed = new global.Discord.MessageEmbed()
+      .setColor(defaultColor);
+
+    const execMessage = await message.channel.send(execEmbed);
+
+    // Execute command
+    const command = exec(input);
+
+    // Handle stdout data
+    command.stdout.on("data", function (data) {
+      description += `${data.toString()}\n`;
+      updateEmbed();
+    });
+
+    // Handle stderr data
+    command.stderr.on("data", function (data) {
+      description += `[stderr] ${data.toString()}\n`;
+      updateEmbed();
+    });
+
+    // Handle error data
+    command.on("error", function (data) {
+      description += `[error] ${data.toString()}\n`;
+      updateEmbed();
+    });
+
+    // Handle exit code
+    command.on("exit", function (code) {
+      description += code === null ? "" : "[status] Return code " + code.toString();
+      updateEmbed();
+    });
   }
 };

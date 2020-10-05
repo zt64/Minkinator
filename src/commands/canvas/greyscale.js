@@ -1,24 +1,25 @@
 module.exports = {
-  description: 'Modifys an images RGB channels to be black and white.',
-  aliases: ['monochrome', 'grey', 'bw'],
+  description: "Modifies an images RGB channels to be black and white.",
+  aliases: ["bw"],
   parameters: [
     {
-      name: 'url',
+      name: "url",
       type: String
     }
   ],
-  async execute (client, message, args) {
-    const imageURL = message.attachments.first() ? message.attachments.first().url : args[0];
-    const image = await client.canvas.loadImage(imageURL);
+  async execute (client, message, [ imageURL ]) {
+    if (!(imageURL || message.attachments.size)) return message.channel.send("No URL or attachment provided.");
+    const image = await global.canvas.loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); });
 
-    const canvas = client.canvas.createCanvas(image.width, image.height);
-    const context = canvas.getContext('2d');
+    const canvas = global.canvas.createCanvas(image.width, image.height);
+    const context = canvas.getContext("2d");
 
     context.drawImage(image, 0, 0);
 
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
 
+    // Change pixels to be grayscale
     for (let i = 0; i < data.length; i += 4) {
       const r = data[i];
       const g = data[i + 1];
@@ -31,6 +32,6 @@ module.exports = {
 
     context.putImageData(imageData, 0, 0);
 
-    return message.channel.send(new client.Discord.MessageAttachment(canvas.toBuffer()));
+    return message.channel.send(new global.Discord.MessageAttachment(canvas.toBuffer()));
   }
 };

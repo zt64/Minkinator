@@ -1,4 +1,6 @@
-vscode
-node_modules
-data
-tokens.json
+# Dependencies and collected data
+node_modules/
+database.sqlite
+
+# Authentication file
+auth.json

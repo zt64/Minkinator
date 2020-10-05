@@ -1,32 +1,32 @@
 module.exports = {
-  description: 'Filters an images RGB channels according to a threshold.',
-  aliases: ['t'],
+  description: "Filters an images RGB channels according to a threshold. Does not support .webp images.",
+  aliases: ["t"],
   parameters: [
     {
-      name: 'url',
+      name: "url",
       type: String,
       required: true
     },
     {
-      name: 'factor',
+      name: "factor",
       type: Number,
       required: true
     }
   ],
-  async execute (client, message, args) {
-    const imageURL = args[0];
-    const image = await client.canvas.loadImage(imageURL);
+  async execute (client, message, [ imageURL, threshold ]) {
+    const image = await global.canvas.loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); }); 
 
-    const canvas = client.canvas.createCanvas(image.width, image.height);
-    const context = canvas.getContext('2d');
+    const canvas = global.canvas.createCanvas(image.width, image.height);
+    const context = canvas.getContext("2d");
 
     context.drawImage(image, 0, 0);
 
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
     const data = imageData.data;
 
-    const threshold = parseInt(args[1]);
+    threshold = parseInt(threshold);
 
+    // Modify pixel data
     for (let i = 0; i < data.length; i += 4) {
       var r = data[i];
       var g = data[i + 1];
@@ -43,6 +43,6 @@ module.exports = {
 
     context.putImageData(imageData, 0, 0);
 
-    return message.channel.send(new client.Discord.MessageAttachment(canvas.toBuffer()));
+    return message.channel.send(new global.Discord.MessageAttachment(canvas.toBuffer()));
   }
 };

@@ -1,16 +1,18 @@
 module.exports = {
-  description: 'Flip a coin.',
-  aliases: ['flip', 'coin'],
-  async execute (client, message, args) {
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
-
-    const result = Math.random();
-
-    return message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(embedColor)
-      .setTitle('Coin toss')
-      .setDescription(result > 0.5 ? 'Heads' : 'Tails')
+  description: "Flip a coin.",
+  aliases: ["flip", "coin"],
+  async execute (client, message) {
+    const guildConfig = global.guildInstance.guildConfig;
+    const defaultColor = guildConfig.colors.default;
+    
+    // Generate result
+    const result = Math.random() > 0.5 ? "Heads" : "Tails";
+    
+    // Send embed
+    return message.channel.send(new global.Discord.MessageEmbed()
+      .setColor(defaultColor)
+      .setTitle("Coin toss")
+      .setDescription(result)
     );
   }
 };

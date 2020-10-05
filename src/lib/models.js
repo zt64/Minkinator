@@ -1,145 +1,62 @@
-exports.create = async (client, guild) => {
-  const Sequelize = client.Sequelize;
+exports.create = async () => {
+  const Sequelize = global.Sequelize;
 
-  const sequelize = new Sequelize('database', 'user', 'password', {
-    host: 'localhost',
-    dialect: 'sqlite',
-    storage: `./data/${guild.id}.sqlite`,
-    logging: false
-  });
-
-  const database = {};
-
-  // Define database members
-
-  database.members = sequelize.define('members', {
-    id: {
-      type: Sequelize.TEXT,
-      primaryKey: true,
-      unique: true
-    },
-    name: {
-      type: Sequelize.TEXT
-    },
-    balance: {
-      type: Sequelize.FLOAT,
-      allowNull: false,
-      defaultValue: 0.00
-    },
-    level: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      defaultValue: 1
-    },
-    xpTotal: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      defaultValue: 0
-    },
-    xpRequired: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      defaultValue: 50
-    },
-    messages: {
-      type: Sequelize.INTEGER,
-      allowNull: false,
-      defaultValue: 0
-    },
-    inventory: {
-      type: Sequelize.JSON,
-      allowNull: false,
-      defaultValue: []
-    },
-    configuration: {
-      type: Sequelize.JSON,
-      allowNull: false,
-      defaultValue: {
-        measurement: 'metric',
-        levelMention: true
-      }
+  const sequelize = new Sequelize("database", "user", "password", {
+    host: "localhost",
+    dialect: "sqlite",
+    storage: "./database.sqlite",
+    logging: false,
+    define: {
+      timestamps: false,
+      underscored: true
     }
-  }, {
-    timestamps: false
   });
 
-  // Define database properties
+  // Require all models
+  const Guild = require("../models/Guild.js")(sequelize, Sequelize);
+  const GuildConfig = require("../models/GuildConfig.js")(sequelize, Sequelize);
 
-  database.properties = sequelize.define('properties', {
-    key: {
-      type: Sequelize.TEXT,
-      primaryKey: true
-    },
-    value: {
-      type: Sequelize.JSON,
-      defaultValue: 0,
-      allowNull: false
-    }
-  }, {
-    timestamps: false
-  });
+  const Member = require("../models/Member.js")(sequelize, Sequelize);
+  const MemberConfig = require("../models/MemberConfig.js")(sequelize, Sequelize);
+  
+  const Item = require("../models/Item.js")(sequelize, Sequelize);
 
-  database.sequelize = sequelize;
+  // Setup associations
+  Guild.hasOne(GuildConfig);
+  Guild.hasMany(Member);
+  Guild.hasMany(Item);
+  
+  Member.hasOne(MemberConfig, { foreignKey: "userId"} );
 
   await sequelize.sync();
 
-  return database;
+  return sequelize;
 };
 
-exports.populate = async (client, guild, database) => {
-  const databaseMembers = database.members;
-  const databaseProperties = database.properties;
+exports.populate = async (guild, sequelize) => {
+  const models = sequelize.models;
 
-  // Create model if it doesn't exist
+  await models.guild.findOrCreate({ where: { id: guild.id } });
+  await models.guildConfig.findOrCreate({ where: { guildId: guild.id }, defaults: { guildId: guild.id }});
+};
 
-  // for (const guildMember of guild.members.cache.array()) {
-  //   const user = guildMember.user;
-  //   const [memberData] = await databaseMembers.findOrCreate({ where: { id: user.id } });
+exports.checkMembers = async (guild, sequelize) => {
+  const guildInstance = await sequelize.models.guild.findOne({ where: { id: guild.id }});
+  const databaseMembers = guildInstance.getMembers();
 
-  //   await memberData.update({ name: user.tag });
-  // };
+  if (databaseMembers) {
+    const { chalk, moment } = global;
 
-  // Destroy model if the member left
+    const time = moment().format("HH:mm M/D/Y");
 
-  for (const memberData of await databaseMembers.findAll()) {
-    try {
-      await guild.members.fetch(memberData.id);
-    } catch (error) {
-      await memberData.destroy();
+    for (const memberData of await databaseMembers.findAll()) {
+      try {
+        await guild.members.fetch(memberData.id);
+      } catch (error) {
+        await memberData.destroy();
 
-      console.log(`${memberData.name} destroyed.`);
-    }
-  };
-
-  // Set guild properties
-
-  await databaseProperties.findOrCreate({ where: { key: 'id' }, defaults: { value: guild.id } });
-  await databaseProperties.findOrCreate({ where: { key: 'name' }, defaults: { value: guild.name } });
-  await databaseProperties.findOrCreate({ where: { key: 'data' }, defaults: { value: [] } });
-  await databaseProperties.findOrCreate({ where: { key: 'items' }, defaults: { value: [] } });
-  await databaseProperties.findOrCreate({ where: { key: 'mutes' }, defaults: { value: [] } });
-  await databaseProperties.findOrCreate({ where: { key: 'bans' }, defaults: { value: [] } });
-  await databaseProperties.findOrCreate({ where: { key: 'coolDowns' }, defaults: { value: [] } });
-
-  await databaseProperties.findOrCreate({
-    where: { key: 'configuration' },
-    defaults: {
-      value: {
-        prefix: '!',
-        currency: '₼',
-        embedErrorColor: '#FF0000',
-        embedSuccessColor: '#1ED760',
-        ignore: ['!'],
-        errorTimeout: 5000,
-        markovTries: 1000,
-        markovScore: 100,
-        sellPrice: 0.5,
-        redditNSFW: false,
-        levelMention: true,
-        ignoreBots: true
+        console.log(chalk.green(`(${time})`), `Deleted ${memberData.id} from ${guild.name}.`);
       }
     }
-  });
-
-  return database;
+  }
 };

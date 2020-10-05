@@ -1,8 +1,15 @@
 module.exports = async (client, guild) => {
-  const time = client.moment().format('HH:mm M/D/Y');
+  const { moment, chalk, pluralize } = global;
+  const time = moment().format("HH:mm M/D/Y");
 
-  const database = await client.databases.create(client, guild);
-  await client.databases.populate(client, guild, database);
+  console.log(chalk.green(`(${time})`), `Minkinator has joined: ${guild.name} (${guild.id}).`);
 
-  return console.log(`${`(${time})`.green} Minkinator has joined: ${guild.name} (${guild.id})`);
+  // Populate database
+  await client.database.populate(client, guild, await client.database.create(client, guild));
+
+  // Set count values
+  const users = pluralize("user", client.users.cache.size, true);
+  const guilds = pluralize("guild", client.guilds.cache.size, true);
+
+  return client.user.setActivity(`${users} in ${guilds}.`, { type: "WATCHING" });
 };

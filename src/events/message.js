@@ -1,96 +1,93 @@
 module.exports = async (client, message) => {
-  const time = client.moment().format('HH:mm M/D/Y');
+  if (message.channel.type === "dm") {
+    if (message.author === client.user) return;
+    
+    const botOwner = await client.users.fetch(global.config.ownerID);
+    const author = message.author;
 
-  // Return if in DM channel
-
-  if (message.channel.type === 'dm') {
-    if (message.author.bot) return;
-
-    return message.channel.send('Commands cannot be run inside DMs.');
+    return botOwner.send(`Message from \`${author.tag} (${author.id})\`:\n${message.content}`);
   }
 
-  // Set constants
-
-  const guildDatabase = await client.databases[message.guild.name];
-
-  const guildProperties = guildDatabase.properties;
-  const guildMembers = guildDatabase.members;
-
-  client.database = guildDatabase;
-
-  // Set guild constants
-
-  const guildConfig = await guildProperties.findByPk('configuration').then(key => key.value);
-  const embedColor = guildConfig.embedSuccessColor;
-  const errorColor = guildConfig.embedErrorColor;
-  const errorTimeout = guildConfig.errorTimeout;
-  const currency = guildConfig.currency;
-  const prefix = guildConfig.prefix;
-  const ignore = guildConfig.ignore;
-
-  // Return if ignoreBots is true and author is bot
+  const guildInstance = global.guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true, nested: true } });
+  const guildConfig = guildInstance.guildConfig;
 
   if (guildConfig.ignoreBots && message.author.bot) return;
 
-  // Set member constants;
+  const { errorTimeout, currency, prefix, ignore, colors } = guildConfig;
+  
+  let memberInstance = global.memberInstance = await global.sequelize.models.member.findByPk(message.author.id, { include: { all: true, nested: true } });
+  
+  if (!memberInstance) memberInstance = await guildInstance.createMember({ userId: message.author.id, guildId: message.guild.id });
+  if (!memberInstance.memberConfig) var memberConfig = await memberInstance.createMemberConfig();
 
-  const [memberData] = await guildMembers.findOrCreate({ where: { id: message.author.id }, defaults: { name: message.author.tag } });
-  const memberConfig = memberData.configuration;
+  const { level, xpTotal, xpRequired } = memberInstance;
 
-  let level = memberData.level;
+  xpTotal + Math.round(Math.random() * (level / 0.5));
 
-  const xpTotal = memberData.xpTotal + Math.round(Math.random() * (level / 0.5));
-  const xpRequired = memberData.xpRequired;
+  await memberInstance.update({ xpTotal: xpTotal, messages: memberInstance.messages + 1 });
 
-  memberData.update({ xpTotal: xpTotal, messages: memberData.messages + 1 });
-
-  // Check if message author can level up
-
+  // Check if the member can level up
   if (xpTotal >= xpRequired) {
-    memberData.update({ level: level + 1, xpRequired: Math.round(xpRequired * 1.5) });
-    level++;
+    await memberInstance.update({ level: level + 1, xpRequired: Math.round(xpRequired * 1.5) });
 
+    // Check if level mention is enabled
     if (guildConfig.levelMention && memberConfig.levelMention) {
-      if (!(level % 5)) {
-        const levelUpEmbed = new client.Discord.MessageEmbed()
-          .setColor(embedColor)
+      if (!(level + 1 % 5)) {
+        const levelUpEmbed = new global.Discord.MessageEmbed()
+          .setColor(colors.default)
           .setTitle(`${message.author.username} has levelled up!`)
-          .setDescription(`${message.author} is now level ${level.toLocaleString()} and earned ${currency}500 as a reward!`);
+          .setDescription(`${message.author} is now level ${global.functions.formatNumber(level + 1)} and earned ${currency}500 as a reward!`);
 
-        memberData.increment('balance', { by: 500 });
+        await memberInstance.increment("balance", { by: 500 });
 
         message.channel.send(levelUpEmbed);
       }
     }
   }
 
-  // Write message to data.json
+  // Generate markov on mention of self
+  if (message.mentions.users.first() === client.user) {
+    const TextGenerator = require("node-markov-generator").TextGenerator;
+    const generator = new TextGenerator(guildInstance.data);
 
-  if (!message.content.startsWith(prefix) && ignore.some(element => message.content.startsWith(element))) {
-    const dataProperty = await guildProperties.findByPk('data');
-    const data = dataProperty.value;
-
-    data.push(message.content);
-
-    return dataProperty.update({ value: data });
+    message.channel.send(generator.generateSentence());
   }
 
-  // Check if command exists
+  // Write message to data.json
+  if (![prefix, ...ignore].some(x => message.content.startsWith(x))) {
+    const array = guildInstance.data;
 
-  const args = message.content.slice(prefix.length).split(/ +/);
-  const commandName = args.shift().toLowerCase();
-  const command = client.commands.get(commandName) || client.commands.find((cmd) => cmd.aliases && cmd.aliases.includes(commandName));
+    array.push(message.content);
+
+    const g = await global.sequelize.models.guild.findOne({ guildId: message.guild.id });
+    await g.update({ data: array });
+
+    // I honestly have no idea why this won't work
+    // await guildInstance.update({ data: array });
+  }
+
+  if (memberInstance.botBan) return;
+  if (!message.content.startsWith(prefix)) return;
+
+  // Check if command exists
+  const parameters = message.content.slice(prefix.length).split(/ +/g);
+  const commandName = parameters.shift().toLowerCase();
+  let command = client.commands.find(command => command.aliases.find(alias => alias === commandName));
 
   if (!command) return;
 
-  if (message.author.id !== client.config.ownerID) {
-    // Check if message author has permission
+  // Check that the command isn't disabled
+  const disabledCommands = guildInstance.commands;
+  if (disabledCommands.includes(commandName)) return;
 
-    if (command.ownerOnly || (!message.member.hasPermission(command.permissions))) {
-      const permissionError = await message.channel.send(new client.Discord.MessageEmbed()
-        .setColor(errorColor)
-        .setTitle('Missing Permissions')
-        .addField('You are missing one of the following permissions:', command.permissions ? command.permissions.join(', ') : 'Bot owner only')
+  // Check if message author has permission
+  if (message.author.id !== global.config.ownerID) {
+    if (command.ownerOnly) return;
+    if (!message.member.hasPermission(command.permissions)) {
+      const permissionError = await message.channel.send(new global.Discord.MessageEmbed()
+        .setColor(colors.error)
+        .setTitle("Missing Permissions")
+        .addField("You are missing one of the following permissions:", command.permissions.join(", "))
       );
 
       return permissionError.delete({ timeout: errorTimeout });
@@ -98,63 +95,60 @@ module.exports = async (client, message) => {
   }
 
   // Check if parameters are correct
+  const usageEmbed = new global.Discord.MessageEmbed()
+    .setColor(colors.error)
+    .setTitle(`Improper usage of ${commandName}`)
+    .setDescription(command.description);
 
   if (command.parameters) {
-    var usageEmbed = new client.Discord.MessageEmbed()
-      .setColor(errorColor)
-      .setTitle(`Improper usage of ${commandName}`)
-      .setDescription(command.description)
-      .addField('Proper usage', `${prefix}${commandName} `);
-
     for (const parameter of command.parameters) {
       const i = command.parameters.indexOf(parameter);
 
-      if (!parameter.required || !parameter.type) continue;
-      if (!args[i]) return error(command);
+      if (!parameter.required) continue;
+      if (!parameters[i]) return error(command);
 
       try {
-        if (JSON.parse(args[i]).constructor !== parameter.type) return error(command);
+        if (parameter.type && JSON.parse(parameters[i]).constructor !== parameter.type) return error(command);
       } catch (e) {
         if (parameter.type !== String) return error(command);
       }
-    };
-  };
+    }
+  } else if (command.subCommands) {
+    const subCommand = command.subCommands.find(subCommand => subCommand.name === parameters[0]);
 
-  // Check sub commands
+    if (!subCommand) {
+      const name = command.subCommands.map(subCommand => subCommand.name);
 
-  if (command.subCommands) {
-    const subCommand = command.subCommands.find(subCommand => subCommand.name === args[0]);
+      usageEmbed.addField("Sub commands:", `\`[${name.join(" | ")}]\``);
 
-    if (!subCommand) return message.channel.send(`${args[0]} is not a sub-command.`);
+      return message.channel.send(usageEmbed);
+    }
+
+    // Remove the sub command from the arguments array
+    parameters.shift();
 
     if (subCommand.parameters) {
-      var usageEmbed = new client.Discord.MessageEmbed()
-        .setColor(errorColor)
-        .setTitle(`Improper usage of ${commandName}`)
-        .setDescription(command.description)
-        .addField('Proper usage', `${prefix}${commandName} ${subCommand.name} `);
-
       for (const parameter of subCommand.parameters) {
         const i = subCommand.parameters.indexOf(parameter);
 
-        if (!parameter.required || !parameter.type) continue;
-        if (!args[i + 1]) return error(subCommand);
+        if (!parameter.required) continue;
+        if (!parameters[i]) return error(subCommand, subCommand.name);
 
         try {
-          if (JSON.parse(args[i + 1]).constructor !== parameter.type) return error(subCommand);
+          if (parameter.type && JSON.parse(parameters[i]).constructor !== parameter.type) return error(subCommand, subCommand.name);
         } catch (e) {
-          if (parameter.type !== String) return error(subCommand);
+          if (parameter.type !== String) return error(subCommand, subCommand.name);
         }
       }
     }
+
+    command = subCommand;
   }
 
-  async function error (command) {
-    command.parameters.map(parameter => {
-      const field = usageEmbed.fields[0];
+  async function error (command, name) {
+    const array = command.parameters.map(parameter => parameter.required ? `[${parameter.name}]` : `<${parameter.name}>`);
 
-      parameter.required ? field.value += `[${parameter.name}] ` : field.value += `<${parameter.name}> `;
-    });
+    usageEmbed.addField("Proper usage", `\`${prefix}${commandName}${name ? ` ${name} ` : " "}${array.join(" ")}\``);
 
     const usageMessage = await message.channel.send(usageEmbed);
 
@@ -162,53 +156,53 @@ module.exports = async (client, message) => {
   }
 
   // Check if command cool down exists
-
-  if (message.author.id !== client.config.ownerID) {
-    if (!client.coolDowns.has(commandName)) client.coolDowns.set(commandName, new client.Discord.Collection());
+  if (message.author.id !== global.config.ownerID) {
+    if (!client.coolDowns.has(commandName)) client.coolDowns.set(commandName, new Map());
 
     const now = Date.now();
     const timestamps = client.coolDowns.get(commandName);
-    const coolDownAmount = (command.coolDown || 3) * 1000;
+    const coolDownLength = (command.coolDown || 3) * 1000;
 
     if (timestamps.has(message.author.id)) {
-      const expirationTime = timestamps.get(message.author.id) + coolDownAmount;
+      const expirationTime = timestamps.get(message.author.id) + coolDownLength;
 
       if (now < expirationTime) {
         const timeLeft = (expirationTime - now) / 1000;
 
-        const coolDownError = await message.channel.send(new client.Discord.MessageEmbed()
-          .setColor(errorColor)
-          .setTitle('Cool down active')
-          .setDescription(`Please wait, a cool down of ${client.pluralize('second', timeLeft.toFixed(1), true)} is remaining.`)
+        const coolDownEmbed = await message.channel.send(new global.Discord.MessageEmbed()
+          .setColor(colors.error)
+          .setTitle("Cool down active")
+          .setDescription(`Please wait, a cool down of ${global.pluralize("second", timeLeft.toFixed(1), true)} is remaining.`)
         );
 
-        return coolDownError.delete({ timeout: errorTimeout });
+        coolDownEmbed.delete({ timeout: errorTimeout });
       }
+
+      timestamps.set(message.author.id, now);
+
+      setTimeout(() => timestamps.delete(message.author.id), coolDownLength);
     }
 
+    // Set cool down for the command
     timestamps.set(message.author.id, now);
-
-    setTimeout(() => timestamps.delete(message.author.id), coolDownAmount);
   }
 
+  const time = global.moment().format("HH:mm M/D/Y");
+  const chalk = global.chalk;
+
+  console.log(chalk.green(`(${time})`), chalk.cyan(`(${message.guild.name} #${message.channel.name})`), chalk.yellow(message.author.tag), message.content);
+
   // Execute the command
-
-  message.channel.startTyping();
-
-  console.log(`${`(${time})`.green} ${`(${message.guild.name} #${message.channel.name})`.cyan}`, message.author.tag.yellow, message.content);
-
   try {
-    await command.execute(client, message, args);
+    return command.execute(client, message, parameters);
   } catch (error) {
     console.error(error);
 
-    await message.channel.send(new client.Discord.MessageEmbed()
-      .setColor(errorColor)
-      .setTitle('An error has occurred')
-      .setDescription(error, { code: 'js' })
-      .setFooter('See console for more information')
+    return message.channel.send(new global.Discord.MessageEmbed()
+      .setColor(colors.error)
+      .setTitle("An error has occurred")
+      .setDescription(`\`\`\`js\n${error}\`\`\``)
+      .setFooter("See console for more information")
     );
   }
-
-  return message.channel.stopTyping();
 };

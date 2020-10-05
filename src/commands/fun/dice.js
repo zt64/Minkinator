@@ -1,27 +1,35 @@
 module.exports = {
-  description: 'Roll a dice.',
-  async execute (client, message, args) {
-    const result = client.functions.randomInteger(1, 6);
+  description: "Roll a dice.",
+  aliases: ["roll"],
+  parameters: [
+    {
+      name: "sides",
+      type: Number
+    }
+  ],
+  async execute (client, message, [ sides ]) {
+    const guildConfig = global.guildInstance.guildConfig;
+    const defaultColor = guildConfig.colors.default;
+    const { randomInteger, sleep } = global.functions;
 
-    const guildConfig = await client.database.properties.findByPk('configuration').then(key => key.value);
-    const embedColor = guildConfig.embedSuccessColor;
+    if (isNaN(sides)) sides = 6;
+
+    // Generate number
+    const result = randomInteger(1, sides);
 
     // Create embed
-
-    const diceEmbed = new client.Discord.MessageEmbed()
-      .setColor(embedColor)
-      .setTitle('Dice roll')
-      .setDescription('Rolling...');
+    const diceEmbed = new global.Discord.MessageEmbed()
+      .setColor(defaultColor)
+      .setTitle("Dice roll")
+      .setDescription("Rolling...");
 
     // Send message
-
     const diceMessage = await message.channel.send(diceEmbed);
 
-    // Delete message
+    await sleep(1000);
 
-    setTimeout(() => {
-      diceEmbed.setDescription(result);
-      diceMessage.edit(diceEmbed);
-    }, 1000);
+    // Edit embed
+    diceEmbed.setDescription(result);
+    diceMessage.edit(diceEmbed);
   }
 };
