@@ -29,10 +29,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: true
     },
-    ignoreBots: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true
-    },
     ignore: {
       type: DataTypes.JSON,
       defaultValue: [ "?" ]
