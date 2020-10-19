@@ -17,7 +17,7 @@ module.exports = {
         }
       ],
       async execute (client, message, [ modelName, instanceName ]) {
-        const guildConfig = global.guildInstance.guildConfig;
+        const guildConfig = global.guildInstance.config;
         const defaultColor = guildConfig.colors.default;
 
         const embed = new global.Discord.MessageEmbed()
@@ -97,7 +97,7 @@ module.exports = {
       name: "info",
       description: "Shows information about the database.",
       async execute (client, message) {
-        const guildConfig = global.guildInstance.guildConfig;
+        const guildConfig = global.guildInstance.config;
         const defaultColor = guildConfig.colors.default;
 
         const { dependencies } = require("../../../package.json");

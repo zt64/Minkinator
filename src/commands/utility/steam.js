@@ -12,7 +12,7 @@ module.exports = {
         }
       ],
       async execute (client, message, [ steamID ]) {
-        const guildConfig = global.guildInstance.guildConfig;
+        const guildConfig = global.guildInstance.config;
         const key = global.auth.steam;
 
         const json = await global.functions.fetchJSON(`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${key}&steamids=${steamID}`);

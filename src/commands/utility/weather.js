@@ -8,7 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ cityName ]) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
 
     const { fetchJSON, kToC, formatNumber} = global.functions;

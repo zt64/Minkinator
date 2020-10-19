@@ -2,7 +2,7 @@ module.exports = {
   description: "Flip a coin.",
   aliases: ["flip", "coin"],
   async execute (client, message) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
     
     // Generate result

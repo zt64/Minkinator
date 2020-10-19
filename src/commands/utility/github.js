@@ -17,7 +17,7 @@ module.exports = {
         }
       ],
       async execute (client, message, [ owner, name ]) {
-        const guildConfig = global.guildInstance.guildConfig;
+        const guildConfig = global.guildInstance.config;
         const defaultColor = guildConfig.colors.default;
 
         const json = await global.functions.fetchJson(`https://api.github.com/repos/${owner}/${name}`);
@@ -60,7 +60,7 @@ module.exports = {
         }
       ],
       async execute (client, message, [ user ]) {
-        const guildConfig = global.guildInstance.guildConfig;
+        const guildConfig = global.guildInstance.config;
         const defaultColor = guildConfig.colors.default;
 
         const json = await global.functions.fetchJson(`https://api.github.com/users/${user}`);

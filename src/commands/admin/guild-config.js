@@ -16,7 +16,7 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildInstance = global.guildInstance;
-    const config = await guildInstance.guildConfig;
+    const config = await guildInstance.config;
     const defaultColor = config.dataValues.colors.default;
 
     const key = args[0];
@@ -64,7 +64,7 @@ module.exports = {
       configEmbed.setDescription(`Successfully set \`${key}\` to \`${value}\`.`);
     }
 
-    await guildInstance.setGuildConfig(config);
+    await guildInstance.setConfig(config);
 
     return message.channel.send(configEmbed);
   }

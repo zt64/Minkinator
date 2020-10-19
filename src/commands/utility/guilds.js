@@ -2,11 +2,11 @@ module.exports = {
   description: "Shows the current guilds and members Minkinator is watching.",
   aliases: ["servers"],
   async execute (client, message, [ page ]) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
 
-    const guilds = client.guilds.cache;
-    const pages = Math.ceil(guilds.size / 10);
+    const guilds = client.guilds.cache.array();
+    const pages = Math.ceil(guilds.length / 10);
 
     if (!page) page = 1;
 
@@ -14,10 +14,16 @@ module.exports = {
 
     const guildsEmbed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
-      .setTitle(`Watching ${global.pluralize("guild", guilds.size, true)} and ${client.users.cache.size} users`)
+      .setTitle(`Watching ${global.pluralize("guild", guilds.length, true)} and ${client.users.cache.size} users`)
       .setFooter(`Page ${page} of ${pages}`);
 
-    guilds.map(guild => guildsEmbed.addField(`${guild.name}`, `Members: ${guild.memberCount} \n ID: ${guild.id}`));
+    function populate () {
+      guilds.slice((page - 1) * 10, page * 10).map((guild) => {
+        guildsEmbed.addField(`${guild.name}`, `Members: ${guild.memberCount} \n ID: ${guild.id}`);
+      });
+    }
+
+    populate();
 
     const guildsMessage = await message.channel.send(guildsEmbed);
 
@@ -35,12 +41,16 @@ module.exports = {
       case "🏠":
         page = 1;
 
+        populate();
+
         guildsMessage.reactions.removeAll();
 
         if (pages > 1) guildsMessage.react("➡️");
         break;
       case "⬅️":
         page--;
+
+        populate();
 
         guildsMessage.reactions.removeAll();
 
@@ -50,6 +60,8 @@ module.exports = {
         break;
       case "➡️":
         page++;
+
+        populate();
 
         guildsMessage.reactions.removeAll();
 

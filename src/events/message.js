@@ -1,4 +1,6 @@
 module.exports = async (client, message) => {
+  if (message.author.bot) return;
+
   if (message.channel.type === "dm") {
     if (message.author === client.user) return;
     
@@ -9,16 +11,14 @@ module.exports = async (client, message) => {
   }
 
   const guildInstance = global.guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true, nested: true } });
-  const guildConfig = guildInstance.guildConfig;
-
-  if (guildConfig.ignoreBots && message.author.bot) return;
+  const guildConfig = guildInstance.config;
 
   const { errorTimeout, currency, prefix, ignore, colors } = guildConfig;
   
   let memberInstance = global.memberInstance = await global.sequelize.models.member.findByPk(message.author.id, { include: { all: true, nested: true } });
   
   if (!memberInstance) memberInstance = await guildInstance.createMember({ userId: message.author.id, guildId: message.guild.id });
-  if (!memberInstance.memberConfig) var memberConfig = await memberInstance.createMemberConfig();
+  if (!memberInstance.config) var memberConfig = await memberInstance.createConfig();
 
   const { level, xpTotal, xpRequired } = memberInstance;
 

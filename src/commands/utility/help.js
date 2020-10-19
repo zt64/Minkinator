@@ -8,7 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ commandName ]) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
     const prefix = guildConfig.prefix;
 
@@ -64,7 +64,7 @@ module.exports = {
       client.commands.forEach(command => {
         if (command.category !== category) return;
 
-        helpEmbed.addField(`\`${prefix}${command.name}\``, command.description || "\u200b");
+        helpEmbed.addField(`\`${prefix}${command.aliases[command.aliases.length - 1]}\``, command.description || "\u200b");
       });
     }
 

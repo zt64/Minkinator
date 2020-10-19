@@ -1,7 +1,7 @@
 module.exports = {
   description: "Displays information regarding Minkinator.",
   async execute (client, message) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
     const owner = await client.users.fetch(global.config.ownerID);
 

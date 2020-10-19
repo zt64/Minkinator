@@ -23,10 +23,10 @@ module.exports = {
     message.author = await client.users.fetch(userID);
 
     const command = client.commands.get(commandName) || [...client.commands.values()].find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-    const guildInstance = global.guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true, nested: true } });
+    const guildInstance = global.guildInstance;
 
-    let memberInstance = await global.sequelize.models.member.findByPk(message.author.id, { include: { all: true, nested: true } });
-    if (!memberInstance) memberInstance = await guildInstance.createMember({ userId: message.author.id, guildId: message.guild.id });
+    let memberInstance = await global.sequelize.models.member.findOrCreate({ where: { userId: userID }}, { include: { all: true, nested: true } });
+    if (!memberInstance) memberInstance = await guildInstance.createMember({ userId: userID, guildId: message.guild.id });
 
     global.memberInstance = memberInstance;
 

@@ -1,7 +1,7 @@
 module.exports = {
   description: "Create a poll.",
   async execute (client, message, args) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const embedColor = guildConfig.colors.default;
     const options = args;
 

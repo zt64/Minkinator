@@ -9,7 +9,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ guess ]) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const memberInstance = global.memberInstance;
 
     guess = Math.round(guess);

@@ -19,7 +19,7 @@ module.exports = {
   async execute (client, message, args) {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
 
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const mutes = global.guildInstance.mutes;
     const defaultColor = guildConfig.colors.default;
 

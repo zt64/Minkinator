@@ -2,13 +2,31 @@ module.exports = {
   description: "Generates a markov chain.",
   aliases: [ "mkv" ],
   async execute (client, message) {
-    const data = global.guildInstance.data;
-    const markov = global.markov(1);
+    // const corpus = global.guildInstance.data;
+    const chain = new global.markov();
 
-    markov.seed(data.join(""));
+    chain.config.grams = global.functions.randomInteger(1, 3);
 
-    const key = markov.pick();
+    const data = global.fs.readFileSync("corpus.txt");
+    const corpus = data.toString().split("\n");
 
-    return message.channel.send(markov.forward(key));
+    corpus.map(sentence => chain.update(sentence));
+
+    const phrase = [];
+    const n = 3;
+
+    for (let i = 0; i < n; i++) {
+      const sentence = chain.generate();
+      phrase.push(sentence);
+
+      const words = sentence.split(" ");
+
+      if (words.length === 1) break;
+      if (words.length > 1) chain.config.from = words[words.length - 2];
+    }
+
+    console.log(phrase);
+
+    return message.channel.send(phrase.join(" "));
   }
 };

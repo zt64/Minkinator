@@ -8,7 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ page ]) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
 
@@ -28,13 +28,14 @@ module.exports = {
 
     if (page > pages || page < 1) return message.channel.send(`Page \`${page}\` does not exist.`);
 
-    function populateLeaderBoard () {
+    function populate () {
       members.slice((page - 1) * 10, page * 10).map((member, index) => {
-        leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${client.users.cache.get(member.userId).tag}:`, `${currency}${formatNumber(member.balance, 2)}`);
+        const tag = client.users.cache.get(member.userId).tag;
+        leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${tag}:`, `${currency}${formatNumber(member.balance, 2)}`);
       });
     }
 
-    populateLeaderBoard();
+    populate();
 
     const leaderBoardMessage = await message.channel.send(leaderBoardEmbed);
 
@@ -78,7 +79,7 @@ module.exports = {
 
       leaderBoardEmbed.fields = [];
 
-      populateLeaderBoard();
+      populate();
 
       leaderBoardEmbed.setFooter(`Page ${page} of ${pages}`);
 

@@ -9,7 +9,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ messageEmoji ]) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
 
     const twemoji = global.twemoji;

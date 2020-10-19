@@ -2,7 +2,7 @@ module.exports = {
   description: "Show guild information.",
   aliases: ["gi", "guildinfo"],
   async execute (client, message) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
 
     const guild = message.guild;

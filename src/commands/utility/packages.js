@@ -2,7 +2,7 @@ module.exports = {
   description: "Shows all the packages that Minkinator is using.",
   aliases: ["pkg", "pkgs"],
   async execute (client, message) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
 
     const { dependencies } = require("../../../package.json");

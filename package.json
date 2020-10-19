@@ -20,6 +20,7 @@
 		"pluralize": "^8.0.0",
 		"pretty-bytes": "^5.3.0",
 		"pretty-ms": "^7.0.0",
+		"purpl-markov-chain": "^2.0.3",
 		"qrcode": "^1.4.4",
 		"sequelize": "^6.3.4",
 		"sqlite3": "^5.0.0",

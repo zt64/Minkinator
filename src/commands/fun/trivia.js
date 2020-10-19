@@ -5,7 +5,7 @@ module.exports = {
     const { randomInteger, sleep } = global.functions;
     const entities = global.entities;
 
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
 

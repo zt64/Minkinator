@@ -14,7 +14,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ member, amount ]) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
     const currency = guildConfig.currency;
 

@@ -9,6 +9,7 @@ const client = new Discord.Client(config.clientOptions);
 const time = moment().format("HH:mm M/D/Y");
 
 global.functions = require("./lib/functions.js");
+global.markov = require("purpl-markov-chain");
 global.GifEncoder = require("gif-encoder");
 global.Sequelize = require("sequelize");
 global.pluralize = require("pluralize");
@@ -74,6 +75,7 @@ client.loadEvents();
 client.loadCommands();
 
 // Login to Discord API
+if (!auth.discord) return console.error("No token provided, enter a token in to the auth file to login.");
 client.login(auth.discord);
 
 // Handle promise rejections

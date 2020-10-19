@@ -2,11 +2,14 @@ module.exports = {
   description: "Change your settings.",
   aliases: [ "mc" ],
   async execute (client, message, [ key, value ]) {
-    const memberInstance = global.memberInstance;
-    const memberConfig = await memberInstance.getMemberConfig();
+    const memberConfig = global.memberInstance.config;
 
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
+
+    const embed = new global.Discord.MessageEmbed()
+      .setColor(defaultColor)
+      .setTitle("Member Configuration");
 
     if (key) {
       if (key in memberConfig) {
@@ -14,7 +17,7 @@ module.exports = {
 
         memberConfig[key] = JSON.parse(value);
 
-        await memberInstance.update({ memberConfig: memberConfig });
+        await memberConfig.update({ [key]: value });
 
         return message.channel.send(`Successfully set \`${key}\` to \`${value}\`.`);
       } else {
@@ -23,9 +26,7 @@ module.exports = {
     }
 
     // Create embed
-    const embed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
-      .setTitle("Member Configuration");
+    
 
     embed.setDescription(`\`\`\`json\n${JSON.stringify(memberConfig, null, 2)}\`\`\``);
 

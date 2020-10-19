@@ -17,7 +17,7 @@ module.exports = {
         }
       ],
       async execute (client, message, [ itemName, itemAmount ]) {
-        const guildConfig = global.guildInstance.guildConfig;
+        const guildConfig = global.guildInstance.config;
         const shopItems = global.guildInstance.items;
         const memberData = global.memberInstance;
 
@@ -80,7 +80,7 @@ module.exports = {
         }
       ],
       async execute (client, message, [ itemName, itemAmount ]) {
-        const guildConfig = global.guildInstance.guildConfig;
+        const guildConfig = global.guildInstance.config;
         const shopItems = global.guildInstance.items;
         const memberData = global.memberInstance;
 
@@ -127,7 +127,7 @@ module.exports = {
         }
       ],
       async execute (client, message, [ page ]) {
-        const guildConfig = global.guildInstance.guildConfig;
+        const guildConfig = global.guildInstance.config;
         const shopItems = global.guildInstance.items;
 
         const { formatNumber } = global.functions;

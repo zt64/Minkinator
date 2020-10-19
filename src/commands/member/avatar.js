@@ -8,7 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ member ]) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
 
     // Get user

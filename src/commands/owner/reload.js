@@ -2,7 +2,7 @@ module.exports = {
   description: "Reloads all the bot events and commands.",
   aliases: ["r"],
   async execute (client, message) {
-    const guildConfig = global.guildInstance.guildConfig;
+    const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
 
     const commands = client.commands;

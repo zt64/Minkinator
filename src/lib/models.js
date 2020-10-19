@@ -21,42 +21,44 @@ exports.create = async () => {
   
   const Item = require("../models/Item.js")(sequelize, Sequelize);
 
-  // Setup associations
-  Guild.hasOne(GuildConfig);
+  // Set up associations
+  Guild.hasOne(GuildConfig, { as: "config", foreignKey: "guildId" });
+  Member.hasOne(MemberConfig, { as: "config", foreignKey: "userId"} );
+
   Guild.hasMany(Member);
   Guild.hasMany(Item);
-  
-  Member.hasOne(MemberConfig, { foreignKey: "userId"} );
 
   await sequelize.sync();
 
   return sequelize;
 };
 
-exports.populate = async (guild, sequelize) => {
-  const models = sequelize.models;
+exports.initialize = async (guild) => {
+  const models = global.sequelize.models;
 
-  await models.guild.findOrCreate({ where: { id: guild.id } });
-  await models.guildConfig.findOrCreate({ where: { guildId: guild.id }, defaults: { guildId: guild.id }});
+  const guildInstance = await models.guild.findOrCreate({ where: { id: guild.id } });
+  await models.guildConfig.findOrCreate({ where: { guildId: guild.id } });
+
+  return guildInstance;
 };
 
-exports.checkMembers = async (guild, sequelize) => {
-  const guildInstance = await sequelize.models.guild.findOne({ where: { id: guild.id }});
+exports.checkMembers = async (guild, guildInstance) => {
+  console.log(guildInstance);
   const databaseMembers = guildInstance.getMembers();
 
-  if (databaseMembers) {
-    const { chalk, moment } = global;
+  if (!databaseMembers) return;
 
-    const time = moment().format("HH:mm M/D/Y");
+  const { chalk, moment } = global;
 
-    for (const memberData of await databaseMembers.findAll()) {
-      try {
-        await guild.members.fetch(memberData.id);
-      } catch (error) {
-        await memberData.destroy();
+  const time = moment().format("HH:mm M/D/Y");
 
-        console.log(chalk.green(`(${time})`), `Deleted ${memberData.id} from ${guild.name}.`);
-      }
+  for (const memberData of await databaseMembers.findAll()) {
+    try {
+      await guild.members.fetch(memberData.id);
+    } catch (error) {
+      await memberData.destroy();
+
+      console.log(chalk.green(`(${time})`), `Deleted ${memberData.id} from ${guild.name}.`);
     }
   }
 };
