@@ -2,13 +2,10 @@ module.exports = {
   description: "Generates a markov chain.",
   aliases: [ "mkv" ],
   async execute (client, message) {
-    // const corpus = global.guildInstance.data;
+    const corpus = global.guildInstance.data;
     const chain = new global.markov();
 
     chain.config.grams = global.functions.randomInteger(1, 3);
-
-    const data = global.fs.readFileSync("corpus.txt");
-    const corpus = data.toString().split("\n");
 
     corpus.map(sentence => chain.update(sentence));
 

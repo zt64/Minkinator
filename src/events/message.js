@@ -47,10 +47,14 @@ module.exports = async (client, message) => {
 
   // Generate markov on mention of self
   if (message.mentions.users.first() === client.user) {
-    const TextGenerator = require("node-markov-generator").TextGenerator;
-    const generator = new TextGenerator(guildInstance.data);
+    const corpus = global.guildInstance.data;
+    const chain = new global.markov();
 
-    message.channel.send(generator.generateSentence());
+    chain.config.grams = global.functions.randomInteger(1, 3);
+
+    corpus.map(sentence => chain.update(sentence));
+
+    message.channel.send(chain.generate());
   }
 
   // Write message to data.json
@@ -72,8 +76,8 @@ module.exports = async (client, message) => {
   // Check if command exists
   const parameters = message.content.slice(prefix.length).split(/ +/g);
   const commandName = parameters.shift().toLowerCase();
-  let command = client.commands.find(command => command.aliases.find(alias => alias === commandName));
-
+  let command = client.commands.find(command => command.name === commandName) || [...client.commands.values()].find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
+  
   if (!command) return;
 
   // Check that the command isn't disabled
