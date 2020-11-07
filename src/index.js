@@ -8,7 +8,7 @@ const fs = global.fs = require("fs");
 const client = new Discord.Client(config.clientOptions);
 const time = moment().format("HH:mm M/D/Y");
 
-global.functions = require("./lib/functions.js");
+global.functions = require("./util/functions.js");
 global.markov = require("purpl-markov-chain");
 global.GifEncoder = require("gif-encoder");
 global.Sequelize = require("sequelize");
@@ -25,7 +25,7 @@ global.qr = require("qrcode");
 global.os = require("os");
 
 // Set client properties
-client.database = require("./lib/models.js");
+client.database = require("./util/models.js");
 client.coolDowns = new Map();
 
 // Set up event handler
@@ -59,8 +59,7 @@ client.loadCommands = async () => {
 
       if (!command.aliases) command.aliases = [];
 
-      command.aliases.push(commandName.replace(".js", ""));
-      // command.name = commandName.replace(".js", "");
+      command.name = commandName.replace(".js", "");
       command.category = category;
 
       client.commands.push(command);
@@ -88,4 +87,9 @@ process.stdin.on("data", async data => {
   } catch (error) {
     console.error(error.message);
   }
+});
+
+process.on("SIGINT", function() {
+  client.destroy();
+  process.exit();
 });
