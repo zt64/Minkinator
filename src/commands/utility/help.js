@@ -17,7 +17,7 @@ module.exports = {
       .setFooter(`Created by Litleck (${await client.users.fetch(global.config.ownerID).then(user => user.tag)})`);
 
     if (commandName) {
-      const command = client.commands.get(commandName.toLowerCase()) || client.commands.find(c => c.aliases && c.aliases.includes(commandName.toLowerCase()));
+      const command = client.commands.find(command => command.name === commandName) || [...client.commands.values()].find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
       if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
         return message.channel.send(new global.Discord.MessageEmbed()
