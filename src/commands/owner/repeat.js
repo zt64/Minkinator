@@ -13,8 +13,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const amount = args[0];
-    const commandName = args[1];
+    const [ amount, commandName ] = args;
 
     const command = client.commands.get(commandName);
 

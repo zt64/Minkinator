@@ -9,7 +9,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ commandName ]) {
-    const guildInstance = global.guildInstance;
+    const { guildInstance } = global;
 
     const commandsArray = guildInstance.commands;
 

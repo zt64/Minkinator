@@ -1,5 +1,5 @@
 module.exports = async (client, member) => {
-  const guild = member.guild;
+  const { guild } = member;
   const channel = guild.channels.cache.find(channel => channel.name === "member-log");
 
   if (!channel) return;

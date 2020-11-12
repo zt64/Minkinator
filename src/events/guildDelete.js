@@ -1,7 +1,6 @@
 module.exports = async (client, guild) => {
-  const time = global.moment().format("HH:mm M/D/Y");
-  const pluralize = global.pluralize;
-  const chalk = global.chalk;
+  const { moment, chalk, pluralize } = global;
+  const time = moment().format("HH:mm M/D/Y");
 
   console.log(chalk.green(`(${time})`), `Minkinator has left: ${guild.name} (${guild.id}).`);
 

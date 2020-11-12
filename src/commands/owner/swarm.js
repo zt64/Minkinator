@@ -13,7 +13,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const amount = args[0];
+    const [ amount ] = args;
     const string = args.slice(1).join(" ");
 
     const members = message.guild.members.cache.array();
@@ -27,7 +27,7 @@ module.exports = {
 
     // Send messages
     for (let i = 0; i < amount; i++) {
-      const user = members[Math.floor(Math.random() * members.length)].user;
+      const { user } = members[Math.floor(Math.random() * members.length)];
       await webhook.send(string, { username: user.username, avatarURL: user.avatarURL() });
 
       await global.functions.sleep(750);

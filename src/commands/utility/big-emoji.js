@@ -9,10 +9,8 @@ module.exports = {
     }
   ],
   async execute (client, message, [ messageEmoji ]) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
-
-    const twemoji = global.twemoji;
+    const { colors } = global.guildInstance.config;
+    const { twemoji } = global;
 
     let url;
 
@@ -28,15 +26,14 @@ module.exports = {
 
       if (emoji === messageEmoji) return message.channel.send(`\`${messageEmoji}\` is not a valid emoji.`);
 
-      url = emoji.match(/http.+png/)[0];
+      [ url ] = emoji.match(/http.+png/);
     }
 
-    const emojiEmbed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
-      .setTitle("Scaled emoji")
-      .setURL(url)
-      .setImage(url);
-
-    return message.channel.send(emojiEmbed);
+    return message.channel.send(new global.Discord.MessageEmbed({
+      color: colors.default,
+      title: "Scaled Emoji",
+      url: url,
+      image: { url }
+    }));
   }
 };

@@ -7,8 +7,7 @@ module.exports = {
   ],
   async execute (client, message, [ member ]) {
     const user = await global.functions.getUser(client, message, member);
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
+    const { colors } = global.guildInstance.config;
 
     const platforms = [];
 
@@ -19,7 +18,7 @@ module.exports = {
 
     // Create embed
     const infoEmbed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
+      .setColor(colors.default)
       .setAuthor(`User information: ${user.tag}`, user.avatarURL())
       .addField("ID:", user.id)
       .addField("Created:", user.createdAt.toLocaleDateString(), true)

@@ -2,14 +2,13 @@ module.exports = {
   description: "Show guild information.",
   aliases: ["gi", "guildinfo"],
   async execute (client, message) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
+    const { colors } = global.guildInstance.config;
 
-    const guild = message.guild;
+    const { guild } = message;
 
     // Create embed
     const infoEmbed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
+      .setColor(colors.default)
       .setThumbnail(guild.iconURL())
       .setTitle("Guild Information")
       .addField("Name:", guild.name, true)

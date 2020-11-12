@@ -57,8 +57,6 @@ client.loadCommands = async () => {
 
       if (category === "owner") command.ownerOnly = true;
 
-      if (!command.aliases) command.aliases = [];
-
       command.name = commandName.replace(".js", "");
       command.category = category;
 

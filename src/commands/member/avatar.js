@@ -8,20 +8,19 @@ module.exports = {
     }
   ],
   async execute (client, message, [ member ]) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
+    const { colors } = global.guildInstance.config;
 
     // Get user
     const user = await global.functions.getUser(client, message, member);
     const avatar = user.displayAvatarURL({ format: "png", dynamic: true, size: 256 });
 
     // Send embed
-    return message.channel.send(new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
-      .setTitle(`Avatar of ${user.tag}`)
-      .setURL(avatar)
-      .setImage(avatar)
-      .setFooter(`User ID: ${user.id}`)
-    );
+    return message.channel.send(new global.Discord.MessageEmbed({
+      color: colors.default,
+      title: `Avatar of ${user.tag}`,
+      url: avatar,
+      image: { url: avatar },
+      footer: { text: `User ID: ${user.id}` }
+    }));
   }
 };

@@ -3,17 +3,15 @@ module.exports = {
   aliases: ["quiz"],
   async execute (client, message) {
     const { randomInteger, sleep } = global.functions;
-    const entities = global.entities;
+    const { entities } = global;
 
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
-    const currency = guildConfig.currency;
+    const { currency, colors } = global.guildInstance.config;
 
     let correctIndex = 0;
 
     // Fetch question
     const responses = await global.fetch("https://opentdb.com/api.php?amount=1").then(res => res.json());
-    const response = responses.results[0];
+    const [ response ] = responses.results;
 
     const question = entities.decodeHTML(response.question);
 
@@ -33,7 +31,7 @@ module.exports = {
 
     // Create embed
     const questionEmbed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
+      .setColor(colors.default)
       .setTitle(`${response.category} question`)
       .setDescription(question)
       .setFooter(`This question is worth ${currency}${reward}`);
@@ -75,7 +73,7 @@ module.exports = {
     }
 
     const answerEmbed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
+      .setColor(colors.default)
       .setTitle("Trivia Answer");
 
     if (users.length) {

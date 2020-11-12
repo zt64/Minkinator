@@ -8,22 +8,15 @@ module.exports = {
     chain.config.grams = global.functions.randomInteger(1, 3);
 
     corpus.map(sentence => chain.update(sentence));
+    
+    let result = chain.generate();
 
-    const phrase = [];
-    const n = 3;
+    if (result.length < 5) {
+      chain.config.from = result;
 
-    for (let i = 0; i < n; i++) {
-      const sentence = chain.generate();
-      phrase.push(sentence);
-
-      const words = sentence.split(" ");
-
-      if (words.length === 1) break;
-      if (words.length > 1) chain.config.from = words[words.length - 2];
+      result = chain.generate();
     }
 
-    console.log(phrase);
-
-    return message.channel.send(phrase.join(" "));
+    return message.channel.send(chain.generate());
   }
 };

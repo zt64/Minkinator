@@ -1,14 +1,14 @@
 module.exports = {
   description: "Draw a mathematical equation.",
   async execute (client, message, args) {
-    const math = global.math;
+    const { math } = global;
 
     const expr = math.compile("4 * sin(x) + 5 * cos(x/2)");
 
     // evaluate the expression repeatedly for different values of x
     const xValues = math.range(-10, 10, 0.5).toArray();
     const yValues = xValues.map(function (x) {
-      return expr.evaluate({x: x});
+      return expr.evaluate({ x: x });
     });
 
     const canvas = global.canvas.createCanvas(512, 512);

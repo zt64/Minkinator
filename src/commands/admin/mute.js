@@ -19,9 +19,7 @@ module.exports = {
   async execute (client, message, args) {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
 
-    const guildConfig = global.guildInstance.config;
-    const mutes = global.guildInstance.mutes;
-    const defaultColor = guildConfig.colors.default;
+    const { mutes, config: { colors } } = global.guildInstance.config;
 
     const member = message.mentions.members.first();
     const reason = args.slice(2).join(" ");
@@ -35,7 +33,7 @@ module.exports = {
     });
 
     return message.channel.send(new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
+      .setColor(colors.default)
       .setAuthor(`${member.user.tag} has been muted${minutes ? ` for ${global.pluralize("minute", minutes, true)}` : ""}.`, member.user.avatarURL())
       .setDescription(reason || "No reason provided.")
     );

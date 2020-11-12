@@ -12,7 +12,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const event = args[0];
+    const [ event ] = args;
     const parameters = args.slice(2).join();
 
     // Emit event

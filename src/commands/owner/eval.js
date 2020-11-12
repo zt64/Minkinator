@@ -9,12 +9,11 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
+    const { colors } = global.guildInstance.config;
 
     const input = args.join(" ");
     const embed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor);
+      .setColor(colors.default);
 
     // Attempt to run code
     try {

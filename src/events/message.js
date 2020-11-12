@@ -5,7 +5,7 @@ module.exports = async (client, message) => {
     if (message.author === client.user) return;
     
     const botOwner = await client.users.fetch(global.config.ownerID);
-    const author = message.author;
+    const { author } = message;
 
     return botOwner.send(`Message from \`${author.tag} (${author.id})\`:\n${message.content}`);
   }
@@ -192,7 +192,7 @@ module.exports = async (client, message) => {
   }
 
   const time = global.moment().format("HH:mm M/D/Y");
-  const chalk = global.chalk;
+  const { chalk } = global;
 
   console.log(chalk.green(`(${time})`), chalk.cyan(`(${message.guild.name} #${message.channel.name})`), chalk.yellow(message.author.tag), message.content);
 

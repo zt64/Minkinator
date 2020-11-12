@@ -17,18 +17,17 @@ module.exports = {
         }
       ],
       async execute (client, message, [ modelName, instanceName ]) {
-        const guildConfig = global.guildInstance.config;
-        const defaultColor = guildConfig.colors.default;
+        const { colors } = global.guildInstance.config;
 
         const embed = new global.Discord.MessageEmbed()
-          .setColor(defaultColor);
+          .setColor(colors.default);
 
         const model = global.sequelize.models[modelName];
         if (!model) return message.channel.send(`Model \`${modelName}\` does not exist.`);
 
         // If no entity provided, show all entities
         if (!instanceName) {
-          const entities = await model.findAll({ include: { all: true, nested: true }});
+          const entities = await model.findAll({ include: { all: true, nested: true } });
           const array = entities.map(entity => Object.values(entity.dataValues)[0]);
 
           embed.setTitle(`${modelName}`);
@@ -38,7 +37,7 @@ module.exports = {
         }
 
         // Check if object exists
-        const object = await model.findByPk(instanceName, { include: { all: true, nested: true }});
+        const object = await model.findByPk(instanceName, { include: { all: true, nested: true } });
         if (object === null) return message.channel.send(`Object: ${instanceName}, does not exist.`);
 
         // Set embed properties
@@ -70,13 +69,7 @@ module.exports = {
           name: "value"
         }
       ],
-      async execute (client, message, args) {
-        const modelName = args[0];
-        const instanceName = args[1];
-        const propertyName = args[2];
-
-        const value = args.slice(3).join(" ");
-
+      async execute (client, message, [ modelName, instanceName, propertyName, value ]) {
         // Check if model exists
         const model = global.sequelize.models[modelName];
         if (!model) return message.channel.send(`Model \`${modelName}\` does not exist.`);

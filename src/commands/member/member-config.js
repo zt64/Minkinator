@@ -3,12 +3,10 @@ module.exports = {
   aliases: [ "mc" ],
   async execute (client, message, [ key, value ]) {
     const memberConfig = global.memberInstance.config;
-
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
+    const { colors } = global.guildInstance.config;
 
     const embed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
+      .setColor(colors.default)
       .setTitle("Member Configuration");
 
     if (key) {

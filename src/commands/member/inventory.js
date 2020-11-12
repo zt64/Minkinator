@@ -13,7 +13,7 @@ module.exports = {
 
     const user = message.mentions.users.first() || message.author;
     const member = message.guild.member(user);
-    const inventory = global.memberInstance.inventory;
+    const { inventory } = global.memberInstance;
 
     // Create embed
     const inventoryEmbed = new global.Discord.MessageEmbed()

@@ -1,5 +1,5 @@
 exports.create = async () => {
-  const Sequelize = global.Sequelize;
+  const { Sequelize } = global;
 
   const sequelize = new Sequelize("database", "user", "password", {
     host: "localhost",
@@ -23,7 +23,7 @@ exports.create = async () => {
 
   // Set up associations
   Guild.hasOne(GuildConfig, { as: "config", foreignKey: "guildId" });
-  Member.hasOne(MemberConfig, { as: "config", foreignKey: "userId"} );
+  Member.hasOne(MemberConfig, { as: "config", foreignKey: "userId" } );
 
   Guild.hasMany(Member);
   Guild.hasMany(Item);
@@ -34,7 +34,7 @@ exports.create = async () => {
 };
 
 exports.initialize = async (guild) => {
-  const models = global.sequelize.models;
+  const { models } = global.sequelize;
 
   const guildInstance = await models.guild.findOrCreate({ where: { id: guild.id } });
   await models.guildConfig.findOrCreate({ where: { guildId: guild.id } });

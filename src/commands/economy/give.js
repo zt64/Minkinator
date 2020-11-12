@@ -14,9 +14,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ member, amount ]) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
-    const currency = guildConfig.currency;
+    const { currency, colors } = global.guildInstance.config;
 
     const { formatNumber } = global.functions;
 
@@ -29,7 +27,7 @@ module.exports = {
 
     // Get data for the sender and receiver
     const [targetInstance] = await global.sequelize.models.member.findOrCreate({ where: { userId: target.user.id } });
-    const memberInstance = global.memberInstance;
+    const { memberInstance } = global;
 
     if (memberInstance.balance - amount < 0) return message.reply(`You are missing the additional ${currency}${Math.abs(amount - memberInstance.balance)}.`);
 
@@ -38,7 +36,7 @@ module.exports = {
     await targetInstance.increment("balance", { by: parseInt(amount) });
 
     return message.channel.send(new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
+      .setColor(colors.default)
       .setTitle("Payment Transaction")
       .setDescription(`${message.author} has sent ${currency}${amount} to ${target}`)
       .addField(`${message.author.username}"s new balance:`, `${currency}${formatNumber(memberInstance.balance - amount, 2)}`, true)

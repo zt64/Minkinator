@@ -17,32 +17,34 @@ module.exports = {
         }
       ],
       async execute (client, message, [ owner, name ]) {
-        const guildConfig = global.guildInstance.config;
-        const defaultColor = guildConfig.colors.default;
+        const { colors } = global.guildInstance.config;
 
-        const json = await global.functions.fetchJson(`https://api.github.com/repos/${owner}/${name}`);
+        const json = await global.functions.fetchJSON(`https://api.github.com/repos/${owner}/${name}`);
         
         if (json.message === "Not Found") return message.channel.send("Could not find repository.");
 
-        const commits = await global.functions.fetchJson(`https://api.github.com/repos/${owner}/${name}/commits`);
-        const pulls = await global.functions.fetchJson(`https://api.github.com/repos/${owner}/${name}/pulls`);
+        const commits = await global.functions.fetchJSON(`https://api.github.com/repos/${owner}/${name}/commits`);
+        const pulls = await global.functions.fetchJSON(`https://api.github.com/repos/${owner}/${name}/pulls`);
 
         // Create embed
-        const embed = new global.Discord.MessageEmbed()
-          .setColor(defaultColor)
-          .setTitle(json.full_name)
-          .setURL(json.html_url)
-          .addField("ID:", json.id, true)
-          .addField("Language:", json.language, true)
-          .addField("Size:", `${json.size / 1000}MB`, true)
-          .addField("Watchers:", json.watchers, true)
-          .addField("Forks:", json.forks, true)
-          .addField("Pull Requests:", pulls.length)
-          .addField("Issues:", json.open_issues, true)
-          .addField("Commits:", commits.length)
-          .addField("License:", json.license.name)
-          .addField("Created:", global.moment(json.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a"))
-          .addField("Updated:", global.moment(json.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+        const embed = new global.Discord.MessageEmbed({
+          color: colors.default,
+          title: json.full_name,
+          url: json.html_url,
+          fields: [
+            { name: "ID:", value: json.id, inline: true },
+            { name: "Language:", value: json.id, inline: true },
+            { name: "Size:", value: global.pbs(json.size * 1000), inline: true },
+            { name: "Watchers:", value: json.watchers, inline: true },
+            { name: "Forks:", value: json.forks, inline: true },
+            { name: "Pull Requests:", value: pulls.length, inline: true },
+            { name: "Issues:", value: json.open_issues, inline: true },
+            { name: "Commits:", value: commits.length, inline: true },
+            { name: "License:", value: json.license.name, inline: true },
+            { name: "Created:", value: global.moment(json.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a") },
+            { name: "Updated:", value: global.moment(json.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a") }
+          ]
+        });
 
         if (json.description) embed.setDescription(json.description);
 
@@ -60,26 +62,27 @@ module.exports = {
         }
       ],
       async execute (client, message, [ user ]) {
-        const guildConfig = global.guildInstance.config;
-        const defaultColor = guildConfig.colors.default;
+        const { colors } = global.guildInstance.config;
 
-        const json = await global.functions.fetchJson(`https://api.github.com/users/${user}`);
+        const json = await global.functions.fetchJSON(`https://api.github.com/users/${user}`);
 
         if (json.message === "Not Found") return message.channel.send("Could not find user.");
 
         // Create embed
-        const embed = new global.Discord.MessageEmbed()
-          .setColor(defaultColor)
-          .setTitle(json.login)
-          .setURL(json.html_url)
-          .addField("Location:", json.location, true)
-          .addField("Hireable:", json.hireable ? "True" : "False", true)
-          .addField("Public Repositories:", json.public_repos, true)
-          .addField("Public Gists:", json.public_gists, true)
-          .addField("Followers:", json.followers, true)
-          .addField("Following:", json.following, true)
-          .addField("Created:", global.moment(json.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a"))
-          .addField("Updated:", global.moment(json.updated_at).format("dddd, MMMM Do YYYY, h:mm:ss a"));
+        const embed = new global.Discord.MessageEmbed({
+          color: colors.default,
+          title: json.login,
+          url: json.html_url,
+          fields: [
+            { name: "Location:", value: json.location, inline: true },
+            { name: "Hireable:", value: json.hireable ? "True" : "False", inline: true },
+            { name: "Public Repositories:", value: json.public_repos, inline: true },
+            { name: "Public Gists:", value: json.public_gists, inline: true },
+            { name: "Followers:", value: json.followers, inline: true },
+            { name: "Following:", value: json.following, inline: true },
+            { name: "Created:", value: global.moment(json.created_at).format("dddd, MMMM Do YYYY, h:mm:ss a") }
+          ]
+        });
 
         if (json.bio) embed.setDescription(json.bio);
         if (json.name) embed.addField("Name:", json.name, true);

@@ -1,17 +1,15 @@
 module.exports = {
   description: "Create a poll.",
   async execute (client, message, args) {
-    const guildConfig = global.guildInstance.config;
-    const embedColor = guildConfig.colors.default;
-    const options = args;
+    const { colors } = global.guildInstance.config;
 
     // Create embed
     const pollEmbed = new global.Discord.MessageEmbed()
-      .setColor(embedColor)
+      .setColor(colors.default)
       .setTitle("Quick poll");
 
     // Add options
-    options.forEach(option => {
+    args.forEach(option => {
       pollEmbed.addField(option);
     });
 

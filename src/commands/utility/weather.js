@@ -11,7 +11,7 @@ module.exports = {
     const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
 
-    const { fetchJSON, kToC, formatNumber} = global.functions;
+    const { fetchJSON, kToC, formatNumber } = global.functions;
 
     // Fetch data from API
     const data = await fetchJSON(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${global.auth.openWeatherMap}`);
@@ -20,8 +20,8 @@ module.exports = {
 
     if (data.cod === "404") return message.channel.send("Invalid location.");
 
-    const weather = data.weather;
-    const main = data.main;
+    const { weather } = data;
+    const { main } = data;
 
     const embed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)

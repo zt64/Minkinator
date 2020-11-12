@@ -20,7 +20,7 @@ module.exports = {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
 
     const guildConfig = global.guildInstance.config;
-    const bans = global.guildInstance.bans;
+    const { bans } = global.guildInstance;
     const defaultColor = guildConfig.colors.default;
 
     const member = message.mentions.users.first();

@@ -8,8 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ sides ]) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
+    const { colors } = global.guildInstance.config;
     const { randomInteger, sleep } = global.functions;
 
     if (isNaN(sides)) sides = 6;
@@ -19,7 +18,7 @@ module.exports = {
 
     // Create embed
     const diceEmbed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
+      .setColor(colors.default)
       .setTitle("Dice roll")
       .setDescription("Rolling...");
 

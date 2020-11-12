@@ -65,7 +65,7 @@ exports.formatNumber = (number, places = 0) => {
 };
 
 exports.fetchJSON = async (url) => {
-  const fetch = global.fetch;
+  const { fetch } = global;
   
   return fetch(url).then(response => response.json());
 };

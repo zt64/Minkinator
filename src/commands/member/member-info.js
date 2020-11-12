@@ -8,10 +8,8 @@ module.exports = {
     }
   ],
   async execute (client, message) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
-    const currency = guildConfig.currency;
-    const formatNumber = global.functions.formatNumber;
+    const { currency, colors } = global.guildInstance.config;
+    const { formatNumber } = global.functions;
 
     const user = message.mentions.users.first() || message.author;
 
@@ -22,7 +20,7 @@ module.exports = {
 
     // Create info embed
     const infoEmbed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
+      .setColor(colors.default)
       .setAuthor(`Member information: ${member.nickname || user.tag}`, user.avatarURL())
       .addField("Balance:", `${currency}${formatNumber(memberData.balance, 2)}`, true)
       .addField("Level:", formatNumber(memberData.level), true)

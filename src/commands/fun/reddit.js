@@ -9,11 +9,8 @@ module.exports = {
     }
   ],
   async execute (client, message, [ subreddit ]) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
-    const redditNSFW = guildConfig.redditNSFW;
-
-    const entities = global.entities;
+    const { redditNSFW, colors } = global.guildInstance.config;
+    const { entities } = global;
 
     const body = await global.fetch(`https://api.reddit.com/r/${subreddit}/hot?limit=64`).then(response => response.json());
 
@@ -30,7 +27,7 @@ module.exports = {
 
     // Create embed
     const embed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
+      .setColor(colors.default)
       .setTitle(`r/${subreddit} ${post.title}`)
       .setURL(`https://reddit.com${post.permalink}`)
       .addField("Author:", `\`${post.author}\``, true)

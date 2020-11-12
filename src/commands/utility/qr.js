@@ -7,11 +7,19 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
+    const { colors } = global.guildInstance.config;
+    const input = args.join(" ");
+
     const canvas = global.canvas.createCanvas(512, 512);
 
-    // Generate QR code
-    await global.qr.toCanvas(canvas, args.join(" "), { margin: 2 });
+    await global.qr.toCanvas(canvas, input, { margin: 2 });
 
-    return message.channel.send(new global.Discord.MessageAttachment(canvas.toBuffer()));
+    return message.channel.send(new global.Discord.MessageEmbed({
+      color: colors.default,
+      title: "QR Code",
+      description: input,
+      files: [ new global.Discord.MessageAttachment(canvas.toBuffer(), "qr.png") ],
+      image: { url: "attachment://qr.png" }
+    }));
   }
 };

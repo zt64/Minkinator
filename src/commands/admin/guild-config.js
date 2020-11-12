@@ -8,64 +8,29 @@ module.exports = {
       type: String
     },
     {
-      name: "value | key"
-    },
-    {
       name: "value"
     }
   ],
-  async execute (client, message, args) {
-    const guildInstance = global.guildInstance;
-    const config = await guildInstance.config;
-    const defaultColor = config.dataValues.colors.default;
+  async execute (client, message, [ key, value ]) {
+    const guildConfig = global.guildInstance.config;
+    const defaultColor = guildConfig.dataValues.colors.default;
 
-    const key = args[0];
-
-    // Create embed
-    const configEmbed = new global.Discord.MessageEmbed()
+    const embed = new global.Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle("Guild Configuration");
 
-    if (!key) {
-      configEmbed.setDescription(`\`\`\`json\n${JSON.stringify(config.dataValues, null, 2)}\`\`\``);
+    if (key) {
+      if (!guildConfig[key]) return message.channel.send(`\`${key}\` does not exist in the guild configuration.`);
 
-      return message.channel.send(configEmbed);
-    }
+      if (typeof(guildConfig[key]) === "object");
 
-    // Make sure property exists
-    if (!(key in config.dataValues)) return message.channel.send(`\`${key}\` is not a guild property.`);
+      await guildConfig.update({ [key]: value });
 
-    if (typeof (config.dataValues[key]) === "object") {
-      const object = config.dataValues[key];
-      const objectKey = args[1];
-      const value = args[2];
-
-      if (!(objectKey in object)) return message.channel.send(`\`${objectKey}\` does not exist in ${key}`);
-      if (!value) return message.channel.send(`No value specified for: \`${key}\`.`);
-
-      try {
-        config.dataValues[key][objectKey] = JSON.parse(value);
-      } catch (error) {
-        return message.channel.send(`Unable to parse \`${value}\` for \`${objectKey}\`.`);
-      }
-
-      configEmbed.setDescription(`Successfully set \`${key}.${objectKey}\` to \`${value}\`.`);
+      embed.setDescription(`Successfully set \`${key}\` to \`${value}\`.`);
     } else {
-      const value = args[1];
-
-      if (!value) return message.channel.send(`No value specified for: \`${key}\`.`);
-
-      try {
-        config.dataValues[key] = JSON.parse(value);
-      } catch (error) {
-        return message.channel.send(`Unable to parse \`${value}\` for \`${key}\`.`);
-      }
-
-      configEmbed.setDescription(`Successfully set \`${key}\` to \`${value}\`.`);
+      embed.setDescription(`\`\`\`json\n${JSON.stringify(guildConfig.dataValues, null, 2)}\`\`\``);
     }
 
-    await guildInstance.setConfig(config);
-
-    return message.channel.send(configEmbed);
+    return message.channel.send(embed);
   }
 };

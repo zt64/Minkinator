@@ -2,14 +2,13 @@ module.exports = {
   description: "Shows all the packages that Minkinator is using.",
   aliases: ["pkg", "pkgs"],
   async execute (client, message) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
+    const { colors } = global.guildInstance.config;
 
     const { dependencies } = require("../../../package.json");
 
     // Create embed
     const packageEmbed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
+      .setColor(colors.default)
       .setTitle("Packages");
 
     // Add packages to embed

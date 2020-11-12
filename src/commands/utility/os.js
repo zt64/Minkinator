@@ -5,10 +5,7 @@ module.exports = {
     const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
 
-    const pms = global.pms;
-    const os = global.os;
-
-    const prettyBytes = global.pbs;
+    const { pms, pbs, os } = global;
 
     // Create and send embed
     return message.channel.send(new global.Discord.MessageEmbed()
@@ -19,8 +16,8 @@ module.exports = {
       .addField("Release:", os.release(), true)
       .addField("Hostname:", os.hostname(), true)
       .addField("Home Directory:", os.homedir(), true)
-      .addField("Free Memory:", prettyBytes(os.freemem()), true)
-      .addField("Total Memory:", prettyBytes(os.totalmem()), true)
+      .addField("Free Memory:", pbs(os.freemem()), true)
+      .addField("Total Memory:", pbs(os.totalmem()), true)
       .addField("System Uptime:", pms(os.uptime() * 1000), true)
       .addField("CPU:", os.cpus()[0].model)
       .addField("Discord.js Version:", `v${global.Discord.version}`, true)

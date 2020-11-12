@@ -14,7 +14,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ itemName, itemPrice ]) {
-    const currency = global.guildInstance.config.currency;
+    const { currency } = global.guildInstance.config;
 
     itemPrice = parseInt(itemPrice);
 

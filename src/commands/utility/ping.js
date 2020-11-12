@@ -5,8 +5,8 @@ module.exports = {
     const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
     
-    const pms = global.pms;
-    const ws = client.ws;
+    const { pms } = global;
+    const { ws } = client;
 
     const connections = ["READY", "CONNECTING", "RECONNECTING", "IDLE", "NEARLY", "DISCONNECTED"];
 
@@ -25,7 +25,7 @@ module.exports = {
 
     const connectionPing = pms(Number(end - start) / 1e+6);
     const connectionStatus = connections[ws.status];
-    const gateway = ws.gateway;
+    const { gateway } = ws;
 
     // Edit embed
     pingEmbed.setTitle("Ping Information");

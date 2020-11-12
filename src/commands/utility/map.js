@@ -1,5 +1,6 @@
 module.exports = {
   name: "map",
+  description: "Get a satellite image view of a location.",
   parameters: [
     {
       name: "search",
@@ -7,8 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
+    const { colors } = global.guildInstance.config;
 
     const key = global.auth.mapbox;
     const search = args.join(" ");
@@ -17,22 +17,20 @@ module.exports = {
 
     if (!geocode.features.length) return message.channel.send(`\`${search}\` could not be located.`);
 
-    const features = geocode.features;
-    const feature = features[0];
+    const { features } = geocode;
+    const [ feature ] = features;
 
-    const longitude = feature.center[0];
-    const latitude = feature.center[1];
+    const [ longitude, latitude ] = feature.center;
 
     const map = await global.fetch(`https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/${longitude},${latitude},8,0/1024x1024?access_token=${key}`);
-    const url = map.url;
-
-    const embed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
-      .setTitle(feature.place_name)
-      .setURL(url)
-      .setImage(url)
-      .setFooter(`Query: ${search} | Powered by Mapbox`);
+    const { url } = map;
     
-    return message.channel.send(embed);
+    return message.channel.send(new global.Discord.MessageEmbed({
+      color: colors.default,
+      title: feature.place_name,
+      url: url,
+      image: { url },
+      footer: { text: `Query: ${search} | Powered by Mapbox` }
+    }));
   }
 };

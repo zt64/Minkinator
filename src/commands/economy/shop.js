@@ -17,19 +17,12 @@ module.exports = {
         }
       ],
       async execute (client, message, [ itemName, itemAmount ]) {
-        const guildConfig = global.guildInstance.config;
+        const { currency, colors } = global.guildInstance.config;
         const shopItems = global.guildInstance.items;
         const memberData = global.memberInstance;
 
         const { formatNumber } = global.functions;
-
-        // Set guild constants
-        const defaultColor = guildConfig.colors.default;
-        const currency = guildConfig.currency;
-
-        // Set member constants
-        const inventory = memberData.inventory;
-        const balance = memberData.balance;
+        const { inventory, balance } = memberData;
 
         // Set item constants
         itemAmount = parseInt(itemAmount) || 1;
@@ -58,7 +51,7 @@ module.exports = {
         await memberData.update({ inventory: inventory });
 
         return message.channel.send(new global.Discord.MessageEmbed()
-          .setColor(defaultColor)
+          .setColor(colors.default)
           .setTitle("Transaction Successful")
           .setDescription(`Bought ${global.pluralize(itemName, itemAmount, true)} for ${currency}${formatNumber(shopItemPrice, 2)}.`)
         );
@@ -80,17 +73,13 @@ module.exports = {
         }
       ],
       async execute (client, message, [ itemName, itemAmount ]) {
-        const guildConfig = global.guildInstance.config;
+        const { currency, colors } = global.guildInstance.config;
         const shopItems = global.guildInstance.items;
         const memberData = global.memberInstance;
 
-        // Set guild constants
-        const defaultColor = guildConfig.colors.default;
-        const currency = guildConfig.currency;
-
         // Set member constants
-        const inventory = memberData.inventory;
-        let balance = memberData.balance;
+        const { inventory } = memberData;
+        let { balance } = memberData;
 
         // Set item constants
         itemAmount = parseInt(itemAmount) || 1;
@@ -111,7 +100,7 @@ module.exports = {
         await memberData.update({ balance: balance, inventory: inventory });
 
         return message.channel.send(new global.Discord.MessageEmbed()
-          .setColor(defaultColor)
+          .setColor(colors.default)
           .setTitle("Transaction Successful")
           .setDescription(`Sold ${global.pluralize(itemName, itemAmount, true)} for ${currency}${sellPrice.toFixed(2)}`)
         );
@@ -127,15 +116,10 @@ module.exports = {
         }
       ],
       async execute (client, message, [ page ]) {
-        const guildConfig = global.guildInstance.config;
+        const { currency, colors, prefix } = global.guildInstance.config;
         const shopItems = global.guildInstance.items;
 
         const { formatNumber } = global.functions;
-
-        // Set guild constants
-        const defaultColor = guildConfig.colors.default;
-        const currency = guildConfig.currency;
-        const prefix = guildConfig.prefix;
 
         // Setup pages
         const pages = Math.ceil(shopItems.length / 10);
@@ -148,7 +132,7 @@ module.exports = {
 
         // Create embed
         const shopEmbed = new global.Discord.MessageEmbed()
-          .setColor(defaultColor)
+          .setColor(colors.default)
           .setTitle(`${message.guild.name} shop`)
           .setDescription(`Buy items using \`${prefix}shop buy [item] [amount]\` \n Sell items using \`${prefix}shop sell [item] [amount] [price]\``)
           .setFooter(`Page ${page} of ${pages}`);

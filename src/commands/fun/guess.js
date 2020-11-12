@@ -9,20 +9,15 @@ module.exports = {
     }
   ],
   async execute (client, message, [ guess ]) {
-    const guildConfig = global.guildInstance.config;
-    const memberInstance = global.memberInstance;
-
     guess = Math.round(guess);
 
     if (guess < 1 || guess > 100) return message.channel.send("Guess must be 1 - 100, inclusive.");
 
     // Set guild constants
-    const defaultColor = guildConfig.colors.default;
-    const currency = guildConfig.currency;
+    const { currency, colors } = global.guildInstance.config;
+    const { memberInstance, functions: { formatNumber, randomInteger } } = global;
 
-    const { formatNumber, randomInteger } = global.functions;
-
-    let balance = memberInstance.balance;
+    let { balance } = memberInstance;
     let earn;
 
     // Generate random value
@@ -36,7 +31,7 @@ module.exports = {
 
       earn = 1000;
     } else {
-      embed.setColor(defaultColor);
+      embed.setColor(colors.default);
       embed.setTitle("Guessing Game");
 
       earn = 50 / Math.abs(value - guess) * 4;

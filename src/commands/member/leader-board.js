@@ -8,10 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ page ]) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
-    const currency = guildConfig.currency;
-
+    const { currency, colors } = global.guildInstance.config;
     const { formatNumber } = global.functions;
 
     // Set members const and sort by balance
@@ -22,7 +19,7 @@ module.exports = {
 
     // Create embed
     const leaderBoardEmbed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
+      .setColor(colors.default)
       .setTitle("Leader board")
       .setFooter(`Page ${page} of ${pages}`);
 
@@ -30,7 +27,7 @@ module.exports = {
 
     function populate () {
       members.slice((page - 1) * 10, page * 10).map((member, index) => {
-        const tag = client.users.cache.get(member.userId).tag;
+        const { tag } = client.users.cache.get(member.userId);
         leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${tag}:`, `${currency}${formatNumber(member.balance, 2)}`);
       });
     }

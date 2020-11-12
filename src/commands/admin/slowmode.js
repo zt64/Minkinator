@@ -9,7 +9,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ seconds ]) {
-    const channel = message.channel;
+    const { channel } = message;
 
     await channel.setRateLimitPerUser(seconds);
 
