@@ -33,10 +33,11 @@ module.exports = async (client, message) => {
     // Check if level mention is enabled
     if (guildConfig.levelMention && memberConfig.levelMention) {
       if (!(level + 1 % 5)) {
-        const levelUpEmbed = new global.Discord.MessageEmbed()
-          .setColor(colors.default)
-          .setTitle(`${message.author.username} has levelled up!`)
-          .setDescription(`${message.author} is now level ${global.functions.formatNumber(level + 1)} and earned ${currency}500 as a reward!`);
+        const levelUpEmbed = new global.Discord.MessageEmbed({
+          color: colors.default,
+          title: `${message.author.username} has levelled up!`,
+          description: `${message.author} is now level ${global.functions.formatNumber(level + 1)} and earned ${currency}500 as a reward!`
+        });
 
         await memberInstance.increment("balance", { by: 500 });
 
@@ -59,19 +60,13 @@ module.exports = async (client, message) => {
 
   // Write message to data.json
   if (![prefix, ...ignore].some(x => message.content.startsWith(x))) {
-    const array = guildInstance.data;
+    guildInstance.data.push(message.content);
 
-    array.push(message.content);
-
-    const g = await global.sequelize.models.guild.findOne({ guildId: message.guild.id });
-    await g.update({ data: array });
-
-    // I honestly have no idea why this won't work
-    // await guildInstance.update({ data: array });
+    const g = await global.sequelize.models.guild.findByPk(message.guild.id);
+    await g.update({ data: guildInstance.data });
   }
 
-  if (memberInstance.botBan) return;
-  if (!message.content.startsWith(prefix)) return;
+  if (!message.content.startsWith(prefix) || memberInstance.botBan) return;
 
   // Check if command exists
   const parameters = message.content.slice(prefix.length).split(/ +/g);
@@ -88,21 +83,22 @@ module.exports = async (client, message) => {
   if (message.author.id !== global.config.ownerID) {
     if (command.ownerOnly) return;
     if (!message.member.hasPermission(command.permissions)) {
-      const permissionError = await message.channel.send(new global.Discord.MessageEmbed()
-        .setColor(colors.error)
-        .setTitle("Missing Permissions")
-        .addField("You are missing one of the following permissions:", command.permissions.join(", "))
-      );
+      const permissionError = await message.channel.send(new global.Discord.MessageEmbed({
+        color: colors.error,
+        title: "Missing Permissions",
+        fields: [ { name: "You are missing one of the following permissions:", value: command.permissions.join(", ") } ]
+      }));
 
       return permissionError.delete({ timeout: errorTimeout });
     }
   }
 
   // Check if parameters are correct
-  const usageEmbed = new global.Discord.MessageEmbed()
-    .setColor(colors.error)
-    .setTitle(`Improper usage of ${commandName}`)
-    .setDescription(command.description);
+  const usageEmbed = new global.Discord.MessageEmbed({
+    color: colors.error,
+    title: `Improper usage of ${commandName}`,
+    description: command.description
+  });
 
   if (command.parameters) {
     for (const parameter of command.parameters) {
@@ -173,11 +169,11 @@ module.exports = async (client, message) => {
       if (now < expirationTime) {
         const timeLeft = (expirationTime - now) / 1000;
 
-        const coolDownEmbed = await message.channel.send(new global.Discord.MessageEmbed()
-          .setColor(colors.error)
-          .setTitle("Cool down active")
-          .setDescription(`Please wait, a cool down of ${global.pluralize("second", timeLeft.toFixed(1), true)} is remaining.`)
-        );
+        const coolDownEmbed = await message.channel.send(new global.Discord.MessageEmbed({
+          color: colors.error,
+          title: "Cool down active",
+          description: `Please wait, a cool down of ${global.pluralize("second", timeLeft.toFixed(1), true)} is remaining.`
+        }));
 
         coolDownEmbed.delete({ timeout: errorTimeout });
       }
@@ -202,11 +198,11 @@ module.exports = async (client, message) => {
   } catch (error) {
     console.error(error);
 
-    return message.channel.send(new global.Discord.MessageEmbed()
-      .setColor(colors.error)
-      .setTitle("An error has occurred")
-      .setDescription(`\`\`\`js\n${error}\`\`\``)
-      .setFooter("See console for more information")
-    );
+    return message.channel.send(new global.Discord.MessageEmbed({
+      color: colors.error,
+      title: "An error has occurred",
+      description: `\`\`\`js\n${error}\`\`\``,
+      footer: { text: "See console for more information" }
+    }));
   }
 };
