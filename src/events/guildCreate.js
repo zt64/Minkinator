@@ -4,8 +4,7 @@ module.exports = async (client, guild) => {
 
   console.log(chalk.green(`(${time})`), `Minkinator has joined: ${guild.name} (${guild.id}).`);
 
-  // Populate database
-  await client.database.populate(client, guild, await client.database.create(client, guild));
+  await client.database.initialize(guild, global.sequelize);
 
   // Set count values
   const users = pluralize("user", client.users.cache.size, true);
