@@ -1,6 +1,6 @@
 {
   "ownerID": "289556910426816513",
-  "prefix": "?",
+  "prefix": ">",
   "clientOptions": {
     "messageCacheMaxSize": 100,
     "messageSweepInterval": 3600,
