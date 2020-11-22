@@ -4,7 +4,7 @@ module.exports = {
     const { colors } = global.guildInstance.config;
 
     // Generate URL for invite
-    const inviteURL = await client.generateInvite(["ADMINISTRATOR"]);
+    const inviteURL = await client.generateInvite({ permissions: ["ADMINISTRATOR"] });
 
     return message.channel.send(new global.Discord.MessageEmbed({
       color: colors.default,
