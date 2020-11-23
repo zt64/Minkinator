@@ -47,7 +47,7 @@ module.exports = async (client, message) => {
   }
 
   // Generate markov on mention of self
-  if (message.mentions.users.first() === client.user) {
+  if (message.mentions.has(client.user)) {
     const corpus = global.guildInstance.data;
     const chain = new global.markov();
 
