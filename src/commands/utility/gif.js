@@ -2,7 +2,7 @@ module.exports = {
   description: "Generates a gif",
   async execute () {
     const gif = new global.GifEncoder(512, 512, { highWaterMark: 6.4e+7 });
-    const { randomInteger } = global.functions;
+    const { randomInteger } = global.util;
 
     const frames = 16;
 

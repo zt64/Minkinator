@@ -36,7 +36,7 @@ module.exports = async (client, message) => {
         const levelUpEmbed = new global.Discord.MessageEmbed({
           color: colors.default,
           title: `${message.author.username} has levelled up!`,
-          description: `${message.author} is now level ${global.functions.formatNumber(level + 1)} and earned ${currency}500 as a reward!`
+          description: `${message.author} is now level ${global.util.formatNumber(level + 1)} and earned ${currency}500 as a reward!`
         });
 
         await memberInstance.increment("balance", { by: 500 });
@@ -48,14 +48,24 @@ module.exports = async (client, message) => {
 
   // Generate markov on mention of self
   if (message.mentions.has(client.user)) {
+
     const corpus = global.guildInstance.data;
     const chain = new global.markov();
 
-    chain.config.grams = global.functions.randomInteger(1, 3);
-
     corpus.map(sentence => chain.update(sentence));
 
-    message.channel.send(chain.generate());
+    chain.config.grams = global.util.randomInteger(1, 3);
+
+    let sentence = chain.generate();
+    let i = 0;
+    
+    // Prevent verbatim sentences from being generated
+    while ((corpus.includes(sentence) || sentence.length <= 10) && i < 100) {
+      sentence = chain.generate();
+      i++;
+    }
+
+    message.channel.send(sentence);
   }
 
   // Write message to data.json

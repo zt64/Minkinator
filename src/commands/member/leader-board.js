@@ -9,7 +9,7 @@ module.exports = {
   ],
   async execute (client, message, [ page ]) {
     const { currency, colors } = global.guildInstance.config;
-    const { formatNumber } = global.functions;
+    const { formatNumber } = global.util;
 
     // Set members const and sort by balance
     const members = await global.guildInstance.getMembers({ order: [["balance", "DESC"]] });

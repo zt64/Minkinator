@@ -13,7 +13,7 @@ module.exports = {
     const key = global.auth.mapbox;
     const search = args.join(" ");
 
-    const geocode = await global.functions.fetchJSON(`https://api.mapbox.com/geocoding/v5/mapbox.places/${args.join("%20")}.json?access_token=${key}`);
+    const geocode = await global.util.fetchJSON(`https://api.mapbox.com/geocoding/v5/mapbox.places/${args.join("%20")}.json?access_token=${key}`);
 
     if (!geocode.features.length) return message.channel.send(`\`${search}\` could not be located.`);
 

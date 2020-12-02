@@ -8,7 +8,7 @@ module.exports = async (client, member) => {
 
   const time = global.moment().format("HH:mm M/D/Y");
 
-  const guildConfig = await global.sequelize.models.guild.findByPk(guild.id, { include: global.sequelize.models.guildConfig });
+  const guildConfig = await global.sequelize.models.guild.findByPk(guild.id, { include: "config" });
   const defaultColor = guildConfig.colors.default;
 
   // Set count values

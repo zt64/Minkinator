@@ -4,13 +4,14 @@ module.exports = async (client, member) => {
 
   if (!channel) return;
 
-  const database = client.database[guild.name];
   const { pluralize, chalk } = global;
 
   const time = global.moment().format("HH:mm M/D/Y");
 
-  const guildConfig = await database.properties.findByPk("configuration").then(key => key.value);
-  const defaultColor = guildConfig.colors.default;
+  const { models } = global.sequelize;
+
+  const guildInstance = await models.guild.findByPk(guild.id, { include: "config" });
+  const defaultColor = guildInstance.config.colors.default;
 
   // Set count values
   const users = pluralize("user", client.users.cache.size, true);
@@ -22,7 +23,7 @@ module.exports = async (client, member) => {
   console.log(chalk.green(`(${time})`), `${member.user.tag} has left ${guild.name}`);
 
   // Destroy member data
-  await database.members.findByPk(member.id).then(data => data.destroy());
+  await models.member.findByPk(member.id).then(data => data.destroy());
 
   // Send embed
   return channel.send(new global.Discord.MessageEmbed()

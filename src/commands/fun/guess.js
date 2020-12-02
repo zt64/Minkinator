@@ -15,7 +15,7 @@ module.exports = {
 
     // Set guild constants
     const { currency, colors } = global.guildInstance.config;
-    const { memberInstance, functions: { formatNumber, randomInteger } } = global;
+    const { memberInstance, util: { formatNumber, randomInteger } } = global;
 
     let { balance } = memberInstance;
     let earn;

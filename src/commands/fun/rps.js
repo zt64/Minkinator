@@ -21,7 +21,7 @@ module.exports = {
       .setColor(defaultColor)
       .setTitle("Rock Paper Scissors");
 
-    const { randomInteger, capitalize } = global.functions;
+    const { randomInteger, capitalize } = global.util;
     const computerChoice = choices[randomInteger(0, 2)];
 
     function sendEmbed (lose) {

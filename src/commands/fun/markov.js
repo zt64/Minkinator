@@ -1,22 +1,29 @@
 module.exports = {
   description: "Generates a markov chain.",
   aliases: [ "mkv" ],
-  async execute (client, message) {
+  parameters: [
+    {
+      name: "start word",
+      type: String
+    }
+  ],
+  async execute (client, message, [ startWord ]) {
     const corpus = global.guildInstance.data;
     const chain = new global.markov();
 
-    chain.config.grams = global.functions.randomInteger(1, 3);
-
     corpus.map(sentence => chain.update(sentence));
+
+    chain.config.grams = global.util.randomInteger(1, 3);
+    if (startWord) chain.config.from = startWord;
+
+    let sentence = chain.generate();
+    let i = 0;
     
-    let result = chain.generate();
-
-    if (result.length < 5) {
-      chain.config.from = result;
-
-      result = chain.generate();
+    while ((corpus.includes(sentence) || sentence.length <= 16) && i < 100) {
+      sentence = chain.generate();
+      i++;
     }
 
-    return message.channel.send(chain.generate());
+    return message.channel.send(sentence);
   }
 };

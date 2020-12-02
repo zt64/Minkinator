@@ -2,7 +2,7 @@ module.exports = {
   description: "Play a game of trivia.",
   aliases: ["quiz"],
   async execute (client, message) {
-    const { randomInteger, sleep } = global.functions;
+    const { randomInteger, sleep } = global.util;
     const { entities } = global;
 
     const { currency, colors } = global.guildInstance.config;

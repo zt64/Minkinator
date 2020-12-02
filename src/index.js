@@ -8,7 +8,7 @@ const fs = global.fs = require("fs");
 const client = new Discord.Client(config.clientOptions);
 const time = moment().format("HH:mm M/D/Y");
 
-global.functions = require("./util/functions.js");
+global.util = require("./util/functions.js");
 global.markov = require("purpl-markov-chain");
 global.GifEncoder = require("gif-encoder");
 global.Sequelize = require("sequelize");
@@ -53,7 +53,14 @@ client.loadCommands = async () => {
     fs.readdirSync(`./commands/${category}`).forEach(commandName => {
       delete require.cache[require.resolve(`./commands/${category}/${commandName}`)];
 
-      const command = require(`./commands/${category}/${commandName}`);
+      let command;
+
+      try {
+        command = require(`./commands/${category}/${commandName}`);
+      } catch (error) {
+        console.log(chalk.green(`(${time})`), `Failed to load ${commandName}, skipping.`);
+        return console.error(error);
+      }
 
       if (category === "owner") command.ownerOnly = true;
 

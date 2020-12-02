@@ -16,11 +16,11 @@ module.exports = {
   async execute (client, message, [ member, amount ]) {
     const { currency, colors } = global.guildInstance.config;
 
-    const { formatNumber } = global.functions;
+    const { formatNumber } = global.util;
 
     amount = parseInt(amount);
 
-    const target = await global.functions.getUser(client, message, member);
+    const target = await global.util.getUser(client, message, member);
 
     if (!message.mentions.members.first()) return message.reply(`\`${target}\` is not a valid member.`);
     if (amount < 1 || isNaN(amount)) return message.channel.send(`\`${amount}\` is not a valid amount.`);

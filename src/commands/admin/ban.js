@@ -44,7 +44,7 @@ module.exports = {
 
     if (!minutes) return;
 
-    await global.functions.sleep(minutes * 60000);
+    await global.util.sleep(minutes * 60000);
 
     message.guild.unban(member.user);
 

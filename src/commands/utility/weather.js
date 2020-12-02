@@ -11,7 +11,7 @@ module.exports = {
     const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
 
-    const { fetchJSON, kToC, formatNumber } = global.functions;
+    const { fetchJSON, kToC, formatNumber } = global.util;
 
     // Fetch data from API
     const data = await fetchJSON(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${global.auth.openWeatherMap}`);

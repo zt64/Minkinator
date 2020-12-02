@@ -19,12 +19,12 @@ module.exports = {
       async execute (client, message, [ owner, name ]) {
         const { colors } = global.guildInstance.config;
 
-        const json = await global.functions.fetchJSON(`https://api.github.com/repos/${owner}/${name}`);
+        const json = await global.util.fetchJSON(`https://api.github.com/repos/${owner}/${name}`);
         
         if (json.message === "Not Found") return message.channel.send("Could not find repository.");
 
-        const commits = await global.functions.fetchJSON(`https://api.github.com/repos/${owner}/${name}/commits`);
-        const pulls = await global.functions.fetchJSON(`https://api.github.com/repos/${owner}/${name}/pulls`);
+        const commits = await global.util.fetchJSON(`https://api.github.com/repos/${owner}/${name}/commits`);
+        const pulls = await global.util.fetchJSON(`https://api.github.com/repos/${owner}/${name}/pulls`);
 
         // Create embed
         const embed = new global.Discord.MessageEmbed({
@@ -64,7 +64,7 @@ module.exports = {
       async execute (client, message, [ user ]) {
         const { colors } = global.guildInstance.config;
 
-        const json = await global.functions.fetchJSON(`https://api.github.com/users/${user}`);
+        const json = await global.util.fetchJSON(`https://api.github.com/users/${user}`);
 
         if (json.message === "Not Found") return message.channel.send("Could not find user.");
 

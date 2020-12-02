@@ -9,7 +9,7 @@ module.exports = {
   ],
   async execute (client, message, [ sides ]) {
     const { colors } = global.guildInstance.config;
-    const { randomInteger, sleep } = global.functions;
+    const { randomInteger, sleep } = global.util;
 
     if (isNaN(sides)) sides = 6;
 

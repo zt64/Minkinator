@@ -21,7 +21,7 @@ module.exports = {
         const shopItems = global.guildInstance.items;
         const memberData = global.memberInstance;
 
-        const { formatNumber } = global.functions;
+        const { formatNumber } = global.util;
         const { inventory, balance } = memberData;
 
         // Set item constants
@@ -119,7 +119,7 @@ module.exports = {
         const { currency, colors, prefix } = global.guildInstance.config;
         const shopItems = global.guildInstance.items;
 
-        const { formatNumber } = global.functions;
+        const { formatNumber } = global.util;
 
         // Setup pages
         const pages = Math.ceil(shopItems.length / 10);

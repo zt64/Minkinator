@@ -27,11 +27,11 @@ module.exports = {
       }
 
       helpEmbed.addFields([
-        { name: "Command", value: command.name, inline: true },
-        { name: "Category", value: command.category, inline: true },
-        { name: "Description", value: command.description },
-        { name: "Cool down", value: global.pluralize("second", command.coolDown || 3, true), inline: true },
-        { name: "Permissions", value: command.permissions ? command.permissions.join(", ") : "Everyone", inline: true }
+        { name: "Command:", value: command.name, inline: true },
+        { name: "Category:", value: command.category, inline: true },
+        { name: "Description:", value: command.description },
+        { name: "Cool down:", value: global.pluralize("second", command.coolDown || 3, true), inline: true },
+        { name: "Permissions:", value: command.permissions ? command.permissions.join(", ") : "Everyone", inline: true }
       ]);
 
       if (command.aliases) helpEmbed.addField("Aliases:", command.aliases.join(", "), true);
@@ -39,7 +39,7 @@ module.exports = {
       if (command.parameters) {
         const array = command.parameters.map(parameter => parameter.required ? `[${parameter.name}]` : `<${parameter.name}>`);
 
-        helpEmbed.addField("Proper usage", `\`${prefix}${commandName} ${array.join(" ")}\``);
+        helpEmbed.addField("Proper usage:", `\`${prefix}${commandName} ${array.join(" ")}\``);
       }
 
       return message.channel.send(helpEmbed);

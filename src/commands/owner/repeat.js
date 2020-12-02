@@ -23,7 +23,7 @@ module.exports = {
     for (var i = 0; i < amount; i++) {
       await command.execute(client, message, args.slice(2));
 
-      await global.functions.sleep(1000);
+      await global.util.sleep(1000);
     }
   }
 };

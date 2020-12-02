@@ -6,7 +6,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ member ]) {
-    const user = await global.functions.getUser(client, message, member);
+    const user = await global.util.getUser(client, message, member);
     const { colors } = global.guildInstance.config;
 
     const platforms = [];
@@ -22,7 +22,7 @@ module.exports = {
       .setAuthor(`User information: ${user.tag}`, user.avatarURL())
       .addField("ID:", user.id)
       .addField("Created:", user.createdAt.toLocaleDateString(), true)
-      .addField("Status:", user.presence.status === "dnd" ? "DND" : global.functions.capitalize(user.presence.status), true);
+      .addField("Status:", user.presence.status === "dnd" ? "DND" : global.util.capitalize(user.presence.status), true);
 
     if (platforms.length !== 0) infoEmbed.addField("Platforms:", platforms.join(", "), true);
 

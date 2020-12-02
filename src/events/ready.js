@@ -7,6 +7,8 @@ module.exports = async (client) => {
   for (const guild of client.guilds.cache.array()) {
     await client.database.initialize(guild, sequelize);
 
+    
+
     //await client.database.checkMembers(guild, guildInstance);
   }
 

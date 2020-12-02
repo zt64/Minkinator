@@ -31,17 +31,23 @@ module.exports = {
     {
       name: "play",
       description: "Play audio from a URL in a voice channel.",
-      async execute (client, message, [ url ]) {
-        if (client.voice.connections.size >= 1) {
-          const connection = client.voice.connections.first();
-
-          // Play URL
-          const dispatcher = connection.play(url);
-
-          dispatcher.on("error", console.error);
-        } else {
-          return message.channel.send("Must be in voice channel before running.");
+      parameters: [
+        {
+          name: "url",
+          type: String,
+          required: true
         }
+      ],
+      async execute (client, message, [ url ]) {
+        if (client.voice.connections.size === 0) return message.channel.send("Must be in voice channel before running.");
+
+        const connection = client.voice.connections.first();
+
+        const ytdl = require("ytdl-core-discord");
+        const dispatcher = connection.play(await ytdl(url), { type: "opus", volume: false });
+        
+
+        dispatcher.on("error", console.error);
       }
     }
   ]
