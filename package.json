@@ -7,11 +7,11 @@
     "url": "https://github.com/Litleck/Minkinator.git"
   },
   "dependencies": {
-    "@discordjs/opus": "^0.3.2",
+    "@discordjs/opus": "^0.3.3",
     "canvas": "^2.6.1",
     "chalk": "^4.1.0",
     "chart.js": "^2.9.3",
-    "discord.js": "github:discordjs/discord.js",
+    "discord.js": "^12.5.1",
     "entities": "^2.0.3",
     "gif-encoder": "^0.7.2",
     "mathjs": "^7.2.0",
@@ -24,7 +24,8 @@
     "qrcode": "^1.4.4",
     "sequelize": "^6.3.4",
     "sqlite3": "^5.0.0",
-    "twemoji": "^13.0.1"
+    "twemoji": "^13.0.1",
+    "ytdl-core-discord": "^1.2.4"
   },
   "devDependencies": {
     "eslint": "^7.7.0",
@@ -41,12 +42,33 @@
       "ecmaVersion": 11
     },
     "rules": {
-      "prefer-destructuring": [ "error", { "object": true, "array": true } ],
-      "indent": [ "error", 2 ],
-      "linebreak-style": [ "error", "unix" ],
-      "quotes": [ "error", "double" ],
-      "semi": [ "error", "always" ],
-      "object-curly-spacing": ["error", "always"]
+      "prefer-destructuring": [
+        "error",
+        {
+          "object": true,
+          "array": true
+        }
+      ],
+      "indent": [
+        "error",
+        2
+      ],
+      "linebreak-style": [
+        "error",
+        "unix"
+      ],
+      "quotes": [
+        "error",
+        "double"
+      ],
+      "semi": [
+        "error",
+        "always"
+      ],
+      "object-curly-spacing": [
+        "error",
+        "always"
+      ]
     }
   }
 }
