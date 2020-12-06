@@ -1,6 +1,6 @@
-exports.create = async () => {
-  const { Sequelize } = global;
+const Sequelize = require("sequelize");
 
+exports.create = async () => {
   const sequelize = new Sequelize("database", "user", "password", {
     host: "localhost",
     dialect: "sqlite",
@@ -13,13 +13,13 @@ exports.create = async () => {
   });
 
   // Require all models
-  const Guild = require("../models/Guild.js")(sequelize, Sequelize);
-  const GuildConfig = require("../models/GuildConfig.js")(sequelize, Sequelize);
+  const Guild = require("./Guild.js")(sequelize, Sequelize);
+  const GuildConfig = require("./GuildConfig.js")(sequelize, Sequelize);
 
-  const Member = require("../models/Member.js")(sequelize, Sequelize);
-  const MemberConfig = require("../models/MemberConfig.js")(sequelize, Sequelize);
+  const Member = require("./Member.js")(sequelize, Sequelize);
+  const MemberConfig = require("./MemberConfig.js")(sequelize, Sequelize);
   
-  const Item = require("../models/Item.js")(sequelize, Sequelize);
+  const Item = require("./Item.js")(sequelize, Sequelize);
 
   // Set up associations
   Guild.hasOne(GuildConfig, { as: "config", foreignKey: "guildId" });
