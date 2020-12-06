@@ -1,3 +1,5 @@
+.vscode/
+
 # Dependencies and collected data
 node_modules/
 database.sqlite
