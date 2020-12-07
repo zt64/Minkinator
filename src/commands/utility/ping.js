@@ -1,3 +1,5 @@
+const prettyMilliseconds = require("pretty-ms");
+
 module.exports = {
   description: "Returns ping and web socket information.",
   aliases: ["ws"],
@@ -5,14 +7,14 @@ module.exports = {
     const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
     
-    const { pms } = global;
     const { ws } = client;
 
     const connections = ["READY", "CONNECTING", "RECONNECTING", "IDLE", "NEARLY", "DISCONNECTED"];
 
-    const pingEmbed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
-      .setTitle("Pinging...");
+    const pingEmbed = new global.Discord.MessageEmbed({
+      color: defaultColor,
+      title: "Pinging..."
+    });
 
     const pingMessage = await message.channel.send(pingEmbed);
 
@@ -23,7 +25,7 @@ module.exports = {
     await global.fetch("https://www.google.com");
     const end = process.hrtime.bigint();
 
-    const connectionPing = pms(Number(end - start) / 1e+6);
+    const connectionPing = prettyMilliseconds(Number(end - start) / 1e+6);
     const connectionStatus = connections[ws.status];
     const { gateway } = ws;
 

@@ -1,5 +1,5 @@
 module.exports = {
-  description: "Gets a random cat image from the internet.",
+  description: "Gets a random cat image.",
   parameters: [
     {
       name: "breed",

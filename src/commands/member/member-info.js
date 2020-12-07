@@ -9,7 +9,7 @@ module.exports = {
   ],
   async execute (client, message) {
     const { currency, colors } = global.guildInstance.config;
-    const { formatNumber } = global.util;
+    const { formatNumber } = util;
 
     const user = message.mentions.users.first() || message.author;
 

@@ -8,7 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const user = await global.util.getUser(client, message, args[0]);
+    const user = await util.getUser(client, message, args[0]);
     const memberData = global.memberInstance;
 
     // Toggle state on a member

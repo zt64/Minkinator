@@ -11,7 +11,7 @@ module.exports = {
     const { colors } = global.guildInstance.config;
 
     // Get user
-    const user = await global.util.getUser(client, message, member);
+    const user = await util.getUser(client, message, member);
     const avatar = user.displayAvatarURL({ format: "png", dynamic: true, size: 256 });
 
     // Send embed

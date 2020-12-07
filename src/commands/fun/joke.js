@@ -1,9 +1,8 @@
 module.exports = {
-  description: "Tells a joke.",
-  async execute (client, message, args) {
+  description: "Get a random joke.",
+  async execute (client, message) {
     const response = await global.fetch("https://icanhazdadjoke.com/", {
-      headers: { 
-        "Accept": "application/json" }
+      headers: { "Accept": "application/json" }
     });
 
     const json = await response.json();

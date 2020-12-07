@@ -9,7 +9,6 @@ module.exports = {
   ],
   async execute (client, message, [ page ]) {
     const { currency, colors } = global.guildInstance.config;
-    const { formatNumber } = global.util;
 
     // Set members const and sort by balance
     const members = await global.guildInstance.getMembers({ order: [["balance", "DESC"]] });
@@ -28,7 +27,7 @@ module.exports = {
     function populate () {
       members.slice((page - 1) * 10, page * 10).map((member, index) => {
         const { tag } = client.users.cache.get(member.userId);
-        leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${tag}:`, `${currency}${formatNumber(member.balance, 2)}`);
+        leaderBoardEmbed.addField(`${index + 1 + (page - 1) * 10}. ${tag}:`, `${currency}${util.formatNumber(member.balance, 2)}`);
       });
     }
 

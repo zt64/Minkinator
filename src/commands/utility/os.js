@@ -1,3 +1,7 @@
+const os = require("os");
+const prettyBytes = require("pretty-bytes");
+const prettyMilliseconds = require("pretty-ms");
+
 module.exports = {
   description: "Returns information about the host OS.",
   aliases: ["os"],
@@ -5,24 +9,23 @@ module.exports = {
     const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
 
-    const { pms, pbs, os } = global;
-
     // Create and send embed
-    return message.channel.send(new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
-      .setTitle("OS Information")
-      .addField("Platform:", os.platform(), true)
-      .addField("Architecture:", os.arch(), true)
-      .addField("Release:", os.release(), true)
-      .addField("Hostname:", os.hostname(), true)
-      .addField("Home Directory:", os.homedir(), true)
-      .addField("Free Memory:", pbs(os.freemem()), true)
-      .addField("Total Memory:", pbs(os.totalmem()), true)
-      .addField("System Uptime:", pms(os.uptime() * 1000), true)
-      .addField("CPU:", os.cpus()[0].model)
-      .addField("Discord.js Version:", `v${global.Discord.version}`, true)
-      .addField("Node Version:", process.version, true)
-      .addField("Node Uptime:", pms(process.uptime() * 1000), true)
-    );
+    return message.channel.send(new global.Discord.MessageEmbed({
+      color: defaultColor,
+      title: "Host OS Information",
+      fields: [
+        { name: "Platform", value: os.platform(), inline: true },
+        { name: "Architecture", value: os.arch(), inline: true },
+        { name: "Release", value: os.release(), inline: true },
+        { name: "Hostname", value: os.hostname(), inline: true },
+        { name: "Home Directory", value: os.homedir(), inline: true },
+        { name: "Free Memory:", value: prettyBytes(os.freemem()), inline: true },
+        { name: "Total Memory:", value: prettyBytes(os.totalmem()), inline: true },
+        { name: "System Uptime:", value: prettyMilliseconds(os.uptime() * 1000), inline: true },
+        { name: "CPU:", value: os.cpus()[0].model, inline: true },
+        { name: "Node Version:", value: process.version, inline: true },
+        { name: "Node Uptime:", value: prettyMilliseconds(process.uptime() * 1000), inline: true },
+      ]
+    }));
   }
 };

@@ -13,7 +13,7 @@ module.exports = {
 
     corpus.map(sentence => chain.update(sentence));
 
-    chain.config.grams = global.util.randomInteger(1, 3);
+    chain.config.grams = util.randomInteger(1, 3);
     if (startWord) chain.config.from = startWord;
 
     let sentence = chain.generate();

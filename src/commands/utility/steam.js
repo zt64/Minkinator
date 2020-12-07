@@ -15,7 +15,7 @@ module.exports = {
         const { colors } = global.guildInstance.config;
         const key = global.auth.steam;
 
-        const json = await global.util.fetchJSON(`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${key}&steamids=${steamID}`);
+        const json = await util.fetchJSON(`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${key}&steamids=${steamID}`);
 
         const [ user ] = json.response.players;
         if (!user) return message.channel.send(`Failed to find a Steam user with the ID of \`${steamID}\`. Make sure that this is a 64 bit ID and try again.`);

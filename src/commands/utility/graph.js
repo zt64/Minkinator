@@ -1,8 +1,9 @@
+const Chart = require("chart.js");
+const math = require("mathjs");
+
 module.exports = {
   description: "Draw a mathematical equation.",
   async execute (client, message, args) {
-    const { math } = global;
-
     const expr = math.compile("4 * sin(x) + 5 * cos(x/2)");
 
     // evaluate the expression repeatedly for different values of x
@@ -14,7 +15,7 @@ module.exports = {
     const canvas = global.canvas.createCanvas(512, 512);
     const ctx = canvas.getContext("2d");
 
-    var myChart = new global.Chart(ctx, {
+    const myChart = new Chart(ctx, {
       type: "bar",
       data: {
         labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],

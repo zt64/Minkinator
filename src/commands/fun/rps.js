@@ -17,18 +17,18 @@ module.exports = {
     const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
     
-    const embed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
-      .setTitle("Rock Paper Scissors");
+    const embed = new global.Discord.MessageEmbed({
+      color: defaultColor,
+      title: "Rock Paper Scissors"
+    });
 
-    const { randomInteger, capitalize } = global.util;
-    const computerChoice = choices[randomInteger(0, 2)];
+    const computerChoice = choices[util.randomInteger(0, 2)];
 
     function sendEmbed (lose) {
       if (lose) {
-        embed.setDescription(`${capitalize(computerChoice)} beats ${capitalize(playerChoice)}`);
+        embed.setDescription(`${util.capitalize(computerChoice)} beats ${util.capitalize(playerChoice)}`);
       } else {
-        embed.setDescription(`${capitalize(playerChoice)} beats ${capitalize(computerChoice)}`);
+        embed.setDescription(`${util.capitalize(playerChoice)} beats ${util.capitalize(computerChoice)}`);
       }
     
       return message.channel.send(embed);

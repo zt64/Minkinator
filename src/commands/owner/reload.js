@@ -2,14 +2,13 @@ module.exports = {
   description: "Reloads all the bot events and commands.",
   aliases: ["r"],
   async execute (client, message) {
-    const { colors } = global.guildInstance.config;
-
     const { commands, events } = client;
 
-    const reloadEmbed = new global.Discord.MessageEmbed()
-      .setColor(colors.default)
-      .setTitle("Reloading")
-      .setDescription(`Reloading \`${commands.length}\` commands and \`${events.length}\` events.`);
+    const reloadEmbed = new global.Discord.MessageEmbed({
+      color: global.guildInstance.config.colors.default,
+      title: "Reloading",
+      description: `Reloading \`${commands.length}\` commands and \`${events.length}\` events.`
+    });
 
     const reloadMessage = await message.channel.send(reloadEmbed);
 

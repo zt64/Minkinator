@@ -1,3 +1,5 @@
+const prettyBytes = require("pretty-bytes");
+
 module.exports = {
   description: "Allows usage of the GitHub API.",
   subCommands: [
@@ -19,12 +21,12 @@ module.exports = {
       async execute (client, message, [ owner, name ]) {
         const { colors } = global.guildInstance.config;
 
-        const json = await global.util.fetchJSON(`https://api.github.com/repos/${owner}/${name}`);
+        const json = await util.fetchJSON(`https://api.github.com/repos/${owner}/${name}`);
         
         if (json.message === "Not Found") return message.channel.send("Could not find repository.");
 
-        const commits = await global.util.fetchJSON(`https://api.github.com/repos/${owner}/${name}/commits`);
-        const pulls = await global.util.fetchJSON(`https://api.github.com/repos/${owner}/${name}/pulls`);
+        const commits = await util.fetchJSON(`https://api.github.com/repos/${owner}/${name}/commits`);
+        const pulls = await util.fetchJSON(`https://api.github.com/repos/${owner}/${name}/pulls`);
 
         // Create embed
         const embed = new global.Discord.MessageEmbed({
@@ -34,7 +36,7 @@ module.exports = {
           fields: [
             { name: "ID:", value: json.id, inline: true },
             { name: "Language:", value: json.id, inline: true },
-            { name: "Size:", value: global.pbs(json.size * 1000), inline: true },
+            { name: "Size:", value: prettyBytes(json.size * 1000), inline: true },
             { name: "Watchers:", value: json.watchers, inline: true },
             { name: "Forks:", value: json.forks, inline: true },
             { name: "Pull Requests:", value: pulls.length, inline: true },
@@ -64,7 +66,7 @@ module.exports = {
       async execute (client, message, [ user ]) {
         const { colors } = global.guildInstance.config;
 
-        const json = await global.util.fetchJSON(`https://api.github.com/users/${user}`);
+        const json = await util.fetchJSON(`https://api.github.com/users/${user}`);
 
         if (json.message === "Not Found") return message.channel.send("Could not find user.");
 

@@ -1,3 +1,5 @@
+const qr = require("qrcode");
+
 module.exports = {
   description: "Generates a QR code using the input.",
   parameters: [
@@ -12,7 +14,7 @@ module.exports = {
 
     const canvas = global.canvas.createCanvas(512, 512);
 
-    await global.qr.toCanvas(canvas, input, { margin: 2 });
+    await qr.toCanvas(canvas, input, { margin: 2 });
 
     return message.channel.send(new global.Discord.MessageEmbed({
       color: colors.default,

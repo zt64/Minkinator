@@ -1,3 +1,5 @@
+const entities = require("entities");
+
 module.exports = {
   description: "Retrieves an image from a subreddit.",
   aliases: ["rdt"],
@@ -10,7 +12,6 @@ module.exports = {
   ],
   async execute (client, message, [ subreddit ]) {
     const { redditNSFW, colors } = global.guildInstance.config;
-    const { entities } = global;
 
     const body = await global.fetch(`https://api.reddit.com/r/${subreddit}/hot?limit=64`).then(response => response.json());
 

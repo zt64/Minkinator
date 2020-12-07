@@ -1,3 +1,5 @@
+const twemoji = require("twemoji");
+
 module.exports = {
   description: "Get a scaled up version of an emoji.",
   aliases: ["emoji"],
@@ -10,7 +12,6 @@ module.exports = {
   ],
   async execute (client, message, [ messageEmoji ]) {
     const { colors } = global.guildInstance.config;
-    const { twemoji } = global;
 
     let url;
 

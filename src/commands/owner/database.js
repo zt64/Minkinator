@@ -1,3 +1,5 @@
+const prettyBytes = require("pretty-bytes");
+
 module.exports = {
   description: "Set or get database properties.",
   aliases: ["db"],
@@ -98,10 +100,10 @@ module.exports = {
         const sequelizeVersion = dependencies.sequelize;
         const sqlite3Version = dependencies.sqlite3;
 
-        const { pbs, fs } = global;
+        const { fs } = global;
 
         const stats = fs.statSync("./database.sqlite");
-        const size = pbs(stats.size);
+        const size = prettyBytes(stats.size);
 
         // Create embed
         const embed = new global.Discord.MessageEmbed()

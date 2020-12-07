@@ -1,15 +1,20 @@
+const moment = require("moment");
+
 module.exports = {
   description: "Shows the current time.",
   async execute (client, message) {
-    const { moment, guildInstance: { config: { colors } } } = global;
+    const utc = moment.utc();
 
     // Create embed
-    const timeEmbed = new global.Discord.MessageEmbed()
-      .setColor(colors.default)
-      .setTitle("Time / Date")
-      .addField("UTC Date:", moment.utc().format("dddd MMMM DD, YYYY"))
-      .addField("UTC Time:", moment.utc().format("kk:mm:ss"))
-      .addField("Unix Timestamp:", moment().unix());
+    const timeEmbed = new global.Discord.MessageEmbed({
+      color: global.guildInstance.config.colors.default,
+      title: "Time / Date",
+      fields: [
+        { name: "UTC Date:", value: utc.format("dddd, MMMM D, YYYY") },
+        { name: "UTC Time:", value: utc.format("kk:mm:ss") },
+        { name: "Unix Timestamp:", value: moment().unix() }
+      ]
+    });
 
     return message.channel.send(timeEmbed);
   }

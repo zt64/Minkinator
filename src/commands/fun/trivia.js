@@ -1,9 +1,10 @@
+const entities = require("entities");
+
 module.exports = {
   description: "Play a game of trivia.",
   aliases: ["quiz"],
   async execute (client, message) {
-    const { randomInteger, sleep } = global.util;
-    const { entities } = global;
+    const { randomInteger, sleep } = util;
 
     const { currency, colors } = global.guildInstance.config;
 
