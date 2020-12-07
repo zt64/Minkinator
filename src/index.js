@@ -5,27 +5,17 @@ const moment = global.moment = require("moment");
 const chalk = global.chalk = require("chalk");
 const fs = global.fs = require("fs");
 
-const client = new Discord.Client(config.clientOptions);
+const client = global.client = new Discord.Client(config.clientOptions);
 const time = moment().format("HH:mm M/D/Y");
 
-global.util = require("./util/functions.js");
 global.markov = require("purpl-markov-chain");
-global.GifEncoder = require("gif-encoder");
-global.Sequelize = require("sequelize");
+global.util = require("./util/functions.js");
 global.pluralize = require("pluralize");
-global.entities = require("entities");
 global.fetch = require("node-fetch");
-global.pbs = require("pretty-bytes");
-global.twemoji = require("twemoji");
-global.Chart = require("chart.js");
-global.pms = require("pretty-ms");
 global.canvas = require("canvas");
-global.math = require("mathjs");
-global.qr = require("qrcode");
-global.os = require("os");
 
 // Set client properties
-client.database = require("./util/models.js");
+client.database = require("./models/");
 client.coolDowns = new Map();
 
 // Set up event handler
