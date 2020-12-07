@@ -64,8 +64,9 @@ exports.formatNumber = (number, places = 0) => {
   return (number).toFixed(places).replace(/\d(?=(\d{3})+\.)/g, "$&,");
 };
 
-exports.fetchJSON = async (url) => {
-  const { fetch } = global;
-  
-  return fetch(url).then(response => response.json());
+exports.fetchJSON = async (url, options) => {
+  const fetch = require("node-fetch");
+  const response = await fetch(url, options);
+
+  return response.json();
 };
