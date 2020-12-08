@@ -13,7 +13,6 @@
     "chart.js": "^2.9.3",
     "discord.js": "^12.5.1",
     "entities": "^2.0.3",
-    "gif-encoder": "^0.7.2",
     "mathjs": "^7.2.0",
     "moment": "^2.27.0",
     "node-fetch": "^2.6.1",
@@ -21,7 +20,6 @@
     "pretty-bytes": "^5.3.0",
     "pretty-ms": "^7.0.0",
     "purpl-markov-chain": "^2.0.3",
-    "qrcode": "^1.4.4",
     "sequelize": "^6.3.4",
     "sqlite3": "^5.0.0",
     "twemoji": "^13.0.1",
@@ -32,21 +30,23 @@
     "prettier": "2.1.1"
   },
   "eslintConfig": {
+    "extends": "eslint:recommended",
     "env": {
       "commonjs": true,
       "es2020": true,
       "node": true
     },
-    "extends": "eslint:recommended",
     "parserOptions": {
       "ecmaVersion": 11
+    },
+    "globals": {
+      "util": "readonly"
     },
     "rules": {
       "prefer-destructuring": [
         "error",
         {
-          "object": true,
-          "array": true
+          "object": true
         }
       ],
       "indent": [
