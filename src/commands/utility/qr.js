@@ -1,5 +1,4 @@
 const fetch = require("node-fetch");
-const entities = require("entities");
 
 module.exports = {
   description: "Generates a QR code using the input.",
@@ -11,9 +10,10 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const text = args.join(" ");
-    const data = entities.encodeHTML(text);
 
-    const response = await fetch(`https://image-charts.com/chart?chs=150x150&cht=qr&chl=${data}`);
+    const response = await fetch(`https://image-charts.com/chart?chs=150x150&cht=qr&chl=${text}`);
+
+    if (response.status !== 200) return message.channel.send("An error occurred generating a QR code. Check your input and try again.");
 
     return message.channel.send(new global.Discord.MessageEmbed({
       color: global.guildInstance.config.colors.default,
