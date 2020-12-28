@@ -60,7 +60,7 @@ module.exports = async (client, message) => {
     let i = 0;
     
     // Prevent verbatim sentences from being generated
-    while ((corpus.includes(sentence) || sentence.length <= 10) && i < 100) {
+    while ((corpus.includes(sentence) || sentence.length <= 10) && i < 10) {
       sentence = chain.generate();
       i++;
     }
