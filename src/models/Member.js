@@ -25,11 +25,6 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false,
       defaultValue: 32
     },
-    messages: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0
-    },
     botBan: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
