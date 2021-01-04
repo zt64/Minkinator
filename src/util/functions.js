@@ -70,3 +70,7 @@ exports.fetchJSON = async (url, options) => {
 
   return response.json();
 };
+
+exports.paginate = (items, size, page) => {
+  return items.slice((page - 1) * size, page * size);
+};
