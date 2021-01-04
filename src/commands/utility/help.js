@@ -58,7 +58,7 @@ module.exports = {
 
     const helpMessage = await message.channel.send(helpEmbed);
 
-    ["🥳", "💵", "👤", "🖌️", "🛠️", "🔒"].map(async reaction => await helpMessage.react(reaction) );
+    ["🥳", "💵", "👤", "🖌️", "🛠️", "🔒"].forEach(async reaction => await helpMessage.react(reaction) );
 
     function switchCategory(category, title) {
       helpEmbed.setTitle(title);
@@ -66,7 +66,7 @@ module.exports = {
     
       helpEmbed.fields = [];
     
-      client.commands.forEach(command => {
+      return client.commands.forEach(command => {
         if (command.category !== category) return;
     
         helpEmbed.addField(`\`${prefix}${command.name}\``, command.description || "\u200b");

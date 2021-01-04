@@ -3,11 +3,11 @@ module.exports = {
   aliases: [ "mc" ],
   async execute (client, message, [ key, value ]) {
     const memberConfig = global.memberInstance.config;
-    const { colors } = global.guildInstance.config;
 
-    const embed = new global.Discord.MessageEmbed()
-      .setColor(colors.default)
-      .setTitle("Member Configuration");
+    const embed = new global.Discord.MessageEmbed({
+      color: global.guildInstance.config.colors.default,
+      title: "Member Configuration"
+    });
 
     if (key) {
       if (key in memberConfig) {
@@ -22,9 +22,6 @@ module.exports = {
         return message.channel.send(`\`${key}\` does not exist in the member configuration.`);
       }
     }
-
-    // Create embed
-    
 
     embed.setDescription(`\`\`\`json\n${JSON.stringify(memberConfig, null, 2)}\`\`\``);
 

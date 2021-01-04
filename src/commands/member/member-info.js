@@ -19,15 +19,17 @@ module.exports = {
     const memberData = await global.sequelize.models.member.findByPk(user.id);
 
     // Create info embed
-    const infoEmbed = new global.Discord.MessageEmbed()
-      .setColor(colors.default)
-      .setAuthor(`Member information: ${member.nickname || user.tag}`, user.avatarURL())
-      .addField("Balance:", `${currency}${formatNumber(memberData.balance, 2)}`, true)
-      .addField("Level:", formatNumber(memberData.level), true)
-      .addField("Total messages:", formatNumber(memberData.messages), true)
-      .addField("Total experience:", `${formatNumber(memberData.xpTotal)} XP`, true)
-      .addField("Required experience", `${formatNumber(memberData.xpRequired)} XP`, true)
-      .addField("Joined:", member.joinedAt.toLocaleDateString(), true);
+    const infoEmbed = new global.Discord.MessageEmbed({
+      color: colors.default,
+      author: { iconURL: user.avatarURL(), name: `Member information: ${member.nickname || user.tag}` },
+      fields: [
+        { name: "Balance:", value: `${currency}${formatNumber(memberData.balance, 2)}`, inline: true },
+        { name: "Level:", value: formatNumber(memberData.level), inline: true },
+        { name: "Total experience:", value: `${formatNumber(memberData.xpTotal)} XP`, inline: true },
+        { name: "Required experience:", value: `${formatNumber(memberData.xpRequired)} XP`, inline: true },
+        { name: "Joined:", value: member.joinedAt.toLocaleDateString(), inline: true }
+      ]
+    });
 
     return message.channel.send(infoEmbed);
   }

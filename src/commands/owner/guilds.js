@@ -15,13 +15,9 @@ module.exports = {
       footer: { text: `Page ${page} of ${pages}` }
     });
 
-    function populate () {
-      guilds.slice((page - 1) * 10, page * 10).map((guild) => {
-        guildsEmbed.addField(`${guild.name}`, `Members: ${guild.memberCount} \n ID: ${guild.id}`);
-      });
-    }
-
-    populate();
+    util.paginate(guilds, 10, page).forEach(guild => {
+      guildsEmbed.addField(`${guild.name}`, `Members: ${guild.memberCount} \n ID: ${guild.id}`);
+    });
 
     const guildsMessage = await message.channel.send(guildsEmbed);
 
@@ -39,8 +35,6 @@ module.exports = {
       case "🏠":
         page = 1;
 
-        populate();
-
         guildsMessage.reactions.removeAll();
 
         if (pages > 1) guildsMessage.react("➡️");
@@ -48,33 +42,57 @@ module.exports = {
       case "⬅️":
         page--;
 
-        populate();
-
         guildsMessage.reactions.removeAll();
 
-        if (page !== 1) guildsMessage.react("🏠");
+        if (page > 2) guildsMessage.react("🏠");
 
         guildsMessage.react("➡️");
         break;
       case "➡️":
         page++;
 
-        populate();
-
         guildsMessage.reactions.removeAll();
 
-        guildsMessage.react("🏠");
+        if (page > 2) guildsMessage.react("🏠");
         guildsMessage.react("⬅️");
 
         if (pages > page) guildsMessage.react("➡️");
-        break;
       }
 
       guildsEmbed.fields = [];
 
-      guildsEmbed.setFooter(`Page ${page} of ${pages}`);
+      util.paginate(guilds, 10, page).forEach(guild => {
+        guildsEmbed.addField(`${guild.name}`, `Members: ${guild.memberCount} \n ID: ${guild.id}`);
+      });
 
+      guildsEmbed.setFooter(`Page ${page} of ${pages}`);
       guildsMessage.edit(guildsEmbed);
     });
   }
 };
+
+// const buttons = {
+//   HOME: "🏠",
+//   LEFT: "⬅️",
+//   RIGHT: "➡️",
+// }
+
+// collector.on("collect", async reaction => {
+// const emoji = reaction.emoji.name;
+// guildsMessage.reactions.removeAll();
+
+// if (page > 2) guildsMessage.react(buttons.HOME);
+
+// switch (emoji) {
+//   case buttons.HOME:
+//     page = 1;
+//     if (pages > 1) guildsMessage.react(buttons.RIGHT);
+//   case buttons.LEFT:
+//     page--;
+//     guildsMessage.react(buttons.RIGHT);
+//   case buttons.RIGHT:
+//     page++;
+//     if (pages > page) guildsMessage.react(buttons.RIGHT);
+//     guildsMessage.react(buttons.LEFT);
+// }
+// });
