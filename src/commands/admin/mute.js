@@ -1,3 +1,5 @@
+const pluralize = require("pluralize");
+
 module.exports = {
   description: "Mutes a member.",
   permissions: ["MANAGE_CHANNELS"],
@@ -19,7 +21,7 @@ module.exports = {
   async execute (client, message, args) {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
 
-    const { mutes, config: { colors } } = global.guildInstance.config;
+    const { mutes } = global.guildInstance.config;
 
     const member = message.mentions.members.first();
     const reason = args.slice(2).join(" ");
@@ -32,10 +34,10 @@ module.exports = {
       epoch: Date.now()
     });
 
-    return message.channel.send(new global.Discord.MessageEmbed()
-      .setColor(colors.default)
-      .setAuthor(`${member.user.tag} has been muted${minutes ? ` for ${global.pluralize("minute", minutes, true)}` : ""}.`, member.user.avatarURL())
-      .setDescription(reason || "No reason provided.")
-    );
+    return message.channel.send(new Discord.MessageEmbed({
+      color: global.guildInstance.config.colors.default,
+      author: { iconURL: member.user.avatarURL(), name: `${member.user.tag} has been muted${minutes ? ` for ${pluralize("minute", minutes, true)}` : ""}.` },
+      description: reason || "No reason provided."
+    }));
   }
 };

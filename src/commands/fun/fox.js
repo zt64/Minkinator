@@ -6,7 +6,7 @@ module.exports = {
     
     const fox = await util.fetchJSON("https://randomfox.ca/floof/");
 
-    const foxEmbed = new global.Discord.MessageEmbed({
+    const foxEmbed = new Discord.MessageEmbed({
       color: defaultColor,
       title: "Random Fox",
       url: fox.link,

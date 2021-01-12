@@ -1,3 +1,5 @@
+const { createCanvas } = require("canvas");
+
 module.exports = {
   description: "Creates an image from text.",
   parameters: [
@@ -8,7 +10,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const canvas = global.canvas.createCanvas(512, 512);
+    const canvas = createCanvas(512, 512);
     const ctx = canvas.getContext("2d");
 
     const text = args.join(" ");
@@ -25,7 +27,7 @@ module.exports = {
     ctx.textBaseLine = "bottom";
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
-    const attachment = new global.Discord.MessageAttachment(canvas.toBuffer());
+    const attachment = new Discord.MessageAttachment(canvas.toBuffer());
     return message.channel.send(attachment);
   }
 };

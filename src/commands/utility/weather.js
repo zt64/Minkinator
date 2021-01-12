@@ -21,7 +21,7 @@ module.exports = {
     const { weather } = data;
     const { main } = data;
 
-    const embed = new global.Discord.MessageEmbed()
+    const embed = new Discord.MessageEmbed()
       .setColor(defaultColor)
       .setTitle(`Weather for ${data.name}`)
       .addField("Longitude:", data.coord.lon, true)

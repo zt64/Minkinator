@@ -17,10 +17,11 @@ module.exports = {
     if (!page) page = 1;
 
     // Create embed
-    const leaderBoardEmbed = new global.Discord.MessageEmbed()
-      .setColor(colors.default)
-      .setTitle("Leader board")
-      .setFooter(`Page ${page} of ${pages}`);
+    const leaderBoardEmbed = new Discord.MessageEmbed({
+      color: colors.default,
+      title: "Leader Board",
+      footer: `Page ${page} of ${pages}`
+    });
 
     if (page > pages || page < 1) return message.channel.send(`Page \`${page}\` does not exist.`);
 

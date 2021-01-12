@@ -22,7 +22,7 @@ module.exports = {
 
         const states = ["Offline", "Online", "Busy", "Away", "Snooze", "Looking to trade", "Looking to play"];
 
-        const embed = new global.Discord.MessageEmbed()
+        const embed = new Discord.MessageEmbed()
           .setColor(colors.default)
           .setAuthor(user.personaname, user.avatar)
           .setTitle("Steam User Summary")

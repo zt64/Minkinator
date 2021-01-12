@@ -14,7 +14,6 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
 
     const member = message.mentions.members.first();
     const reason = args.slice(1).join(" ");
@@ -25,10 +24,10 @@ module.exports = {
     message.guild.member(member).kick();
 
     // Send embed
-    return message.channel.send(new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
-      .setTitle(`${member.user.tag} has been kicked`)
-      .setDescription(reason || "No reason provided.")
-    );
+    return message.channel.send(new Discord.MessageEmbed({
+      color: guildConfig.colors.default,
+      title: `${member.user.tag} has been kicked`,
+      description: reason || "No reason provided."
+    }));
   }
 };

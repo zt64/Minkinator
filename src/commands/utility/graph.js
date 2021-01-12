@@ -1,3 +1,4 @@
+const { createCanvas } = require("canvas");
 const Chart = require("chart.js");
 const math = require("mathjs");
 
@@ -12,7 +13,7 @@ module.exports = {
       return expr.evaluate({ x: x });
     });
 
-    const canvas = global.canvas.createCanvas(512, 512);
+    const canvas = createCanvas(512, 512);
     const ctx = canvas.getContext("2d");
 
     const myChart = new Chart(ctx, {
@@ -52,7 +53,7 @@ module.exports = {
       }
     });
 
-    const attachment = new global.Discord.MessageAttachment(canvas.toBuffer());
+    const attachment = new Discord.MessageAttachment(canvas.toBuffer());
 
     return message.channel.send(attachment);
   }

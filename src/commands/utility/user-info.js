@@ -17,7 +17,7 @@ module.exports = {
     if (user.presence.clientStatus.desktop) platforms.push("Desktop");
 
     // Create embed
-    const infoEmbed = new global.Discord.MessageEmbed()
+    const infoEmbed = new Discord.MessageEmbed()
       .setColor(colors.default)
       .setAuthor(`User information: ${user.tag}`, user.avatarURL())
       .addField("ID:", user.id)

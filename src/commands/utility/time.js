@@ -6,7 +6,7 @@ module.exports = {
     const utc = moment.utc();
 
     // Create embed
-    const timeEmbed = new global.Discord.MessageEmbed({
+    const timeEmbed = new Discord.MessageEmbed({
       color: global.guildInstance.config.colors.default,
       title: "Time / Date",
       fields: [

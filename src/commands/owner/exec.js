@@ -8,7 +8,6 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const { colors } = global.guildInstance.config;
     const input = args.join(" ");
 
     const { exec } = require("child_process");
@@ -26,8 +25,9 @@ module.exports = {
       execMessage.edit(execEmbed);
     }
   
-    const execEmbed = new global.Discord.MessageEmbed()
-      .setColor(colors.default);
+    const execEmbed = new Discord.MessageEmbed({
+      color: global.guildInstance.config.colors.default
+    });
 
     const execMessage = await message.channel.send(execEmbed);
 

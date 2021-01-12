@@ -16,7 +16,7 @@ module.exports = {
     const result = util.randomInteger(1, sides);
 
     // Create embed
-    const diceEmbed = new global.Discord.MessageEmbed({
+    const diceEmbed = new Discord.MessageEmbed({
       color: colors.default,
       title: "Dice Roll",
       description: "Rolling..."

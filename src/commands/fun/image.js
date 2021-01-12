@@ -21,7 +21,7 @@ module.exports = {
       body: form
     }).then(res => res.json());
 
-    return message.channel.send(new global.Discord.MessageEmbed({
+    return message.channel.send(new Discord.MessageEmbed({
       color: global.guildInstance.config.colors.default,
       title: "DeepAI Text to Image",
       description: text,

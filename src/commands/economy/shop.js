@@ -1,3 +1,5 @@
+const pluralize = require("pluralize");
+
 module.exports = {
   description: "Buy, sell, and see what items are available.",
   aliases: ["s"],
@@ -32,7 +34,7 @@ module.exports = {
         const shopItem = shopItems.find(x => x.name === itemName);
         const shopItemPrice = itemAmount * shopItem.price;
 
-        if (balance < shopItemPrice) return message.channel.send(`You cannot afford ${global.pluralize(itemName, itemAmount, true)}.`);
+        if (balance < shopItemPrice) return message.channel.send(`You cannot afford ${pluralize(itemName, itemAmount, true)}.`);
 
         const inventoryItem = inventory.find(item => item.name === itemName);
 
@@ -50,10 +52,10 @@ module.exports = {
         await memberData.decrement("balance", { by: shopItemPrice });
         await memberData.update({ inventory: inventory });
 
-        return message.channel.send(new global.Discord.MessageEmbed()
+        return message.channel.send(new Discord.MessageEmbed()
           .setColor(colors.default)
           .setTitle("Transaction Successful")
-          .setDescription(`Bought ${global.pluralize(itemName, itemAmount, true)} for ${currency}${formatNumber(shopItemPrice, 2)}.`)
+          .setDescription(`Bought ${pluralize(itemName, itemAmount, true)} for ${currency}${formatNumber(shopItemPrice, 2)}.`)
         );
       }
     },
@@ -99,10 +101,10 @@ module.exports = {
 
         await memberData.update({ balance: balance, inventory: inventory });
 
-        return message.channel.send(new global.Discord.MessageEmbed()
+        return message.channel.send(new Discord.MessageEmbed()
           .setColor(colors.default)
           .setTitle("Transaction Successful")
-          .setDescription(`Sold ${global.pluralize(itemName, itemAmount, true)} for ${currency}${sellPrice.toFixed(2)}`)
+          .setDescription(`Sold ${pluralize(itemName, itemAmount, true)} for ${currency}${sellPrice.toFixed(2)}`)
         );
       }
     },
@@ -131,7 +133,7 @@ module.exports = {
         if (page > pages || page < 1 || isNaN(page)) return message.channel.send(`Page \`${page}\` does not exist.`);
 
         // Create embed
-        const shopEmbed = new global.Discord.MessageEmbed()
+        const shopEmbed = new Discord.MessageEmbed()
           .setColor(colors.default)
           .setTitle(`${message.guild.name} shop`)
           .setDescription(`Buy items using \`${prefix}shop buy [item] [amount]\` \n Sell items using \`${prefix}shop sell [item] [amount] [price]\``)

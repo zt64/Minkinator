@@ -9,9 +9,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ seconds ]) {
-    const { channel } = message;
-
-    await channel.setRateLimitPerUser(seconds);
+    await message.channel.setRateLimitPerUser(seconds);
 
     return message.channel.send(`Successfully set the rate limit per user to ${seconds} seconds.`);
   }

@@ -10,7 +10,7 @@ module.exports = {
     const defaultColor = guildConfig.colors.default;
 
     // Create and send embed
-    return message.channel.send(new global.Discord.MessageEmbed({
+    return message.channel.send(new Discord.MessageEmbed({
       color: defaultColor,
       title: "Host OS Information",
       fields: [

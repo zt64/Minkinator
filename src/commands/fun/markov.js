@@ -1,3 +1,5 @@
+const MarkovChain = require("purpl-markov-chain");
+
 module.exports = {
   description: "Generates a markov chain.",
   aliases: [ "mkv" ],
@@ -8,22 +10,12 @@ module.exports = {
     }
   ],
   async execute (client, message, [ startWord ]) {
-    const corpus = global.guildInstance.data;
-    const chain = new global.markov();
-
-    corpus.map(sentence => chain.update(sentence));
+    const chain = new MarkovChain(global.guildInstance.corpus);
 
     chain.config.grams = util.randomInteger(1, 3);
+
     if (startWord) chain.config.from = startWord;
 
-    let sentence = chain.generate();
-    let i = 0;
-    
-    while ((corpus.includes(sentence) || sentence.length <= 16) && i < 100) {
-      sentence = chain.generate();
-      i++;
-    }
-
-    return message.channel.send(sentence);
+    return message.channel.send(chain.generate());
   }
 };

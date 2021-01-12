@@ -4,7 +4,7 @@ module.exports = {
     const owner = await client.users.fetch(global.config.ownerID);
 
     // Send embed
-    return message.channel.send(new global.Discord.MessageEmbed({
+    return message.channel.send(new Discord.MessageEmbed({
       color: global.guildInstance.config.colors.default,
       title: "Minkinator Information",
       description: "What is a Minkinator you may ask. Well, I'm not quite sure myself. On the 22nd of August, 2019, I just decided to try and make a Discord bot on my phone. Soon Minkinator would be hosted on my desktop computer and currently is hosted on my own Raspberry Pi. I never had any idea that Minkinator would reach this far. If you ever find a bug or have a feature request, please do so on the GitHub repository below.",

@@ -1,3 +1,5 @@
+const fetch = require("node-fetch");
+
 module.exports = {
   name: "map",
   description: "Get a satellite image view of a location.",
@@ -22,10 +24,10 @@ module.exports = {
 
     const [ longitude, latitude ] = feature.center;
 
-    const map = await global.fetch(`https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/${longitude},${latitude},8,0/1024x1024?access_token=${key}`);
+    const map = await fetch(`https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/${longitude},${latitude},8,0/1024x1024?access_token=${key}`);
     const { url } = map;
     
-    return message.channel.send(new global.Discord.MessageEmbed({
+    return message.channel.send(new Discord.MessageEmbed({
       color: colors.default,
       title: feature.place_name,
       url: url,

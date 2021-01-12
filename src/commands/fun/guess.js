@@ -23,7 +23,7 @@ module.exports = {
     // Generate random value
     const value = randomInteger(1, 100);
 
-    const embed = new global.Discord.MessageEmbed();
+    const embed = new Discord.MessageEmbed();
 
     if (value === guess) {
       embed.setColor("#F0B27A");

@@ -4,7 +4,7 @@ module.exports = {
   async execute (client, message) {
     const { commands, events } = client;
 
-    const reloadEmbed = new global.Discord.MessageEmbed({
+    const reloadEmbed = new Discord.MessageEmbed({
       color: global.guildInstance.config.colors.default,
       title: "Reloading",
       description: `Reloading \`${commands.length}\` commands and \`${events.length}\` events.`

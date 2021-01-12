@@ -15,7 +15,7 @@ module.exports = {
 
     if (response.status !== 200) return message.channel.send("An error occurred generating a QR code. Check your input and try again.");
 
-    return message.channel.send(new global.Discord.MessageEmbed({
+    return message.channel.send(new Discord.MessageEmbed({
       color: global.guildInstance.config.colors.default,
       title: "QR Code",
       description: text,

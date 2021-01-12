@@ -11,7 +11,7 @@ module.exports = {
     const { colors } = global.guildInstance.config;
 
     const input = args.join(" ");
-    const embed = new global.Discord.MessageEmbed({ color: colors.default });
+    const embed = new Discord.MessageEmbed({ color: colors.default });
 
     // Attempt to run code
     try {

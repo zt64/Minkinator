@@ -30,7 +30,7 @@ module.exports = {
       [ url ] = emoji.match(/http.+png/);
     }
 
-    return message.channel.send(new global.Discord.MessageEmbed({
+    return message.channel.send(new Discord.MessageEmbed({
       color: colors.default,
       title: "Scaled Emoji",
       url: url,

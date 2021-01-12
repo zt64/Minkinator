@@ -24,10 +24,11 @@ module.exports = {
     message.guild.unban(member.user);
 
     // Send embed
-    return message.channel.send(new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
-      .setAuthor(`${member.user.tag} has been unbanned`, member.user.avatarURL)
-      .setFooter(member.id)
+    return message.channel.send(new Discord.MessageEmbed({
+      color: defaultColor,
+      author: { url:  member.user.avatarURL, name: `${member.user.tag} has been unbanned` },
+      footer: { text: member.id }
+    })
     );
   }
 };

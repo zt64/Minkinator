@@ -13,11 +13,11 @@ module.exports = {
   ],
   async execute (client, message, [ key, value ]) {
     const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.dataValues.colors.default;
 
-    const embed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
-      .setTitle("Guild Configuration");
+    const embed = new Discord.MessageEmbed({
+      color: guildConfig.dataValues.colors.default,
+      title: "Guild Configuration"
+    });
 
     if (key) {
       if (!guildConfig[key]) return message.channel.send(`\`${key}\` does not exist in the guild configuration.`);

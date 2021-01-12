@@ -19,7 +19,7 @@ module.exports = {
     const memberData = await global.sequelize.models.member.findByPk(user.id);
 
     // Create info embed
-    const infoEmbed = new global.Discord.MessageEmbed({
+    const infoEmbed = new Discord.MessageEmbed({
       color: colors.default,
       author: { iconURL: user.avatarURL(), name: `Member information: ${member.nickname || user.tag}` },
       fields: [

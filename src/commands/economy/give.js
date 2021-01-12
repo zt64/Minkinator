@@ -33,7 +33,7 @@ module.exports = {
     await memberInstance.decrement("balance", { by: parseInt(amount) });
     await targetInstance.increment("balance", { by: parseInt(amount) });
 
-    return message.channel.send(new global.Discord.MessageEmbed()
+    return message.channel.send(new Discord.MessageEmbed()
       .setColor(colors.default)
       .setTitle("Payment Transaction")
       .setDescription(`${message.author} has sent ${currency}${amount} to ${target}`)

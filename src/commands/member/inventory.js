@@ -12,7 +12,7 @@ module.exports = {
     const member = message.guild.member(user);
 
     // Create embed
-    const inventoryEmbed = new global.Discord.MessageEmbed({
+    const inventoryEmbed = new Discord.MessageEmbed({
       color: global.guildInstance.config.colors.default,
       title: `Inventory of ${member.displayName}`
     });

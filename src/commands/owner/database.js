@@ -1,4 +1,5 @@
 const prettyBytes = require("pretty-bytes");
+const fs = require("fs");
 
 module.exports = {
   description: "Set or get database properties.",
@@ -19,10 +20,9 @@ module.exports = {
         }
       ],
       async execute (client, message, [ modelName, instanceName ]) {
-        const { colors } = global.guildInstance.config;
-
-        const embed = new global.Discord.MessageEmbed()
-          .setColor(colors.default);
+        const embed = new Discord.MessageEmbed({
+          color: global.guildInstance.config.colors.default
+        });
 
         const model = global.sequelize.models[modelName];
         if (!model) return message.channel.send(`Model \`${modelName}\` does not exist.`);
@@ -100,13 +100,11 @@ module.exports = {
         const sequelizeVersion = dependencies.sequelize;
         const sqlite3Version = dependencies.sqlite3;
 
-        const { fs } = global;
-
         const stats = fs.statSync("./database.sqlite");
         const size = prettyBytes(stats.size);
 
         // Create embed
-        const embed = new global.Discord.MessageEmbed()
+        const embed = new Discord.MessageEmbed()
           .setColor(defaultColor)
           .setTitle("Database Information")
           .addField("Sequelize Version:", sequelizeVersion)

@@ -1,4 +1,5 @@
 const entities = require("entities");
+const fetch = require("node-fetch");
 
 module.exports = {
   description: "Retrieves an image from a subreddit.",
@@ -13,7 +14,7 @@ module.exports = {
   async execute (client, message, [ subreddit ]) {
     const { redditNSFW, colors } = global.guildInstance.config;
 
-    const body = await global.fetch(`https://api.reddit.com/r/${subreddit}/hot?limit=64`).then(response => response.json());
+    const body = await fetch(`https://api.reddit.com/r/${subreddit}/hot?limit=64`).then(response => response.json());
 
     // Check if subreddit exists and has posts
     if (!body.data) return message.channel.send(`Subreddit \`r/${subreddit}\` does not exist.`);
@@ -27,7 +28,7 @@ module.exports = {
     const post = posts[Math.floor(Math.random() * posts.length)].data;
 
     // Create embed
-    const embed = new global.Discord.MessageEmbed()
+    const embed = new Discord.MessageEmbed()
       .setColor(colors.default)
       .setTitle(`r/${subreddit} ${post.title}`)
       .setURL(`https://reddit.com${post.permalink}`)

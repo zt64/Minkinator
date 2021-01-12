@@ -1,5 +1,5 @@
 const entities = require("entities");
-
+const fetch = require("node-fetch");
 module.exports = {
   description: "Play a game of trivia.",
   aliases: ["quiz"],
@@ -11,7 +11,7 @@ module.exports = {
     let correctIndex = 0;
 
     // Fetch question
-    const responses = await global.fetch("https://opentdb.com/api.php?amount=1").then(res => res.json());
+    const responses = await fetch("https://opentdb.com/api.php?amount=1").then(res => res.json());
     const [ response ] = responses.results;
 
     const question = entities.decodeHTML(response.question);
@@ -31,7 +31,7 @@ module.exports = {
     const reward = randomInteger(20, 50);
 
     // Create embed
-    const questionEmbed = new global.Discord.MessageEmbed()
+    const questionEmbed = new Discord.MessageEmbed()
       .setColor(colors.default)
       .setTitle(`${response.category} question`)
       .setDescription(question)
@@ -73,7 +73,7 @@ module.exports = {
       await data.update({ balance: balance });
     }
 
-    const answerEmbed = new global.Discord.MessageEmbed()
+    const answerEmbed = new Discord.MessageEmbed()
       .setColor(colors.default)
       .setTitle("Trivia Answer");
 

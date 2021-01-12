@@ -17,7 +17,7 @@ module.exports = {
     const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
     
-    const embed = new global.Discord.MessageEmbed({
+    const embed = new Discord.MessageEmbed({
       color: defaultColor,
       title: "Rock Paper Scissors"
     });

@@ -43,12 +43,12 @@ exports.initialize = async (guild) => {
 };
 
 exports.checkMembers = async (guild, guildInstance) => {
-  console.log(guildInstance);
+  const chalk = require("chalk");
+  const moment = require("moment");
+
   const databaseMembers = guildInstance.getMembers();
 
   if (!databaseMembers) return;
-
-  const { chalk, moment } = global;
 
   const time = moment().format("HH:mm M/D/Y");
 

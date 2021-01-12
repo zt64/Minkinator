@@ -1,5 +1,8 @@
+const pluralize = require("pluralize");
+const moment = require("moment");
+const chalk = require("chalk");
+
 module.exports = async (client, guild) => {
-  const { moment, chalk, pluralize } = global;
   const time = moment().format("HH:mm M/D/Y");
 
   console.log(chalk.green(`(${time})`), `Minkinator has left: ${guild.name} (${guild.id}).`);

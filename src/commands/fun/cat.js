@@ -1,3 +1,5 @@
+const fetch = require("node-fetch");
+
 module.exports = {
   description: "Gets a random cat image.",
   parameters: [
@@ -8,17 +10,17 @@ module.exports = {
   ],
   async execute (client, message, args) {
     const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
 
     const search = args.join(" ");
 
-    const catEmbed = new global.Discord.MessageEmbed()
-      .setColor(defaultColor)
-      .setFooter("Source: https://api.thecatapi.com");
+    const catEmbed = new Discord.MessageEmbed({
+      color: guildConfig.colors.default,
+      footer: { text: "Source: https://api.thecatapi.com" }
+    });
 
     // Fetch a random image if unspecified
     if (!search) {
-      const cats = await global.fetch("https://api.thecatapi.com/v1/images/search").then(res => res.json());
+      const cats = await fetch("https://api.thecatapi.com/v1/images/search").then(res => res.json());
       const [ cat ] = cats;
 
       catEmbed.setTitle("Random cat");
@@ -29,12 +31,12 @@ module.exports = {
     }
 
     // Check if a breed exists and fetch an image for it
-    const breeds = await global.fetch(`https://api.thecatapi.com/v1/breeds/search?q=${search}`).then(res => res.json());
+    const breeds = await fetch(`https://api.thecatapi.com/v1/breeds/search?q=${search}`).then(res => res.json());
     const [ breed ] = breeds;
 
     if (breeds.length === 0) return message.channel.send(`No images found for \`${search}\`.`);
 
-    const cats = await global.fetch(`https://api.thecatapi.com/v1/images/search/?breed_id=${breed.id}`).then(res => res.json());
+    const cats = await fetch(`https://api.thecatapi.com/v1/images/search/?breed_id=${breed.id}`).then(res => res.json());
     const [ cat ] = cats;
 
     if (!cat) return message.channel.send(`No images found for \`${search}\`.`);

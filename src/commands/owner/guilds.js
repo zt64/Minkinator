@@ -1,3 +1,5 @@
+const pluralize = require("pluralize");
+
 module.exports = {
   description: "Shows the current guilds and members Minkinator is watching.",
   aliases: ["servers"],
@@ -9,9 +11,9 @@ module.exports = {
 
     if (page > pages || page < 1) return message.channel.send(`Page \`${page}\` does not exist.`);
 
-    const guildsEmbed = new global.Discord.MessageEmbed({
+    const guildsEmbed = new Discord.MessageEmbed({
       color: global.guildInstance.config.colors.default,
-      title: `Watching ${global.pluralize("guild", guilds.length, true)} and ${client.users.cache.size} users`,
+      title: `Watching ${pluralize("guild", guilds.length, true)} and ${client.users.cache.size} users`,
       footer: { text: `Page ${page} of ${pages}` }
     });
 

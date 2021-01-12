@@ -1,4 +1,5 @@
 const prettyMilliseconds = require("pretty-ms");
+const fetch = require("node-fetch");
 
 module.exports = {
   description: "Returns ping and web socket information.",
@@ -11,7 +12,7 @@ module.exports = {
 
     const connections = ["READY", "CONNECTING", "RECONNECTING", "IDLE", "NEARLY", "DISCONNECTED"];
 
-    const pingEmbed = new global.Discord.MessageEmbed({
+    const pingEmbed = new Discord.MessageEmbed({
       color: defaultColor,
       title: "Pinging..."
     });
@@ -22,7 +23,7 @@ module.exports = {
 
     // Check connection ping
     const start = process.hrtime.bigint();
-    await global.fetch("https://www.google.com");
+    await fetch("https://www.google.com");
     const end = process.hrtime.bigint();
 
     const connectionPing = prettyMilliseconds(Number(end - start) / 1e+6);

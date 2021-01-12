@@ -4,7 +4,7 @@ module.exports = {
   async execute (client, message, [ key, value ]) {
     const memberConfig = global.memberInstance.config;
 
-    const embed = new global.Discord.MessageEmbed({
+    const embed = new Discord.MessageEmbed({
       color: global.guildInstance.config.colors.default,
       title: "Member Configuration"
     });

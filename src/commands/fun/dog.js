@@ -4,7 +4,7 @@ module.exports = {
     const guildConfig = global.guildInstance.config;
     const defaultColor = guildConfig.colors.default;
 
-    const dogEmbed = new global.Discord.MessageEmbed({
+    const dogEmbed = new Discord.MessageEmbed({
       color: defaultColor,
       footer: { text: "Source: https://random.dog/woof.json" }
     });

@@ -1,3 +1,5 @@
+const { createCanvas, loadImage } = require("canvas");
+
 module.exports = {
   description: "Modifies an images RGB channels to be black and white.",
   aliases: ["bw"],
@@ -9,9 +11,9 @@ module.exports = {
   ],
   async execute (client, message, [ imageURL ]) {
     if (!(imageURL || message.attachments.size)) return message.channel.send("No URL or attachment provided.");
-    const image = await global.canvas.loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); });
+    const image = await loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); });
 
-    const canvas = global.canvas.createCanvas(image.width, image.height);
+    const canvas = createCanvas(image.width, image.height);
     const context = canvas.getContext("2d");
 
     context.drawImage(image, 0, 0);
@@ -32,6 +34,6 @@ module.exports = {
 
     context.putImageData(imageData, 0, 0);
 
-    return message.channel.send(new global.Discord.MessageAttachment(canvas.toBuffer()));
+    return message.channel.send(new Discord.MessageAttachment(canvas.toBuffer()));
   }
 };
