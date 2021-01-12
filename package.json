@@ -26,8 +26,12 @@
     "ytdl-core-discord": "^1.2.4"
   },
   "devDependencies": {
-    "eslint": "^7.7.0",
-    "prettier": "2.1.1"
+    "eslint": "^7.17.0"
+  },
+  "main": "./src/index.js",
+  "scripts": {
+    "start": "node .",
+    "lint": "eslint src"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
@@ -40,7 +44,8 @@
       "ecmaVersion": 11
     },
     "globals": {
-      "util": "readonly"
+      "util": "readonly",
+      "Discord": "readonly"
     },
     "rules": {
       "prefer-destructuring": [
