@@ -1,18 +1,15 @@
 const config = global.config = require("./config/config.json");
 const auth = global.auth = require("./config/auth.json");
 const Discord = global.Discord = require("discord.js");
-const moment = global.moment = require("moment");
-const chalk = global.chalk = require("chalk");
-const fs = global.fs = require("fs");
 
 const client = global.client = new Discord.Client(config.clientOptions);
-const time = moment().format("HH:mm M/D/Y");
 
-global.markov = require("purpl-markov-chain");
+const moment = require("moment");
+const chalk = require("chalk");
+const path = require("path");
+const fs = require("fs");
+
 global.util = require("./util/functions.js");
-global.pluralize = require("pluralize");
-global.fetch = require("node-fetch");
-global.canvas = require("canvas");
 
 // Set client properties
 client.database = require("./models/");
@@ -20,35 +17,40 @@ client.coolDowns = new Map();
 
 // Set up event handler
 client.loadEvents = async () => {
-  client.events = [];
+  const eventsDir = path.join(__dirname, "events");
 
-  fs.readdirSync("./events/").forEach(eventName => {
-    delete require.cache[require.resolve(`./events/${eventName}`)];
+  client.events = fs.readdirSync(eventsDir).map(eventName => {
+    const eventPath = path.join(eventsDir, eventName);
+    delete require.cache[eventPath];
+    const event = require(eventPath);
 
-    const event = require(`./events/${eventName}`);
+    client.on(path.parse(eventName).name, event.bind(null, client));
 
-    client.events.push(event);
-
-    client.on(eventName.replace(".js", ""), event.bind(null, client));
+    return event;
   });
 
-  console.log(chalk.green(`(${time})`), `Successfully loaded ${client.events.length} events.`);
+  console.log(chalk.green(`(${moment().format("HH:mm M/D/Y")})`), `Successfully loaded ${client.events.length} events.`);
 };
 
 // Set up command handler
 client.loadCommands = async () => {
   client.commands = [];
 
-  fs.readdirSync("./commands/").forEach(category => {
-    fs.readdirSync(`./commands/${category}`).forEach(commandName => {
-      delete require.cache[require.resolve(`./commands/${category}/${commandName}`)];
+  const commandsDir = path.join(__dirname, "commands");
+
+  fs.readdirSync(commandsDir).forEach(category => {
+    const categoryDir = path.join(commandsDir, category);
+
+    fs.readdirSync(categoryDir).forEach(commandName => {
+      const commandPath = path.join(categoryDir, commandName);
+      delete require.cache[commandPath];
 
       let command;
 
       try {
-        command = require(`./commands/${category}/${commandName}`);
+        command = require(commandPath);
       } catch (error) {
-        console.log(chalk.green(`(${time})`), `Failed to load ${commandName}, skipping.`);
+        console.log(chalk.green(`(${moment().format("HH:mm M/D/Y")})`), `Failed to load ${commandName}, skipping.`);
         return console.error(error);
       }
 
@@ -61,7 +63,7 @@ client.loadCommands = async () => {
     });
   });
 
-  console.log(chalk.green(`(${time})`), `Successfully loaded ${client.commands.length} commands.`);
+  console.log(chalk.green(`(${moment().format("HH:mm M/D/Y")})`), `Successfully loaded ${client.commands.length} commands.`);
 };
 
 // Load events and commands
@@ -70,6 +72,7 @@ client.loadCommands();
 
 // Login to Discord API
 if (!auth.discord) return console.error("No token provided, enter a token in to the auth file to login.");
+
 client.login(auth.discord);
 
 // Handle promise rejections
