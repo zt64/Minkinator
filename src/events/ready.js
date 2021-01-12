@@ -1,13 +1,14 @@
+const pluralize = require("pluralize");
+const moment = require("moment");
+const chalk = require("chalk");
+
 module.exports = async (client) => {
-  const { moment, chalk, pluralize } = global;
   const time = moment().format("HH:mm M/D/Y");
 
   const sequelize = global.sequelize = await client.database.create();
 
   for (const guild of client.guilds.cache.array()) {
     await client.database.initialize(guild, sequelize);
-
-    
 
     //await client.database.checkMembers(guild, guildInstance);
   }
