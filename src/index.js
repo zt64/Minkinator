@@ -9,6 +9,7 @@ const chalk = require("chalk");
 const path = require("path");
 const fs = require("fs");
 
+global.__basedir = __dirname;
 global.util = require("./util/functions.js");
 
 // Set client properties

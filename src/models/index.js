@@ -4,7 +4,7 @@ exports.create = async () => {
   const sequelize = new Sequelize("database", "user", "password", {
     host: "localhost",
     dialect: "sqlite",
-    storage: "./database.sqlite",
+    storage: `${__basedir}/database.sqlite`,
     logging: false,
     define: {
       timestamps: false,
