@@ -74,3 +74,12 @@ exports.fetchJSON = async (url, options) => {
 exports.paginate = (items, size, page) => {
   return items.slice((page - 1) * size, page * size);
 };
+
+exports.generateChain = () => {
+  const MarkovChain = require("purpl-markov-chain");
+  const chain = new MarkovChain(global.guildInstance.corpus);
+
+  chain.config.grams = util.randomInteger(1, 3);
+
+  return chain.generate();
+};
