@@ -15,7 +15,7 @@ module.exports = {
   async execute (client, message, [ itemName, newPrice ]) {
     if (isNaN(newPrice) || newPrice <= 0) return message.channel.send(`\`${newPrice}\` is not a valid amount.`);
 
-    const { items } = global.guildInstance;
+    const { items } = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
     const item = items.value.filter(item => item.name === itemName);
 
     if (!item) return message.channel.send(`\`${itemName}\` does not exist in the guild shop.`);

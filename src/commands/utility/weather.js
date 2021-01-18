@@ -8,11 +8,10 @@ module.exports = {
     }
   ],
   async execute (client, message, [ cityName ]) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     // Fetch data from API
-    const data = await util.fetchJSON(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${global.auth.openWeatherMap}`);
+    const data = await util.fetchJSON(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${global.config.auth.openWeatherMap}`);
 
     console.log(data);
 
@@ -22,7 +21,7 @@ module.exports = {
     const { main } = data;
 
     const embed = new Discord.MessageEmbed()
-      .setColor(defaultColor)
+      .setColor(colors.default)
       .setTitle(`Weather for ${data.name}`)
       .addField("Longitude:", data.coord.lon, true)
       .addField("Latitude:", data.coord.lat, true)

@@ -8,7 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ member ]) {
-    const { colors } = global.guildInstance.config;
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     // Get user
     const user = await util.getUser(client, message, member);

@@ -17,9 +17,7 @@ module.exports = {
   async execute (client, message, args) {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
 
-    const guildConfig = global.guildInstance.config;
-    const { bans } = global.guildInstance;
-    const defaultColor = guildConfig.colors.default;
+    const { bans, config: { colors } } = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
 
     const member = message.mentions.users.first();
     const reason = args.slice(1).join(" ");
@@ -31,7 +29,7 @@ module.exports = {
 
     // Send embed
     return message.channel.send(new Discord.MessageEmbed({
-      color: defaultColor,
+      color: colors.default,
       author: { url: member.user.avatarURL(), name: `${member.user.tag} has been banned${minutes ? ` for ${pluralize("minute", minutes, true)}` : ""}.` },
       description: reason || "No reason provided."
     }));

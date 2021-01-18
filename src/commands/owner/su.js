@@ -27,8 +27,6 @@ module.exports = {
     let memberInstance = await global.sequelize.models.member.findOrCreate({ where: { userId: userID } }, { include: { all: true, nested: true } });
     if (!memberInstance) memberInstance = await guildInstance.createMember({ userId: userID, guildId: message.guild.id });
 
-    global.memberInstance = memberInstance;
-
     return command.execute(client, message, commandArgs);
   }
 };

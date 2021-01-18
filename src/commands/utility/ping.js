@@ -5,15 +5,14 @@ module.exports = {
   description: "Returns ping and web socket information.",
   aliases: ["ws"],
   async execute (client, message) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     
     const { ws } = client;
 
     const connections = ["READY", "CONNECTING", "RECONNECTING", "IDLE", "NEARLY", "DISCONNECTED"];
 
     const pingEmbed = new Discord.MessageEmbed({
-      color: defaultColor,
+      color: colors.default,
       title: "Pinging..."
     });
 

@@ -8,10 +8,11 @@ module.exports = {
     }
   ],
   async execute (client, message, [ page ]) {
-    const { currency, colors } = global.guildInstance.config;
+    const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
+    const { config: { currency, colors } } = guildInstance;
 
     // Set members const and sort by balance
-    const members = await global.guildInstance.getMembers({ order: [["balance", "DESC"]] });
+    const members = await guildInstance.getMembers({ order: [["balance", "DESC"]] });
 
     const pages = Math.ceil(members.length / 10);
     if (!page) page = 1;

@@ -10,7 +10,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ commandName ]) {
-    const { prefix, colors } = global.guildInstance.config;
+    const { prefix, colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const helpEmbed = new Discord.MessageEmbed({
       color: colors.default,
       footer: { text: `Created by Litleck (${await client.users.fetch(global.config.ownerID).then(user => user.tag)})` }

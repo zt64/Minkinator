@@ -92,24 +92,26 @@ module.exports = {
       name: "info",
       description: "Shows information about the database.",
       async execute (client, message) {
-        const guildConfig = global.guildInstance.config;
-        const defaultColor = guildConfig.colors.default;
+        const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
-        const { dependencies } = require("../../../package.json");
+        const { dependencies } = require(`${__basedir}/../package.json`);
         
         const sequelizeVersion = dependencies.sequelize;
         const sqlite3Version = dependencies.sqlite3;
 
-        const stats = fs.statSync("./database.sqlite");
+        const stats = fs.statSync(`${__basedir}/database.sqlite`);
         const size = prettyBytes(stats.size);
 
         // Create embed
-        const embed = new Discord.MessageEmbed()
-          .setColor(defaultColor)
-          .setTitle("Database Information")
-          .addField("Sequelize Version:", sequelizeVersion)
-          .addField("Sqlite3 Version:", sqlite3Version)
-          .addField("Database Size:", size);
+        const embed = new Discord.MessageEmbed({
+          color: colors.default,
+          title: "Database Information",
+          fields: [
+            { name: "Sequelize Version:", value: sequelizeVersion, inline: true },
+            { name: "Sqlite3 Version:", value: sqlite3Version, inline: true },
+            { name: "Database Size:", value: size },
+          ]
+        });
 
         return message.channel.send(embed);
       }

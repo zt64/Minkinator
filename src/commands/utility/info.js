@@ -1,13 +1,14 @@
 module.exports = {
   description: "Displays information regarding Minkinator.",
   async execute (client, message) {
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const owner = await client.users.fetch(global.config.ownerID);
 
     // Send embed
     return message.channel.send(new Discord.MessageEmbed({
-      color: global.guildInstance.config.colors.default,
+      color: colors.default,
       title: "Minkinator Information",
-      description: "What is a Minkinator you may ask. Well, I'm not quite sure myself. On the 22nd of August, 2019, I just decided to try and make a Discord bot on my phone. Soon Minkinator would be hosted on my desktop computer and currently is hosted on my own Raspberry Pi. I never had any idea that Minkinator would reach this far. If you ever find a bug or have a feature request, please do so on the GitHub repository below.",
+      description: "The name Minkinator comes from my cats name, Minky, who is also the cat in the bots avatar. The purpose of this bot was originally a coding playground for me, but now its more focused on the end users. If you ever find a bug or have a feature request, please do so on the GitHub repository below.",
       thumbnail: { url: client.user.displayAvatarURL() },
       fields: [
         { name: "Github", value: "https://github.com/Litleck/Minkinator" },

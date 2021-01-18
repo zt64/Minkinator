@@ -21,9 +21,7 @@ module.exports = {
     if (amount < 1 || amount > 100000000) return message.channel.send("Enter an amount above one and no more than 100,000,000.");
 
     // Create webhook
-    const webhook = await message.channel.createWebhook("Swarm", {
-      avatar: client.user.avatarURL()
-    });
+    const webhook = await message.channel.createWebhook("Swarm", { avatar: client.user.avatarURL() });
 
     // Send messages
     for (let i = 0; i < amount; i++) {

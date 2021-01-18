@@ -2,12 +2,14 @@ module.exports = {
   description: "Flip a coin.",
   aliases: ["flip", "coin"],
   async execute (client, message) {
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
+
     // Generate result
     const result = Math.random() > 0.5 ? "Heads" : "Tails";
     
     // Send embed
     return message.channel.send(new Discord.MessageEmbed({
-      color: global.guildInstance.config.colors.default,
+      color: colors.default,
       title: "Coin Toss",
       description: result
     }));

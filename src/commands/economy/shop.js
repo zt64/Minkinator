@@ -19,19 +19,18 @@ module.exports = {
         }
       ],
       async execute (client, message, [ itemName, itemAmount ]) {
-        const { currency, colors } = global.guildInstance.config;
-        const shopItems = global.guildInstance.items;
-        const memberData = global.memberInstance;
+        const { items, config: { currency, colors } } = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
+        const memberInstance = await global.sequelize.models.member.findByPk(message.author.id);
 
         const { formatNumber } = util;
-        const { inventory, balance } = memberData;
+        const { inventory, balance } = memberInstance;
 
         // Set item constants
         itemAmount = parseInt(itemAmount) || 1;
 
-        if (!shopItems.find(x => x.name === itemName)) return message.channel.send(`\`${itemName}\` is not available for sale.`);
+        if (!items.find(x => x.name === itemName)) return message.channel.send(`\`${itemName}\` is not available for sale.`);
 
-        const shopItem = shopItems.find(x => x.name === itemName);
+        const shopItem = items.find(x => x.name === itemName);
         const shopItemPrice = itemAmount * shopItem.price;
 
         if (balance < shopItemPrice) return message.channel.send(`You cannot afford ${pluralize(itemName, itemAmount, true)}.`);
@@ -41,16 +40,13 @@ module.exports = {
         if (inventoryItem) {
           inventoryItem.amount += itemAmount;
         } else {
-          inventory.push(
-            {
-              name: itemName,
-              amount: itemAmount
-            }
-          );
+          inventory.push({ name: itemName, amount: itemAmount });
         }
 
-        await memberData.decrement("balance", { by: shopItemPrice });
-        await memberData.update({ inventory: inventory });
+        console.log(inventory);
+
+        await memberInstance.decrement("balance", { by: shopItemPrice });
+        await memberInstance.update({ inventory: inventory });
 
         return message.channel.send(new Discord.MessageEmbed()
           .setColor(colors.default)
@@ -75,18 +71,17 @@ module.exports = {
         }
       ],
       async execute (client, message, [ itemName, itemAmount ]) {
-        const { currency, colors } = global.guildInstance.config;
-        const shopItems = global.guildInstance.items;
-        const memberData = global.memberInstance;
+        const { items, config: { currency, colors } } = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
+        const memberInstance = await global.sequelize.models.member.findByPk(message.author.id);
 
         // Set member constants
-        const { inventory } = memberData;
-        let { balance } = memberData;
+        const { inventory } = memberInstance;
+        let { balance } = memberInstance;
 
         // Set item constants
         itemAmount = parseInt(itemAmount) || 1;
 
-        const shopItem = shopItems.find(item => item.name === itemName);
+        const shopItem = items.find(item => item.name === itemName);
         const inventoryItem = inventory.find(item => item.name === itemName);
 
         const sellPrice = (itemAmount * shopItem.price) / 2;
@@ -99,7 +94,7 @@ module.exports = {
 
         balance += sellPrice;
 
-        await memberData.update({ balance: balance, inventory: inventory });
+        await memberInstance.update({ balance: balance, inventory: inventory });
 
         return message.channel.send(new Discord.MessageEmbed()
           .setColor(colors.default)
@@ -118,13 +113,11 @@ module.exports = {
         }
       ],
       async execute (client, message, [ page ]) {
-        const { currency, colors, prefix } = global.guildInstance.config;
-        const shopItems = global.guildInstance.items;
-
+        const { items, config: { currency, prefix, colors } } = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
         const { formatNumber } = util;
 
         // Setup pages
-        const pages = Math.ceil(shopItems.length / 10);
+        const pages = Math.ceil(items.length / 10);
 
         if (!pages) return message.channel.send("The shop is currently empty.");
 
@@ -139,7 +132,7 @@ module.exports = {
           .setDescription(`Buy items using \`${prefix}shop buy [item] [amount]\` \n Sell items using \`${prefix}shop sell [item] [amount] [price]\``)
           .setFooter(`Page ${page} of ${pages}`);
 
-        shopItems.slice((page - 1) * 10, page * 10).map((item) => {
+        items.slice((page - 1) * 10, page * 10).map((item) => {
           shopEmbed.addField(item.name, `${currency}${formatNumber(item.price, 2)}`, true);
         });
 
@@ -192,7 +185,7 @@ module.exports = {
 
           shopEmbed.fields = [];
 
-          shopItems.slice((page - 1) * 10, page * 10).map((item) => {
+          items.slice((page - 1) * 10, page * 10).map((item) => {
             shopEmbed.addField(item.name, `${currency}${formatNumber(item.price, 2)}`, true);
           });
 

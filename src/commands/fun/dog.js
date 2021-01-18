@@ -1,11 +1,10 @@
 module.exports = {
   description: "Gets a random dog image.",
   async execute (client, message) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     const dogEmbed = new Discord.MessageEmbed({
-      color: defaultColor,
+      color: colors.default,
       footer: { text: "Source: https://random.dog/woof.json" }
     });
     

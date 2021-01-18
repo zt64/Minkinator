@@ -9,16 +9,16 @@ module.exports = {
     }
   ],
   async execute (client, message, [ commandName ]) {
-    const commandsKey = global.guildInstance.commands;
-    const commandsArray = commandsKey.value;
+    const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id);
+    const { commands } = guildInstance;
 
     // Make sure command exists in array
-    if (!commandsArray.includes(commandName)) {
+    if (!commands.includes(commandName)) {
       return message.channel.send(`\`${commandName}\` is either non-existent or already enabled.`);
     }
 
     // Update commands in database
-    commandsKey.update({ value: commandsArray.filter(element => element !== commandName) });
+    await guildInstance.update({ commands: commands.filter(element => element !== commandName) });
 
     return message.channel.send(`Enabled \`${commandName}\`.`);
   }

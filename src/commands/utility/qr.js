@@ -9,6 +9,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const text = args.join(" ");
 
     const response = await fetch(`https://image-charts.com/chart?chs=150x150&cht=qr&chl=${text}`);
@@ -16,7 +17,7 @@ module.exports = {
     if (response.status !== 200) return message.channel.send("An error occurred generating a QR code. Check your input and try again.");
 
     return message.channel.send(new Discord.MessageEmbed({
-      color: global.guildInstance.config.colors.default,
+      color: colors.default,
       title: "QR Code",
       description: text,
       image: { url: response.url },

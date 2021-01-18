@@ -1,7 +1,7 @@
 module.exports = {
   description: "Generates an invitation link for Minkinator",
   async execute (client, message) {
-    const { colors } = global.guildInstance.config;
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     // Generate URL for invite
     const inviteURL = await client.generateInvite({ permissions: ["ADMINISTRATOR"] });

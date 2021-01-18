@@ -20,7 +20,7 @@ module.exports = {
         }
       ],
       async execute (client, message, [ owner, name ]) {
-        const { colors } = global.guildInstance.config;
+        const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
         const json = await util.fetchJSON(`https://api.github.com/repos/${owner}/${name}`);
         
@@ -65,7 +65,7 @@ module.exports = {
         }
       ],
       async execute (client, message, [ user ]) {
-        const { colors } = global.guildInstance.config;
+        const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
         const json = await util.fetchJSON(`https://api.github.com/users/${user}`);
 

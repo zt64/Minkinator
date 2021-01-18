@@ -9,21 +9,17 @@ module.exports = {
     }
   ],
   async execute (client, message, [ commandName ]) {
-    const { guildInstance } = global;
-
-    const commandsArray = guildInstance.commands;
+    const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id);
+    const { commands } = guildInstance;
 
     // Check if command can be disabled
     if (!client.commands.get(commandName)) {
       return message.channel.send(`\`${commandName}\` is not a valid command.`);
-    } else if (commandsArray.includes(commandName)) {
+    } else if (commands.includes(commandName)) {
       return message.channel.send(`\`${commandName}\` is already disabled.`);
     }
 
-    // Add command to database
-    commandsArray.push(commandName);
-
-    await guildInstance.update({ commands: commandsArray });
+    await guildInstance.update({ commands: [ ...commands, commandName] });
 
     return message.channel.send(`Disabled \`${commandName}\`.`);
   }

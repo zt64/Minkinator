@@ -7,15 +7,15 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, args) {
-    const user = await util.getUser(client, message, args[0]);
-    const memberData = global.memberInstance;
+  async execute (client, message, [ member ]) {
+    const user = await util.getUser(client, message, member);
+    const memberInstance = await global.sequelize.models.member.findByPk(user.id);
 
     // Toggle state on a member
-    const state = memberData.botBan ? "unbanned" : "banned";
+    const state = memberInstance.botBan ? "unbanned" : "banned";
 
     // Update member data
-    memberData.update({ botBan: !memberData.botBan });
+    memberInstance.update({ botBan: !memberInstance.botBan });
 
     return message.channel.send(`${user} has been ${state} from using Minkinator.`);
   }

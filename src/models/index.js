@@ -44,13 +44,10 @@ exports.initialize = async (guild) => {
 
 exports.checkMembers = async (guild, guildInstance) => {
   const chalk = require("chalk");
-  const moment = require("moment");
 
   const databaseMembers = guildInstance.getMembers();
 
   if (!databaseMembers) return;
-
-  const time = moment().format("HH:mm M/D/Y");
 
   for (const memberData of await databaseMembers.findAll()) {
     try {
@@ -58,7 +55,7 @@ exports.checkMembers = async (guild, guildInstance) => {
     } catch (error) {
       await memberData.destroy();
 
-      console.log(chalk.green(`(${time})`), `Deleted ${memberData.id} from ${guild.name}.`);
+      console.log(chalk.green(`(${util.time()})`), `Deleted ${memberData.id} from ${guild.name}.`);
     }
   }
 };

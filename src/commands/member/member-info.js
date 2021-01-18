@@ -1,6 +1,6 @@
 module.exports = {
   description: "Displays a members statistics.",
-  aliases: ["bal", "balance", "stats", "xp", "level", "lvl"],
+  aliases: ["bal", "balance", "stats"],
   parameters: [
     {
       name: "member",
@@ -8,7 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message) {
-    const { currency, colors } = global.guildInstance.config;
+    const { currency, colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const { formatNumber } = util;
 
     const user = message.mentions.users.first() || message.author;
@@ -24,9 +24,6 @@ module.exports = {
       author: { iconURL: user.avatarURL(), name: `Member information: ${member.nickname || user.tag}` },
       fields: [
         { name: "Balance:", value: `${currency}${formatNumber(memberData.balance, 2)}`, inline: true },
-        { name: "Level:", value: formatNumber(memberData.level), inline: true },
-        { name: "Total experience:", value: `${formatNumber(memberData.xpTotal)} XP`, inline: true },
-        { name: "Required experience:", value: `${formatNumber(memberData.xpRequired)} XP`, inline: true },
         { name: "Joined:", value: member.joinedAt.toLocaleDateString(), inline: true }
       ]
     });

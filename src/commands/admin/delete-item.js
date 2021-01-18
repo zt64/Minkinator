@@ -9,12 +9,13 @@ module.exports = {
     }
   ],
   async execute (client, message, [ itemName ]) {
+    const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
     const shopItem = await global.sequelize.models.shopItem.findByPk(itemName);
 
     // Make sure item exists
     if (!shopItem) return message.channel.send(`Item: \`${itemName}\`, does not exist in the guild shop.`);
 
-    await global.guildInstance.removeShopItem(shopItem);
+    await guildInstance.removeShopItem(shopItem);
 
     return message.channel.send(`Successfully deleted: \`${itemName}\`, from the guild shop.`);
   }

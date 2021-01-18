@@ -9,12 +9,12 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const guildConfig = global.guildInstance.config;
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     const search = args.join(" ");
 
     const catEmbed = new Discord.MessageEmbed({
-      color: guildConfig.colors.default,
+      color: colors.default,
       footer: { text: "Source: https://api.thecatapi.com" }
     });
 

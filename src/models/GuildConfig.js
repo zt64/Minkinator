@@ -21,14 +21,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.FLOAT,
       defaultValue: 0.5
     },
-    redditNSFW: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false
-    },
-    levelMention: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true
-    },
     ignore: {
       type: DataTypes.JSON,
       defaultValue: [ "?" ]

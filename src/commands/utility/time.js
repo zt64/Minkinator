@@ -3,11 +3,12 @@ const moment = require("moment");
 module.exports = {
   description: "Shows the current time.",
   async execute (client, message) {
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const utc = moment.utc();
 
     // Create embed
     const timeEmbed = new Discord.MessageEmbed({
-      color: global.guildInstance.config.colors.default,
+      color: colors.default,
       title: "Time / Date",
       fields: [
         { name: "UTC Date:", value: utc.format("dddd, MMMM D, YYYY") },

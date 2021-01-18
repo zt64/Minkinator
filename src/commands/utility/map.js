@@ -10,9 +10,9 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const { colors } = global.guildInstance.config;
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
-    const key = global.auth.mapbox;
+    const key = global.config.auth.mapbox;
     const search = args.join(" ");
 
     const geocode = await util.fetchJSON(`https://api.mapbox.com/geocoding/v5/mapbox.places/${args.join("%20")}.json?access_token=${key}`);

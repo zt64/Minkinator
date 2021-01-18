@@ -12,10 +12,10 @@ module.exports = {
     }
   ],
   async execute (client, message, [ key, value ]) {
-    const guildConfig = global.guildInstance.config;
+    const guildConfig = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     const embed = new Discord.MessageEmbed({
-      color: guildConfig.dataValues.colors.default,
+      color: guildConfig.colors.default,
       title: "Guild Configuration"
     });
 

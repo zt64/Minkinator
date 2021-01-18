@@ -75,11 +75,24 @@ exports.paginate = (items, size, page) => {
   return items.slice((page - 1) * size, page * size);
 };
 
-exports.generateChain = () => {
+exports.time = (format = "HH:mm M/D/Y") => {
+  const moment = require("moment");
+
+  return moment().format(format);
+};
+
+exports.generateChain = async (corpus) => {
   const MarkovChain = require("purpl-markov-chain");
-  const chain = new MarkovChain(global.guildInstance.corpus);
+  const chain = new MarkovChain(corpus);
 
   chain.config.grams = util.randomInteger(1, 3);
 
   return chain.generate();
+};
+
+exports.hasPermission = (member, command) => {
+  if (command.ownerOnly && member.user.id !== global.config.ownerID) return false;
+  if (!member.hasPermission(command.permissions)) return false;
+
+  return true;
 };

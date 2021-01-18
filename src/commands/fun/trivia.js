@@ -6,7 +6,7 @@ module.exports = {
   async execute (client, message) {
     const { randomInteger, sleep } = util;
 
-    const { currency, colors } = global.guildInstance.config;
+    const { currency, colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     let correctIndex = 0;
 
@@ -67,15 +67,15 @@ module.exports = {
 
     // Update balances
     for (const user of users) {
-      const data = global.sequelize.models.member.findByPk(user.id);
-      const balance = data.balance + reward;
+      const memberInstance = await global.sequelize.models.member.findByPk(user.id);
 
-      await data.update({ balance: balance });
+      await memberInstance.increment("balance", { by: reward });
     }
 
-    const answerEmbed = new Discord.MessageEmbed()
-      .setColor(colors.default)
-      .setTitle("Trivia Answer");
+    const answerEmbed = new Discord.MessageEmbed({
+      color: colors.default,
+      title: "Trivia Answer"
+    });
 
     if (users.length) {
       answerEmbed.setDescription(`The correct answer was ${letters[correctIndex]}: \`${correctAnswer}\`, \n ${currency}${reward} has been sent to ${users}.`);

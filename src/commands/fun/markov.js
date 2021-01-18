@@ -10,7 +10,8 @@ module.exports = {
     }
   ],
   async execute (client, message, [ startWord ]) {
-    const chain = new MarkovChain(global.guildInstance.corpus);
+    const { corpus } = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
+    const chain = new MarkovChain(corpus);
 
     chain.config.grams = util.randomInteger(1, 3);
 

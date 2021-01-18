@@ -10,6 +10,7 @@ module.exports = {
     }
   ],
   async execute(client, message, args) {
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const form = new FormData();
     const text = args.join(" ");
 
@@ -17,12 +18,12 @@ module.exports = {
 
     const { output_url } = await fetch("https://api.deepai.org/api/text2img", {
       method: "POST",
-      headers: { "api-key": global.auth.deepAI },
+      headers: { "api-key": global.config.auth.deepAI },
       body: form
     }).then(res => res.json());
 
     return message.channel.send(new Discord.MessageEmbed({
-      color: global.guildInstance.config.colors.default,
+      color: colors.default,
       title: "DeepAI Text to Image",
       description: text,
       image: { url: output_url },

@@ -8,7 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
-    const { colors } = global.guildInstance.config;
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     const input = args.join(" ");
     const embed = new Discord.MessageEmbed({ color: colors.default });

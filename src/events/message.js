@@ -1,3 +1,8 @@
+const MarkovChain = require("purpl-markov-chain");
+const pluralize = require("pluralize");
+const Discord = require("discord.js");
+const chalk = require("chalk");
+
 module.exports = async (client, message) => {
   if (message.author.bot) return;
 
@@ -10,70 +15,27 @@ module.exports = async (client, message) => {
     return botOwner.send(`Message from \`${author.tag} (${author.id})\`:\n${message.content}`);
   }
 
-  const guildInstance = global.guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true, nested: true } });
+  const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
   const guildConfig = guildInstance.config;
 
-  const { errorTimeout, currency, prefix, ignore, colors } = guildConfig;
-  
-  let memberInstance = global.memberInstance = await global.sequelize.models.member.findByPk(message.author.id, { include: { all: true, nested: true } });
-  
-  if (!memberInstance) memberInstance = await guildInstance.createMember({ userId: message.author.id, guildId: message.guild.id });
-  if (!memberInstance.config) var memberConfig = await memberInstance.createConfig();
-
-  const { level, xpTotal, xpRequired } = memberInstance;
-
-  xpTotal + Math.round(Math.random() * (level / 0.5));
-
-  await memberInstance.update({ xpTotal: xpTotal, messages: memberInstance.messages + 1 });
-
-  // Check if the member can level up
-  if (xpTotal >= xpRequired) {
-    await memberInstance.update({ level: level + 1, xpRequired: Math.round(xpRequired * 1.5) });
-
-    // Check if level mention is enabled
-    if (guildConfig.levelMention && memberConfig.levelMention) {
-      if (!(level + 1 % 5)) {
-        const levelUpEmbed = new global.Discord.MessageEmbed({
-          color: colors.default,
-          title: `${message.author.username} has levelled up!`,
-          description: `${message.author} is now level ${global.util.formatNumber(level + 1)} and earned ${currency}500 as a reward!`
-        });
-
-        await memberInstance.increment("balance", { by: 500 });
-
-        message.channel.send(levelUpEmbed);
-      }
-    }
-  }
+  const { errorTimeout, prefix, ignore, colors } = guildConfig;
+    
+  const [ memberInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: message.author.id }, include: { all: true } });
 
   // Generate markov on mention of self
-  if (message.mentions.has(client.user)) {
-
-    const corpus = global.guildInstance.data;
-    const chain = new global.markov();
-
-    corpus.map(sentence => chain.update(sentence));
-
-    chain.config.grams = global.util.randomInteger(1, 3);
-
-    let sentence = chain.generate();
-    let i = 0;
-    
-    // Prevent verbatim sentences from being generated
-    while ((corpus.includes(sentence) || sentence.length <= 10) && i < 10) {
-      sentence = chain.generate();
-      i++;
-    }
-
-    message.channel.send(sentence);
-  }
+  if (message.mentions.has(client.user)) message.channel.send(util.generateChain(guildInstance.corpus));
 
   // Write message to data.json
   if (![prefix, ...ignore].some(x => message.content.startsWith(x))) {
-    guildInstance.data.push(message.content);
+    const chain = new MarkovChain(guildInstance.corpus);
+    let sentence = message.content;
+
+    if (message.attachments.size) sentence += ` ${message.attachments.map(attachment => attachment.url).join()}`;
+
+    chain.update(sentence);
 
     const g = await global.sequelize.models.guild.findByPk(message.guild.id);
-    await g.update({ data: guildInstance.data });
+    await g.update({ corpus: chain.toJSON() });
   }
 
   if (!message.content.startsWith(prefix) || memberInstance.botBan) return;
@@ -90,21 +52,18 @@ module.exports = async (client, message) => {
   if (disabledCommands.includes(commandName)) return;
 
   // Check if message author has permission
-  if (message.author.id !== global.config.ownerID) {
-    if (command.ownerOnly) return;
-    if (!message.member.hasPermission(command.permissions)) {
-      const permissionError = await message.channel.send(new global.Discord.MessageEmbed({
-        color: colors.error,
-        title: "Missing Permissions",
-        fields: [ { name: "You are missing one of the following permissions:", value: command.permissions.join(", ") } ]
-      }));
+  if (!util.hasPermission(message.member, command)) {
+    const permissionError = await message.channel.send(new Discord.MessageEmbed({
+      color: colors.error,
+      title: "Missing Permissions",
+      fields: [ { name: "You are missing one of the following permissions:", value: command.permissions.join(", ") } ]
+    }));
 
-      return permissionError.delete({ timeout: errorTimeout });
-    }
+    return permissionError.delete({ timeout: errorTimeout });
   }
 
   // Check if parameters are correct
-  const usageEmbed = new global.Discord.MessageEmbed({
+  const usageEmbed = new Discord.MessageEmbed({
     color: colors.error,
     title: `Improper usage of ${commandName}`,
     description: command.description
@@ -179,10 +138,10 @@ module.exports = async (client, message) => {
       if (now < expirationTime) {
         const timeLeft = (expirationTime - now) / 1000;
 
-        const coolDownEmbed = await message.channel.send(new global.Discord.MessageEmbed({
+        const coolDownEmbed = await message.channel.send(new Discord.MessageEmbed({
           color: colors.error,
           title: "Cool down active",
-          description: `Please wait, a cool down of ${global.pluralize("second", timeLeft.toFixed(1), true)} is remaining.`
+          description: `Please wait, a cool down of ${pluralize("second", timeLeft.toFixed(1), true)} is remaining.`
         }));
 
         coolDownEmbed.delete({ timeout: errorTimeout });
@@ -197,10 +156,7 @@ module.exports = async (client, message) => {
     timestamps.set(message.author.id, now);
   }
 
-  const time = global.moment().format("HH:mm M/D/Y");
-  const { chalk } = global;
-
-  console.log(chalk.green(`(${time})`), chalk.cyan(`(${message.guild.name} #${message.channel.name})`), chalk.yellow(message.author.tag), message.content);
+  console.log(chalk.green(`(${util.time()})`), chalk.cyan(`(${message.guild.name} #${message.channel.name})`), chalk.yellow(message.author.tag), message.content);
 
   // Execute the command
   try {
@@ -208,7 +164,7 @@ module.exports = async (client, message) => {
   } catch (error) {
     console.error(error);
 
-    return message.channel.send(new global.Discord.MessageEmbed({
+    return message.channel.send(new Discord.MessageEmbed({
       color: colors.error,
       title: "An error has occurred",
       description: `\`\`\`js\n${error}\`\`\``,

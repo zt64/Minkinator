@@ -4,8 +4,7 @@ module.exports = {
   description: "Show guild information.",
   aliases: ["gi", "guildinfo"],
   async execute (client, message) {
-    const { colors } = global.guildInstance.config;
-
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const { guild } = message;
 
     // Create embed

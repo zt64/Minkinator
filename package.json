@@ -10,10 +10,8 @@
     "@discordjs/opus": "^0.3.3",
     "canvas": "^2.6.1",
     "chalk": "^4.1.0",
-    "chart.js": "^2.9.3",
     "discord.js": "^12.5.1",
     "entities": "^2.0.3",
-    "mathjs": "^7.2.0",
     "moment": "^2.27.0",
     "node-fetch": "^2.6.1",
     "pluralize": "^8.0.0",
@@ -44,6 +42,7 @@
       "ecmaVersion": 11
     },
     "globals": {
+      "__basedir": "readonly",
       "util": "readonly",
       "Discord": "readonly"
     },

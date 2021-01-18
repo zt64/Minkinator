@@ -1,10 +1,7 @@
 const pluralize = require("pluralize");
-const moment = require("moment");
 const chalk = require("chalk");
 
 module.exports = async (client) => {
-  const time = moment().format("HH:mm M/D/Y");
-
   const sequelize = global.sequelize = await client.database.create();
 
   for (const guild of client.guilds.cache.array()) {
@@ -13,7 +10,7 @@ module.exports = async (client) => {
     //await client.database.checkMembers(guild, guildInstance);
   }
 
-  console.log(chalk.green(`(${time})`), `Initialized database for ${pluralize("guild", client.guilds.cache.size, true)}.`);
+  console.log(chalk.green(`(${util.time()})`), `Initialized database for ${pluralize("guild", client.guilds.cache.size, true)}.`);
 
   // Pluralize user and guild counts
   const users = pluralize("user", client.users.cache.size, true);
@@ -22,5 +19,5 @@ module.exports = async (client) => {
   // Set the user activity
   client.user.setActivity(`${users} in ${guilds}.`, { type: "WATCHING" });
 
-  return console.log(chalk.green(`(${time})`), "Minkinator is now online.");
+  return console.log(chalk.green(`(${util.time()})`), "Minkinator is now online.");
 };

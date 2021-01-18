@@ -12,8 +12,8 @@ module.exports = {
         }
       ],
       async execute (client, message, [ steamID ]) {
-        const { colors } = global.guildInstance.config;
-        const key = global.auth.steam;
+        const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
+        const key = global.config.auth.steam;
 
         const json = await util.fetchJSON(`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${key}&steamids=${steamID}`);
 

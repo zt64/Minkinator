@@ -6,12 +6,11 @@ module.exports = {
   description: "Returns information about the host OS.",
   aliases: ["os"],
   async execute (client, message) {
-    const guildConfig = global.guildInstance.config;
-    const defaultColor = guildConfig.colors.default;
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     // Create and send embed
     return message.channel.send(new Discord.MessageEmbed({
-      color: defaultColor,
+      color: colors.default,
       title: "Host OS Information",
       fields: [
         { name: "Platform", value: os.platform(), inline: true },

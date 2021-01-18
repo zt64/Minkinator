@@ -13,16 +13,15 @@ module.exports = {
 
     if (guess < 1 || guess > 100) return message.channel.send("Guess must be 1 - 100, inclusive.");
 
-    // Set guild constants
-    const { currency, colors } = global.guildInstance.config;
-    const { memberInstance, util: { formatNumber, randomInteger } } = global;
+    const memberInstance = await global.sequelize.models.member.findByPk(message.author.id);
+    const { currency, colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
+    const { formatNumber, randomInteger } = util;
 
     let { balance } = memberInstance;
     let earn;
 
     // Generate random value
     const value = randomInteger(1, 100);
-
     const embed = new Discord.MessageEmbed();
 
     if (value === guess) {

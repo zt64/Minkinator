@@ -2,7 +2,7 @@
 
 # Dependencies and collected data
 node_modules/
-database.sqlite
+src/database.sqlite
 
-# Authentication file
-auth.json
+# Config file
+src/config.json

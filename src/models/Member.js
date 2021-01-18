@@ -6,24 +6,9 @@ module.exports = (sequelize, DataTypes) => {
       unique: true
     },
     balance: {
-      type: DataTypes.FLOAT,
+      type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
       defaultValue: 0.00
-    },
-    level: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 1
-    },
-    xpTotal: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 0
-    },
-    xpRequired: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      defaultValue: 32
     },
     botBan: {
       type: DataTypes.BOOLEAN,

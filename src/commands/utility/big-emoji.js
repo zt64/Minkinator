@@ -11,7 +11,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ messageEmoji ]) {
-    const { colors } = global.guildInstance.config;
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     let url;
 

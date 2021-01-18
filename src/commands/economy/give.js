@@ -14,7 +14,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ member, amount ]) {
-    const { currency, colors } = global.guildInstance.config;
+    const { currency, colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     amount = parseInt(amount);
 
@@ -25,7 +25,7 @@ module.exports = {
 
     // Get data for the sender and receiver
     const [ targetInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: target.user.id } });
-    const { memberInstance } = global;
+    const memberInstance = await global.sequelize.models.member.findByPk(message.author.id);
 
     if (memberInstance.balance - amount < 0) return message.reply(`You are missing the additional ${currency}${Math.abs(amount - memberInstance.balance)}.`);
 

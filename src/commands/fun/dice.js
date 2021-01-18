@@ -8,12 +8,12 @@ module.exports = {
     }
   ],
   async execute (client, message, [ sides ]) {
-    const { colors } = global.guildInstance.config;
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     if (isNaN(sides)) sides = 6;
 
     // Generate number
-    const result = util.randomInteger(1, sides);
+    const side = util.randomInteger(1, sides);
 
     // Create embed
     const diceEmbed = new Discord.MessageEmbed({
@@ -28,7 +28,7 @@ module.exports = {
     await util.sleep(1000);
 
     // Edit embed
-    diceEmbed.setDescription(result);
+    diceEmbed.setDescription(`You rolled a ${side}`);
     diceMessage.edit(diceEmbed);
   }
 };

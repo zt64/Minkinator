@@ -8,6 +8,7 @@ module.exports = {
     }
   ],
   async execute (client, message, args) {
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const input = args.join(" ");
 
     const { exec } = require("child_process");
@@ -26,7 +27,7 @@ module.exports = {
     }
   
     const execEmbed = new Discord.MessageEmbed({
-      color: global.guildInstance.config.colors.default
+      color: colors.default
     });
 
     const execMessage = await message.channel.send(execEmbed);
