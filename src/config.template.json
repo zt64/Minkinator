@@ -1,0 +1,15 @@
+{
+  "ownerID": "",
+  "prefix": ">",
+  "clientOptions": {
+    "messageSweepInterval": 3600,
+    "fetchAllMembers": true
+  },
+  "auth": {
+    "discord": "",
+    "openWeatherMap": "",
+    "mapbox": "",
+    "steam": "",
+    "deepAI": ""
+  }
+}
