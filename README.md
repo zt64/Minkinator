@@ -5,7 +5,6 @@
 ## Requirements
 * [Node v12.16 or newer](https://nodejs.org/en/download/)
 * [Discord bot token](https://discord.com/developers/applications)
-* [DarkSky API key](https://darksky.net/dev)
 
 ## Setup
 To get started, clone this repository using `git clone https://github.com/Litleck/Minkinator.git`.
