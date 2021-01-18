@@ -81,13 +81,13 @@ exports.time = (format = "HH:mm M/D/Y") => {
   return moment().format(format);
 };
 
-exports.generateChain = async (corpus) => {
+exports.generateSentence = async (corpus, startWord) => {
   const MarkovChain = require("purpl-markov-chain");
   const chain = new MarkovChain(corpus);
 
-  chain.config.grams = util.randomInteger(1, 3);
+  if (startWord) chain.config.from = startWord;
 
-  return chain.generate();
+  return chain.generate({ grams: util.randomInteger(1, 3) });
 };
 
 exports.hasPermission = (member, command) => {

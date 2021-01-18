@@ -23,7 +23,7 @@ module.exports = async (client, message) => {
   const [ memberInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: message.author.id }, include: { all: true } });
 
   // Generate markov on mention of self
-  if (message.mentions.has(client.user)) message.channel.send(util.generateChain(guildInstance.corpus));
+  if (message.mentions.has(client.user)) message.channel.send(await util.generateSentence(guildInstance.corpus));
 
   // Write message to data.json
   if (![prefix, ...ignore].some(x => message.content.startsWith(x))) {
@@ -34,8 +34,7 @@ module.exports = async (client, message) => {
 
     chain.update(sentence);
 
-    const g = await global.sequelize.models.guild.findByPk(message.guild.id);
-    await g.update({ corpus: chain.toJSON() });
+    await guildInstance.update({ corpus: chain.toJSON() });
   }
 
   if (!message.content.startsWith(prefix) || memberInstance.botBan) return;

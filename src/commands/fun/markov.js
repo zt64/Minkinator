@@ -1,5 +1,3 @@
-const MarkovChain = require("purpl-markov-chain");
-
 module.exports = {
   description: "Generates a markov chain.",
   aliases: [ "mkv" ],
@@ -11,12 +9,7 @@ module.exports = {
   ],
   async execute (client, message, [ startWord ]) {
     const { corpus } = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
-    const chain = new MarkovChain(corpus);
 
-    chain.config.grams = util.randomInteger(1, 3);
-
-    if (startWord) chain.config.from = startWord;
-
-    return message.channel.send(chain.generate());
+    return message.channel.send(await util.generateSentence(corpus, startWord));
   }
 };
