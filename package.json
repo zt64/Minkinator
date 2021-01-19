@@ -29,7 +29,9 @@
   "main": "./src/index.js",
   "scripts": {
     "start": "node .",
-    "lint": "eslint src"
+    "packages": "npm i",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
@@ -72,7 +74,8 @@
       "object-curly-spacing": [
         "error",
         "always"
-      ]
+      ],
+      "no-trailing-spaces": "error"
     }
   }
 }
