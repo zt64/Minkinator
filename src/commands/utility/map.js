@@ -26,7 +26,7 @@ module.exports = {
 
     const map = await fetch(`https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/${longitude},${latitude},8,0/1024x1024?access_token=${key}`);
     const { url } = map;
-    
+
     return message.channel.send(new Discord.MessageEmbed({
       color: colors.default,
       title: feature.place_name,

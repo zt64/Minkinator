@@ -45,7 +45,7 @@ module.exports = {
 
         const ytdl = require("ytdl-core-discord");
         const dispatcher = connection.play(await ytdl(url), { type: "opus", volume: false });
-        
+
 
         dispatcher.on("error", console.error);
       }

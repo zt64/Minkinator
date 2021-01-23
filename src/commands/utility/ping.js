@@ -6,7 +6,7 @@ module.exports = {
   aliases: ["ws"],
   async execute (client, message) {
     const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-    
+
     const { ws } = client;
 
     const connections = ["READY", "CONNECTING", "RECONNECTING", "IDLE", "NEARLY", "DISCONNECTED"];

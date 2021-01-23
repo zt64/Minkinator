@@ -23,13 +23,13 @@ module.exports = {
 
       return message.channel.send("An error has occurred while reloading events.");
     }
-    
+
     // Load commands
     try {
       await client.loadCommands();
     } catch (error) {
       console.error(error);
-      
+
       return message.channel.send("An error has occurred while reloading commands.");
     }
 

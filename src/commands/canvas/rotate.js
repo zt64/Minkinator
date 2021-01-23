@@ -15,7 +15,7 @@ module.exports = {
     },
   ],
   async execute (client, message, [ imageURL, degrees ]) {
-    const image = await loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); }); 
+    const image = await loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); });
 
     const radians = parseFloat(degrees) * Math.PI / 180;
 

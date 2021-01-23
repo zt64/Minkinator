@@ -2,7 +2,7 @@ module.exports = {
   description: "Gets a random fox image.",
   async execute (client, message) {
     const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-    
+
     const fox = await util.fetchJSON("https://randomfox.ca/floof/");
 
     const foxEmbed = new Discord.MessageEmbed({

@@ -10,7 +10,7 @@ module.exports = {
   ],
   async execute (client, message, [ imageURL ]) {
     if (!(imageURL || message.attachments.size)) return message.channel.send("No URL or attachment provided.");
-    const image = await loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); }); 
+    const image = await loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); });
 
     const canvas = createCanvas(image.width, image.height);
     const context = canvas.getContext("2d");

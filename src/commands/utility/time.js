@@ -6,17 +6,17 @@ module.exports = {
     const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const utc = moment.utc();
 
-    // Create embed
-    const timeEmbed = new Discord.MessageEmbed({
-      color: colors.default,
-      title: "Time / Date",
-      fields: [
-        { name: "UTC Date:", value: utc.format("dddd, MMMM D, YYYY") },
-        { name: "UTC Time:", value: utc.format("kk:mm:ss") },
-        { name: "Unix Timestamp:", value: moment().unix() }
-      ]
+    // Send message
+    return message.channel.send({
+      embed: {
+        color: colors.default,
+        title: "Time / Date",
+        fields: [
+          { name: "UTC Date:", value: utc.format("dddd, MMMM D, YYYY") },
+          { name: "UTC Time:", value: utc.format("kk:mm:ss") },
+          { name: "Unix Timestamp:", value: moment().unix() }
+        ]
+      }
     });
-
-    return message.channel.send(timeEmbed);
   }
 };

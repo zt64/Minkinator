@@ -16,7 +16,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ imageURL, threshold ]) {
-    const image = await loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); }); 
+    const image = await loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); });
 
     const canvas = createCanvas(image.width, image.height);
     const context = canvas.getContext("2d");

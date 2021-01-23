@@ -25,12 +25,14 @@ module.exports = {
       execEmbed.setDescription(`\`\`\`sh\n${description}\`\`\``);
       execMessage.edit(execEmbed);
     }
-  
+
     const execEmbed = new Discord.MessageEmbed({
       color: colors.default
     });
 
     const execMessage = await message.channel.send(execEmbed);
+
+    updateEmbed();
 
     // Execute command
     const command = exec(input);

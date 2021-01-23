@@ -6,7 +6,7 @@ module.exports = {
 
     // Generate result
     const result = Math.random() > 0.5 ? "Heads" : "Tails";
-    
+
     // Send embed
     return message.channel.send(new Discord.MessageEmbed({
       color: colors.default,

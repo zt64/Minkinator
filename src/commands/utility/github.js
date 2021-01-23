@@ -23,7 +23,7 @@ module.exports = {
         const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
         const json = await util.fetchJSON(`https://api.github.com/repos/${owner}/${name}`);
-        
+
         if (json.message === "Not Found") return message.channel.send("Could not find repository.");
 
         const commits = await util.fetchJSON(`https://api.github.com/repos/${owner}/${name}/commits`);

@@ -82,9 +82,9 @@ module.exports = {
 
         // Check if property exists
         if (!object[propertyName]) return message.channel.send(`Property \`${propertyName}\` does not exist.`);
-        
+
         await object.update({ [propertyName]: JSON.parse(value) });
-          
+
         return message.channel.send(`Set ${modelName}: ${instanceName}.${propertyName} to \`${value}\`.`);
       }
     },
@@ -95,7 +95,7 @@ module.exports = {
         const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
         const { dependencies } = require(`${__basedir}/../package.json`);
-        
+
         const sequelizeVersion = dependencies.sequelize;
         const sqlite3Version = dependencies.sqlite3;
 

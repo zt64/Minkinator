@@ -28,7 +28,7 @@ module.exports = {
 
     // Set up reaction collector
     const filter = (reaction, user) => user.id === message.author.id;
-   
+
     const collector = guildsMessage.createReactionCollector(filter);
 
     collector.on("collect", async reaction => {

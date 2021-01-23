@@ -13,9 +13,9 @@ module.exports = {
     playerChoice = playerChoice.toLowerCase();
 
     if (!choices.includes(playerChoice)) return message.channel.send(`\`${playerChoice}\` is not a valid choice.`);
-    
+
     const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-    
+
     const embed = new Discord.MessageEmbed({
       color: colors.default,
       title: "Rock Paper Scissors"
@@ -29,7 +29,7 @@ module.exports = {
       } else {
         embed.setDescription(`${util.capitalize(playerChoice)} beats ${util.capitalize(computerChoice)}`);
       }
-    
+
       return message.channel.send(embed);
     }
 

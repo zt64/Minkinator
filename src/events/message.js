@@ -8,7 +8,7 @@ module.exports = async (client, message) => {
 
   if (message.channel.type === "dm") {
     if (message.author === client.user) return;
-    
+
     const botOwner = await client.users.fetch(global.config.ownerID);
     const { author } = message;
 
@@ -19,11 +19,12 @@ module.exports = async (client, message) => {
   const guildConfig = guildInstance.config;
 
   const { errorTimeout, prefix, ignore, colors } = guildConfig;
-    
+
   const [ memberInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: message.author.id }, include: { all: true } });
 
   // Generate markov on mention of self
   if (message.mentions.has(client.user)) message.channel.send(await util.generateSentence(guildInstance.corpus));
+  if (Math.random() >= 0.90) message.channel.send(await util.generateSentence(guildInstance.corpus));
 
   // Write message to data.json
   if (![prefix, ...ignore].some(x => message.content.startsWith(x))) {
@@ -43,7 +44,7 @@ module.exports = async (client, message) => {
   const parameters = message.content.slice(prefix.length).split(/ +/g);
   const commandName = parameters.shift().toLowerCase();
   let command = client.commands.find(command => command.name === commandName) || [...client.commands.values()].find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
-  
+
   if (!command) return;
 
   // Check that the command isn't disabled
@@ -55,7 +56,7 @@ module.exports = async (client, message) => {
     const permissionError = await message.channel.send(new Discord.MessageEmbed({
       color: colors.error,
       title: "Missing Permissions",
-      fields: [ { name: "You are missing one of the following permissions:", value: command.permissions.join(", ") } ]
+      fields: [ { name: "You are missing one of the following permissions:", value: command.permissions.join(", ") || "Bot Owner Only" } ]
     }));
 
     return permissionError.delete({ timeout: errorTimeout });

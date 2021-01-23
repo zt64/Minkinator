@@ -19,7 +19,7 @@ module.exports = {
 
     canvas.width = ctx.measureText(text).width * 3;
     canvas.height = size * 3;
-    
+
     // Set ctx properties
     ctx.font = `${size}px ${font}`;
     ctx.fillStyle = "white";

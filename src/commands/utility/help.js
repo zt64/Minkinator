@@ -79,7 +79,7 @@ module.exports = {
 
       helpEmbed.setTitle(`${emoji} ${util.capitalize(category)} Commands`);
       helpEmbed.setDescription(`For more information on a certain command you can type \`${prefix}help <command name>\``);
-    
+
       helpEmbed.fields = [];
 
       client.commands.forEach(command => {
@@ -91,7 +91,7 @@ module.exports = {
           const parameters = command.parameters.map(parameter => parameter.required ? `[${parameter.name}]` : `<${parameter.name}>`);
           title += ` ${parameters.join(" ")}`;
         }
-    
+
         helpEmbed.addField(`\`${title}\``, command.description || "\u200b");
       });
 
