@@ -1,3 +1,7 @@
+const MarkovChain = require("purpl-markov-chain");
+const fetch = require("node-fetch");
+const moment = require("moment");
+
 exports.convertTime = (time) => {
   const map = new Map([["s", 1000], ["m", 6e+4], ["h", 3.6e+6], ["d", 8.64e+7], ["w", 6.048e+8], ["M", 2.628e+9], ["y", 3.154e+10], ["D", 3.154e+11], ["c", 3.154e+12]]);
   let mem = "";
@@ -65,7 +69,6 @@ exports.formatNumber = (number, places = 0) => {
 };
 
 exports.fetchJSON = async (url, options) => {
-  const fetch = require("node-fetch");
   const response = await fetch(url, options);
 
   return response.json();
@@ -76,13 +79,10 @@ exports.paginate = (items, size, page) => {
 };
 
 exports.time = (format = "HH:mm M/D/Y") => {
-  const moment = require("moment");
-
   return moment().format(format);
 };
 
 exports.generateSentence = async (corpus, startWord) => {
-  const MarkovChain = require("purpl-markov-chain");
   const chain = new MarkovChain(corpus);
 
   if (startWord) chain.config.from = startWord;
@@ -91,8 +91,9 @@ exports.generateSentence = async (corpus, startWord) => {
 };
 
 exports.hasPermission = (member, command) => {
-  if (command.ownerOnly && member.user.id !== global.config.ownerID) return false;
-  if (!member.hasPermission(command.permissions)) return false;
+  if (member.user.id !== global.config.ownerID) {
+    if (command.ownerOnly || !member.hasPermission(command.permissions)) return false;
+  }
 
   return true;
 };
