@@ -4,7 +4,9 @@ const Discord = require("discord.js");
 const chalk = require("chalk");
 
 module.exports = async (client, message) => {
-  if (message.author.bot) return;
+  if (message.author.bot && !message.content.match(/^\w{2}/)?.length) return;
+
+  console.log(message.content);
 
   if (message.channel.type === "dm") {
     if (message.author === client.user) return;
@@ -18,16 +20,15 @@ module.exports = async (client, message) => {
   const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
   const guildConfig = guildInstance.config;
 
-  const { errorTimeout, prefix, ignore, colors } = guildConfig;
+  const { errorTimeout, prefix, colors } = guildConfig;
 
   const [ memberInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: message.author.id }, include: { all: true } });
 
   // Generate markov on mention of self
-  if (message.mentions.has(client.user)) message.channel.send(await util.generateSentence(guildInstance.corpus));
-  if (Math.random() >= 0.90) message.channel.send(await util.generateSentence(guildInstance.corpus));
+  if (message.mentions.has(client.user) || Math.random() >= 0.98) message.channel.send(await util.generateSentence(guildInstance.corpus));
 
   // Write message to data.json
-  if (![prefix, ...ignore].some(x => message.content.startsWith(x))) {
+  if (!message.content.startsWith(prefix)) {
     const chain = new MarkovChain(guildInstance.corpus);
     let sentence = message.content;
 
@@ -53,11 +54,13 @@ module.exports = async (client, message) => {
 
   // Check if message author has permission
   if (!util.hasPermission(message.member, command)) {
-    const permissionError = await message.channel.send(new Discord.MessageEmbed({
-      color: colors.error,
-      title: "Missing Permissions",
-      fields: [ { name: "You are missing one of the following permissions:", value: command.permissions.join(", ") || "Bot Owner Only" } ]
-    }));
+    const permissionError = await message.channel.send({
+      embed: {
+        color: colors.error,
+        title: "Missing Permissions",
+        fields: [ { name: "You are missing one of the following permissions:", value: command.permissions.join(", ") || "Bot Owner Only" } ]
+      }
+    });
 
     return permissionError.delete({ timeout: errorTimeout });
   }
@@ -138,11 +141,13 @@ module.exports = async (client, message) => {
       if (now < expirationTime) {
         const timeLeft = (expirationTime - now) / 1000;
 
-        const coolDownEmbed = await message.channel.send(new Discord.MessageEmbed({
-          color: colors.error,
-          title: "Cool down active",
-          description: `Please wait, a cool down of ${pluralize("second", timeLeft.toFixed(1), true)} is remaining.`
-        }));
+        const coolDownEmbed = await message.channel.send({
+          embed: {
+            color: colors.error,
+            title: "Cool down active",
+            description: `Please wait, a cool down of ${pluralize("second", timeLeft.toFixed(1), true)} is remaining.`
+          }
+        });
 
         coolDownEmbed.delete({ timeout: errorTimeout });
       }
@@ -164,11 +169,13 @@ module.exports = async (client, message) => {
   } catch (error) {
     console.error(error);
 
-    return message.channel.send(new Discord.MessageEmbed({
-      color: colors.error,
-      title: "An error has occurred",
-      description: `\`\`\`js\n${error}\`\`\``,
-      footer: { text: "See console for more information" }
-    }));
+    return message.channel.send({
+      embed: {
+        color: colors.error,
+        title: "An error has occurred",
+        description: `\`\`\`js\n${error}\`\`\``,
+        footer: { text: "See console for more information" }
+      }
+    });
   }
 };

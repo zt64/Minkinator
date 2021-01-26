@@ -18,13 +18,15 @@ exports.create = async () => {
 
   const Member = require("./Member.js")(sequelize, Sequelize);
   const MemberConfig = require("./MemberConfig.js")(sequelize, Sequelize);
-  
+
   const Item = require("./Item.js")(sequelize, Sequelize);
+  const Command = require("./Command.js")(sequelize, Sequelize);
 
   // Set up associations
   Guild.hasOne(GuildConfig, { as: "config", foreignKey: "guildId" });
   Member.hasOne(MemberConfig, { as: "config", foreignKey: "userId" } );
 
+  Guild.hasMany(Command);
   Guild.hasMany(Member);
   Guild.hasMany(Item);
 

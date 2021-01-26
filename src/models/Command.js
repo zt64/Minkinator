@@ -1,12 +1,14 @@
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define("guild", {
-    id: {
+  return sequelize.define("command", {
+    name: {
       type: DataTypes.STRING,
       primaryKey: true
     },
-    corpus: {
+    config: {
       type: DataTypes.JSON,
-      defaultValue: []
+      defaultValue: {
+        enabled: true
+      }
     }
   });
 };

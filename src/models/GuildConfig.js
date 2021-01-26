@@ -21,10 +21,6 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.FLOAT,
       defaultValue: 0.5
     },
-    ignore: {
-      type: DataTypes.JSON,
-      defaultValue: [ "?" ]
-    },
     colors: {
       type: DataTypes.JSON,
       defaultValue: {
