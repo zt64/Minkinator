@@ -4,7 +4,7 @@ const Discord = require("discord.js");
 const chalk = require("chalk");
 
 module.exports = async (client, message) => {
-  if (message.author.bot && !message.content.match(/^\w{2}/)?.length) return;
+  if (message.author.bot || !/^\w{2}/.test(message.content)) return;
 
   console.log(message.content);
 
@@ -18,9 +18,8 @@ module.exports = async (client, message) => {
   }
 
   const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
-  const guildConfig = guildInstance.config;
 
-  const { errorTimeout, prefix, colors } = guildConfig;
+  const { errorTimeout, prefix, colors } = guildInstance.config;
 
   const [ memberInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: message.author.id }, include: { all: true } });
 
