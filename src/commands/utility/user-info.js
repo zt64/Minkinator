@@ -31,9 +31,9 @@ module.exports = {
 
     const platforms = [];
 
-    if (user.presence?.clientStatus.web) platforms.push("Web");
-    if (user.presence?.clientStatus.mobile) platforms.push("Mobile");
-    if (user.presence?.clientStatus.desktop) platforms.push("Desktop");
+    if (user.presence.clientStatus?.web) platforms.push("Web");
+    if (user.presence.clientStatus?.mobile) platforms.push("Mobile");
+    if (user.presence.clientStatus?.desktop) platforms.push("Desktop");
 
     if (platforms.length !== 0) infoEmbed.addField("Platforms:", platforms.join(", "), true);
 
