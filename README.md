@@ -24,5 +24,5 @@ To start the bot use either `npm start` or `node .` in the root directory.
 Contributions, issues and feature requests are welcome!<br />Feel free to check the [issues page](https://github.com/Litleck/Minkinator-Bot/issues) if you have anything to contribute.
 
 ## License
-Copyright © 2020 [Nicholas Owens](https://github.com/Litleck). <br>
+Copyright © 2021 [Nicholas Owens](https://github.com/Litleck). <br>
 This project is [MIT](https://github.com/Litleck/Minkinator-Bot/blob/master/LICENSE) licensed.
