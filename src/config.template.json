@@ -3,7 +3,13 @@
   "prefix": ">",
   "clientOptions": {
     "messageSweepInterval": 3600,
-    "fetchAllMembers": true
+    "fetchAllMembers": true,
+    "intents": [
+      "GUILDS",
+      "GUILD_MESSAGES",
+      "GUILD_MESSAGE_REACTIONS",
+      "DIRECT_MESSAGES"
+    ],
   },
   "auth": {
     "discord": "",
