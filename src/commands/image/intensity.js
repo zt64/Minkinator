@@ -15,7 +15,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ imageURL, factor ]) {
-    const image = await loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); });
+    const image = await loadImage(imageURL).catch(() => { return message.reply("Invalid URL provided."); });
 
     const canvas = createCanvas(image.width, image.height);
     const context = canvas.getContext("2d");
@@ -36,6 +36,6 @@ module.exports = {
 
     context.putImageData(imageData, 0, 0);
 
-    return message.channel.send(new Discord.MessageAttachment(canvas.toBuffer()));
+    return message.reply(new Discord.MessageAttachment(canvas.toBuffer()));
   }
 };

@@ -1,6 +1,6 @@
 module.exports = {
-  description: "Leader board for user stats",
-  aliases: ["lb"],
+  description: "Shows the leader board for member balances.",
+  aliases: [ "lb" ],
   parameters: [
     {
       name: "page",
@@ -8,11 +8,11 @@ module.exports = {
     }
   ],
   async execute (client, message, [ page ]) {
-    const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
+    const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true, nested: true } });
     const { config: { currency, colors } } = guildInstance;
 
     // Set members const and sort by balance
-    const members = await guildInstance.getMembers({ order: [["balance", "DESC"]] });
+    const members = await guildInstance.getMembers({ order: [ [ "balance", "DESC" ] ] });
 
     const pages = Math.ceil(members.length / 10);
     if (!page) page = 1;
@@ -24,7 +24,7 @@ module.exports = {
       footer: `Page ${page} of ${pages}`
     });
 
-    if (page > pages || page < 1) return message.channel.send(`Page \`${page}\` does not exist.`);
+    if (page > pages || page < 1) return message.reply(`Page \`${page}\` does not exist.`);
 
     function populate () {
       members.slice((page - 1) * 10, page * 10).map((member, index) => {
@@ -35,7 +35,7 @@ module.exports = {
 
     populate();
 
-    const leaderBoardMessage = await message.channel.send(leaderBoardEmbed);
+    const leaderBoardMessage = await message.reply(leaderBoardEmbed);
 
     if (pages > 1) leaderBoardMessage.react("➡️");
 
@@ -78,10 +78,23 @@ module.exports = {
       leaderBoardEmbed.fields = [];
 
       populate();
+    });
+
+    collector.on("collect", async reaction => {
+      const emoji = reaction.emoji.name;
+
+      leaderBoardEmbed.fields = [];
+
+      util.paginate(members, 10, page).forEach((member, index) => {
+        const { tag } = client.users.cache.get(member.userId);
+        leaderBoardEmbed.addField(`${index}. ${tag}:`, `${currency}${util.formatNumber(member.balance, 2)}`);
+      });
 
       leaderBoardEmbed.setFooter(`Page ${page} of ${pages}`);
 
-      leaderBoardMessage.edit(leaderBoardEmbed);
+      leaderBoardMessage.reactions.resolve(emoji).users.remove(message.author);
+
+      await leaderBoardMessage.edit(leaderBoardEmbed);
     });
   }
 };

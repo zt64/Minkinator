@@ -12,7 +12,7 @@ module.exports = {
 
     playerChoice = playerChoice.toLowerCase();
 
-    if (!choices.includes(playerChoice)) return message.channel.send(`\`${playerChoice}\` is not a valid choice.`);
+    if (!choices.includes(playerChoice)) return message.reply(`\`${playerChoice}\` is not a valid choice.`);
 
     const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
@@ -30,7 +30,7 @@ module.exports = {
         embed.setDescription(`${util.capitalize(playerChoice)} beats ${util.capitalize(computerChoice)}`);
       }
 
-      return message.channel.send(embed);
+      return message.reply(embed);
     }
 
     if (playerChoice === "rock") {
@@ -46,6 +46,6 @@ module.exports = {
 
     embed.setDescription("It's a draw!");
 
-    return message.channel.send(embed);
+    return message.reply(embed);
   }
 };

@@ -18,18 +18,21 @@ module.exports = {
         const json = await util.fetchJSON(`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${key}&steamids=${steamID}`);
 
         const [ user ] = json.response.players;
-        if (!user) return message.channel.send(`Failed to find a Steam user with the ID of \`${steamID}\`. Make sure that this is a 64 bit ID and try again.`);
+        if (!user) return message.reply(`Failed to find a Steam user with the ID of \`${steamID}\`. Make sure that this is a 64 bit ID and try again.`);
 
         const states = ["Offline", "Online", "Busy", "Away", "Snooze", "Looking to trade", "Looking to play"];
 
-        const embed = new Discord.MessageEmbed()
-          .setColor(colors.default)
-          .setAuthor(user.personaname, user.avatar)
-          .setTitle("Steam User Summary")
-          .setURL(user.profileurl)
-          .addField("Status", states[user.personastate]);
-
-        return message.channel.send(embed);
+        return message.reply({
+          embed: {
+            color: colors.default,
+            author: { iconURL: user.avatar, name: user.personaname },
+            title: "Steam User Summary",
+            url: user.profile.url,
+            fields: [
+              { name: "Status", value: states[user.personastate] }
+            ]
+          }
+        });
       }
     }
   ]

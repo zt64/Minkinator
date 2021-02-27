@@ -14,12 +14,12 @@ module.exports = {
 
     // Make sure command exists in array
     if (!commands.includes(commandName)) {
-      return message.channel.send(`\`${commandName}\` is either non-existent or already enabled.`);
+      return message.reply(`\`${commandName}\` is either non-existent or already enabled.`);
     }
 
     // Update commands in database
     await guildInstance.update({ commands: commands.filter(element => element !== commandName) });
 
-    return message.channel.send(`Enabled \`${commandName}\`.`);
+    return message.reply(`Enabled \`${commandName}\`.`);
   }
 };

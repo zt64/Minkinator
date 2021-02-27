@@ -8,11 +8,11 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, words) {
+  async execute (client, message, string) {
     // Delete message
     await message.delete();
 
     // Send message
-    return message.channel.send(words.join(" "));
+    return message.channel.send(string.join(" "));
   }
 };

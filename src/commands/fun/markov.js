@@ -7,9 +7,9 @@ module.exports = {
       type: String
     }
   ],
-  async execute (client, message, [ startWord ]) {
-    const { corpus } = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
+  async execute (client, message, [ start ]) {
+    const { data } = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
 
-    return message.channel.send(await util.generateSentence(corpus, startWord));
+    return message.reply(await util.generateSentence(data, start));
   }
 };

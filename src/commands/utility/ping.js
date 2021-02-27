@@ -16,7 +16,7 @@ module.exports = {
       title: "Pinging..."
     });
 
-    const pingMessage = await message.channel.send(pingEmbed);
+    const pingMessage = await message.reply(pingEmbed);
 
     const apiPing = Math.round(ws.ping);
 

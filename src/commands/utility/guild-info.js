@@ -26,6 +26,6 @@ module.exports = {
 
     if (guild.description) infoEmbed.setDescription(guild.description);
 
-    return message.channel.send(infoEmbed);
+    return message.reply(infoEmbed);
   }
 };

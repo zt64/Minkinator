@@ -23,7 +23,7 @@ module.exports = {
     });
 
     // Send message
-    const diceMessage = await message.channel.send(diceEmbed);
+    const diceMessage = await message.reply(diceEmbed);
 
     await util.sleep(1000);
 

@@ -21,7 +21,7 @@ module.exports = {
     const target = await util.getUser(client, message, member);
 
     if (!message.mentions.members.first()) return message.reply(`\`${target}\` is not a valid member.`);
-    if (amount < 1 || isNaN(amount)) return message.channel.send(`\`${amount}\` is not a valid amount.`);
+    if (amount < 1 || isNaN(amount)) return message.reply(`\`${amount}\` is not a valid amount.`);
 
     // Get data for the sender and receiver
     const [ targetInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: target.user.id } });
@@ -33,7 +33,7 @@ module.exports = {
     await memberInstance.decrement("balance", { by: parseInt(amount) });
     await targetInstance.increment("balance", { by: parseInt(amount) });
 
-    return message.channel.send(new Discord.MessageEmbed()
+    return message.reply(new Discord.MessageEmbed()
       .setColor(colors.default)
       .setTitle("Payment Transaction")
       .setDescription(`${message.author} has sent ${currency}${amount} to ${target}`)

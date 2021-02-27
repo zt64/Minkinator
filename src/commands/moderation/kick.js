@@ -24,10 +24,12 @@ module.exports = {
     message.guild.member(member).kick();
 
     // Send embed
-    return message.channel.send(new Discord.MessageEmbed({
-      color: guildConfig.colors.default,
-      title: `${member.user.tag} has been kicked`,
-      description: reason || "No reason provided."
-    }));
+    return message.reply({
+      embed: {
+        color: guildConfig.colors.default,
+        title: `${member.user.tag} has been kicked`,
+        description: reason || "No reason provided."
+      }
+    });
   }
 };

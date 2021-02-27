@@ -15,7 +15,7 @@ module.exports = {
 
     console.log(data);
 
-    if (data.cod === "404") return message.channel.send("Invalid location.");
+    if (data.cod === "404") return message.reply("Invalid location.");
 
     const { weather } = data;
     const { main } = data;
@@ -39,6 +39,6 @@ module.exports = {
       .addField("Clouds:", data.clouds.all)
       .addField("Country Code:", data.sys.country);
 
-    return message.channel.send(embed);
+    return message.reply(embed);
   }
 };

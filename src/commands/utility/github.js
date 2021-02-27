@@ -24,7 +24,7 @@ module.exports = {
 
         const json = await util.fetchJSON(`https://api.github.com/repos/${owner}/${name}`);
 
-        if (json.message === "Not Found") return message.channel.send("Could not find repository.");
+        if (json.message === "Not Found") return message.reply("Could not find repository.");
 
         const commits = await util.fetchJSON(`https://api.github.com/repos/${owner}/${name}/commits`);
         const pulls = await util.fetchJSON(`https://api.github.com/repos/${owner}/${name}/pulls`);
@@ -51,7 +51,7 @@ module.exports = {
 
         if (json.description) embed.setDescription(json.description);
 
-        return message.channel.send(embed);
+        return message.reply(embed);
       }
     },
     {
@@ -69,7 +69,7 @@ module.exports = {
 
         const json = await util.fetchJSON(`https://api.github.com/users/${user}`);
 
-        if (json.message === "Not Found") return message.channel.send("Could not find user.");
+        if (json.message === "Not Found") return message.reply("Could not find user.");
 
         // Create embed
         const embed = new Discord.MessageEmbed({
@@ -92,7 +92,7 @@ module.exports = {
         if (json.company) embed.addField("Company:", json.company, true);
         if (json.blog) embed.addField("Website:", json.blog, true);
 
-        return message.channel.send(embed);
+        return message.reply(embed);
       }
     }
   ]

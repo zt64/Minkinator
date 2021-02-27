@@ -4,8 +4,10 @@ module.exports = {
   description: "Shows all the packages that Minkinator is using.",
   aliases: ["pkg", "pkgs"],
   async execute (client, message) {
+    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
+
     const packageEmbed = new Discord.MessageEmbed({
-      color: global.guildInstance.config.colors.default,
+      color: colors.default,
       title: "Packages"
     });
 
@@ -14,6 +16,6 @@ module.exports = {
       packageEmbed.addField(key, value, true);
     }
 
-    return message.channel.send(packageEmbed);
+    return message.reply(packageEmbed);
   }
 };

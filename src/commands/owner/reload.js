@@ -11,7 +11,7 @@ module.exports = {
       description: `Reloading \`${commands.length}\` commands and \`${events.length}\` events.`
     });
 
-    const reloadMessage = await message.channel.send(reloadEmbed);
+    const reloadMessage = await message.reply(reloadEmbed);
 
     client.removeAllListeners();
 
@@ -21,7 +21,7 @@ module.exports = {
     } catch (error) {
       console.error(error);
 
-      return message.channel.send("An error has occurred while reloading events.");
+      return message.reply("An error has occurred while reloading events.");
     }
 
     // Load commands
@@ -30,7 +30,7 @@ module.exports = {
     } catch (error) {
       console.error(error);
 
-      return message.channel.send("An error has occurred while reloading commands.");
+      return message.reply("An error has occurred while reloading commands.");
     }
 
     await client.emit("ready");

@@ -27,24 +27,24 @@ module.exports = {
       catEmbed.setURL(cat.url);
       catEmbed.setImage(cat.url);
 
-      return message.channel.send(catEmbed);
+      return message.reply(catEmbed);
     }
 
     // Check if a breed exists and fetch an image for it
     const breeds = await fetch(`https://api.thecatapi.com/v1/breeds/search?q=${search}`).then(res => res.json());
     const [ breed ] = breeds;
 
-    if (breeds.length === 0) return message.channel.send(`No images found for \`${search}\`.`);
+    if (breeds.length === 0) return message.reply(`No images found for \`${search}\`.`);
 
     const cats = await fetch(`https://api.thecatapi.com/v1/images/search/?breed_id=${breed.id}`).then(res => res.json());
     const [ cat ] = cats;
 
-    if (!cat) return message.channel.send(`No images found for \`${search}\`.`);
+    if (!cat) return message.reply(`No images found for \`${search}\`.`);
 
     catEmbed.setTitle(`${breed.name} cat`);
     catEmbed.setURL(cat.url);
     catEmbed.setImage(cat.url);
 
-    return message.channel.send(catEmbed);
+    return message.reply(catEmbed);
   }
 };

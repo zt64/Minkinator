@@ -28,6 +28,6 @@ module.exports = {
     ctx.fillText(text, canvas.width / 2, canvas.height / 2);
 
     const attachment = new Discord.MessageAttachment(canvas.toBuffer());
-    return message.channel.send(attachment);
+    return message.reply(attachment);
   }
 };

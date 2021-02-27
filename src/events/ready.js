@@ -4,11 +4,7 @@ const chalk = require("chalk");
 module.exports = async (client) => {
   const sequelize = global.sequelize = await client.database.create();
 
-  for (const guild of client.guilds.cache.array()) {
-    await client.database.initialize(guild, sequelize);
-
-    //await client.database.checkMembers(guild, guildInstance);
-  }
+  for (const guild of client.guilds.cache.array()) await client.database.initialize(guild, sequelize);
 
   console.log(chalk.green(`(${util.time()})`), `Initialized database for ${pluralize("guild", client.guilds.cache.size, true)}.`);
 
@@ -17,7 +13,7 @@ module.exports = async (client) => {
   const guilds = pluralize("guild", client.guilds.cache.size, true);
 
   // Set the user activity
-  client.user.setActivity(`${users} in ${guilds}.`, { type: "WATCHING" });
+  client.user.setPresence({ status: "watching", activity: { name: `${users} in ${guilds}` } });
 
   return console.log(chalk.green(`(${util.time()})`), "Minkinator is now online.");
 };

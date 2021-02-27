@@ -10,7 +10,7 @@ module.exports = {
 
     if (!page) page = 1;
 
-    if (page > pages || page < 1) return message.channel.send(`Page \`${page}\` does not exist.`);
+    if (page > pages || page < 1) return message.reply(`Page \`${page}\` does not exist.`);
 
     const guildsEmbed = new Discord.MessageEmbed({
       color: colors.default,
@@ -22,7 +22,7 @@ module.exports = {
       guildsEmbed.addField(`${guild.name}`, `Members: ${guild.memberCount} \n ID: ${guild.id}`);
     });
 
-    const guildsMessage = await message.channel.send(guildsEmbed);
+    const guildsMessage = await message.reply(guildsEmbed);
 
     if (pages > 1) guildsMessage.react("➡️");
 

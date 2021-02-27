@@ -28,12 +28,12 @@ module.exports = {
         // Set item constants
         itemAmount = parseInt(itemAmount) || 1;
 
-        if (!items.find(x => x.name === itemName)) return message.channel.send(`\`${itemName}\` is not available for sale.`);
+        if (!items.find(x => x.name === itemName)) return message.reply(`\`${itemName}\` is not available for sale.`);
 
         const shopItem = items.find(x => x.name === itemName);
         const shopItemPrice = itemAmount * shopItem.price;
 
-        if (balance < shopItemPrice) return message.channel.send(`You cannot afford ${pluralize(itemName, itemAmount, true)}.`);
+        if (balance < shopItemPrice) return message.reply(`You cannot afford ${pluralize(itemName, itemAmount, true)}.`);
 
         const inventoryItem = inventory.find(item => item.name === itemName);
 
@@ -48,7 +48,7 @@ module.exports = {
         await memberInstance.decrement("balance", { by: shopItemPrice });
         await memberInstance.update({ inventory: inventory });
 
-        return message.channel.send(new Discord.MessageEmbed()
+        return message.reply(new Discord.MessageEmbed()
           .setColor(colors.default)
           .setTitle("Transaction Successful")
           .setDescription(`Bought ${pluralize(itemName, itemAmount, true)} for ${currency}${formatNumber(shopItemPrice, 2)}.`)
@@ -87,8 +87,8 @@ module.exports = {
         const sellPrice = (itemAmount * shopItem.price) / 2;
 
         // Check if possible to sell
-        if (!inventoryItem) return message.channel.send(`You do not have: \`${itemName}\``);
-        if (itemAmount > inventoryItem.amount) return message.channel.send(`You are missing the additional: \`${itemAmount - inventoryItem.amount}\` ${itemName}.`);
+        if (!inventoryItem) return message.reply(`You do not have: \`${itemName}\``);
+        if (itemAmount > inventoryItem.amount) return message.reply(`You are missing the additional: \`${itemAmount - inventoryItem.amount}\` ${itemName}.`);
 
         inventoryItem.amount - itemAmount ? inventoryItem.amount -= itemAmount : inventory.splice(inventory.indexOf(inventoryItem), 1);
 
@@ -96,7 +96,7 @@ module.exports = {
 
         await memberInstance.update({ balance: balance, inventory: inventory });
 
-        return message.channel.send(new Discord.MessageEmbed()
+        return message.reply(new Discord.MessageEmbed()
           .setColor(colors.default)
           .setTitle("Transaction Successful")
           .setDescription(`Sold ${pluralize(itemName, itemAmount, true)} for ${currency}${sellPrice.toFixed(2)}`)
@@ -119,11 +119,11 @@ module.exports = {
         // Setup pages
         const pages = Math.ceil(items.length / 10);
 
-        if (!pages) return message.channel.send("The shop is currently empty.");
+        if (!pages) return message.reply("The shop is currently empty.");
 
         if (!page) page = 1;
 
-        if (page > pages || page < 1 || isNaN(page)) return message.channel.send(`Page \`${page}\` does not exist.`);
+        if (page > pages || page < 1 || isNaN(page)) return message.reply(`Page \`${page}\` does not exist.`);
 
         // Create embed
         const shopEmbed = new Discord.MessageEmbed()
@@ -136,7 +136,7 @@ module.exports = {
           shopEmbed.addField(item.name, `${currency}${formatNumber(item.price, 2)}`, true);
         });
 
-        const shopMessage = await message.channel.send(shopEmbed);
+        const shopMessage = await message.reply(shopEmbed);
 
         if (pages > 1) shopMessage.react("➡️");
 

@@ -5,14 +5,14 @@ module.exports = {
 
     const fox = await util.fetchJSON("https://randomfox.ca/floof/");
 
-    const foxEmbed = new Discord.MessageEmbed({
-      color: colors.default,
-      title: "Random Fox",
-      url: fox.link,
-      image: { url: fox.image },
-      footer: { text: "Source: https://randomfox.ca/floof/" }
+    return message.reply({
+      embed: {
+        color: colors.default,
+        title: "Random Fox",
+        url: fox.link,
+        image: { url: fox.image },
+        footer: { text: "Source: https://randomfox.ca/floof/" }
+      }
     });
-
-    return message.channel.send(foxEmbed);
   }
 };

@@ -11,6 +11,6 @@ module.exports = {
   async execute (client, message, [ seconds ]) {
     await message.channel.setRateLimitPerUser(seconds);
 
-    return message.channel.send(`Successfully set the rate limit per user to ${seconds} seconds.`);
+    return message.reply(`Successfully set the rate limit per user to ${seconds} seconds.`);
   }
 };

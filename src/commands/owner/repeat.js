@@ -17,7 +17,7 @@ module.exports = {
 
     const command = client.commands.get(commandName);
 
-    if (!command) return message.channel.send(`Unable to find \`${commandName}\`.`);
+    if (!command) return message.reply(`Unable to find \`${commandName}\`.`);
 
     // Send command
     for (var i = 0; i < amount; i++) {

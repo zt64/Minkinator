@@ -19,9 +19,9 @@ module.exports = {
     try {
       client.emit(event, parameters);
 
-      return message.channel.send(`Successfully emitted \`${event}\`.`);
+      return message.reply(`Successfully emitted \`${event}\`.`);
     } catch (error) {
-      return message.channel.send(`Failed to emit \`${event}\`.`);
+      return message.reply(`Failed to emit \`${event}\`.`);
     }
   }
 };

@@ -7,7 +7,7 @@ module.exports = {
     const utc = moment.utc();
 
     // Send message
-    return message.channel.send({
+    return message.reply({
       embed: {
         color: colors.default,
         title: "Time / Date",

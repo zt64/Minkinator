@@ -25,7 +25,7 @@ module.exports = {
         });
 
         const model = global.sequelize.models[modelName];
-        if (!model) return message.channel.send(`Model \`${modelName}\` does not exist.`);
+        if (!model) return message.reply(`Model \`${modelName}\` does not exist.`);
 
         // If no entity provided, show all entities
         if (!instanceName) {
@@ -35,18 +35,18 @@ module.exports = {
           embed.setTitle(`${modelName}`);
           embed.setDescription(`\`\`\`json\n${JSON.stringify(array, null, 2)}\`\`\``);
 
-          return message.channel.send(embed);
+          return message.reply(embed);
         }
 
         // Check if object exists
         const object = await model.findByPk(instanceName, { include: { all: true, nested: true } });
-        if (object === null) return message.channel.send(`Object: ${instanceName}, does not exist.`);
+        if (object === null) return message.reply(`Object: ${instanceName}, does not exist.`);
 
         // Set embed properties
         embed.setTitle(`${modelName}: ${instanceName}`);
         embed.setDescription(`\`\`\`json\n${JSON.stringify(object, null, 2)}\`\`\``);
 
-        return message.channel.send(embed);
+        return message.reply(embed);
       }
     },
     {
@@ -74,18 +74,18 @@ module.exports = {
       async execute (client, message, [ modelName, instanceName, propertyName, value ]) {
         // Check if model exists
         const model = global.sequelize.models[modelName];
-        if (!model) return message.channel.send(`Model \`${modelName}\` does not exist.`);
+        if (!model) return message.reply(`Model \`${modelName}\` does not exist.`);
 
         // Check if object exists
         const object = await model.findByPk(instanceName);
-        if (object === null) return message.channel.send(`Object \`${instanceName}\` does not exist.`);
+        if (object === null) return message.reply(`Object \`${instanceName}\` does not exist.`);
 
         // Check if property exists
-        if (!object[propertyName]) return message.channel.send(`Property \`${propertyName}\` does not exist.`);
+        if (!object[propertyName]) return message.reply(`Property \`${propertyName}\` does not exist.`);
 
         await object.update({ [propertyName]: JSON.parse(value) });
 
-        return message.channel.send(`Set ${modelName}: ${instanceName}.${propertyName} to \`${value}\`.`);
+        return message.reply(`Set ${modelName}: ${instanceName}.${propertyName} to \`${value}\`.`);
       }
     },
     {
@@ -102,18 +102,17 @@ module.exports = {
         const stats = fs.statSync(`${__basedir}/database.sqlite`);
         const size = prettyBytes(stats.size);
 
-        // Create embed
-        const embed = new Discord.MessageEmbed({
-          color: colors.default,
-          title: "Database Information",
-          fields: [
-            { name: "Sequelize Version:", value: sequelizeVersion, inline: true },
-            { name: "Sqlite3 Version:", value: sqlite3Version, inline: true },
-            { name: "Database Size:", value: size },
-          ]
+        return message.reply({
+          embed: {
+            color: colors.default,
+            title: "Database Information",
+            fields: [
+              { name: "Sequelize Version:", value: sequelizeVersion, inline: true },
+              { name: "Sqlite3 Version:", value: sqlite3Version, inline: true },
+              { name: "Database Size:", value: size },
+            ]
+          }
         });
-
-        return message.channel.send(embed);
       }
     }
   ]

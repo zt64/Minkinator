@@ -17,7 +17,7 @@ module.exports = {
 
     const geocode = await util.fetchJSON(`https://api.mapbox.com/geocoding/v5/mapbox.places/${args.join("%20")}.json?access_token=${key}`);
 
-    if (!geocode.features.length) return message.channel.send(`\`${search}\` could not be located.`);
+    if (!geocode.features.length) return message.reply(`\`${search}\` could not be located.`);
 
     const { features } = geocode;
     const [ feature ] = features;
@@ -27,12 +27,14 @@ module.exports = {
     const map = await fetch(`https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/static/${longitude},${latitude},8,0/1024x1024?access_token=${key}`);
     const { url } = map;
 
-    return message.channel.send(new Discord.MessageEmbed({
-      color: colors.default,
-      title: feature.place_name,
-      url: url,
-      image: { url },
-      footer: { text: `Query: ${search} | Powered by Mapbox` }
-    }));
+    return message.reply({
+      embed: {
+        color: colors.default,
+        title: feature.place_name,
+        url: url,
+        image: { url },
+        footer: { text: `Query: ${search} | Powered by Mapbox` }
+      }
+    });
   }
 };

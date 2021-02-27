@@ -11,7 +11,7 @@ module.exports = async (client, { guild, user }) => {
   const users = pluralize("user", client.users.cache.size, true);
   const guilds = pluralize("guild", client.guilds.cache.size, true);
 
-  client.user.setActivity(`${users} in ${guilds}.`, { type: "WATCHING" });
+  client.user.setPresence({ status: "watching", activity: { name: `${users} in ${guilds}` } });
 
   console.log(chalk.green(`(${util.time()})`), `${user.tag} has joined ${guild.name}.`);
 

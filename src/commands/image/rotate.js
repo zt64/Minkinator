@@ -15,7 +15,7 @@ module.exports = {
     },
   ],
   async execute (client, message, [ imageURL, degrees ]) {
-    const image = await loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); });
+    const image = await loadImage(imageURL).catch(() => { return message.reply("Invalid URL provided."); });
 
     const radians = parseFloat(degrees) * Math.PI / 180;
 
@@ -27,6 +27,6 @@ module.exports = {
     context.translate(-image.width / 2, -image.height / 2);
     context.drawImage(image, 0, 0);
 
-    return message.channel.send(new Discord.MessageAttachment(canvas.toBuffer()));
+    return message.reply(new Discord.MessageAttachment(canvas.toBuffer()));
   }
 };

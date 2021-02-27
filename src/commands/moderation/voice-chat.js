@@ -9,9 +9,9 @@ module.exports = {
         if (message.member.voice.channel) {
           await message.member.voice.channel.join();
 
-          return message.channel.send("Joined voice channel.");
+          return message.reply("Joined voice channel.");
         } else {
-          return message.channel.send("Not in a voice channel.");
+          return message.reply("Not in a voice channel.");
         }
       }
     },
@@ -22,9 +22,9 @@ module.exports = {
         if (client.voice.connections.size >= 1) {
           await client.voice.connections.first().channel.leave();
 
-          return message.channel.send("Left voice channel.");
+          return message.reply("Left voice channel.");
         } else {
-          return message.channel.send("Not in a voice channel.");
+          return message.reply("Not in a voice channel.");
         }
       }
     },
@@ -39,7 +39,7 @@ module.exports = {
         }
       ],
       async execute (client, message, [ url ]) {
-        if (client.voice.connections.size === 0) return message.channel.send("Must be in voice channel before running.");
+        if (client.voice.connections.size === 0) return message.reply("Must be in voice channel before running.");
 
         const connection = client.voice.connections.first();
 

@@ -17,6 +17,6 @@ module.exports = {
     // Update member data
     memberInstance.update({ botBan: !memberInstance.botBan });
 
-    return message.channel.send(`${user} has been ${state} from using Minkinator.`);
+    return message.reply(`${user} has been ${state} from using Minkinator.`);
   }
 };

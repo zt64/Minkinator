@@ -4,7 +4,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       primaryKey: true
     },
-    corpus: {
+    data: {
       type: DataTypes.JSON,
       defaultValue: []
     }

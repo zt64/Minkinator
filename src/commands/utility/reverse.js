@@ -12,7 +12,7 @@ module.exports = {
 
     const flipped = string.join(" ").split("").reverse().join("");
 
-    return message.channel.send({ embed: {
+    return message.reply({ embed: {
       color: colors.default,
       title: "Reversed Text",
       description: flipped

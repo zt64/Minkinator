@@ -13,10 +13,10 @@ module.exports = {
     const shopItem = await global.sequelize.models.shopItem.findByPk(itemName);
 
     // Make sure item exists
-    if (!shopItem) return message.channel.send(`Item: \`${itemName}\`, does not exist in the guild shop.`);
+    if (!shopItem) return message.reply(`Item: \`${itemName}\`, does not exist in the guild shop.`);
 
     await guildInstance.removeShopItem(shopItem);
 
-    return message.channel.send(`Successfully deleted: \`${itemName}\`, from the guild shop.`);
+    return message.reply(`Successfully deleted: \`${itemName}\`, from the guild shop.`);
   }
 };

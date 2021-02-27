@@ -25,6 +25,6 @@ module.exports = {
       embed.setDescription(`\`\`\`js\n${error.stack}\`\`\``);
     }
 
-    return message.channel.send(embed);
+    return message.reply(embed);
   }
 };

@@ -17,6 +17,6 @@ module.exports = {
     await data.destroy();
     await client.database.members.create({ name: member.tag, id: member.id });
 
-    return message.channel.send(`${member.tag}"s data has been reset.`);
+    return message.reply(`${member.tag}"s data has been reset.`);
   }
 };

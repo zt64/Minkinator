@@ -1,4 +1,4 @@
-const MarkovChain = require("purpl-markov-chain");
+const { RiMarkov } = require("rita");
 const fetch = require("node-fetch");
 const moment = require("moment");
 
@@ -82,12 +82,10 @@ exports.time = (format = "HH:mm M/D/Y") => {
   return moment().format(format);
 };
 
-exports.generateSentence = async (corpus, startWord) => {
-  const chain = new MarkovChain(corpus);
-
-  if (startWord) chain.config.from = startWord;
-
-  return chain.generate({ grams: util.randomInteger(1, 3) });
+exports.generateSentence = async (data, start) => {
+  const rm = RiMarkov.fromJSON(data);
+  if (start) return rm.generate(1, { startTokens: start });
+  return rm.generate(1);
 };
 
 exports.hasPermission = (member, command) => {

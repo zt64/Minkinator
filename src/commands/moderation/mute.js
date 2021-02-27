@@ -34,7 +34,7 @@ module.exports = {
       epoch: Date.now()
     });
 
-    return message.channel.send(new Discord.MessageEmbed({
+    return message.reply(new Discord.MessageEmbed({
       color: global.guildInstance.config.colors.default,
       author: { iconURL: member.user.avatarURL(), name: `${member.user.tag} has been muted${minutes ? ` for ${pluralize("minute", minutes, true)}` : ""}.` },
       description: reason || "No reason provided."

@@ -12,20 +12,20 @@ module.exports = {
 
     if (key) {
       if (key in memberConfig) {
-        if (!value) return message.channel.send(`A value is required for \`${key}\`.`);
+        if (!value) return message.reply(`A value is required for \`${key}\`.`);
 
         memberConfig[key] = JSON.parse(value);
 
         await memberConfig.update({ [key]: value });
 
-        return message.channel.send(`Successfully set \`${key}\` to \`${value}\`.`);
+        return message.reply(`Successfully set \`${key}\` to \`${value}\`.`);
       } else {
-        return message.channel.send(`\`${key}\` does not exist in the member configuration.`);
+        return message.reply(`\`${key}\` does not exist in the member configuration.`);
       }
     }
 
     embed.setDescription(`\`\`\`json\n${JSON.stringify(memberConfig, null, 2)}\`\`\``);
 
-    return message.channel.send(embed);
+    return message.reply(embed);
   }
 };

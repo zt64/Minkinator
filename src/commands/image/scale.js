@@ -20,7 +20,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ imageURL, xFactor, yFactor ]) {
-    const image = await loadImage(imageURL).catch(() => { return message.channel.send("Invalid URL provided."); });
+    const image = await loadImage(imageURL).catch(() => { return message.reply("Invalid URL provided."); });
 
     xFactor = parseFloat(xFactor);
     yFactor = parseFloat(yFactor);
@@ -33,6 +33,6 @@ module.exports = {
 
     const attachment = new Discord.MessageAttachment(canvas.toBuffer());
 
-    return message.channel.send(attachment);
+    return message.reply(attachment);
   }
 };

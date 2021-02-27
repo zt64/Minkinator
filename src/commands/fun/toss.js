@@ -8,10 +8,12 @@ module.exports = {
     const result = Math.random() > 0.5 ? "Heads" : "Tails";
 
     // Send embed
-    return message.channel.send(new Discord.MessageEmbed({
-      color: colors.default,
-      title: "Coin Toss",
-      description: result
-    }));
+    return message.reply({
+      embed: {
+        color: colors.default,
+        title: "Coin Toss",
+        description: result
+      }
+    });
   }
 };

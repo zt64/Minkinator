@@ -22,10 +22,12 @@ module.exports = {
     member.roles.remove("671902495726895127");
 
     // Send embed
-    return message.channel.send(new Discord.MessageEmbed()
-      .setColor(colors.default)
-      .setAuthor(`${member.user.tag} has been unmuted`, member.user.avatarURL())
-      .setFooter(member.id)
-    );
+    return message.reply({
+      embed: {
+        color: colors.default,
+        author: { iconURL: member.user.displayAvatarURL(), name: `${member.user.tag} has been unmuted` },
+        footer: { text: member.id }
+      }
+    });
   }
 };

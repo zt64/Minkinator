@@ -1,12 +1,10 @@
-const MarkovChain = require("purpl-markov-chain");
 const pluralize = require("pluralize");
 const Discord = require("discord.js");
+const { RiMarkov } = require("rita");
 const chalk = require("chalk");
 
 module.exports = async (client, message) => {
-  if (message.author.bot || !/^\w{2}/.test(message.content)) return;
-
-  console.log(message.content);
+  if (message.author.bot) return;
 
   if (message.channel.type === "dm") {
     if (message.author === client.user) return;
@@ -18,27 +16,28 @@ module.exports = async (client, message) => {
   }
 
   const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
-
   const { errorTimeout, prefix, colors } = guildInstance.config;
+
+  const prefixPattern = new RegExp("^[a-zA-Z0-9<@ " + prefix + "]{2}");
+  if (!prefixPattern.test(message.content)) return;
 
   const [ memberInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: message.author.id }, include: { all: true } });
 
+  if (memberInstance.botBan) return;
+
   // Generate markov on mention of self
-  if (message.mentions.has(client.user) || Math.random() >= 0.98) message.channel.send(await util.generateSentence(guildInstance.corpus));
+  if (message.mentions.has(client.user) || Math.random() >= 0.98) message.reply(await util.generateSentence(guildInstance.data));
 
   // Write message to data.json
   if (!message.content.startsWith(prefix)) {
-    const chain = new MarkovChain(guildInstance.corpus);
-    let sentence = message.content;
+    const rm = guildInstance.data.length ? RiMarkov.fromJSON(guildInstance.data) : new RiMarkov(3);
 
-    if (message.attachments.size) sentence += ` ${message.attachments.map(attachment => attachment.url).join()}`;
+    if (message.attachments.size) message.content += ` ${message.attachments.map(attachment => attachment.url).join()}`;
 
-    chain.update(sentence);
+    rm.addText(message.content);
 
-    await guildInstance.update({ corpus: chain.toJSON() });
+    return guildInstance.update({ data: rm.toJSON() });
   }
-
-  if (!message.content.startsWith(prefix) || memberInstance.botBan) return;
 
   // Check if command exists
   const parameters = message.content.slice(prefix.length).split(/ +/g);
@@ -53,11 +52,13 @@ module.exports = async (client, message) => {
 
   // Check if message author has permission
   if (!util.hasPermission(message.member, command)) {
-    const permissionError = await message.channel.send({
+    const permissionError = await message.reply({
       embed: {
         color: colors.error,
         title: "Missing Permissions",
-        fields: [ { name: "You are missing one of the following permissions:", value: command.permissions.join(", ") || "Bot Owner Only" } ]
+        fields: [
+          { name: "You are missing one of the following permissions:", value: command.permissions.join(", ") || "Bot Owner Only" }
+        ]
       }
     });
 
@@ -92,7 +93,7 @@ module.exports = async (client, message) => {
 
       usageEmbed.addField("Sub commands:", `\`[${name.join(" | ")}]\``);
 
-      return message.channel.send(usageEmbed);
+      return message.reply(usageEmbed);
     }
 
     // Remove the sub command from the arguments array
@@ -121,7 +122,7 @@ module.exports = async (client, message) => {
 
     usageEmbed.addField("Proper usage", `\`${prefix}${commandName}${name ? ` ${name} ` : " "}${array.join(" ")}\``);
 
-    const usageMessage = await message.channel.send(usageEmbed);
+    const usageMessage = await message.reply(usageEmbed);
 
     return usageMessage.delete({ timeout: errorTimeout });
   }
@@ -140,7 +141,7 @@ module.exports = async (client, message) => {
       if (now < expirationTime) {
         const timeLeft = (expirationTime - now) / 1000;
 
-        const coolDownEmbed = await message.channel.send({
+        const coolDownEmbed = await message.reply({
           embed: {
             color: colors.error,
             title: "Cool down active",
@@ -168,7 +169,7 @@ module.exports = async (client, message) => {
   } catch (error) {
     console.error(error);
 
-    return message.channel.send({
+    return message.reply({
       embed: {
         color: colors.error,
         title: "An error has occurred",

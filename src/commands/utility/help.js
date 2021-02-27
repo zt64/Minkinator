@@ -11,16 +11,17 @@ module.exports = {
   ],
   async execute (client, message, [ commandName ]) {
     const { prefix, colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
+    const owner = await client.users.fetch(global.config.ownerID);
     const helpEmbed = new Discord.MessageEmbed({
       color: colors.default,
-      footer: { text: `Created by Litleck (${await client.users.fetch(global.config.ownerID).then(user => user.tag)})` }
+      footer: { iconURL: owner.displayAvatarURL(), text: `Created by Litleck (${owner.tag})` }
     });
 
     if (commandName) {
       const command = client.commands.find(command => command.name === commandName) || [...client.commands.values()].find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
 
       if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
-        return message.channel.send(new Discord.MessageEmbed({
+        return message.reply(new Discord.MessageEmbed({
           color: colors.default,
           title: "Invalid Command",
           description: `\`${commandName}\` is not a valid command.`
@@ -43,7 +44,7 @@ module.exports = {
         helpEmbed.addField("Proper usage:", `\`${prefix}${commandName} ${array.join(" ")}\``);
       }
 
-      return message.channel.send(helpEmbed);
+      return message.reply(helpEmbed);
     }
 
     helpEmbed.setTitle("🏠 Home Page");
@@ -52,20 +53,20 @@ module.exports = {
       { name: "🥳 Fun", value: "Fun commands to play around with." },
       { name: "💵 Economy ", value: "Buy, sell, and make a profit." },
       { name: "👤 Member", value: "Member related commands." },
-      { name: "🖌️ Canvas", value: "Manipulate an image as you desire." },
+      { name: "🖌️ Image", value: "Manipulate an image as you desire." },
       { name: "🛠️ Utility", value: "Variety of commands with their own uses." },
-      { name: "🔒 Admin", value: "Commands to manage a server." }
+      { name: "🔒 Moderation", value: "Commands to manage a server." }
     ]);
 
-    const helpMessage = await message.channel.send(helpEmbed);
+    const helpMessage = await message.reply(helpEmbed);
 
     const categories = {
       "🥳": "fun",
       "💵": "economy",
       "👤": "member",
-      "🖌️": "canvas",
+      "🖌️": "image",
       "🛠️": "utility",
-      "🔒": "admin"
+      "🔒": "moderation"
     };
 
     Object.keys(categories).forEach(async reaction => await helpMessage.react(reaction));

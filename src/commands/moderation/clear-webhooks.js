@@ -10,6 +10,6 @@ module.exports = {
       await global.fetchWebhook(webhook.id).then(webhook => webhook.delete());
     });
 
-    return message.channel.send(`Deleted \`${webhooks.size}\` webhooks from the guild.`);
+    return message.reply(`Deleted \`${webhooks.size}\` webhooks from the guild.`);
   }
 };

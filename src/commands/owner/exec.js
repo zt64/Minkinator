@@ -30,7 +30,7 @@ module.exports = {
       color: colors.default
     });
 
-    const execMessage = await message.channel.send(execEmbed);
+    const execMessage = await message.reply(execEmbed);
 
     updateEmbed();
 

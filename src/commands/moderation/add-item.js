@@ -20,10 +20,10 @@ module.exports = {
     itemPrice = parseInt(itemPrice);
 
     // Only allow positive integers for price
-    if (isNaN(itemPrice) || itemPrice <= 0) return message.channel.send(`Item price must be a number above ${currency}0.`);
+    if (isNaN(itemPrice) || itemPrice <= 0) return message.reply(`Item price must be a number above ${currency}0.`);
 
     guildInstance.createItem({ name: itemName, price: itemPrice, guildId: message.guild.id });
 
-    return message.channel.send(`Successfully added: \`${itemName}\`, to the guild shop for ${currency}${itemPrice}.`);
+    return message.reply(`Successfully added: \`${itemName}\`, to the guild shop for ${currency}${itemPrice}.`);
   }
 };

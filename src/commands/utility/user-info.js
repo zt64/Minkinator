@@ -10,7 +10,7 @@ module.exports = {
     const { colors, currency } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     const user = await util.getUser(client, message, mention);
-    if (!user) return message.channel.send("Please specify a valid member.");
+    if (!user) return message.reply("Please specify a valid member.");
 
     const member = message.guild.member(user);
 
@@ -21,13 +21,15 @@ module.exports = {
       color: colors.default,
       author: { iconURL: user.avatarURL(), name: `User information: ${user.tag}` },
       fields: [
-        { name: "ID:", value: user.id },
         { name: "Created:", value: user.createdAt.toLocaleDateString(), inline: true },
         { name: "Joined:", value: member.joinedAt.toLocaleDateString(), inline: true },
         { name: "Status", value: user.presence.status === "dnd" ? "DND" : util.capitalize(user.presence.status), inline: true },
         { name: "Balance:", value: `${currency}${util.formatNumber(balance, 2)}`, inline: true }
-      ]
+      ],
+      footer: { text: `User ID: ${user.id}` }
     });
+
+    if (member.nickname) infoEmbed.addField("Nickname:", member.nickname, true);
 
     const platforms = [];
 
@@ -44,6 +46,6 @@ module.exports = {
       }).join(", "));
     }
 
-    return message.channel.send(infoEmbed);
+    return message.reply(infoEmbed);
   }
 };

@@ -15,12 +15,14 @@ module.exports = {
     const avatar = user.displayAvatarURL({ format: "png", dynamic: true, size: 256 });
 
     // Send embed
-    return message.channel.send(new Discord.MessageEmbed({
-      color: colors.default,
-      title: `Avatar of ${user.tag}`,
-      url: avatar,
-      image: { url: avatar },
-      footer: { text: `User ID: ${user.id}` }
-    }));
+    return message.reply({
+      embed: {
+        color: colors.default,
+        title: `Avatar of ${user.tag}`,
+        url: avatar,
+        image: { url: avatar },
+        footer: { text: `User ID: ${user.id}` }
+      }
+    });
   }
 };

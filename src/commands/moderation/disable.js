@@ -14,13 +14,13 @@ module.exports = {
 
     // Check if command can be disabled
     if (!client.commands.get(commandName)) {
-      return message.channel.send(`\`${commandName}\` is not a valid command.`);
+      return message.reply(`\`${commandName}\` is not a valid command.`);
     } else if (commands.includes(commandName)) {
-      return message.channel.send(`\`${commandName}\` is already disabled.`);
+      return message.reply(`\`${commandName}\` is already disabled.`);
     }
 
     await guildInstance.update({ commands: [ ...commands, commandName] });
 
-    return message.channel.send(`Disabled \`${commandName}\`.`);
+    return message.reply(`Disabled \`${commandName}\`.`);
   }
 };

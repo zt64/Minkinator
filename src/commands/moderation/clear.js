@@ -13,7 +13,7 @@ module.exports = {
     count = parseInt(count);
 
     // Check if input is valid
-    if (isNaN(count) || count < 1) return message.channel.send("Please enter a number between 1 and 100");
+    if (isNaN(count) || count < 1) return message.reply("Please enter a number between 1 and 100");
 
     // Ignore command message
     if (count !== 100) count += 1;

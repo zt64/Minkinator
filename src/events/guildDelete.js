@@ -12,5 +12,5 @@ module.exports = async (client, guild) => {
   const users = pluralize("user", client.users.cache.size, true);
   const guilds = pluralize("guild", client.guilds.cache.size, true);
 
-  return client.user.setActivity(`${users} in ${guilds}.`, { type: "WATCHING" });
+  return client.user.setPresence({ status: "watching", activity: { name: `${users} in ${guilds}` } });
 };

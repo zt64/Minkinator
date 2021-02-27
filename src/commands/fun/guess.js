@@ -11,7 +11,7 @@ module.exports = {
   async execute (client, message, [ guess ]) {
     guess = Math.round(guess);
 
-    if (guess < 1 || guess > 100) return message.channel.send("Guess must be 1 - 100, inclusive.");
+    if (guess < 1 || guess > 100) return message.reply("Guess must be 1 - 100, inclusive.");
 
     const memberInstance = await global.sequelize.models.member.findByPk(message.author.id);
     const { currency, colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
@@ -40,6 +40,6 @@ module.exports = {
 
     embed.setDescription(`You guessed ${guess}, and the number was ${value}. \nEarning you ${currency}${formatNumber(earn, 2)} puts your balance at ${currency}${formatNumber(balance + earn, 2)}.`);
 
-    return message.channel.send(embed);
+    return message.reply(embed);
   }
 };
