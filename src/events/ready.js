@@ -13,7 +13,7 @@ module.exports = async (client) => {
   const guilds = pluralize("guild", client.guilds.cache.size, true);
 
   // Set the user activity
-  client.user.setPresence({ status: "watching", activity: { name: `${users} in ${guilds}` } });
+  client.user.setActivity(`${users} in ${guilds}`, { type: "WATCHING" });
 
   return console.log(chalk.green(`(${util.time()})`), "Minkinator is now online.");
 };
