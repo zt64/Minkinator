@@ -1,6 +1,6 @@
 const pluralize = require("pluralize");
 const Discord = require("discord.js");
-const { RiMarkov } = require("rita");
+const RiTa = require("rita");
 const chalk = require("chalk");
 
 module.exports = async (client, message) => {
@@ -18,19 +18,11 @@ module.exports = async (client, message) => {
   const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
   const { errorTimeout, prefix, colors } = guildInstance.config;
 
-  const prefixPattern = new RegExp("^[a-zA-Z0-9<@ " + prefix + "]{2}");
-  if (!prefixPattern.test(message.content)) return;
-
-  const [ memberInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: message.author.id }, include: { all: true } });
-
-  if (memberInstance.botBan) return;
-
-  // Generate markov on mention of self
-  if (message.mentions.has(client.user) || Math.random() >= 0.98) message.reply(await util.generateSentence(guildInstance.data));
-
   // Write message to data.json
   if (!message.content.startsWith(prefix)) {
-    const rm = guildInstance.data.length ? RiMarkov.fromJSON(guildInstance.data) : new RiMarkov(3);
+    const rm = guildInstance.data.length ? RiTa.RiMarkov.fromJSON(guildInstance.data) : new RiTa.markov(3);
+
+    rm.tokenize = (string) => { console.log(RiTa.tokenize(string, "\040")); return RiTa.tokenize(string, "\040"); };
 
     if (message.attachments.size) message.content += ` ${message.attachments.map(attachment => attachment.url).join()}`;
 
@@ -38,6 +30,16 @@ module.exports = async (client, message) => {
 
     return guildInstance.update({ data: rm.toJSON() });
   }
+
+  // Generate markov on mention of self
+  if (message.mentions.has(client.user) || Math.random() >= 0.98) message.reply(await util.generateSentence(guildInstance.data));
+
+  // const prefixPattern = new RegExp("^[a-zA-Z0-9<@: " + prefix + "]{2}");
+  // if (!prefixPattern.test(message.content)) return;
+
+  const [ memberInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: message.author.id }, include: { all: true } });
+
+  if (memberInstance.botBan) return;
 
   // Check if command exists
   const parameters = message.content.slice(prefix.length).split(/ +/g);
