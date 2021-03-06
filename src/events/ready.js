@@ -4,7 +4,7 @@ const chalk = require("chalk");
 module.exports = async (client) => {
   const sequelize = global.sequelize = await client.database.create();
 
-  for (const guild of client.guilds.cache.array()) await client.database.initialize(guild, sequelize);
+  client.guilds.cache.forEach(async guild => await client.database.initialize(guild, sequelize));
 
   console.log(chalk.green(`(${util.time()})`), `Initialized database for ${pluralize("guild", client.guilds.cache.size, true)}.`);
 

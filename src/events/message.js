@@ -10,16 +10,16 @@ module.exports = async (client, message) => {
     if (message.author === client.user) return;
 
     const botOwner = await client.users.fetch(global.config.ownerID);
-    const { author } = message;
+    const { tag, id } = message.author;
 
-    return botOwner.send(`Message from \`${author.tag} (${author.id})\`:\n${message.content}`);
+    return botOwner.send(`Message from \`${tag} (${id})\`:\n${message.content}`);
   }
 
   const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
   const { errorTimeout, prefix, colors } = guildInstance.config;
 
   // Generate markov on mention of self
-  if (message.mentions.has(client.user) || Math.random() >= 0.99) message.reply(await util.generateSentence(guildInstance.data));
+  if (message.mentions.has(client.user) || Math.random() >= 0.99) message.reply(await util.generateSentence(guildInstance.data), { allowedMentions: { parse: [ ] } });
 
   // Write message to data.json
   if (!message.content.startsWith(prefix)) {
@@ -38,6 +38,7 @@ module.exports = async (client, message) => {
   // if (!prefixPattern.test(message.content)) return;
 
   const [ memberInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: message.author.id }, include: { all: true } });
+
 
   if (memberInstance.botBan) return;
 
