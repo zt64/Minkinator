@@ -7,12 +7,11 @@ module.exports = async (client, guild) => {
   await client.database.initialize(guild, global.sequelize);
 
   const botOwner = await client.users.fetch(global.config.ownerID);
-
-  botOwner.send(`Minkinator has been added to \`${guild.name} (${guild.id}\`.`);
+  botOwner.send(`Minkinator has been added to \`${guild.name} (${guild.id}\`).`);
 
   // Set count values
   const users = pluralize("user", client.users.cache.size, true);
   const guilds = pluralize("guild", client.guilds.cache.size, true);
 
-  return client.user.setPresence({ status: "watching", activity: { name: `${users} in ${guilds}` } });
+  return client.user.setActivity(`${users} in ${guilds}`, { type: "WATCHING" });
 };

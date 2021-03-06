@@ -75,7 +75,7 @@ if (!config.auth.discord) return console.error("No token provided, enter a token
 client.login(config.auth.discord);
 
 // Handle promise rejections
-process.on("unhandledRejection", (error) => console.error(error));
+process.on("unhandledRejection", (error) => console.log(error.stack));
 
 process.on("SIGINT", () => {
   client.destroy();

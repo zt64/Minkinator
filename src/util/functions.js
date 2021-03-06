@@ -90,7 +90,7 @@ exports.generateSentence = async (data, start) => {
 
 exports.hasPermission = (member, command) => {
   if (member.user.id !== global.config.ownerID) {
-    if (command.ownerOnly || !member.hasPermission(command.permissions)) return false;
+    if (command.ownerOnly || !member.permissions.has(command.permissions)) return false;
   }
 
   return true;

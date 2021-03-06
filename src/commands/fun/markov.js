@@ -10,6 +10,11 @@ module.exports = {
   async execute (client, message, [ start ]) {
     const { data } = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
 
-    return message.reply(await util.generateSentence(data, start));
+    try {
+      const sentence = start ? await util.generateSentence(data, start) : await util.generateSentence(data);
+      return message.reply(sentence);
+    } catch (error) {
+      return message.reply("Failed to generate a sentence, database may need more data.");
+    }
   }
 };
