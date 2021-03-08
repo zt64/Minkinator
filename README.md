@@ -3,8 +3,8 @@
 # Minkinator, another Discord bot. ![GitHub](https://img.shields.io/github/license/litleck/minkinator) ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/litleck/minkinator) ![Discord](https://img.shields.io/badge/discord-rXVnuTB-6666ee?logo=discord)
 
 ## Requirements
-* [Node v12.16 or newer](https://nodejs.org/en/download/)
 * [Discord bot token](https://discord.com/developers/applications)
+* Node & NPM
 
 ## Setup
 To get started, clone this repository using `git clone https://github.com/Litleck/Minkinator.git`.
