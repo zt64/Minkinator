@@ -12,7 +12,7 @@ module.exports = {
     const user = await util.getUser(client, message, mention);
     if (!user) return message.reply("Please specify a valid member.");
 
-    const member = message.guild.member(user);
+    const member = await message.guild.members.fetch(user.id);
 
     const { balance } = await global.sequelize.models.member.findByPk(user.id);
 
