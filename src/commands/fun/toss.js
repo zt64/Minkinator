@@ -1,7 +1,7 @@
 module.exports = {
   description: "Flip a coin.",
   aliases: ["flip", "coin"],
-  async execute (client, message) {
+  async execute (_, message) {
     const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     // Generate result

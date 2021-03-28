@@ -7,7 +7,7 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, [ playerChoice ]) {
+  async execute (_, message, [ playerChoice ]) {
     const choices = ["rock", "paper", "scissors"];
 
     playerChoice = playerChoice.toLowerCase();

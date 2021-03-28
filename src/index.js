@@ -31,6 +31,15 @@ client.loadEvents = async () => {
   console.log(chalk.green(`(${util.time()})`), `Successfully loaded ${client.events.length} events.`);
 };
 
+// client.loadEvents = async () => {
+//   const dir = await fs.promises.opendir(`${__dirname}/events`);
+//   for await (const dirent of dir) {
+//     const eventFile = require(`${__dirname}/events/${dirent.name}`);
+//     client.on(path.parse(dirent.name).name, eventFile.bind(null, client));
+//   }
+//   console.log(chalk.green(`(${util.time()})`), `Successfully loaded ${client.events.length} events.`);
+// };
+
 // Set up command handler
 client.loadCommands = async () => {
   client.commands = [];

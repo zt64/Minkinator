@@ -7,9 +7,11 @@
     "intents": [
       "GUILDS",
       "GUILD_MESSAGES",
+      "GUILD_BANS",
+      "GUILD_EMOJIS",
       "GUILD_MESSAGE_REACTIONS",
       "DIRECT_MESSAGES"
-    ],
+    ]
   },
   "auth": {
     "discord": "",

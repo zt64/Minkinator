@@ -1,6 +1,5 @@
 module.exports = {
   description: "Sends a message a certain amount of times using random members from the guilds Minkinator is in.",
-  permissions: ["MANAGE_WEBHOOKS"],
   parameters: [
     {
       name: "amount",

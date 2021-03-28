@@ -1,4 +1,5 @@
 const Sequelize = require("sequelize");
+const chalk = require("chalk");
 
 exports.create = async () => {
   const sequelize = new Sequelize("database", "user", "password", {
@@ -35,18 +36,14 @@ exports.create = async () => {
   return sequelize;
 };
 
-exports.initialize = async (guild) => {
-  const { models } = global.sequelize;
-
-  const guildInstance = await models.guild.findOrCreate({ where: { id: guild.id } });
-  await models.guildConfig.findOrCreate({ where: { guildId: guild.id } });
+exports.initialize = async (sequelize, guild) => {
+  const guildInstance = await sequelize.models.guild.findOrCreate({ where: { id: guild.id } });
+  await sequelize.models.guildConfig.findOrCreate({ where: { guildId: guild.id } });
 
   return guildInstance;
 };
 
 exports.checkMembers = async (guild, guildInstance) => {
-  const chalk = require("chalk");
-
   const databaseMembers = guildInstance.getMembers();
 
   if (!databaseMembers) return;

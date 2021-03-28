@@ -3,7 +3,9 @@ module.exports = {
   aliases: [ "mc" ],
   async execute (client, message, [ key, value ]) {
     const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-    const memberConfig = await global.sequelize.models.memberConfig.findByPk(message.author.id);
+    const [ memberConfig ] = await global.sequelize.models.memberConfig.findOrCreate({ where: { userId: message.author.id } });
+
+    delete memberConfig.dataValues.userId;
 
     const embed = new Discord.MessageEmbed({
       color: colors.default,

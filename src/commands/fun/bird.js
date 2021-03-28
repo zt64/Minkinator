@@ -1,7 +1,7 @@
 module.exports = {
   description: "Get a random picture of a bird!",
   aliases: [ "birb" ],
-  async execute (client, message) {
+  async execute (_, message) {
     const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const { link } = await util.fetchJSON("https://some-random-api.ml/img/birb");
 

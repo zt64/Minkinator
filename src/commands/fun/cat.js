@@ -8,7 +8,8 @@ module.exports = {
       type: String
     }
   ],
-  async execute (client, message, args) {
+  aliases: [ "kitty" ],
+  async execute (_, message, args) {
     const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     const search = args.join(" ");

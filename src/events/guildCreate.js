@@ -4,10 +4,10 @@ const chalk = require("chalk");
 module.exports = async (client, guild) => {
   console.log(chalk.green(`(${util.time()})`), `Minkinator has joined: ${guild.name} (${guild.id}).`);
 
-  await client.database.initialize(guild, global.sequelize);
+  await client.database.initialize(global.sequelize, guild);
 
   const botOwner = await client.users.fetch(global.config.ownerID);
-  botOwner.send(`Minkinator has been added to \`${guild.name} (${guild.id}\`).`);
+  await botOwner.send(`Minkinator has been added to \`${guild.name} (${guild.id}\`).`);
 
   // Set count values
   const users = pluralize("user", client.users.cache.size, true);

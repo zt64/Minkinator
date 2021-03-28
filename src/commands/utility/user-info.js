@@ -5,7 +5,7 @@ module.exports = {
       name: "member"
     }
   ],
-  aliases: [ "userinfo" ],
+  aliases: [ "userinfo", "bal", "balance", "money" ],
   async execute (client, message, [ mention ]) {
     const { colors, currency } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 

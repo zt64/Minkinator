@@ -1,4 +1,4 @@
-const { RiMarkov } = require("rita");
+const { PythonShell } = require("python-shell");
 const fetch = require("node-fetch");
 const moment = require("moment");
 
@@ -82,10 +82,26 @@ exports.time = (format = "HH:mm M/D/Y") => {
   return moment().format(format);
 };
 
-exports.generateSentence = async (data, start) => {
-  const rm = RiMarkov.fromJSON(data);
-  if (start) return rm.generate(1, { startTokens: start });
-  return rm.generate(1);
+exports.generateSentence = async (data) => {
+  const pyshell = new PythonShell(`${__basedir}/util/markov.py`, {
+    mode: "text"
+  });
+
+  let stdout = "";
+
+  pyshell.send(data);
+
+  return new Promise((resolve, reject) => {
+    // Send strings to python script
+    pyshell.on("message", (string) => {
+      stdout += string;
+    });
+
+    pyshell.end((err) => {
+      if (err) reject(err);
+      resolve(stdout);
+    });
+  });
 };
 
 exports.hasPermission = (member, command) => {

@@ -1,6 +1,5 @@
 const pluralize = require("pluralize");
 const Discord = require("discord.js");
-const RiTa = require("rita");
 const chalk = require("chalk");
 
 module.exports = async (client, message) => {
@@ -16,31 +15,38 @@ module.exports = async (client, message) => {
   }
 
   const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
+  const [ memberInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: message.author.id }, defaults: { guildId: message.guild.id }, include: { all: true } });
+
+  if (memberInstance.botBan) return;
   const { errorTimeout, prefix, colors } = guildInstance.config;
 
   // Generate markov on mention of self
-  if (message.mentions.has(client.user) || Math.random() >= 0.99) message.reply(await util.generateSentence(guildInstance.data), { allowedMentions: { parse: [ ] } });
+  if (message.mentions.has(client.user)) {
+    try {
+      message.reply(await util.generateSentence(guildInstance.data));
+      // message.reply(await util.generateSentence(guildInstance.data), { allowedMentions: { parse: [ ] } });
+    } catch (error) {
+      return;
+    }
+  } else if (Math.random() >= 0.99) {
+    try {
+      message.channel.send(await util.generateSentence(guildInstance.data));
+      // message.reply(await util.generateSentence(guildInstance.data), { allowedMentions: { parse: [ ] } });
+    } catch (error) {
+      return;
+    }
+  }
 
   // Write message to data.json
   if (!message.content.startsWith(prefix)) {
-    const rm = guildInstance.data.length ? RiTa.RiMarkov.fromJSON(guildInstance.data) : new RiTa.markov(3);
-
-    rm.tokenize = (string) => RiTa.tokenize(string, "\040");
-
     if (message.attachments.size) message.content += ` ${message.attachments.map(attachment => attachment.url).join()}`;
+    const newData = `${guildInstance.data += message.content}\n`;
 
-    rm.addText(message.content);
-
-    return guildInstance.update({ data: rm.toJSON() });
+    return guildInstance.update({ data: newData });
   }
 
   // const prefixPattern = new RegExp("^[a-zA-Z0-9<@: " + prefix + "]{2}");
   // if (!prefixPattern.test(message.content)) return;
-
-  const [ memberInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: message.author.id }, include: { all: true } });
-
-
-  if (memberInstance.botBan) return;
 
   // Check if command exists
   const parameters = message.content.slice(prefix.length).split(/ +/g);
@@ -65,7 +71,7 @@ module.exports = async (client, message) => {
       }
     });
 
-    return permissionError.delete({ timeout: errorTimeout });
+    return setTimeout(() => permissionError.delete(), errorTimeout);
   }
 
   // Check if parameters are correct
@@ -126,8 +132,7 @@ module.exports = async (client, message) => {
     usageEmbed.addField("Proper usage", `\`${prefix}${commandName}${name ? ` ${name} ` : " "}${array.join(" ")}\``);
 
     const usageMessage = await message.reply(usageEmbed);
-
-    return usageMessage.delete({ timeout: errorTimeout });
+    return setTimeout(() => usageMessage.delete(), errorTimeout);
   }
 
   // Check if command cool down exists
@@ -152,7 +157,7 @@ module.exports = async (client, message) => {
           }
         });
 
-        coolDownEmbed.delete({ timeout: errorTimeout });
+        return setTimeout(() => coolDownEmbed.delete(), errorTimeout);
       }
 
       timestamps.set(message.author.id, now);

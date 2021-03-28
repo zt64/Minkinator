@@ -1,3 +1,5 @@
+const ytdl = require("ytdl-core-discord");
+
 module.exports = {
   description: "Commands for interaction with voice chat.",
   aliases: ["vc"],
@@ -42,10 +44,17 @@ module.exports = {
         if (client.voice.connections.size === 0) return message.reply("Must be in voice channel before running.");
 
         const connection = client.voice.connections.first();
+        let dispatcher;
 
-        const ytdl = require("ytdl-core-discord");
-        const dispatcher = connection.play(await ytdl(url), { type: "opus", volume: false });
-
+        try {
+          dispatcher = connection.play(await ytdl(url), { type: "opus", volume: false });
+        } catch (error) {
+          try {
+            dispatcher = connection.play(url);
+          } catch (error) {
+            return message.reply("Failed to play URL.");
+          }
+        }
 
         dispatcher.on("error", console.error);
       }

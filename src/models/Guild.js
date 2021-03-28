@@ -5,8 +5,8 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true
     },
     data: {
-      type: DataTypes.JSON,
-      defaultValue: []
+      type: DataTypes.TEXT,
+      defaultValue: ""
     }
   });
 };

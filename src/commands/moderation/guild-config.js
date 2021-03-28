@@ -11,8 +11,10 @@ module.exports = {
       name: "value"
     }
   ],
-  async execute (client, message, [ key, value ]) {
+  async execute (_, message, [ key, value ]) {
     const guildConfig = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
+
+    delete guildConfig.dataValues.guildId;
 
     const embed = new Discord.MessageEmbed({
       color: guildConfig.colors.default,
