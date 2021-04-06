@@ -23,14 +23,14 @@ module.exports = async (client, message) => {
   // Generate markov on mention of self
   if (message.mentions.has(client.user)) {
     try {
-      message.reply(await util.generateSentence(guildInstance.data));
-      // message.reply(await util.generateSentence(guildInstance.data), { allowedMentions: { parse: [ ] } });
+      // message.reply(await util.generateSentence(guildInstance.data));
+      message.reply(await util.generateSentence(guildInstance.data), { allowedMentions: { parse: [ ] } });
     } catch (error) {
       return;
     }
   } else if (Math.random() >= 0.99) {
     try {
-      message.channel.send(await util.generateSentence(guildInstance.data));
+      // message.channel.send(await util.generateSentence(guildInstance.data));
       // message.reply(await util.generateSentence(guildInstance.data), { allowedMentions: { parse: [ ] } });
     } catch (error) {
       return;
