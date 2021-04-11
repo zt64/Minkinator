@@ -4,7 +4,6 @@ module.exports = {
   description: "Shows the current guilds and members Minkinator is watching.",
   aliases: ["servers"],
   async execute (client, message, [ page ]) {
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const guilds = client.guilds.cache.array();
     const pages = Math.ceil(guilds.length / 10);
 
@@ -13,7 +12,7 @@ module.exports = {
     if (page > pages || page < 1) return message.reply(`Page \`${page}\` does not exist.`);
 
     const guildsEmbed = new Discord.MessageEmbed({
-      color: colors.default,
+      color: global.config.colors.default,
       title: `Watching ${pluralize("guild", guilds.length, true)} and ${client.users.cache.size} users`,
       footer: { text: `Page ${page} of ${pages}` }
     });

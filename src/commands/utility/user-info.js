@@ -1,3 +1,5 @@
+const moment = require("moment");
+
 module.exports = {
   description: "Shows the users information.",
   parameters: [
@@ -7,7 +9,7 @@ module.exports = {
   ],
   aliases: [ "userinfo", "bal", "balance", "money" ],
   async execute (client, message, [ mention ]) {
-    const { colors, currency } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
+    const { currency } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     const user = await util.getUser(client, message, mention);
     if (!user) return message.reply("Please specify a valid member.");
@@ -18,11 +20,11 @@ module.exports = {
 
     // Create embed
     const infoEmbed = new Discord.MessageEmbed({
-      color: colors.default,
+      color: global.config.colors.default,
       author: { iconURL: user.avatarURL(), name: `User information: ${user.tag}` },
       fields: [
-        { name: "Created:", value: user.createdAt.toLocaleDateString(), inline: true },
-        { name: "Joined:", value: member.joinedAt.toLocaleDateString(), inline: true },
+        { name: "Created:", value: moment(user.createdAt).format("MMMM Do YYYY, h:mm a"), inline: true },
+        { name: "Joined:", value: moment(member.joinedAt).format("MMMM Do YYYY, h:mm a"), inline: true },
         { name: "Status", value: user.presence.status === "dnd" ? "DND" : util.capitalize(user.presence.status), inline: true },
         { name: "Balance:", value: `${currency}${util.formatNumber(balance, 2)}`, inline: true }
       ],

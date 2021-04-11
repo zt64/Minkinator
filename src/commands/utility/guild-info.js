@@ -3,13 +3,12 @@ const moment = require("moment");
 module.exports = {
   description: "Show guild information.",
   aliases: ["gi", "guildinfo"],
-  async execute (client, message) {
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
+  async execute (_, message) {
     const { guild } = message;
 
     // Create embed
     const infoEmbed = new Discord.MessageEmbed()
-      .setColor(colors.default)
+      .setColor(global.config.colors.default)
       .setThumbnail(guild.iconURL())
       .setTitle("Guild Information")
       .addField("Name:", guild.name, true)

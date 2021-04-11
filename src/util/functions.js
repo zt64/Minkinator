@@ -39,21 +39,13 @@ exports.getUser = async (client, message, idArg) => {
   return message.author;
 };
 
-exports.kToC = (k) => {
-  return (k - 273.15).toFixed(2);
-};
+exports.kToC = (k) => (k - 273.15).toFixed(2);
 
-exports.cToK = (c) => {
-  return c + 273.15;
-};
+exports.cToK = (c) => c + 273.15;
 
-exports.cToF = (c) => {
-  return (c * 1.8) + 32;
-};
+exports.cToF = (c) => (c * 1.8) + 32;
 
-exports.fToC = (f) => {
-  return (f - 32) / 1.8;
-};
+exports.fToC = (f) => (f - 32) / 1.8;
 
 exports.capitalize = (string) => {
   if (typeof (string) !== "string") return "";
@@ -74,13 +66,9 @@ exports.fetchJSON = async (url, options) => {
   return response.json();
 };
 
-exports.paginate = (items, size, page) => {
-  return items.slice((page - 1) * size, page * size);
-};
+exports.paginate = (items, size, page) => items.slice((page - 1) * size, page * size);
 
-exports.time = (format = "HH:mm M/D/Y") => {
-  return moment().format(format);
-};
+exports.time = (format = "HH:mm M/D/Y") => moment().format(format);
 
 exports.generateSentence = async (data) => {
   const pyshell = new PythonShell(`${__basedir}/util/markov.py`, {
@@ -94,13 +82,11 @@ exports.generateSentence = async (data) => {
   return new Promise((resolve, reject) => {
     // Send strings to python script
     pyshell.on("message", (string) => {
+      if (string === "None") reject();
       stdout += string;
     });
 
-    pyshell.end((err) => {
-      if (err) reject(err);
-      resolve(stdout);
-    });
+    pyshell.end((err) => err ? reject(err) : resolve(stdout));
   });
 };
 

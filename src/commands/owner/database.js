@@ -92,8 +92,6 @@ module.exports = {
       name: "info",
       description: "Shows information about the database.",
       async execute (client, message) {
-        const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-
         const { dependencies } = require(`${__basedir}/../package.json`);
 
         const sequelizeVersion = dependencies.sequelize;
@@ -104,7 +102,7 @@ module.exports = {
 
         return message.reply({
           embed: {
-            color: colors.default,
+            color: global.config.colors.default,
             title: "Database Information",
             fields: [
               { name: "Sequelize Version:", value: sequelizeVersion, inline: true },

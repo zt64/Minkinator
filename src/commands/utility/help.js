@@ -10,10 +10,10 @@ module.exports = {
     }
   ],
   async execute (client, message, [ commandName ]) {
-    const { prefix, colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
+    const { prefix } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const owner = await client.users.fetch(global.config.ownerID);
     const helpEmbed = new Discord.MessageEmbed({
-      color: colors.default,
+      color: global.config.colors.default,
       footer: { iconURL: owner.displayAvatarURL(), text: `Created by Litleck (${owner.tag})` }
     });
 
@@ -22,7 +22,7 @@ module.exports = {
 
       if (!command || (command.permissions && !message.member.hasPermission(command.permissions))) {
         return message.reply(new Discord.MessageEmbed({
-          color: colors.default,
+          color: global.config.colors.default,
           title: "Invalid Command",
           description: `\`${commandName}\` is not a valid command.`
         }));

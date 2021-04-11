@@ -14,10 +14,8 @@ module.exports = {
 
     if (!choices.includes(playerChoice)) return message.reply(`\`${playerChoice}\` is not a valid choice.`);
 
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-
     const embed = new Discord.MessageEmbed({
-      color: colors.default,
+      color: global.config.colors.default,
       title: "Rock Paper Scissors"
     });
 

@@ -8,14 +8,12 @@ module.exports = {
     }
   ],
   async execute (client, message, string) {
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-
-    const flipped = string.join(" ").split("").reverse().join("");
+    const reversedText = string.join(" ").split("").reverse().join("");
 
     return message.reply({ embed: {
-      color: colors.default,
+      color: global.config.colors.default,
       title: "Reversed Text",
-      description: flipped
+      description: reversedText
     } });
   }
 };

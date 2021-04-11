@@ -20,7 +20,6 @@ exports.create = async () => {
   const Member = require("./Member.js")(sequelize, Sequelize);
   const MemberConfig = require("./MemberConfig.js")(sequelize, Sequelize);
 
-  const Item = require("./Item.js")(sequelize, Sequelize);
   const Command = require("./Command.js")(sequelize, Sequelize);
 
   // Set up associations
@@ -29,7 +28,6 @@ exports.create = async () => {
 
   Guild.hasMany(Command);
   Guild.hasMany(Member);
-  Guild.hasMany(Item);
 
   await sequelize.sync();
 

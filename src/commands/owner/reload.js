@@ -2,11 +2,10 @@ module.exports = {
   description: "Reloads all the bot events and commands.",
   aliases: ["r"],
   async execute (client, message) {
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const { commands, events } = client;
 
     const reloadEmbed = new Discord.MessageEmbed({
-      color: colors.default,
+      color: global.config.colors.default,
       title: "Reloading",
       description: `Reloading \`${commands.length}\` commands and \`${events.length}\` events.`
     });

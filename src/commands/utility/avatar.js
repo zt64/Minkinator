@@ -8,8 +8,6 @@ module.exports = {
     }
   ],
   async execute (client, message, [ member ]) {
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-
     // Get user
     const user = await util.getUser(client, message, member);
     const avatar = user.displayAvatarURL({ format: "png", dynamic: true, size: 256 });
@@ -17,7 +15,7 @@ module.exports = {
     // Send embed
     return message.reply({
       embed: {
-        color: colors.default,
+        color: global.config.colors.default,
         title: `Avatar of ${user.tag}`,
         url: avatar,
         image: { url: avatar },

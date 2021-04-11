@@ -13,11 +13,6 @@ module.exports = (sequelize, DataTypes) => {
     botBan: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
-    },
-    inventory: {
-      type: DataTypes.JSON,
-      allowNull: false,
-      defaultValue: []
     }
   });
 };

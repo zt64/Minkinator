@@ -8,8 +8,7 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, args) {
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
+  async execute (_, message, args) {
     const text = args.join(" ");
 
     const response = await fetch(`https://image-charts.com/chart?chs=150x150&cht=qr&chl=${text}`);
@@ -18,7 +17,7 @@ module.exports = {
 
     return message.reply({
       embed: {
-        color: colors.default,
+        color: global.config.colors.default,
         title: "QR Code",
         description: text,
         image: { url: response.url },

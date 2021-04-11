@@ -3,11 +3,9 @@ const { dependencies } = require(`${__basedir}/../package.json`);
 module.exports = {
   description: "Shows all the packages that Minkinator is using.",
   aliases: ["pkg", "pkgs"],
-  async execute (client, message) {
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-
+  async execute (_, message) {
     const packageEmbed = new Discord.MessageEmbed({
-      color: colors.default,
+      color: global.config.colors.default,
       title: "Packages"
     });
 

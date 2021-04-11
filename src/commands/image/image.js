@@ -9,7 +9,6 @@ module.exports = {
     }
   ],
   async execute(client, message, args) {
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const form = new FormData();
     const text = args.join(" ");
 
@@ -23,7 +22,7 @@ module.exports = {
 
     return message.reply({
       embed: {
-        color: colors.default,
+        color: global.config.colors.default,
         title: "DeepAI Text to Image",
         description: text,
         image: { url: output_url },

@@ -18,7 +18,7 @@ module.exports = async (client, message) => {
   const [ memberInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: message.author.id }, defaults: { guildId: message.guild.id }, include: { all: true } });
 
   if (memberInstance.botBan) return;
-  const { errorTimeout, prefix, colors } = guildInstance.config;
+  const { errorTimeout, prefix } = guildInstance.config;
 
   // Generate markov on mention of self
   if (message.mentions.has(client.user)) {
@@ -63,7 +63,7 @@ module.exports = async (client, message) => {
   if (!util.hasPermission(message.member, command)) {
     const permissionError = await message.reply({
       embed: {
-        color: colors.error,
+        color: global.config.colors.error,
         title: "Missing Permissions",
         fields: [
           { name: "You are missing one of the following permissions:", value: command.permissions.join(", ") || "Bot Owner Only" }
@@ -76,7 +76,7 @@ module.exports = async (client, message) => {
 
   // Check if parameters are correct
   const usageEmbed = new Discord.MessageEmbed({
-    color: colors.error,
+    color: global.config.colors.error,
     title: `Improper usage of ${commandName}`,
     description: command.description
   });
@@ -151,7 +151,7 @@ module.exports = async (client, message) => {
 
         const coolDownEmbed = await message.reply({
           embed: {
-            color: colors.error,
+            color: global.config.colors.error,
             title: "Cool down active",
             description: `Please wait, a cool down of ${pluralize("second", timeLeft.toFixed(1), true)} is remaining.`
           }
@@ -179,7 +179,7 @@ module.exports = async (client, message) => {
 
     return message.reply({
       embed: {
-        color: colors.error,
+        color: global.config.colors.error,
         title: "An error has occurred",
         description: `\`\`\`js\n${error}\`\`\``,
         footer: { text: "See console for more information" }

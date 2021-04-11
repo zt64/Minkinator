@@ -11,8 +11,6 @@ module.exports = {
     }
   ],
   async execute (client, message, [ messageEmoji ]) {
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-
     let url;
 
     // Check if emoji is a guild emoji
@@ -31,7 +29,7 @@ module.exports = {
     }
 
     return message.channel.send(new Discord.MessageEmbed({
-      color: colors.default,
+      color: global.config.colors.default,
       title: "Scaled Emoji",
       url: url,
       image: { url }

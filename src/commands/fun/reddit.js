@@ -18,8 +18,6 @@ module.exports = {
     }
   ],
   async execute (client, message, [ subreddit ]) {
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-
     const body = await fetch(`https://api.reddit.com/r/${subreddit}/hot?limit=64`).then(response => response.json());
 
     // Check if subreddit exists and has posts
@@ -34,12 +32,15 @@ module.exports = {
     const post = posts[Math.floor(Math.random() * posts.length)].data;
 
     // Create embed
-    const embed = new Discord.MessageEmbed()
-      .setColor(colors.default)
-      .setTitle(`r/${subreddit} ${post.title}`)
-      .setURL(`https://reddit.com${post.permalink}`)
-      .addField("Author:", `\`${post.author}\``, true)
-      .addField("Score:", post.score, true);
+    const embed = new Discord.MessageEmbed({
+      color: global.config.colors.default,
+      title: `r/${subreddit} ${post.title}`,
+      url: `https://reddit.com${post.permalink}`,
+      fields: [
+        { name: "Author:", value: `\`${post.author}\``, inline: true },
+        { name: "Score:", value: post.score, inline: true }
+      ]
+    });
 
     if (post.selftext) embed.setDescription(entities.decodeHTML(post.selftext));
     if (post.url.endsWith(".jpg") || post.url.endsWith(".png")) embed.setImage(post.url);

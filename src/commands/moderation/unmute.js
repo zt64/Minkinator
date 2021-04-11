@@ -14,7 +14,6 @@ module.exports = {
   ],
   async execute (client, message) {
     if (!message.mentions.members.first()) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     const member = message.mentions.members.first();
 
@@ -24,7 +23,7 @@ module.exports = {
     // Send embed
     return message.reply({
       embed: {
-        color: colors.default,
+        color: global.config.colors.default,
         author: { iconURL: member.user.displayAvatarURL(), name: `${member.user.tag} has been unmuted` },
         footer: { text: member.id }
       }

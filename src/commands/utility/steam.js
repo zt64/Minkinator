@@ -12,7 +12,6 @@ module.exports = {
         }
       ],
       async execute (client, message, [ steamID ]) {
-        const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
         const key = global.config.auth.steam;
 
         const json = await util.fetchJSON(`http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=${key}&steamids=${steamID}`);
@@ -24,7 +23,7 @@ module.exports = {
 
         return message.reply({
           embed: {
-            color: colors.default,
+            color: global.config.colors.default,
             author: { iconURL: user.avatar, name: user.personaname },
             title: "Steam User Summary",
             url: user.profile.url,

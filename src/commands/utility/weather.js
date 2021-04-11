@@ -8,8 +8,6 @@ module.exports = {
     }
   ],
   async execute (client, message, [ cityName ]) {
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-
     // Fetch data from API
     const data = await util.fetchJSON(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${global.config.auth.openWeatherMap}`);
 
@@ -17,28 +15,30 @@ module.exports = {
 
     if (data.cod === "404") return message.reply("Invalid location.");
 
-    const { weather } = data;
-    const { main } = data;
+    const { weather, main } = data;
 
-    const embed = new Discord.MessageEmbed()
-      .setColor(colors.default)
-      .setTitle(`Weather for ${data.name}`)
-      .addField("Longitude:", data.coord.lon, true)
-      .addField("Latitude:", data.coord.lat, true)
-      .addField("Weather:", weather[0].main, true)
-      .addField("Weather Description:", weather[0].description, true)
-      .addField("Temperature:", `${util.kToC(main.temp)} C`, true)
-      .addField("Feels Like:", `${util.kToC(main.feels_like)} C`, true)
-      .addField("Minimum Temperature:", `${util.kToC(main.temp_min)} C`, true)
-      .addField("Maximum Temperature:", `${util.kToC(main.temp_max)} C`, true)
-      .addField("Pressure:", `${main.pressure}`)
-      .addField("Humidity:", `${main.humidity}`)
-      .addField("Visibility:", `${util.formatNumber(parseInt(data.visibility))} m`)
-      .addField("Wind Speed:", data.wind.speed, true)
-      .addField("Wind Direction:", data.wind.deg, true)
-      .addField("Clouds:", data.clouds.all)
-      .addField("Country Code:", data.sys.country);
-
-    return message.reply(embed);
+    return message.reply({
+      embed: {
+        color: global.config.colors.default,
+        title: `Weather for ${data.name}`,
+        fields: [
+          { name: "Longitude:", value: data.coord.lon, inline: true },
+          { name: "Latitude:", value: data.coord.lat, inline: true },
+          { name: "Weather:", value: weather[0].main, inline: true },
+          { name: "Weather Description:", value: weather[0].description, inline: true },
+          { name: "Temperature:", value: `${util.kToC(main.temp)} C`, inline: true },
+          { name: "Feels Like:", value: `${util.kToC(main.feels_like)} C`, inline: true },
+          { name: "Minimum Temperature:", value: `${util.kToC(main.temp_min)} C`, inline: true },
+          { name: "Maximum Temperature:", value: `${util.kToC(main.temp_max)} C`, inline: true },
+          { name: "Pressure:", value: main.pressure },
+          { name: "Humidity:", value: main.humidity },
+          { name: "Visibility:", value: `${util.formatNumber(parseInt(data.visibility))} m`, inline: true },
+          { name: "Wind Speed:", value: data.wind.speed },
+          { name: "Wind Direction:", value: data.wind.deg },
+          { name: "Clouds:", value: data.clouds.all },
+          { name: "Country Code:", value: data.sys.country }
+        ]
+      }
+    });
   }
 };

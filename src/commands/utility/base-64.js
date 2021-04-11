@@ -19,7 +19,7 @@ module.exports = {
     },
     {
       name: "decode",
-      descripton: "Decode a base64 string.",
+      description: "Decode a base64 string.",
       parameters: [
         {
           name: "string",

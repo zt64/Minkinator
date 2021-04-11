@@ -8,8 +8,6 @@ module.exports = {
     }
   ],
   async execute (client, message, [ sides ]) {
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-
     if (isNaN(sides)) sides = 6;
 
     // Generate number
@@ -17,7 +15,7 @@ module.exports = {
 
     // Create embed
     const diceEmbed = new Discord.MessageEmbed({
-      color: colors.default,
+      color: global.config.colors.default,
       title: "Dice Roll",
       description: "Rolling..."
     });

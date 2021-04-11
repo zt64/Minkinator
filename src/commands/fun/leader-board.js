@@ -9,7 +9,7 @@ module.exports = {
   ],
   async execute (client, message, [ page ]) {
     const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true, nested: true } });
-    const { config: { currency, colors } } = guildInstance;
+    const {  currency } = guildInstance.config;
 
     // Set members const and sort by balance
     const members = await guildInstance.getMembers({ order: [ [ "balance", "DESC" ] ] });
@@ -19,7 +19,7 @@ module.exports = {
 
     // Create embed
     const leaderBoardEmbed = new Discord.MessageEmbed({
-      color: colors.default,
+      color: global.config.colors.default,
       title: "Leader Board",
       footer: `Page ${page} of ${pages}`
     });

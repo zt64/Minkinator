@@ -1,13 +1,11 @@
 module.exports = {
   description: "Gets a random fox image.",
   async execute (client, message) {
-    const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-
     const fox = await util.fetchJSON("https://randomfox.ca/floof/");
 
     return message.reply({
       embed: {
-        color: colors.default,
+        color: global.config.colors.default,
         title: "Random Fox",
         url: fox.link,
         image: { url: fox.image },

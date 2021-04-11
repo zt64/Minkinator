@@ -6,7 +6,7 @@ module.exports = {
   async execute (client, message) {
     const { randomInteger, sleep } = util;
 
-    const { currency, colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
+    const { currency } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
     let correctIndex = 0;
 
@@ -31,11 +31,12 @@ module.exports = {
     const reward = randomInteger(20, 50);
 
     // Create embed
-    const questionEmbed = new Discord.MessageEmbed()
-      .setColor(colors.default)
-      .setTitle(`${response.category} question`)
-      .setDescription(question)
-      .setFooter(`This question is worth ${currency}${reward}`);
+    const questionEmbed = new Discord.MessageEmbed({
+      color: global.config.colors.default,
+      title: `${response.category} question`,
+      description: question,
+      footer: { text: `This question is worth ${currency}${reward}` }
+    });
 
     if (response.type === "multiple") {
       answers.map((answer, index) => questionEmbed.addField(letters[index], entities.decodeHTML(answer), true));
@@ -73,7 +74,7 @@ module.exports = {
     }
 
     const answerEmbed = new Discord.MessageEmbed({
-      color: colors.default,
+      color: global.config.colors.default,
       title: "Trivia Answer"
     });
 

@@ -20,8 +20,6 @@ module.exports = {
         }
       ],
       async execute (client, message, [ owner, name ]) {
-        const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-
         const json = await util.fetchJSON(`https://api.github.com/repos/${owner}/${name}`);
 
         if (json.message === "Not Found") return message.reply("Could not find repository.");
@@ -31,7 +29,7 @@ module.exports = {
 
         // Create embed
         const embed = new Discord.MessageEmbed({
-          color: colors.default,
+          color: global.config.colors.default,
           title: json.full_name,
           url: json.html_url,
           fields: [
@@ -65,15 +63,13 @@ module.exports = {
         }
       ],
       async execute (client, message, [ user ]) {
-        const { colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
-
         const json = await util.fetchJSON(`https://api.github.com/users/${user}`);
 
         if (json.message === "Not Found") return message.reply("Could not find user.");
 
         // Create embed
         const embed = new Discord.MessageEmbed({
-          color: colors.default,
+          color: global.config.colors.default,
           title: json.login,
           url: json.html_url,
           fields: [
