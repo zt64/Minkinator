@@ -17,7 +17,7 @@
       "DIRECT_MESSAGES"
     ]
   },
-  "colors:": {
+  "colors": {
     "default": "#1ED760",
     "error": "#CC0000"
   },
