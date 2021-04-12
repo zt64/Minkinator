@@ -47,19 +47,6 @@ module.exports = {
       return message.reply(helpEmbed);
     }
 
-    helpEmbed.setTitle("🏠 Home Page");
-    helpEmbed.setDescription(`There is a total of 6 command categories. For information on a specific command, run: \`${prefix}help <command>\``);
-    helpEmbed.addFields([
-      { name: "🥳 Fun", value: "Fun commands to play around with." },
-      { name: "💵 Economy ", value: "Buy, sell, and make a profit." },
-      { name: "👤 Member", value: "Member related commands." },
-      { name: "🖌️ Image", value: "Manipulate an image as you desire." },
-      { name: "🛠️ Utility", value: "Variety of commands with their own uses." },
-      { name: "🔒 Moderation", value: "Commands to manage a server." }
-    ]);
-
-    const helpMessage = await message.reply(helpEmbed);
-
     const categories = {
       "🥳": "fun",
       "💵": "economy",
@@ -68,6 +55,28 @@ module.exports = {
       "🛠️": "utility",
       "🔒": "moderation"
     };
+
+    const descriptions = {
+      "fun": "Fun commands to play around with.",
+      "economy": "Buy, sell, and make a profit.",
+      "member": "Member related commands.",
+      "image": "Manipulate an image as you desire.",
+      "utility": "Variety of commands with their own uses.",
+      "moderation": "Commands to manage a server."
+    };
+
+    let categoryCount = Object.keys(categories).length;
+
+    helpEmbed.setTitle("🏠 Home Page");
+    helpEmbed.setDescription(`There is a total of ${categoryCount} command categories. For information on a specific command, run: \`${prefix}help <command>\``);
+    
+    for ([emoji, categoryName] of Object.entries(categories)) {
+      let categoryDescription = descriptions[categoryName];
+      categoryName = categoryName.charAt(0).toUpperCase() + categoryName.slice(1) // nightmare
+      helpEmbed.addField(`${emoji} ${categoryName}`, categoryDescription, false)
+    };
+
+    const helpMessage = await message.reply(helpEmbed);
 
     Object.keys(categories).forEach(async reaction => await helpMessage.react(reaction));
 
