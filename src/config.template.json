@@ -6,12 +6,20 @@
     "fetchAllMembers": true,
     "intents": [
       "GUILDS",
-      "GUILD_MESSAGES",
       "GUILD_BANS",
       "GUILD_EMOJIS",
+      "GUILD_MEMBERS",
+      "GUILD_MESSAGES",
+      "GUILD_WEBHOOKS",
+      "GUILD_PRESENCES",
+      "GUILD_VOICE_STATES",
       "GUILD_MESSAGE_REACTIONS",
       "DIRECT_MESSAGES"
     ]
+  },
+  "colors:": {
+    "default": "#1ED760",
+    "error": "#CC0000"
   },
   "auth": {
     "discord": "",
