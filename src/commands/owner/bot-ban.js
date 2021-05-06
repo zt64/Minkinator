@@ -9,7 +9,7 @@ module.exports = {
   ],
   async execute (client, message, [ member ]) {
     const user = await util.getUser(client, message, member);
-    const memberInstance = await global.sequelize.models.member.findByPk(user.id);
+    const memberInstance = await global.sequelize.models.user.findByPk(user.id);
 
     // Toggle state on a member
     const state = memberInstance.botBan ? "unbanned" : "banned";

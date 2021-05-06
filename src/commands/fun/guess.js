@@ -13,7 +13,7 @@ module.exports = {
 
     if (guess < 1 || guess > 100) return message.reply("Guess must be 1 - 100, inclusive.");
 
-    const memberInstance = await global.sequelize.models.member.findByPk(message.author.id);
+    const memberInstance = await global.sequelize.models.user.findByPk(message.author.id);
     const { currency, colors } = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
     const { formatNumber, randomInteger } = util;
 

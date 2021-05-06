@@ -4,7 +4,7 @@ module.exports = {
   description: "Shows the users information.",
   parameters: [
     {
-      name: "member"
+      name: "user"
     }
   ],
   aliases: [ "userinfo", "bal", "balance", "money" ],
@@ -16,7 +16,7 @@ module.exports = {
 
     const member = await message.guild.members.fetch(user.id);
 
-    const { balance } = await global.sequelize.models.member.findByPk(user.id);
+    const { balance } = await global.sequelize.models.user.findByPk(user.id);
 
     // Create embed
     const infoEmbed = new Discord.MessageEmbed({

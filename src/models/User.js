@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define("member", {
-    userId: {
+  return sequelize.define("user", {
+    id: {
       type: DataTypes.TEXT,
       primaryKey: true,
       unique: true

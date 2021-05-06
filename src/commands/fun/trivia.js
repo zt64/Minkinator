@@ -68,7 +68,7 @@ module.exports = {
 
     // Update balances
     for (const user of users) {
-      const memberInstance = await global.sequelize.models.member.findByPk(user.id);
+      const memberInstance = await global.sequelize.models.user.findByPk(user.id);
 
       await memberInstance.increment("balance", { by: reward });
     }

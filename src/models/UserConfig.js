@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-  return sequelize.define("memberConfig", {
+  return sequelize.define("userConfig", {
     userId: {
       type: DataTypes.TEXT,
       primaryKey: true,

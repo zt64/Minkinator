@@ -14,17 +14,17 @@ module.exports = async (client, message) => {
     return botOwner.send(`Message from \`${tag} (${id})\`:\n${message.content}`);
   }
 
-  const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: { all: true } });
-  const [ memberInstance ] = await global.sequelize.models.member.findOrCreate({ where: { userId: message.author.id }, defaults: { guildId: message.guild.id }, include: { all: true } });
+  const guildInstance = await global.sequelize.models.guild.findByPk(message.guild.id, { include: [ "config", "commands" ] });
+  const [ userInstance ] = await global.sequelize.models.user.findOrCreate({ where: { id: message.author.id }, include: { all: true } });
 
-  if (memberInstance.botBan) return;
+  if (userInstance.botBan) return;
   const { errorTimeout, prefix } = guildInstance.config;
 
   // Generate markov on mention of self
   if (message.mentions.has(client.user)) {
     try {
       // message.reply(await util.generateSentence(guildInstance.data));
-      message.reply(await util.generateSentence(guildInstance.data), { allowedMentions: { parse: [ ] } });
+      message.reply(await util.generateSentence(guildInstance.data), { allowedMentions: { repliedUser: true } });
     } catch (error) {
       return;
     }
@@ -37,12 +37,11 @@ module.exports = async (client, message) => {
     }
   }
 
-  // Write message to data.json
   if (!message.content.startsWith(prefix)) {
     if (message.attachments.size) message.content += ` ${message.attachments.map(attachment => attachment.url).join()}`;
     const newData = `${guildInstance.data += message.content}\n`;
 
-    return guildInstance.update({ data: newData });
+    return await guildInstance.update({ data: newData });
   }
 
   // const prefixPattern = new RegExp("^[a-zA-Z0-9<@: " + prefix + "]{2}");
@@ -169,7 +168,7 @@ module.exports = async (client, message) => {
     timestamps.set(message.author.id, now);
   }
 
-  console.log(chalk.green(`(${util.time()})`), chalk.cyan(`(${message.guild.name} #${message.channel.name})`), chalk.yellow(message.author.tag), message.content);
+  console.log(chalk.cyan(`(${message.guild.name} #${message.channel.name})`), chalk.yellow(message.author.tag), message.content);
 
   // Execute the command
   try {

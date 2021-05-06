@@ -24,7 +24,7 @@ module.exports = {
     const command = client.commands.get(commandName) || [...client.commands.values()].find(cmd => cmd.aliases && cmd.aliases.includes(commandName));
     const { guildInstance } = global;
 
-    let memberInstance = await global.sequelize.models.member.findOrCreate({ where: { userId: userID } }, { include: { all: true, nested: true } });
+    let memberInstance = await global.sequelize.models.user.findOrCreate({ where: { userId: userID } }, { include: { all: true, nested: true } });
     if (!memberInstance) memberInstance = await guildInstance.createMember({ userId: userID, guildId: message.guild.id });
 
     return command.execute(client, message, commandArgs);
