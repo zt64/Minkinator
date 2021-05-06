@@ -37,6 +37,7 @@ module.exports = {
       ]);
 
       if (command.aliases) helpEmbed.addField("Aliases:", command.aliases.join(", "), true);
+      if (command.subCommands) helpEmbed.addField("Sub Commands:", command.subCommands.map(subCommand => subCommand.name).join(", "));
 
       if (command.parameters) {
         const array = command.parameters.map(parameter => parameter.required ? `[${parameter.name}]` : `<${parameter.name}>`);
@@ -49,8 +50,6 @@ module.exports = {
 
     const categories = {
       "🥳": "fun",
-      "💵": "economy",
-      "👤": "member",
       "🖌️": "image",
       "🛠️": "utility",
       "🔒": "moderation"
@@ -58,8 +57,6 @@ module.exports = {
 
     const descriptions = {
       "fun": "Fun commands to play around with.",
-      "economy": "Buy, sell, and make a profit.",
-      "member": "Member related commands.",
       "image": "Manipulate an image as you desire.",
       "utility": "Variety of commands with their own uses.",
       "moderation": "Commands to manage a server."
@@ -69,12 +66,12 @@ module.exports = {
 
     helpEmbed.setTitle("🏠 Home Page");
     helpEmbed.setDescription(`There is a total of ${categoryCount} command categories. For information on a specific command, run: \`${prefix}help <command>\``);
-    
-    for ([emoji, categoryName] of Object.entries(categories)) {
+
+    for (let [emoji, categoryName] of Object.entries(categories)) {
       let categoryDescription = descriptions[categoryName];
-      categoryName = categoryName.charAt(0).toUpperCase() + categoryName.slice(1) // nightmare
-      helpEmbed.addField(`${emoji} ${categoryName}`, categoryDescription, false)
-    };
+      categoryName = categoryName.charAt(0).toUpperCase() + categoryName.slice(1); // nightmare
+      helpEmbed.addField(`${emoji} ${categoryName}`, categoryDescription, false);
+    }
 
     const helpMessage = await message.reply(helpEmbed);
 
