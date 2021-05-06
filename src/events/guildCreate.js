@@ -2,7 +2,7 @@ const pluralize = require("pluralize");
 const chalk = require("chalk");
 
 module.exports = async (client, guild) => {
-  console.log(chalk.green(`(${util.time()})`), `Minkinator has joined: ${guild.name} (${guild.id}).`);
+  console.log(`Minkinator has joined: ${guild.name} (${guild.id}).`);
 
   await client.database.initialize(global.sequelize, guild);
 

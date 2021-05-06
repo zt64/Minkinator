@@ -2,8 +2,7 @@ const pluralize = require("pluralize");
 const chalk = require("chalk");
 
 module.exports = async (client, guild) => {
-  if (guild.id === "810990219281039391") return;
-  console.log(chalk.green(`(${util.time()})`), `Minkinator has left: ${guild.name} (${guild.id}).`);
+  console.log(`Minkinator has left: ${guild.name} (${guild.id}).`);
 
   const botOwner = await client.users.fetch(global.config.ownerID);
   botOwner.send(`Minkinator has been removed from \`${guild.name} (${guild.id}\`).`);

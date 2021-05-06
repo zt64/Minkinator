@@ -13,7 +13,7 @@ module.exports = async (client, { guild, user }) => {
 
   client.user.setActivity(`${users} in ${guilds}`, { type: "WATCHING" });
 
-  console.log(chalk.green(`(${util.time()})`), `${user.tag} has joined ${guild.name}.`);
+  console.log(`${user.tag} has joined ${guild.name}.`);
 
   return channel.send(new Discord.MessageEmbed({
     color: config.colors.default,

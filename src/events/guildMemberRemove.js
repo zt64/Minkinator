@@ -14,10 +14,10 @@ module.exports = async (client, { guild, user }) => {
 
   await client.user.setActivity(`${users} in ${guilds}`, { type: "WATCHING" });
 
-  const data = await models.member.findByPk(user.id);
+  const data = await models.user.findByPk(user.id);
   if (data) await data.destroy();
 
-  console.log(chalk.green(`(${util.time()})`), `${user.tag} has left ${guild.name}.`);
+  console.log(`${user.tag} has left ${guild.name}.`);
 
   return channel.send(new Discord.MessageEmbed({
     color: config.colors.default,

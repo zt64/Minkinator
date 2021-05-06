@@ -28,17 +28,8 @@ client.loadEvents = async () => {
     return event;
   });
 
-  console.log(chalk.green(`(${util.time()})`), `Successfully loaded ${client.events.length} events.`);
+  console.log(`Successfully loaded ${client.events.length} events.`);
 };
-
-// client.loadEvents = async () => {
-//   const dir = await fs.promises.opendir(`${__dirname}/events`);
-//   for await (const dirent of dir) {
-//     const eventFile = require(`${__dirname}/events/${dirent.name}`);
-//     client.on(path.parse(dirent.name).name, eventFile.bind(null, client));
-//   }
-//   console.log(chalk.green(`(${util.time()})`), `Successfully loaded ${client.events.length} events.`);
-// };
 
 // Set up command handler
 client.loadCommands = async () => {
@@ -58,7 +49,7 @@ client.loadCommands = async () => {
       try {
         command = require(commandPath);
       } catch (error) {
-        console.log(chalk.green(`(${util.time()})`), `Failed to load ${commandName}, skipping.`);
+        console.log(`Failed to load ${commandName}, skipping.`);
         return console.error(error);
       }
 
@@ -71,7 +62,7 @@ client.loadCommands = async () => {
     });
   });
 
-  console.log(chalk.green(`(${util.time()})`), `Successfully loaded ${client.commands.length} commands.`);
+  console.log(`Successfully loaded ${client.commands.length} commands.`);
 };
 
 // Load events and commands
