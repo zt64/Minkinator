@@ -11,8 +11,6 @@ module.exports = {
     // Fetch data from API
     const data = await util.fetchJSON(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${global.config.auth.openWeatherMap}`);
 
-    console.log(data);
-
     if (data.cod === "404") return message.reply("Invalid location.");
 
     const { weather, main } = data;

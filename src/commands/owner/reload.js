@@ -1,3 +1,5 @@
+const chalk = require("chalk");
+
 module.exports = {
   description: "Reloads all the bot events and commands.",
   aliases: ["r"],
@@ -18,7 +20,7 @@ module.exports = {
     try {
       await client.loadEvents();
     } catch (error) {
-      console.error(error);
+      console.error(chalk`{red ${error}}`);
 
       return message.reply("An error has occurred while reloading events.");
     }
@@ -27,7 +29,7 @@ module.exports = {
     try {
       await client.loadCommands();
     } catch (error) {
-      console.error(error);
+      console.error(chalk`{red ${error}}`);
 
       return message.reply("An error has occurred while reloading commands.");
     }

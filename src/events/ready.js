@@ -8,7 +8,7 @@ module.exports = async (client) => {
     await client.database.initialize(sequelize, guild);
   }
 
-  console.log(`Initialized database for ${pluralize("guild", client.guilds.cache.size, true)}.`);
+  console.log(chalk`{green Initialized database for {bold ${client.guilds.cache.size}} ${pluralize("guild", client.guilds.cache.size)}.}`);
 
   // Pluralize user and guild counts
   const users = pluralize("user", client.users.cache.size, true);
@@ -17,5 +17,5 @@ module.exports = async (client) => {
   // Set the user activity
   await client.user.setActivity(`${users} in ${guilds}`, { type: "WATCHING" });
 
-  return console.log("Minkinator is now online.");
+  return console.log(chalk`{inverse.green Minkinator is now online.}`);
 };

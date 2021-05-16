@@ -28,7 +28,7 @@ client.loadEvents = async () => {
     return event;
   });
 
-  console.log(`Successfully loaded ${client.events.length} events.`);
+  console.log(chalk`{green Successfully loaded {bold ${client.events.length}} events.}`);
 };
 
 // Set up command handler
@@ -49,8 +49,8 @@ client.loadCommands = async () => {
       try {
         command = require(commandPath);
       } catch (error) {
-        console.log(`Failed to load ${commandName}, skipping.`);
-        return console.error(error);
+        console.error(chalk `{red Failed to load {bold ${commandName}}, skipping.}`);
+        return console.error(chalk`{red ${error.stack}}`);
       }
 
       if (category === "owner") command.ownerOnly = true;
@@ -62,7 +62,7 @@ client.loadCommands = async () => {
     });
   });
 
-  console.log(`Successfully loaded ${client.commands.length} commands.`);
+  console.log(chalk`{green Successfully loaded {bold ${client.commands.length}} commands.}`);
 };
 
 // Load events and commands
@@ -70,12 +70,12 @@ client.loadEvents();
 client.loadCommands();
 
 // Login to Discord API
-if (!config.auth.discord) return console.error("No token provided, enter a token in to the auth file to login.");
+if (!config.auth.discord) return console.error(chalk`{red No token provided, enter a token in to the auth file to login.}`);
 
 client.login(config.auth.discord);
 
 // Handle promise rejections
-process.on("unhandledRejection", (error) => console.log(error.stack));
+process.on("unhandledRejection", (error) => console.error(chalk`{red ${error.stack}}`));
 
 process.on("SIGINT", () => {
   client.destroy();

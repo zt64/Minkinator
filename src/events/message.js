@@ -24,7 +24,9 @@ module.exports = async (client, message) => {
   if (message.mentions.has(client.user)) {
     try {
       // message.reply(await util.generateSentence(guildInstance.data));
-      message.reply(await util.generateSentence(guildInstance.data), { allowedMentions: { repliedUser: true } });
+      const sentence = await util.generateSentence(guildInstance.data);
+      message.reply(sentence, { allowedMentions: { repliedUser: true } });
+      console.log(chalk`{cyan (${message.guild.name} #${message.channel.name})} {green Sent markov:} ${sentence}`);
     } catch (error) {
       return;
     }
@@ -168,13 +170,13 @@ module.exports = async (client, message) => {
     timestamps.set(message.author.id, now);
   }
 
-  console.log(chalk.cyan(`(${message.guild.name} #${message.channel.name})`), chalk.yellow(message.author.tag), message.content);
+  console.log(chalk`{cyan (${message.guild.name} #${message.channel.name})} {yellow ${(message.author.tag)}:} ${message.content}`);
 
   // Execute the command
   try {
     return command.execute(client, message, parameters);
   } catch (error) {
-    console.error(error);
+    console.error(chalk`{red ${error}}`);
 
     return message.reply({
       embed: {
