@@ -8,6 +8,8 @@ module.exports = {
     }
   ],
   async execute (client, message, [ cityName ]) {
+    cityName = encodeURIComponent(cityName);
+    
     // Fetch data from API
     const data = await util.fetchJSON(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${global.config.auth.openWeatherMap}`);
 
