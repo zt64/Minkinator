@@ -9,7 +9,7 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, [ count ]) {
+  async execute (_, message, [ count ]) {
     count = parseInt(count);
 
     // Check if input is valid

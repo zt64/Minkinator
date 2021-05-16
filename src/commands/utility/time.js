@@ -2,6 +2,7 @@ const moment = require("moment");
 
 module.exports = {
   description: "Shows the current time.",
+  aliases: [ "utc" ],
   async execute (_, message) {
     const utc = moment.utc();
 

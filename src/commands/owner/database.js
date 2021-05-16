@@ -21,7 +21,7 @@ module.exports = {
       ],
       async execute (client, message, [ modelName, instanceName ]) {
         const embed = new Discord.MessageEmbed({
-          color: global.guildInstance.config.colors.default
+          color: global.config.colors.default
         });
 
         const model = global.sequelize.models[modelName];
@@ -71,7 +71,7 @@ module.exports = {
           name: "value"
         }
       ],
-      async execute (client, message, [ modelName, instanceName, propertyName, value ]) {
+      async execute (_, message, [ modelName, instanceName, propertyName, value ]) {
         // Check if model exists
         const model = global.sequelize.models[modelName];
         if (!model) return message.reply(`Model \`${modelName}\` does not exist.`);
@@ -81,7 +81,7 @@ module.exports = {
         if (object === null) return message.reply(`Object \`${instanceName}\` does not exist.`);
 
         // Check if property exists
-        if (!object[propertyName]) return message.reply(`Property \`${propertyName}\` does not exist.`);
+        if (object[propertyName] === undefined) return message.reply(`Property \`${propertyName}\` does not exist.`);
 
         await object.update({ [propertyName]: JSON.parse(value) });
 
@@ -91,7 +91,7 @@ module.exports = {
     {
       name: "info",
       description: "Shows information about the database.",
-      async execute (client, message) {
+      async execute (_, message) {
         const { dependencies } = require(`${__basedir}/../package.json`);
 
         const sequelizeVersion = dependencies.sequelize;
@@ -111,6 +111,35 @@ module.exports = {
             ]
           }
         });
+      }
+    },
+    {
+      name: "sync",
+      description: "Sync the database.",
+      parameters: [
+        {
+          name: "force | alter",
+          type: String,
+          required: true
+        }
+      ],
+      async execute (_, message, [ action ]) {
+        if (action === "force") {
+          await global.sequelize.sync({ force: true });
+          return message.reply("Force synced database.");
+        } else if (action === "alter") {
+          await global.sequelize.sync({ alter: true });
+          return message.reply("Altered database.");
+        } else {
+          return message.reply("Invalid action provided.");
+        }
+      }
+    },
+    {
+      name: "reset",
+      description: "Reset the database.",
+      async execute (_, message) {
+        
       }
     }
   ]

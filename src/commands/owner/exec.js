@@ -26,10 +26,11 @@ module.exports = {
     }
 
     const execEmbed = new Discord.MessageEmbed({
-      color: global.config.colors.default
+      color: global.config.colors.default,
+      description: description
     });
 
-    const execMessage = await message.reply(execEmbed);
+    const execMessage = await message.channel.send(execEmbed);
 
     updateEmbed();
 

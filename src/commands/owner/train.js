@@ -7,7 +7,7 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, [ limit ]) {
+  async execute (_, message, [ limit ]) {
     const messageManager = message.channel.messages;
 
     if (limit <= 0) return message.reply("Message limit must be a whole number above zero.");
