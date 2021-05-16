@@ -16,17 +16,6 @@ module.exports = (sequelize, DataTypes) => {
     errorTimeout: {
       type: DataTypes.INTEGER,
       defaultValue: 5000
-    },
-    sellPrice: {
-      type: DataTypes.FLOAT,
-      defaultValue: 0.5
-    },
-    colors: {
-      type: DataTypes.JSON,
-      defaultValue: {
-        default: "#1ED760",
-        error: "#FF0000"
-      }
     }
   });
 };
