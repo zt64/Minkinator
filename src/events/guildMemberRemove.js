@@ -1,12 +1,7 @@
 const pluralize = require("pluralize");
-const Discord = require("discord.js");
 const chalk = require("chalk");
 
-module.exports = async (client, { guild, user }) => {
-  const channel = guild.channels.cache.find(channel => channel.name === "member-log");
-  if (!channel) return;
-
-  const { models } = global.sequelize;
+module.exports = async (client, { guild, user }) => {const { models } = global.sequelize;
   const { config } = await models.guild.findByPk(guild.id, { include: "config" });
 
   const users = pluralize("user", client.users.cache.size, true);
@@ -17,11 +12,17 @@ module.exports = async (client, { guild, user }) => {
   const data = await models.user.findByPk(user.id);
   if (data) await data.destroy();
 
-  console.log(`${user.tag} has left ${guild.name}.`);
+  console.log(chalk`{yellow {bold ${user.tag}} has left {bold ${guild.name}}.}`);
 
-  return channel.send(new Discord.MessageEmbed({
-    color: config.colors.default,
-    author: { iconURL: user.displayAvatarURL(), name: user.tag },
-    footer: { text: "User Left" }
-  }));
+  const channel = guild.channels.cache.find(channel => channel.name === "member-log");
+
+  if (channel) {
+    return channel.send({
+      embed: {
+        color: config.colors.default,
+        author: { iconURL: user.displayAvatarURL(), name: user.tag },
+        footer: { text: "User Joined" }
+      }
+    });
+  }
 };
