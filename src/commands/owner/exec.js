@@ -27,7 +27,7 @@ module.exports = {
 
     const execEmbed = new Discord.MessageEmbed({
       color: global.config.colors.default,
-      description: description
+      description: `\`\`\`sh\n${description}\`\`\``
     });
 
     const execMessage = await message.channel.send(execEmbed);
