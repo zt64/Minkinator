@@ -1,5 +1,5 @@
 module.exports = {
-  description: "Get weather forecast for a location.",
+  description: "Get weather information for a location.",
   parameters: [
     {
       name: "city",
@@ -7,9 +7,9 @@ module.exports = {
       required: true
     }
   ],
-  async execute (client, message, [ cityName ]) {
-    cityName = encodeURIComponent(cityName);
-    
+  async execute (_, message, args) {
+    const cityName = encodeURIComponent(args.join());
+
     // Fetch data from API
     const data = await util.fetchJSON(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${global.config.auth.openWeatherMap}`);
 
