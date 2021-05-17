@@ -8,7 +8,7 @@ module.exports = {
     }
   ],
   async execute (_, message, args) {
-    const cityName = encodeURIComponent(args.join());
+    const cityName = encodeURIComponent(args.join(" "));
 
     // Fetch data from API
     const data = await util.fetchJSON(`https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=${global.config.auth.openWeatherMap}`);
