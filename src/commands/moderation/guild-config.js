@@ -14,16 +14,14 @@ module.exports = {
   async execute (_, message, [ key, value ]) {
     const guildConfig = await global.sequelize.models.guildConfig.findByPk(message.guild.id);
 
-    delete guildConfig.dataValues.guildId;
-
     const embed = new Discord.MessageEmbed({
-      color: guildConfig.colors.default,
+      color: global.config.colors.default,
       title: "Guild Configuration"
     });
 
     if (key) {
       if (!guildConfig[key]) return message.reply(`\`${key}\` does not exist in the guild configuration.`);
-
+      if (key === "guildId") return message.reply("Unable to modify `guildId` as it is the foreign key.");
       if (typeof(guildConfig[key]) === "object");
 
       await guildConfig.update({ [key]: value });
