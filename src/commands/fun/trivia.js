@@ -17,8 +17,7 @@ module.exports = {
     const question = entities.decodeHTML(response.question);
 
     const correctAnswer = response.correct_answer;
-    const incorrectAnswers = response.incorrect_answers;
-    const answers = incorrectAnswers;
+    const answers = response.incorrect_answers;
 
     if (response.type === "multiple") {
       correctIndex = randomInteger(0, 3);

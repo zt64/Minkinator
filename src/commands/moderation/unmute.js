@@ -18,7 +18,7 @@ module.exports = {
     const member = message.mentions.members.first();
 
     // Remove mute role
-    member.roles.remove("671902495726895127");
+    await member.roles.remove("671902495726895127");
 
     // Send embed
     return message.reply({

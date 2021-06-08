@@ -75,7 +75,9 @@ module.exports = {
 
     const helpMessage = await message.reply(helpEmbed);
 
-    Object.keys(categories).forEach(async reaction => await helpMessage.react(reaction));
+    for (const reaction of Object.keys(categories)) {
+      await helpMessage.react(reaction);
+    }
 
     // Create reaction collector
     const collector = helpMessage.createReactionCollector((reaction, user) => Object.keys(categories).includes(reaction.emoji.name) && user.id === message.author.id);
@@ -102,7 +104,7 @@ module.exports = {
         helpEmbed.addField(`\`${title}\``, command.description || "\u200b");
       });
 
-      helpMessage.reactions.resolve(emoji).users.remove(message.author);
+      await helpMessage.reactions.resolve(emoji).users.remove(message.author);
 
       await helpMessage.edit(helpEmbed);
     });

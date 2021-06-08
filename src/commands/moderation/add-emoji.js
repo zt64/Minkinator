@@ -13,7 +13,7 @@ module.exports = {
     }
   ],
   async execute (client, message, [ url, name ]) {
-    message.guild.emojis.create(url, name);
+    await message.guild.emojis.create(url, name);
 
     return message.reply({
       embed: {

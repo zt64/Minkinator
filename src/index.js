@@ -11,7 +11,7 @@ global.util = require("./util/functions.js");
 const client = global.client = new Discord.Client(config.clientOptions);
 
 // Set client properties
-client.database = require("./models/");
+client.database = require("./models");
 client.coolDowns = new Map();
 
 // Set up event handler
@@ -69,15 +69,17 @@ client.loadCommands = async () => {
 client.loadEvents();
 client.loadCommands();
 
-// Login to Discord API
-if (!config.auth.discord) return console.error(chalk`{red No token provided, enter a token in to the auth file to login.}`);
+if (config.auth.discord) {
+  // Login to discord
+  client.login(config.auth.discord);
 
-client.login(config.auth.discord);
+  // Handle promise rejections
+  process.on("unhandledRejection", (error) => console.error(chalk`{red ${error.stack}}`));
 
-// Handle promise rejections
-process.on("unhandledRejection", (error) => console.error(chalk`{red ${error.stack}}`));
-
-process.on("SIGINT", () => {
-  client.destroy();
-  process.exit();
-});
+  process.on("SIGINT", () => {
+    client.destroy();
+    process.exit();
+  });
+} else {
+  console.error(chalk`{red No token provided, enter a token in to the auth file to login.}`);
+}

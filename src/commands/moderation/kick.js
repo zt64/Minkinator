@@ -21,7 +21,7 @@ module.exports = {
     if (!member) return message.reply(`${message.mentions.members.first()} is not a valid member.`);
 
     // Kick member from guild
-    message.guild.member(member).kick();
+    await message.guild.member(member).kick();
 
     // Send embed
     return message.reply({

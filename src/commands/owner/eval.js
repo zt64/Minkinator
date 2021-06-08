@@ -13,8 +13,8 @@ module.exports = {
 
     // Attempt to run code
     try {
-      const jsFunction = Function(`"use strict"; return (async () => { ${input} })()`);
-      const result = await jsFunction();
+      const jsFunction = Function("client", "message", `"use strict"; return (async () => { ${input} })()`);
+      const result = await jsFunction(client, message);
 
       embed.setTitle("Result");
       embed.setDescription(`\`\`\`js\n${result}\`\`\``);

@@ -20,7 +20,7 @@ module.exports = {
     if (!command) return message.reply(`Unable to find \`${commandName}\`.`);
 
     // Send command
-    for (var i = 0; i < amount; i++) {
+    for (let i = 0; i < amount; i++) {
       await command.execute(client, message, args.slice(2));
 
       await util.sleep(1000);

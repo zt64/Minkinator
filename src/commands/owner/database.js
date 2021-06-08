@@ -19,7 +19,7 @@ module.exports = {
           type: String
         }
       ],
-      async execute (client, message, [ modelName, instanceName ]) {
+      async execute (_, message, [ modelName, instanceName ]) {
         const embed = new Discord.MessageEmbed({
           color: global.config.colors.default
         });
@@ -139,7 +139,7 @@ module.exports = {
       name: "reset",
       description: "Reset the database.",
       async execute (_, message) {
-        
+
       }
     }
   ]

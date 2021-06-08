@@ -21,7 +21,7 @@ module.exports = {
     const member = message.mentions.members.first();
 
     // Un-ban member
-    message.guild.unban(member.user);
+    await message.guild.unban(member.user);
 
     // Send embed
     return message.reply({

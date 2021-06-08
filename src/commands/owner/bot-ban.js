@@ -15,7 +15,7 @@ module.exports = {
     const state = memberInstance.botBan ? "unbanned" : "banned";
 
     // Update member data
-    memberInstance.update({ botBan: !memberInstance.botBan });
+    await memberInstance.update({ botBan: !memberInstance.botBan });
 
     return message.reply(`${user} has been ${state} from using Minkinator.`);
   }
