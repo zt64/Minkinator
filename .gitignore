@@ -1,4 +1,5 @@
 .vscode/
+.idea/
 
 # Dependencies and collected data
 node_modules/
