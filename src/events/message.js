@@ -18,22 +18,22 @@ module.exports = async (client, message) => {
   const [ userInstance ] = await global.sequelize.models.user.findOrCreate({ where: { id: message.author.id }, include: { all: true } });
 
   if (userInstance.botBan) return;
-  const { errorTimeout, prefix } = guildInstance.config;
+  const { errorTimeout, prefix, randomMarkov } = guildInstance.config;
 
   // Generate markov on mention of self
   if (message.mentions.has(client.user)) {
     try {
-      // message.reply(await util.generateSentence(guildInstance.data));
-      const sentence = await util.generateSentence(guildInstance.data);
-      message.reply(sentence, { allowedMentions: { repliedUser: true } });
+      const sentence = await util.generateSentence(global.markov[message.guild.id]);
+      message.channel.send(sentence);
       console.log(chalk`{cyan (${message.guild.name} #${message.channel.name})} {green Sent markov:} ${sentence}`);
     } catch (error) {
       return;
     }
-  } else if (Math.random() >= 0.99) {
+  } else if (randomMarkov === true && Math.random() >= 0.99) {
     try {
-      // message.channel.send(await util.generateSentence(guildInstance.data));
-      // message.reply(await util.generateSentence(guildInstance.data), { allowedMentions: { parse: [ ] } });
+      const sentence = await util.generateSentence(global.markov[message.guild.id]);
+      message.channel.send(sentence);
+      console.log(chalk`{cyan (${message.guild.name} #${message.channel.name})} {green Sent markov:} ${sentence}`);
     } catch (error) {
       return;
     }
@@ -62,12 +62,13 @@ module.exports = async (client, message) => {
 
   // Check if message author has permission
   if (!util.hasPermission(message.member, command)) {
+    if (command.ownerOnly) return;
     const permissionError = await message.reply({
       embed: {
         color: global.config.colors.error,
         title: "Missing Permissions",
         fields: [
-          { name: "You are missing one of the following permissions:", value: command.permissions.join(", ") || "Bot Owner Only" }
+          { name: "You are missing one of the following permissions:", value: command.permissions?.join(", ") }
         ]
       }
     });

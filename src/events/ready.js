@@ -4,8 +4,11 @@ const chalk = require("chalk");
 module.exports = async (client) => {
   const sequelize = global.sequelize = await client.database.create();
 
+  global.markov = {};
+
   for (const guild of client.guilds.cache.array()) {
-    await client.database.initialize(sequelize, guild);
+    const [ { data }] = await client.database.initialize(sequelize, guild);
+    if (data.length !== 0) global.markov[guild.id] = await util.mkCorpus(data);
   }
 
   console.log(chalk`{green Initialized database for {bold ${client.guilds.cache.size}} ${pluralize("guild", client.guilds.cache.size)}.}`);

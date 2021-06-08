@@ -72,18 +72,36 @@ exports.time = (format = "HH:mm M/D/Y") => moment().format(format);
 
 exports.generateSentence = async (data) => {
   const pyshell = new PythonShell(`${__basedir}/util/markov.py`, {
-    mode: "text"
+    args: [ "generate" ]
   });
 
   let stdout = "";
 
-  pyshell.send(data);
+  pyshell.send(JSON.stringify(data));
 
   return new Promise((resolve, reject) => {
     // Send strings to python script
-    pyshell.on("message", (string) => {
+    pyshell.once("message", (string) => {
       if (string === "None") reject();
       stdout += string;
+    });
+
+    pyshell.end((err) => err ? reject(err) : resolve(stdout));
+  });
+};
+
+exports.mkCorpus = async (data) => {
+  const pyshell = new PythonShell(`${__basedir}/util/markov.py`, {
+    args: [ "mkcorpus" ]
+  });
+
+  let stdout = "";
+
+  pyshell.send(JSON.stringify(data));
+
+  return new Promise((resolve, reject) => {
+    pyshell.once("message", corpus => {
+      stdout = JSON.parse(corpus);
     });
 
     pyshell.end((err) => err ? reject(err) : resolve(stdout));

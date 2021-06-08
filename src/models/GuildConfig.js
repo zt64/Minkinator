@@ -16,6 +16,10 @@ module.exports = (sequelize, DataTypes) => {
     errorTimeout: {
       type: DataTypes.INTEGER,
       defaultValue: 5000
+    },
+    randomMarkov: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   });
 };
