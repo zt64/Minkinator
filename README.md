@@ -1,0 +1,2 @@
+# Minkinator
+Another Discord bot
