@@ -1,76 +1,127 @@
 package zt.minkinator
 
-import com.akuleshov7.ktoml.file.TomlFileReader
 import com.kotlindiscord.kord.extensions.ExtensibleBot
+import com.kotlindiscord.kord.extensions.utils.env
+import com.kotlindiscord.kord.extensions.utils.envOrNull
+import com.kotlindiscord.kord.extensions.utils.loadModule
 import dev.kord.core.kordLogger
 import dev.kord.gateway.Intent
-import dev.kord.gateway.PrivilegedIntent
+import dev.kord.gateway.builder.Shards
 import io.ktor.client.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import kotlinx.serialization.serializer
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import zt.minkinator.data.Config
-import zt.minkinator.extensions.*
-import zt.minkinator.extensions.utility.*
+import org.koin.core.module.dsl.singleOf
+import org.koin.ext.getFullName
+import org.sqlite.JDBC
+import zt.minkinator.extension.*
+import zt.minkinator.extension.filter.FilterExtension
 
-val config = TomlFileReader.decodeFromFile<Config>(serializer(), "./config.toml")
-val httpClient = HttpClient {
-    install(JsonFeature) {
-        serializer = KotlinxSerializer(kotlinx.serialization.json.Json {
-            prettyPrint = true
-            ignoreUnknownKeys = true
-        })
-    }
-}
+const val GPT_MODE = false
 
-@OptIn(PrivilegedIntent::class)
 suspend fun main() {
-    Database.connect("jdbc:sqlite:./database.db", driver = "org.sqlite.JDBC")
-
-    transaction {
-        //        SchemaUtils.createMissingTablesAndColumns(Guild, MarkovConfig, Filter)
-    }
-
-    val bot = ExtensibleBot(config.token) {
+    val bot = ExtensibleBot(env("TOKEN")) {
         intents(false) {
             +Intent.GuildMessages
-            +Intent.GuildPresences
         }
 
         extensions {
             add(::EventLogExtension)
             add(::FilterExtension)
-            add(::GptExtension)
-            add(::MarkovExtension)
+
+            if (GPT_MODE) {
+                envOrNull("OPENAI_KEY")?.let { key ->
+                    add {
+                        GptExtension(apiKey = key)
+                    }
+                }
+            } else {
+                add(::MarkovExtension)
+            }
+
+            add(::AvatarExtension)
             add(::NameNormalizerExtension)
             add(::AnimalsExtension)
-            add(::TriviaExtension)
             add(::SpotifyExtension)
             add(::PingExtension)
             add(::RestrictedExtension)
             add(::PurgeExtension)
+            add(::StickerExtension)
             add(::GuildInfoExtension)
             add(::UserInfoExtension)
             add(::BanExtension)
             add(::CoinTossExtension)
             add(::EffectsExtension)
             add(::PollExtension)
+            add(::KickExtension)
+            add(::RoleBoardExtension)
+            add(::MemberLogExtension)
+            add(::CaptionExtension)
+            add(::BigmojiExtension)
+
+            // Games
+            add(::TicTacToeExtension)
+            add(::GuessmojiExtension)
+            add(::TriviaExtension)
+            add(::ConnectFourExtension)
+        }
+
+        chatCommands {
+            enabled = true
+            defaultPrefix = ">"
         }
 
         members {
             fillPresences = true
+
+            all()
         }
 
         presence {
             playing("with Kotlin")
         }
+
+        sharding(::Shards)
+
+        errorResponse { message, type ->
+            content = "> $message"
+        }
+
+        hooks {
+            beforeKoinSetup {
+                loadModule {
+                    fun provideJson() = Json {
+                        ignoreUnknownKeys = true
+                        isLenient = true
+                    }
+
+                    fun provideHttpClient(json: Json) = HttpClient {
+                        install(ContentNegotiation) {
+                            json(json)
+                        }
+                    }
+
+                    singleOf(::provideJson)
+                    singleOf(::provideHttpClient)
+                }
+            }
+        }
     }
 
-    Runtime.getRuntime().addShutdownHook(Thread {
-        kordLogger.info("Shutting down...")
-    })
+    Database.connect(url = "jdbc:sqlite:./database.db", driver = JDBC::class.getFullName())
+
+    transaction {
+        SchemaUtils.createMissingTablesAndColumns(Guilds, Users, MarkovConfigs, Filters)
+    }
+
+    Runtime.getRuntime().addShutdownHook(
+        Thread {
+            kordLogger.info("Shutting down...")
+        }
+    )
 
     bot.start()
 }
