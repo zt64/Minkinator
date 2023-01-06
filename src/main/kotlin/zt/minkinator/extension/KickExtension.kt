@@ -13,7 +13,9 @@ import dev.kord.rest.builder.message.create.embed
 import dev.kord.rest.request.RestRequestException
 import zt.minkinator.util.*
 
-class KickExtension(override val name: String = "kick") : Extension() {
+object KickExtension : Extension() {
+    override val name = "kick"
+
     override suspend fun setup() {
         ephemeralSlashCommand(
             name = "kick",

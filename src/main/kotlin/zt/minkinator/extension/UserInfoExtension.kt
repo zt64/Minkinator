@@ -17,7 +17,9 @@ import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.toList
 import zt.minkinator.util.*
 
-class UserInfoExtension(override val name: String = "user-info") : Extension() {
+object UserInfoExtension : Extension() {
+    override val name = "user-info"
+
     private suspend fun EmbedBuilder.buildUserInfoEmbed(target: Member) {
         color = target.accentColor ?: Color.success
         url = target.profileLink

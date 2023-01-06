@@ -20,57 +20,57 @@ import zt.minkinator.util.success
 import zt.minkinator.util.toDiscord
 import kotlin.time.Duration.Companion.seconds
 
-class GuessmojiExtension(override val name: String = "guessmoji") : Extension() {
-    private companion object {
-        private val duration = 10.seconds
+object GuessmojiExtension : Extension() {
+    override val name = "guessmoji"
 
-        private object Emojis {
-            private const val TORNADO = "\uD83C\uDF2A"
-            private const val SNOWFLAKE = "\u2744\uFE0F"
-            private const val FIRE = "\uD83D\uDD25"
-            private const val CLOUD = "\u2601\uFE0F"
-            private const val JOY = "\uD83D\uDE02"
-            private const val SAD = "\uD83D\uDE14"
-            private const val ANGRY = "\uD83D\uDE20"
-            private const val CRY = "\uD83D\uDE22"
-            private const val HEART = "\u2764\uFE0F"
-            private const val CAT = "\uD83D\uDC31"
-            private const val SUN = "\u2600\uFE0F"
-            private const val MOON = "\uD83C\uDF19"
-            private const val RAIN = "\uD83D\uDCA7"
-            private const val EGG = "\uD83E\uDD5A"
-            private const val CHEESE = "\uD83E\uDDC0"
-            private const val BANANA = "\uD83C\uDF4C"
-            private const val APPLE = "\uD83C\uDF4E"
-            private const val PEACH = "\uD83C\uDF51"
-            private const val CHERRY = "\uD83C\uDF52"
-            private const val STRAWBERRY = "\uD83C\uDF53"
-            private const val TOMATO = "\uD83C\uDF45"
+    private val duration = 10.seconds
 
-            val all = listOf(
-                TORNADO,
-                SNOWFLAKE,
-                FIRE,
-                CLOUD,
-                JOY,
-                SAD,
-                ANGRY,
-                CRY,
-                HEART,
-                CAT,
-                SUN,
-                MOON,
-                RAIN,
-                EGG,
-                CHEESE,
-                BANANA,
-                APPLE,
-                PEACH,
-                CHERRY,
-                STRAWBERRY,
-                TOMATO
-            )
-        }
+    private object Emojis {
+        private const val TORNADO = "\uD83C\uDF2A"
+        private const val SNOWFLAKE = "\u2744\uFE0F"
+        private const val FIRE = "\uD83D\uDD25"
+        private const val CLOUD = "\u2601\uFE0F"
+        private const val JOY = "\uD83D\uDE02"
+        private const val SAD = "\uD83D\uDE14"
+        private const val ANGRY = "\uD83D\uDE20"
+        private const val CRY = "\uD83D\uDE22"
+        private const val HEART = "\u2764\uFE0F"
+        private const val CAT = "\uD83D\uDC31"
+        private const val SUN = "\u2600\uFE0F"
+        private const val MOON = "\uD83C\uDF19"
+        private const val RAIN = "\uD83D\uDCA7"
+        private const val EGG = "\uD83E\uDD5A"
+        private const val CHEESE = "\uD83E\uDDC0"
+        private const val BANANA = "\uD83C\uDF4C"
+        private const val APPLE = "\uD83C\uDF4E"
+        private const val PEACH = "\uD83C\uDF51"
+        private const val CHERRY = "\uD83C\uDF52"
+        private const val STRAWBERRY = "\uD83C\uDF53"
+        private const val TOMATO = "\uD83C\uDF45"
+
+        val all = listOf(
+            TORNADO,
+            SNOWFLAKE,
+            FIRE,
+            CLOUD,
+            JOY,
+            SAD,
+            ANGRY,
+            CRY,
+            HEART,
+            CAT,
+            SUN,
+            MOON,
+            RAIN,
+            EGG,
+            CHEESE,
+            BANANA,
+            APPLE,
+            PEACH,
+            CHERRY,
+            STRAWBERRY,
+            TOMATO
+        )
     }
 
     override suspend fun setup() {

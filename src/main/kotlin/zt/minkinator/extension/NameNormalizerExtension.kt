@@ -21,9 +21,11 @@ import zt.minkinator.util.ephemeralSlashCommand
 import zt.minkinator.util.ephemeralUserCommand
 import java.text.Normalizer
 
-class NameNormalizerExtension(override val name: String = "name-normalizer") : Extension() {
+object NameNormalizerExtension : Extension() {
+    override val name = "name-normalizer"
+
     @OptIn(PrivilegedIntent::class)
-    override val intents: MutableSet<Intent> = mutableSetOf(Intent.GuildMembers)
+    override val intents = mutableSetOf<Intent>(Intent.GuildMembers)
 
     private fun String.normalize(form: Normalizer.Form): String = Normalizer.normalize(this, form)
     private fun String.isNormalized(form: Normalizer.Form = Normalizer.Form.NFD) = Normalizer.isNormalized(this, form)

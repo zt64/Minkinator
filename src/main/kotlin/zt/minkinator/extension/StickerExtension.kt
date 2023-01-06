@@ -21,7 +21,9 @@ import kotlinx.coroutines.flow.count
 import org.koin.core.component.inject
 import zt.minkinator.util.ephemeralSlashCommand
 
-class StickerExtension(override val name: String = "sticker") : Extension() {
+object StickerExtension : Extension() {
+    override val name = "sticker"
+
     private val httpClient: HttpClient by inject()
 
     override suspend fun setup() {

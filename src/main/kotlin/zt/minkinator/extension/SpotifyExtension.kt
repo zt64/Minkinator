@@ -13,9 +13,11 @@ import dev.kord.gateway.PrivilegedIntent
 import dev.kord.rest.builder.message.create.embed
 import zt.minkinator.util.*
 
-class SpotifyExtension(override val name: String = "spotify") : Extension() {
+object SpotifyExtension : Extension() {
+    override val name = "spotify"
+
     @OptIn(PrivilegedIntent::class)
-    override val intents: MutableSet<Intent> = mutableSetOf(Intent.GuildPresences)
+    override val intents = mutableSetOf<Intent>(Intent.GuildPresences)
 
     override suspend fun setup() {
         publicSlashCommand(

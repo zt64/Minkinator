@@ -34,7 +34,9 @@ import zt.minkinator.util.*
 import kotlin.collections.set
 import kotlin.time.Duration.Companion.seconds
 
-class TriviaExtension(override val name: String = "trivia") : Extension() {
+object TriviaExtension : Extension() {
+    override val name = "trivia"
+
     private val httpClient: HttpClient by inject()
 
     private enum class Emoji(val emoji: DiscordEmoji.Generic) {

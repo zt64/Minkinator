@@ -19,7 +19,9 @@ import zt.minkinator.util.ephemeralSlashCommand
 import zt.minkinator.util.pluralize
 import zt.minkinator.util.success
 
-class PurgeExtension(override val name: String = "purge") : Extension() {
+object PurgeExtension : Extension() {
+    override val name = "purge"
+
     override suspend fun setup() {
         ephemeralSlashCommand(
             name = "purge",

@@ -17,9 +17,11 @@ import dev.kord.gateway.PrivilegedIntent
 import zt.minkinator.util.mentions
 import zt.minkinator.util.reply
 
-class GptExtension(override val name: String = "gpt", apiKey: String) : Extension() {
+class GptExtension(apiKey: String) : Extension() {
+    override val name = "gpt"
+
     @OptIn(PrivilegedIntent::class)
-    override val intents: MutableSet<Intent> = mutableSetOf(Intent.MessageContent)
+    override val intents = mutableSetOf<Intent>(Intent.MessageContent)
 
     private val openAI = OpenAI(OpenAIConfig(apiKey, LogLevel.None))
     private val prompt = StringBuilder(startingPrompt)

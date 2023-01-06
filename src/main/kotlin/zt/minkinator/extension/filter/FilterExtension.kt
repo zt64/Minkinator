@@ -4,7 +4,7 @@ import com.kotlindiscord.kord.extensions.DiscordRelayedException
 import com.kotlindiscord.kord.extensions.checks.anyGuild
 import com.kotlindiscord.kord.extensions.checks.guildFor
 import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.application.slash.EphemeralSlashCommandContext
+import com.kotlindiscord.kord.extensions.commands.application.slash.SlashGroup
 import com.kotlindiscord.kord.extensions.commands.converters.impl.defaultingBoolean
 import com.kotlindiscord.kord.extensions.commands.converters.impl.duration
 import com.kotlindiscord.kord.extensions.commands.converters.impl.int
@@ -23,7 +23,9 @@ import zt.minkinator.Filter
 import zt.minkinator.Guild
 import zt.minkinator.util.*
 
-class FilterExtension(override val name: String = "filter") : Extension() {
+object FilterExtension : Extension() {
+    override val name = "filter"
+
     override suspend fun setup() {
         event<MessageCreateEvent> {
             check {
@@ -54,15 +56,19 @@ class FilterExtension(override val name: String = "filter") : Extension() {
 
                             message.reply(newResponse)
                         }
+
                         FilterAction.WARN -> {
 
                         }
+
                         FilterAction.TIMEOUT -> {
                             // member.timeout()
                         }
+
                         FilterAction.KICK -> {
                             member.kick("Triggered filter ${filter.id.value}: ${message.content}")
                         }
+
                         FilterAction.BAN -> {
                             member.ban {
                                 reason = "Triggered filter ${filter.id.value}: ${message.content}"
@@ -88,52 +94,57 @@ class FilterExtension(override val name: String = "filter") : Extension() {
                 name = "add",
                 description = "Add a filter"
             ) {
-                suspend fun EphemeralSlashCommandContext<*>.filterAction(initBlock: Filter.() -> Unit) {
-                    val guildId = getGuild()!!.id.value.toLong()
+                suspend fun <T : Arguments> SlashGroup.filterAction(
+                    name: String,
+                    description: String,
+                    arguments: () -> T,
+                    initBlock: Filter.(arguments: T) -> Unit
+                ) {
+                    ephemeralSubCommand(
+                        name = name,
+                        description = description,
+                        arguments = arguments
+                    ) {
+                        action {
+                            val guildId = getGuild()!!.id.value.toLong()
 
-                    transaction {
-                        Filter.new {
-                            guild = Guild.findById(guildId)!!
+                            transaction {
+                                Filter.new {
+                                    guild = Guild.findById(guildId)!!
 
-                            initBlock()
-                        }
-                    }
+                                    initBlock(this@action.arguments)
+                                }
+                            }
 
-                    respond {
-                        embed {
-                            color = Color.success
-                            title = "Added filter"
+                            respond {
+                                embed {
+                                    color = Color.success
+                                    title = "Added filter"
+                                }
+                            }
                         }
                     }
                 }
 
-                ephemeralSubCommand(
+                filterAction(
                     name = "reply",
-                    description = "Reply to a message",
+                    description = "Reply to a message with a message",
                     arguments = ::ReplyArgs
-                ) {
-                    action {
-                        filterAction {
-                            pattern = arguments.regex
-                            action = FilterAction.REPLY
-                            response = arguments.content
-                            deleteMessage = arguments.deleteMessage
-                        }
-                    }
+                ) { arguments ->
+                    action = FilterAction.REPLY
+                    pattern = arguments.regex
+                    response = arguments.content
+                    deleteMessage = arguments.deleteMessage
                 }
 
-                ephemeralSubCommand(
+                filterAction(
                     name = "timeout",
-                    description = "Timeout a user",
+                    description = "Timeout a user for a duration",
                     arguments = ::TimeoutArgs
-                ) {
-                    action {
-                        filterAction {
-                            pattern = arguments.regex
-                            action = FilterAction.TIMEOUT
-                            deleteMessage = arguments.deleteMessage
-                        }
-                    }
+                ) { arguments ->
+                    action = FilterAction.TIMEOUT
+                    pattern = arguments.regex
+                    deleteMessage = arguments.deleteMessage
                 }
             }
 
@@ -185,6 +196,7 @@ class FilterExtension(override val name: String = "filter") : Extension() {
                                                         appendLine("Response: ${filter.response}")
                                                         appendLine("Delete message: ${filter.deleteMessage}")
                                                     }
+
                                                     FilterAction.WARN -> {}
                                                     FilterAction.TIMEOUT -> {}
                                                     FilterAction.KICK -> {}
@@ -235,6 +247,7 @@ class FilterExtension(override val name: String = "filter") : Extension() {
                                                 appendLine("Response: ${filter.response}")
                                                 appendLine("Delete message: ${filter.deleteMessage}")
                                             }
+
                                             FilterAction.WARN -> {}
                                             FilterAction.TIMEOUT -> {}
                                             FilterAction.KICK -> {}
@@ -269,6 +282,7 @@ class FilterExtension(override val name: String = "filter") : Extension() {
         val content by string {
             name = "content"
             description = "The message content to reply with"
+            maxLength = 2000
         }
         val deleteMessage by defaultingBoolean {
             name = "delete-message"

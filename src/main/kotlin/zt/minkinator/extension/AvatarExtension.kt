@@ -13,10 +13,19 @@ import zt.minkinator.util.ephemeralUserCommand
 import zt.minkinator.util.publicSlashCommand
 import zt.minkinator.util.success
 
-class AvatarExtension(override val name: String = "avatar") : Extension() {
+object AvatarExtension : Extension() {
+    override val name = "avatar"
+
     override suspend fun setup() {
         fun Member.getAvatarUrl() = displayAvatar().cdnUrl.toUrl {
             size = Image.Size.Size512
+        }
+
+        class Args : Arguments() {
+            val member by optionalMember {
+                name = "member"
+                description = "The member to get the avatar of"
+            }
         }
 
         publicSlashCommand(
@@ -53,13 +62,6 @@ class AvatarExtension(override val name: String = "avatar") : Extension() {
                     }
                 }
             }
-        }
-    }
-
-    private class Args : Arguments() {
-        val member by optionalMember {
-            name = "member"
-            description = "The member to get the avatar of"
         }
     }
 }

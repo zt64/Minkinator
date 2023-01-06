@@ -3,6 +3,7 @@ package zt.minkinator.extension
 import com.kotlindiscord.kord.extensions.DiscordRelayedException
 import com.kotlindiscord.kord.extensions.checks.*
 import com.kotlindiscord.kord.extensions.commands.Arguments
+import com.kotlindiscord.kord.extensions.commands.converters.impl.channel
 import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalBoolean
 import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalInt
 import com.kotlindiscord.kord.extensions.components.components
@@ -10,52 +11,55 @@ import com.kotlindiscord.kord.extensions.components.ephemeralButton
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.types.respond
+import com.kotlindiscord.kord.extensions.utils.botHasPermissions
+import com.kotlindiscord.kord.extensions.utils.env
 import com.kotlindiscord.kord.extensions.utils.hasPermission
 import com.kotlindiscord.kord.extensions.utils.selfMember
 import dev.kord.common.Color
 import dev.kord.common.entity.ButtonStyle
 import dev.kord.common.entity.Permission
+import dev.kord.common.entity.optional.value
+import dev.kord.core.behavior.channel.asChannelOfOrNull
+import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.reply
-import dev.kord.core.entity.Attachment
+import dev.kord.core.entity.Message
+import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.kordLogger
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
-import dev.kord.rest.builder.message.create.allowedMentions
 import dev.kord.rest.builder.message.create.embed
+import kotlinx.coroutines.flow.toList
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import zt.minkinator.Guild
-import zt.minkinator.util.ephemeralSubCommand
-import zt.minkinator.util.mentions
-import zt.minkinator.util.publicSlashCommand
-import zt.minkinator.util.success
+import zt.minkinator.util.*
 import java.util.*
+import kotlin.random.Random
 
-class MarkovExtension(override val name: String = "markov") : Extension() {
+object MarkovExtension : Extension() {
+    override val name = "markov"
+
     @OptIn(PrivilegedIntent::class)
-    override val intents: MutableSet<Intent> = mutableSetOf(Intent.MessageContent)
+    override val intents = mutableSetOf<Intent>(Intent.MessageContent)
 
     private fun markov(text: String, outputSize: Int): String {
         val words = text.lines().flatMap { line ->
             line.split(' ').filter(String::isNotBlank)
         }
 
-        println("Corpus size: ${words.size} words")
-
         val chain = mutableMapOf<List<String>, MutableList<String>>()
 
-        val numWords = words.size
         for ((index, key1) in words.withIndex()) {
-            if (numWords > index + 2) {
-                val key2 = words[index + 1]
-                val word = words[index + 2]
+            if (words.size <= index + 2) continue
 
-                if (listOf(key1, key2) !in chain) {
-                    chain[listOf(key1, key2)] = mutableListOf(word)
-                } else {
-                    chain[listOf(key1, key2)]!!.add(word)
-                }
+            val key2 = words[index + 1]
+            val word = words[index + 2]
+
+            if (listOf(key1, key2) !in chain) {
+                chain[listOf(key1, key2)] = mutableListOf(word)
+            } else {
+                chain[listOf(key1, key2)]!!.add(word)
             }
         }
 
@@ -76,11 +80,6 @@ class MarkovExtension(override val name: String = "markov") : Extension() {
             check {
                 anyGuild()
                 isNotBot()
-                failIfNot {
-                    guildFor(event)?.selfMember()?.hasPermission(Permission.SendMessages) ?: false
-                }
-                // Buddy.net whitelist
-                // inGuild(Snowflake(664479042161999894))
             }
 
             action {
@@ -96,23 +95,31 @@ class MarkovExtension(override val name: String = "markov") : Extension() {
                         append(message.content.replace(guild.selfMember().mention, "").trim())
 
                         if (message.attachments.isNotEmpty()) {
-                            append(" ${message.attachments.joinToString(separator = " ", transform = Attachment::url)}")
+                            append(" ${message.attachments.joinToString(" ") { it.url }}")
                         }
 
                         appendLine()
                     }
                 }
 
-                if (guild.selfMember().hasPermission(Permission.SendMessages) && message.mentions(kord.selfId)) {
+                if (!guild.selfMember().hasPermission(Permission.SendMessages)) return@action
+
+                if (message.mentions(kord.selfId)) {
                     val sentence = markov(dbGuild.data, (1..100).random())
 
                     message.reply {
                         content = sentence
 
-                        allowedMentions {
-                            repliedUser = true
-                        }
+//                        allowedMentions {
+//                            repliedUser = true
+//                        }
                     }
+
+                    kordLogger.info("Sent markov sentence in ${guild.name}: $sentence")
+                } else if (Random.nextFloat() < 0.008) {
+                    val sentence = markov(dbGuild.data, (1..100).random())
+
+                    message.channel.createMessage(sentence)
 
                     kordLogger.info("Sent markov sentence in ${guild.name}: $sentence")
                 }
@@ -132,7 +139,6 @@ class MarkovExtension(override val name: String = "markov") : Extension() {
                 description = "Markov configuration",
                 arguments = ::ConfigArguments
             ) {
-
                 check {
                     // Check if user has role to configure commands
                 }
@@ -191,6 +197,54 @@ class MarkovExtension(override val name: String = "markov") : Extension() {
                                 }
                             }
                         }
+                    }
+                }
+            }
+
+            class TrainArguments : Arguments() {
+                val channel by channel {
+                    name = "channel"
+                    description = "Channel to train on"
+                }
+                val maxMessages by optionalInt {
+                    name = "max-messages"
+                    description = "Maximum number of messages to train on"
+                    minValue = 0
+                }
+            }
+
+            chatCommand(
+                name = "train-markov",
+                description = "Train markov on past messages",
+                arguments = ::TrainArguments
+            ) {
+                check {
+                    failIf("You must be granted access to this command.") {
+                        userFor(event)!!.id.value != env("SUPER_USER_ID").toULong()
+                    }
+                }
+
+                action {
+                    val channel = arguments.channel.asChannelOfOrNull<TextChannel>() ?: throw DiscordRelayedException("Channel must be a text channel.")
+                    if (!channel.botHasPermissions(Permission.ReadMessageHistory)) {
+                        throw DiscordRelayedException("Bot does not have permission to read message history in ${channel.mention}.")
+                    }
+
+                    val msg = message.channel.createMessage("Training...")
+                    val messages = channel.messages.toList()
+                    val newData = messages.joinToString("\n", transform = Message::content)
+
+                    val guildId = channel.guildId
+                    val dbGuild = transaction {
+                        Guild.findById(guildId.value.toLong()) ?: Guild.new(guildId.value.toLong()) { }
+                    }
+
+                    transaction {
+                        dbGuild.data += "\n$newData"
+                    }
+
+                    msg.edit {
+                        content = "Trained using ${messages.size} ${"message".pluralize(messages.size)}"
                     }
                 }
             }

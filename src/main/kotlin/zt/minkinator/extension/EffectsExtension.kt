@@ -26,7 +26,9 @@ import zt.minkinator.util.mutateImage
 import zt.minkinator.util.publicSlashCommand
 import kotlin.math.PI
 
-class EffectsExtension(override val name: String = "effects") : Extension() {
+object EffectsExtension : Extension() {
+    override val name = "effects"
+
     private val httpClient: HttpClient by inject()
 
     override suspend fun setup() {
@@ -52,9 +54,7 @@ class EffectsExtension(override val name: String = "effects") : Extension() {
 
                     NamedFile(
                         name = "${user.username}.gif",
-                        contentProvider = ChannelProvider {
-                            mutatedGif.toByteReadChannel()
-                        }
+                        contentProvider = ChannelProvider(block = mutatedGif::toByteReadChannel)
                     )
                 } else {
                     val mutatedImage = mutateImage(
@@ -65,9 +65,7 @@ class EffectsExtension(override val name: String = "effects") : Extension() {
 
                     NamedFile(
                         name = "${user.username}.png",
-                        contentProvider = ChannelProvider {
-                            mutatedImage.toByteReadChannel()
-                        }
+                        contentProvider = ChannelProvider(block = mutatedImage::toByteReadChannel)
                     )
                 }
 
@@ -86,7 +84,7 @@ class EffectsExtension(override val name: String = "effects") : Extension() {
             image.filter(filter(this))
         }
 
-        suspend fun addFilterCommand(name: String, description: String, filter: Filter): PublicSlashCommand<BaseArgs> {
+        suspend fun addFilterCommand(name: String, description: String, filter: Filter): PublicSlashCommand<BaseArgs, *> {
             return addCommand(name, description, ::BaseArgs) { image ->
                 image.filter(filter)
             }

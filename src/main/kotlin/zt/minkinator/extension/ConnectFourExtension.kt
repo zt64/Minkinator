@@ -10,7 +10,9 @@ import dev.kord.rest.builder.message.create.embed
 import zt.minkinator.util.footer
 import zt.minkinator.util.publicSlashCommand
 
-class ConnectFourExtension(override val name: String = "connect-four") : Extension() {
+object ConnectFourExtension : Extension() {
+    override val name = "connect-four"
+
     override suspend fun setup() {
         publicSlashCommand(
             name = "connect-four",

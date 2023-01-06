@@ -15,14 +15,20 @@ import io.ktor.client.request.forms.*
 import io.ktor.utils.io.jvm.javaio.*
 import zt.minkinator.util.publicSlashCommand
 
-class BigmojiExtension(override val name: String = "bigmoji") : Extension() {
-    override val intents: MutableSet<Intent> = mutableSetOf(Intent.GuildEmojis)
+object BigmojiExtension : Extension() {
+    override val name = "bigmoji"
+    override val intents = mutableSetOf<Intent>(Intent.GuildEmojis)
 
-    private companion object {
-        private const val SCALE_FACTOR = 2.0
-    }
+    private const val SCALE_FACTOR = 2.0
 
     override suspend fun setup() {
+        class Args : Arguments() {
+            val emoji by emoji {
+                name = "emoji"
+                description = "The emoji"
+            }
+        }
+
         publicSlashCommand(
             name = "bigmoji",
             description = "Resize an emoji to a bigger size",
@@ -56,13 +62,6 @@ class BigmojiExtension(override val name: String = "bigmoji") : Extension() {
                     files += file
                 }
             }
-        }
-    }
-
-    private class Args : Arguments() {
-        val emoji by emoji {
-            name = "emoji"
-            description = "The emoji"
         }
     }
 }

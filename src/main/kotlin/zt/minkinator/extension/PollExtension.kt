@@ -23,7 +23,9 @@ import zt.minkinator.util.success
 import zt.minkinator.util.toDiscord
 import kotlin.time.Duration
 
-class PollExtension(override val name: String = "poll") : Extension() {
+object PollExtension : Extension() {
+    override val name = "poll"
+
     private val polls: MutableMap<Snowflake, Poll> = mutableMapOf()
 
     private data class Poll(

@@ -7,7 +7,9 @@ import dev.kord.rest.builder.message.create.embed
 import zt.minkinator.util.publicSlashCommand
 import zt.minkinator.util.success
 
-class CoinTossExtension(override val name: String = "coin-toss") : Extension() {
+object CoinTossExtension : Extension() {
+    override val name = "coin-toss"
+
     private enum class CoinState {
         HEADS,
         TAILS

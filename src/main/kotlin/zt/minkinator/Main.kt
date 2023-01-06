@@ -19,6 +19,7 @@ import org.koin.ext.getFullName
 import org.sqlite.JDBC
 import zt.minkinator.extension.*
 import zt.minkinator.extension.filter.FilterExtension
+import zt.minkinator.util.unaryPlus
 
 const val GPT_MODE = false
 
@@ -29,8 +30,8 @@ suspend fun main() {
         }
 
         extensions {
-            add(::EventLogExtension)
-            add(::FilterExtension)
+            +EventLogExtension
+            +FilterExtension
 
             if (GPT_MODE) {
                 envOrNull("OPENAI_KEY")?.let { key ->
@@ -39,35 +40,37 @@ suspend fun main() {
                     }
                 }
             } else {
-                add(::MarkovExtension)
+                +MarkovExtension
             }
 
-            add(::AvatarExtension)
-            add(::NameNormalizerExtension)
-            add(::AnimalsExtension)
-            add(::SpotifyExtension)
-            add(::PingExtension)
-            add(::RestrictedExtension)
-            add(::PurgeExtension)
-            add(::StickerExtension)
-            add(::GuildInfoExtension)
-            add(::UserInfoExtension)
-            add(::BanExtension)
-            add(::CoinTossExtension)
-            add(::EffectsExtension)
-            add(::PollExtension)
-            add(::KickExtension)
-            add(::RoleBoardExtension)
-            add(::MemberLogExtension)
-            add(::CaptionExtension)
-            add(::BigmojiExtension)
+            +AvatarExtension
+            +NameNormalizerExtension
+            +AnimalsExtension
+            +SpotifyExtension
+            +PingExtension
+            +RestrictedExtension
+            +PurgeExtension
+            +StickerExtension
+            +GuildInfoExtension
+            +UserInfoExtension
+            +BanExtension
+            +CoinTossExtension
+            +EffectsExtension
+            +PollExtension
+            +KickExtension
+            +RoleBoardExtension
+            +MemberLogExtension
+            +CaptionExtension
+            +BigmojiExtension
 
             // Games
-            add(::TicTacToeExtension)
-            add(::GuessmojiExtension)
-            add(::TriviaExtension)
-            add(::ConnectFourExtension)
+            +TicTacToeExtension
+            +GuessmojiExtension
+            +TriviaExtension
+            +ConnectFourExtension
         }
+
+        pluginBuilder.enabled = false
 
         chatCommands {
             enabled = true

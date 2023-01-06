@@ -13,8 +13,9 @@ import zt.minkinator.util.success
 import java.net.InetAddress
 import kotlin.time.Duration.Companion.milliseconds
 
-class RestrictedExtension(override val name: String = "restricted") : Extension() {
-    override val intents: MutableSet<Intent> = mutableSetOf(Intent.Guilds)
+object RestrictedExtension : Extension() {
+    override val name = "restricted"
+    override val intents = mutableSetOf<Intent>(Intent.Guilds)
 
     private val testingGuildId = env("TESTING_GUILD_ID").toLong()
 

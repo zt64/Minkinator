@@ -17,7 +17,9 @@ import dev.kord.rest.builder.message.create.embed
 import kotlinx.datetime.TimeZone
 import zt.minkinator.util.*
 
-class BanExtension(override val name: String = "ban") : Extension() {
+object BanExtension : Extension() {
+    override val name = "ban"
+
     override suspend fun setup() {
         publicSlashCommand(
             name = "ban",

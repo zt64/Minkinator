@@ -14,7 +14,9 @@ import zt.minkinator.util.footer
 import zt.minkinator.util.publicSlashCommand
 import zt.minkinator.util.success
 
-class AnimalsExtension(override val name: String = "animals") : Extension() {
+object AnimalsExtension : Extension() {
+    override val name = "animals"
+
     private val httpClient: HttpClient by inject()
 
     @Serializable

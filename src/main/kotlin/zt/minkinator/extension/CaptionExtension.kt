@@ -22,12 +22,12 @@ import zt.minkinator.util.publicSlashCommand
 import java.awt.Font
 import kotlin.math.roundToInt
 
-class CaptionExtension(override val name: String = "caption") : Extension() {
+object CaptionExtension : Extension() {
+    override val name = "caption"
+
     private val httpClient: HttpClient by inject()
 
-    private companion object {
-        private const val FONT_NAME = "Futura Extra Black Condensed"
-    }
+    private const val FONT_NAME = "Futura Extra Black Condensed"
 
     override suspend fun setup() {
         publicSlashCommand(
@@ -123,6 +123,7 @@ class CaptionExtension(override val name: String = "caption") : Extension() {
             minLength = 1
             maxLength = 64
         }
+
         val dark by defaultingBoolean {
             name = "dark"
             description = "Whether to use a dark background"

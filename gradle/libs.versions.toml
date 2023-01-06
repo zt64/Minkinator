@@ -1,0 +1,35 @@
+[versions]
+kotlin = "1.8.0"
+scrimmage = "4.0.32"
+exposed = "0.41.1"
+kotlin-dl = "0.5.0"
+
+[libraries]
+kord-ex = "com.kotlindiscord.kord.extensions:kord-extensions:1.5.6-SNAPSHOT"
+kord-emoji = "dev.kord.x:emoji:0.5.0"
+
+scrimmage-core = { module = "com.sksamuel.scrimage:scrimage-core", version.ref = "scrimmage" }
+scrimmage-filters = { module = "com.sksamuel.scrimage:scrimage-filters", version.ref = "scrimmage" }
+scrimmage-webp = { module = "com.sksamuel.scrimage:scrimage-webp", version.ref = "scrimmage" }
+
+kotlin-dl-tensorflow = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow", version.ref = "kotlin-dl" }
+kotlin-dl-onnx = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-onnx", version.ref = "kotlin-dl" }
+kotlin-dl-visualization = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-visualization", version.ref = "kotlin-dl" }
+
+exposed-core = { module = "org.jetbrains.exposed:exposed-core", version.ref = "exposed" }
+exposed-jdbc = { module = "org.jetbrains.exposed:exposed-jdbc", version.ref = "exposed" }
+exposed-dao = { module = "org.jetbrains.exposed:exposed-dao", version.ref = "exposed" }
+
+sqlite-jdbc = "org.xerial:sqlite-jdbc:3.34.0"
+logback-classic = "ch.qos.logback:logback-classic:1.4.5"
+openai-client = "com.aallam.openai:openai-client:2.1.0"
+ktor-client-encoding = "io.ktor:ktor-client-encoding:2.2.2"
+
+[bundles]
+scrimmage = ["scrimmage-core", "scrimmage-filters", "scrimmage-webp"]
+kotlin-dl = ["kotlin-dl-tensorflow", "kotlin-dl-onnx", "kotlin-dl-visualization"]
+exposed = ["exposed-core", "exposed-jdbc", "exposed-dao"]
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

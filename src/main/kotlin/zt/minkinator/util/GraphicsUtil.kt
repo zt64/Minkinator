@@ -12,9 +12,8 @@ fun mutateImage(
     block: (image: ImmutableImage) -> ImmutableImage
 ): InputStream {
     val originalImage = ImmutableImage.loader().fromStream(inputStream)
-    val modifiedImage = block(originalImage)
 
-    return modifiedImage.bytes(writer).inputStream()
+    return block(originalImage).bytes(writer).inputStream()
 }
 
 fun mutateGif(

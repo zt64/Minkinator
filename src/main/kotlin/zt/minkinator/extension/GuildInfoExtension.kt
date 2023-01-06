@@ -11,7 +11,9 @@ import zt.minkinator.util.field
 import zt.minkinator.util.success
 import zt.minkinator.util.thumbnail
 
-class GuildInfoExtension(override val name: String = "guildInfo") : Extension() {
+object GuildInfoExtension : Extension() {
+    override val name = "guildInfo"
+
     override suspend fun setup() {
         ephemeralSlashCommand(
             name = "guild-info",

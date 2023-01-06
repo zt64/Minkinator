@@ -19,7 +19,9 @@ import zt.minkinator.util.ephemeralSlashCommand
 import zt.minkinator.util.ephemeralSubCommand
 import zt.minkinator.util.success
 
-class MemberLogExtension(override val name: String = "member-log") : Extension() {
+object MemberLogExtension : Extension() {
+    override val name = "member-log"
+
     @OptIn(PrivilegedIntent::class)
     override val intents: MutableSet<Intent> = mutableSetOf(Intent.GuildMembers)
 

@@ -19,13 +19,10 @@ import zt.minkinator.util.footer
 import zt.minkinator.util.publicSlashCommand
 import kotlin.time.Duration.Companion.seconds
 
-class TicTacToeExtension(override val name: String = "tic-tac-toe") : Extension() {
-    private companion object {
-        private val timeoutDuration = 30.seconds
+object TicTacToeExtension : Extension() {
+    override val name = "tic-tac-toe"
 
-        private val X_EMOJI = Emojis.x
-        private val O_EMOJI = Emojis.o
-    }
+    private val timeoutDuration = 30.seconds
 
     override suspend fun setup() {
         publicSlashCommand(

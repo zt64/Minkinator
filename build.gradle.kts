@@ -1,7 +1,10 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     application
-    kotlin("jvm") version "1.8.0-Beta"
-    kotlin("plugin.serialization") version "1.8.0-Beta"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 application {
@@ -23,30 +26,25 @@ repositories {
     }
 }
 
+kotlin {
+    jvmToolchain(19)
+}
+
 dependencies {
-    implementation("com.kotlindiscord.kord.extensions:kord-extensions:1.5.5-SNAPSHOT")
-    implementation("dev.kord.x:emoji:0.5.0")
-    implementation("com.aallam.openai:openai-client:2.0.0")
-    implementation("ch.qos.logback:logback-classic:1.4.5")
+    implementation(libs.kord.ex)
+    implementation(libs.kord.emoji)
+    implementation(libs.openai.client)
+    implementation(libs.logback.classic)
+    implementation(libs.ktor.client.encoding)
+    implementation(libs.sqlite.jdbc)
 
-    val scrimmageVersion = "4.0.32"
-    implementation("com.sksamuel.scrimage:scrimage-core:$scrimmageVersion")
-    implementation("com.sksamuel.scrimage:scrimage-filters:$scrimmageVersion")
-    implementation("com.sksamuel.scrimage:scrimage-webp:$scrimmageVersion")
-
-    // Exposed
-    val exposedVersion = "0.41.1"
-    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
-    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-    implementation("org.xerial:sqlite-jdbc:3.39.4.1")
+    implementation(libs.bundles.scrimmage)
+    implementation(libs.bundles.exposed)
+    implementation(libs.bundles.kotlin.dl)
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
-}
-
-kotlin.target.compilations.all {
-    kotlinOptions.jvmTarget = "11"
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs += "-Xcontext-receivers"
+    }
 }
