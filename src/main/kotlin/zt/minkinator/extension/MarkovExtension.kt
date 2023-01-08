@@ -13,16 +13,17 @@ import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.types.respond
 import com.kotlindiscord.kord.extensions.utils.botHasPermissions
 import com.kotlindiscord.kord.extensions.utils.env
-import com.kotlindiscord.kord.extensions.utils.hasPermission
 import com.kotlindiscord.kord.extensions.utils.selfMember
 import dev.kord.common.Color
 import dev.kord.common.entity.ButtonStyle
 import dev.kord.common.entity.Permission
 import dev.kord.common.entity.optional.value
+import dev.kord.core.behavior.channel.asChannelOf
 import dev.kord.core.behavior.channel.asChannelOfOrNull
 import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Message
+import dev.kord.core.entity.channel.GuildChannel
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.kordLogger
@@ -86,7 +87,7 @@ object MarkovExtension : Extension() {
                 val message = event.message
                 val guild = event.getGuild()!!
 
-                val dbGuild = transaction {
+                val dbGuild = newSuspendedTransaction {
                     Guild.findById(event.guildId!!.value.toLong()) ?: Guild.new(event.guildId!!.value.toLong()) { }
                 }
 
@@ -102,7 +103,7 @@ object MarkovExtension : Extension() {
                     }
                 }
 
-                if (!guild.selfMember().hasPermission(Permission.SendMessages)) return@action
+                if (!message.channel.asChannelOf<GuildChannel>().botHasPermissions(Permission.SendMessages)) return@action
 
                 if (message.mentions(kord.selfId)) {
                     val sentence = markov(dbGuild.data, (1..100).random())
