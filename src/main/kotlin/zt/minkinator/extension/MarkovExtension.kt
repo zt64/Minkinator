@@ -33,7 +33,7 @@ import dev.kord.rest.builder.message.create.embed
 import kotlinx.coroutines.flow.toList
 import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
 import org.jetbrains.exposed.sql.transactions.transaction
-import zt.minkinator.Guild
+import zt.minkinator.data.Guild
 import zt.minkinator.util.*
 import java.util.*
 import kotlin.random.Random
@@ -162,15 +162,15 @@ object MarkovExtension : Extension() {
                                 appendLine("Save changes?")
 
                                 if (enabled != null) {
-                                    appendLine("Enabled: prevValue -> $enabled")
+                                    appendLine("Enabled: $enabled")
                                 }
 
                                 if (frequency != null) {
-                                    appendLine("Frequency: prevValue -> $frequency")
+                                    appendLine("Frequency: $frequency")
                                 }
 
                                 if (speakOnMention != null) {
-                                    appendLine("Speak on mention: prevValue -> $speakOnMention")
+                                    appendLine("Speak on mention: $speakOnMention")
                                 }
                             }
                         }
@@ -236,12 +236,10 @@ object MarkovExtension : Extension() {
                     val newData = messages.joinToString("\n", transform = Message::content)
 
                     val guildId = channel.guildId
-                    val dbGuild = transaction {
-                        Guild.findById(guildId.value.toLong()) ?: Guild.new(guildId.value.toLong()) { }
-                    }
 
                     transaction {
-                        dbGuild.data += "\n$newData"
+                        val guild = Guild.findById(guildId.value.toLong()) ?: Guild.new(guildId.value.toLong()) { }
+                        guild.data += "\n$newData"
                     }
 
                     msg.edit {

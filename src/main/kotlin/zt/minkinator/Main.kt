@@ -15,8 +15,9 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.module.dsl.singleOf
-import org.koin.ext.getFullName
-import org.sqlite.JDBC
+import zt.minkinator.data.Filters
+import zt.minkinator.data.Guilds
+import zt.minkinator.data.MarkovConfigs
 import zt.minkinator.extension.*
 import zt.minkinator.extension.filter.FilterExtension
 import zt.minkinator.util.unaryPlus
@@ -27,6 +28,10 @@ suspend fun main() {
     val bot = ExtensibleBot(env("TOKEN")) {
         intents(false) {
             +Intent.GuildMessages
+        }
+
+        kord {
+            stackTraceRecovery = true
         }
 
         extensions {
@@ -101,6 +106,7 @@ suspend fun main() {
                         isLenient = true
                     }
 
+
                     fun provideHttpClient(json: Json) = HttpClient {
                         install(ContentNegotiation) {
                             json(json)
@@ -114,10 +120,10 @@ suspend fun main() {
         }
     }
 
-    Database.connect(url = "jdbc:sqlite:./database.db", driver = JDBC::class.getFullName())
+    Database.connect(url = "jdbc:sqlite:./database.db", driver = "org.sqlite.JDBC")
 
     transaction {
-        SchemaUtils.createMissingTablesAndColumns(Guilds, Users, MarkovConfigs, Filters)
+        SchemaUtils.createMissingTablesAndColumns(Guilds, MarkovConfigs, Filters)
     }
 
     Runtime.getRuntime().addShutdownHook(

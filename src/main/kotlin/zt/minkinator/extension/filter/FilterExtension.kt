@@ -19,8 +19,8 @@ import dev.kord.core.behavior.ban
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.rest.builder.message.create.embed
 import org.jetbrains.exposed.sql.transactions.transaction
-import zt.minkinator.Filter
-import zt.minkinator.Guild
+import zt.minkinator.data.Filter
+import zt.minkinator.data.Guild
 import zt.minkinator.util.*
 
 object FilterExtension : Extension() {
