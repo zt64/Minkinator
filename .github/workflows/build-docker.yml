@@ -10,9 +10,6 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        platform: [{name: linux/amd64}, {name: linux/arm64, prefix: arm64v8\/}]
     steps:
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
@@ -27,21 +24,14 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Checkout
-      uses: actions/checkout@v3
-
     - name: Get repo name
       id: get-repo
       run: |
         echo "repo=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
-
-    - name: Apply platform-specific image prefix
-      run: sed -i 's/FROM eclipse-temurin/FROM ${{ matrix.platform.prefix }}eclipse-temurin/g' ./dockerfile && cat ./dockerfile
 
     - name: Build and push
       uses: docker/build-push-action@v3
       with:
         push: true
         tags: ghcr.io/${{ steps.get-repo.outputs.repo }}:latest
-        platforms: ${{ matrix.platform.name }}
-        context: .
+        platforms: amd64
