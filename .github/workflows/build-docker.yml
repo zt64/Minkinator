@@ -44,3 +44,4 @@ jobs:
         push: true
         tags: ghcr.io/${{ steps.get-repo.outputs.repo }}:latest
         platforms: ${{ matrix.platform.name }}
+        context: .
