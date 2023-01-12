@@ -36,7 +36,7 @@ jobs:
         echo "repo=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
 
     - name: Apply platform-specific image prefix
-      run: sed -i 's/FROM eclipse-temurin/FROM ${{ matrix.platform.prefix }}eclipse-temurin/' ./dockerfile
+      run: sed -i 's/FROM eclipse-temurin/FROM ${{ matrix.platform.prefix }}eclipse-temurin/g' ./dockerfile && cat ./dockerfile
 
     - name: Build and push
       uses: docker/build-push-action@v3
