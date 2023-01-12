@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        platform: [{name: linux/amd64}, {name: linux/arm64, prefix: arm64/}]
+        platform: [{name: linux/amd64}, {name: linux/arm64, prefix: arm64\/}]
     steps:
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
