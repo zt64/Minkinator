@@ -30,9 +30,14 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
+    - name: Get repo name
+      id: get-repo
+      run: |
+        echo "repo=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
+
     - name: Build and push
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: ghcr.io/${{ github.repository }}:latest
+        tags: ghcr.io/${{ steps.get-repo.outputs.repo }}:latest
         platforms: ${{ matrix.platform }}
