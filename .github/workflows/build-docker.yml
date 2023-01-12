@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        platform: [linux/amd64, linux/arm64/v8]
+        platform: [{name: linux/amd64}, {name: linux/arm64, prefix: arm64/}]
     steps:
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2
@@ -35,9 +35,12 @@ jobs:
       run: |
         echo "repo=${GITHUB_REPOSITORY,,}" >> $GITHUB_OUTPUT
 
+    - name: Apply platform-specific image prefix
+      run: sed -i 's/FROM eclipse-temurin/FROM ${{ matrix.platform.prefix }}eclipse-temurin/g' ./dockerfile
+
     - name: Build and push
       uses: docker/build-push-action@v3
       with:
         push: true
         tags: ghcr.io/${{ steps.get-repo.outputs.repo }}:latest
-        platforms: ${{ matrix.platform }}
+        platforms: ${{ matrix.platform.name }}
