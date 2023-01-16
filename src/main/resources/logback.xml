@@ -23,7 +23,7 @@
         </filter>
         <encoder>
             <pattern>
-                %boldGreen(%d{dd-MM-yyyy}) %boldYellow(%d{HH:mm:ss}) %gray(|) %highlight(%-5level) %gray(|) %boldMagenta(%32.32logger{0}) %gray(|) %msg%n
+                %boldGreen(%d{MM-dd-yyyy}) %boldYellow(%d{HH:mm:ss}) %gray(|) %highlight(%-5level) %gray(|) %boldMagenta(%32.32logger{0}) %gray(|) %msg%n
             </pattern>
         </encoder>
     </appender>
