@@ -1,6 +1,7 @@
 package zt.minkinator.extension.filter
 
 import com.kotlindiscord.kord.extensions.DiscordRelayedException
+import com.kotlindiscord.kord.extensions.annotations.DoNotChain
 import com.kotlindiscord.kord.extensions.checks.anyGuild
 import com.kotlindiscord.kord.extensions.checks.guildFor
 import com.kotlindiscord.kord.extensions.commands.Arguments
@@ -13,6 +14,7 @@ import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.types.editingPaginator
 import com.kotlindiscord.kord.extensions.types.respond
+import com.kotlindiscord.kord.extensions.utils.timeout
 import dev.kord.common.Color
 import dev.kord.common.entity.Permission
 import dev.kord.core.behavior.ban
@@ -22,10 +24,12 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import zt.minkinator.data.Filter
 import zt.minkinator.data.Guild
 import zt.minkinator.util.*
+import kotlin.time.Duration
 
 object FilterExtension : Extension() {
     override val name = "filter"
 
+    @OptIn(DoNotChain::class)
     override suspend fun setup() {
         event<MessageCreateEvent> {
             check {
@@ -62,7 +66,10 @@ object FilterExtension : Extension() {
                         }
 
                         FilterAction.TIMEOUT -> {
-                            // member.timeout()
+                            member.timeout(
+                                until = Duration.INFINITE,
+                                reason = "Triggered filter: ${filter.id.value}: ${message.content}"
+                            )
                         }
 
                         FilterAction.KICK -> {
@@ -76,7 +83,9 @@ object FilterExtension : Extension() {
                         }
                     }
 
-                    if (filter.deleteMessage) message.delete("Triggered filter ${filter.id.value}: ${message.content}")
+                    if (filter.deleteMessage) {
+                        message.delete("Triggered filter ${filter.id.value}: ${message.content}")
+                    }
                 }
             }
         }
@@ -164,6 +173,23 @@ object FilterExtension : Extension() {
                 }
             }
 
+            fun Filter.print() = buildString {
+                appendLine("Filter ID: ${id.value}")
+                appendLine("Pattern: `${pattern}`")
+
+                when (action) {
+                    FilterAction.REPLY -> {
+                        appendLine("Response: $response")
+                        appendLine("Delete message: $deleteMessage")
+                    }
+
+                    FilterAction.WARN -> {}
+                    FilterAction.TIMEOUT -> {}
+                    FilterAction.KICK -> {}
+                    FilterAction.BAN -> {}
+                }
+            }
+
             ephemeralSubCommand(
                 name = "list",
                 description = "List all configured filters"
@@ -186,25 +212,11 @@ object FilterExtension : Extension() {
                                     title = "Filters"
 
                                     chunkedFilters.forEach { filter ->
-                                        field {
-                                            name = "ID: ${filter.id.value}"
-                                            value = buildString {
-                                                appendLine("Pattern: `${filter.pattern}`")
-
-                                                when (filter.action) {
-                                                    FilterAction.REPLY -> {
-                                                        appendLine("Response: ${filter.response}")
-                                                        appendLine("Delete message: ${filter.deleteMessage}")
-                                                    }
-
-                                                    FilterAction.WARN -> {}
-                                                    FilterAction.TIMEOUT -> {}
-                                                    FilterAction.KICK -> {}
-                                                    FilterAction.BAN -> {}
-                                                }
-                                            }
+                                        field(
+                                            name = "ID: ${filter.id.value}",
+                                            value = filter.print(),
                                             inline = true
-                                        }
+                                        )
                                     }
                                 }
                             }
@@ -237,24 +249,7 @@ object FilterExtension : Extension() {
                                 description = "No filters matched"
                             } else {
                                 color = Color.success
-                                description = matchedFilters.joinToString { filter ->
-                                    buildString {
-                                        appendLine("Filter ID: ${filter.id.value}")
-                                        appendLine("Pattern: `${filter.pattern}`")
-
-                                        when (filter.action) {
-                                            FilterAction.REPLY -> {
-                                                appendLine("Response: ${filter.response}")
-                                                appendLine("Delete message: ${filter.deleteMessage}")
-                                            }
-
-                                            FilterAction.WARN -> {}
-                                            FilterAction.TIMEOUT -> {}
-                                            FilterAction.KICK -> {}
-                                            FilterAction.BAN -> {}
-                                        }
-                                    }
-                                }
+                                description = matchedFilters.joinToString(transform = Filter::print)
                             }
                         }
                     }

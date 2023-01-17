@@ -95,9 +95,7 @@ object PollExtension : Extension() {
 
                         }
 
-                        description = choices.joinToString(separator = "\n") { choice ->
-                            "$choice: 0"
-                        }
+                        description = choices.joinToString("\n") { choice -> "$choice: 0" }
                     }
                 }
             }

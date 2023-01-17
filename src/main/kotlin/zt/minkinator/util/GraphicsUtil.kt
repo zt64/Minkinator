@@ -1,28 +1,31 @@
 package zt.minkinator.util
 
 import com.sksamuel.scrimage.ImmutableImage
-import com.sksamuel.scrimage.nio.*
+import com.sksamuel.scrimage.nio.AnimatedGifReader
+import com.sksamuel.scrimage.nio.ImageSource
+import com.sksamuel.scrimage.nio.PngWriter
+import com.sksamuel.scrimage.nio.StreamingGifWriter
+import io.ktor.utils.io.*
+import io.ktor.utils.io.jvm.javaio.*
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
-import java.io.InputStream
 
 fun mutateImage(
-    inputStream: InputStream,
-    writer: ImageWriter = PngWriter.MinCompression,
+    byteArray: ByteArray,
     block: (image: ImmutableImage) -> ImmutableImage
-): InputStream {
-    val originalImage = ImmutableImage.loader().fromStream(inputStream)
+): ByteReadChannel {
+    val originalImage = ImmutableImage.loader().fromBytes(byteArray)
 
-    return block(originalImage).bytes(writer).inputStream()
+    return block(originalImage).bytes(PngWriter.MinCompression).inputStream().toByteReadChannel()
 }
 
 fun mutateGif(
-    inputStream: InputStream,
+    byteArray: ByteArray,
     block: (frame: ImmutableImage) -> ImmutableImage
-): InputStream {
-    val gif = AnimatedGifReader.read(ImageSource.of(inputStream))
+): ByteReadChannel {
+    val gif = AnimatedGifReader.read(ImageSource.of(byteArray))
 
-    val gifWriter = StreamingGifWriter(gif.getDelay(0), true)
+    val gifWriter = StreamingGifWriter(gif.getDelay(0), true, true)
     val outputStream = ByteArrayOutputStream()
     val stream = gifWriter.prepareStream(outputStream, BufferedImage.TYPE_INT_ARGB)
 
@@ -32,5 +35,5 @@ fun mutateGif(
         }
     }
 
-    return outputStream.toByteArray().inputStream()
+    return outputStream.toByteArray().inputStream().toByteReadChannel()
 }

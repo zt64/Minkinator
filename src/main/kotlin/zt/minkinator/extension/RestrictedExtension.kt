@@ -9,6 +9,7 @@ import dev.kord.gateway.Intent
 import dev.kord.rest.builder.message.create.embed
 import kotlinx.coroutines.flow.toList
 import zt.minkinator.util.ephemeralSlashCommand
+import zt.minkinator.util.isSuperuser
 import zt.minkinator.util.success
 import java.net.InetAddress
 import kotlin.time.Duration.Companion.milliseconds
@@ -27,7 +28,7 @@ object RestrictedExtension : Extension() {
             guild(testingGuildId)
 
             check {
-
+                isSuperuser()
             }
 
             action {
@@ -44,7 +45,7 @@ object RestrictedExtension : Extension() {
             guild(testingGuildId)
 
             check {
-
+                isSuperuser()
             }
 
             action {
@@ -69,7 +70,7 @@ object RestrictedExtension : Extension() {
             guild(testingGuildId)
 
             check {
-
+                isSuperuser()
             }
 
             action {

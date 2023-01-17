@@ -6,6 +6,7 @@ import com.kotlindiscord.kord.extensions.commands.Arguments
 import com.kotlindiscord.kord.extensions.commands.converters.impl.member
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.event
+import com.kotlindiscord.kord.extensions.types.EphemeralInteractionContext
 import com.kotlindiscord.kord.extensions.types.respond
 import com.kotlindiscord.kord.extensions.utils.hasPermission
 import com.kotlindiscord.kord.extensions.utils.selfMember
@@ -70,6 +71,18 @@ object NameNormalizerExtension : Extension() {
             }
         }
 
+        suspend fun EphemeralInteractionContext.normalize(member: Member) {
+            respond {
+                content = if (!member.displayName.isNormalized()) {
+                    member.normalizeName()
+
+                    "Normalized name for ${member.mention}"
+                } else {
+                    "Name is already normalized for ${member.mention}"
+                }
+            }
+        }
+
         ephemeralSlashCommand(
             name = "normalize",
             description = "Normalize a members display name",
@@ -83,17 +96,7 @@ object NameNormalizerExtension : Extension() {
             }
 
             action {
-                val target = arguments.member
-
-                respond {
-                    content = if (!target.displayName.isNormalized()) {
-                        target.normalizeName()
-
-                        "Normalized name for ${target.mention}"
-                    } else {
-                        "Name is already normalized for ${target.mention}"
-                    }
-                }
+                normalize(arguments.member)
             }
         }
 
@@ -106,17 +109,7 @@ object NameNormalizerExtension : Extension() {
             }
 
             action {
-                val member = targetUsers.single().asMember(guild!!.id)
-
-                respond {
-                    content = if (!member.displayName.isNormalized()) {
-                        member.normalizeName()
-
-                        "Normalized name for ${member.mention}"
-                    } else {
-                        "Name is already normalized for ${member.mention}"
-                    }
-                }
+                normalize(targetUsers.single().asMember(guild!!.id))
             }
         }
     }

@@ -4,9 +4,11 @@ import com.kotlindiscord.kord.extensions.ExtensibleBot
 import com.kotlindiscord.kord.extensions.utils.env
 import com.kotlindiscord.kord.extensions.utils.envOrNull
 import com.kotlindiscord.kord.extensions.utils.loadModule
+import dev.kord.common.Color
 import dev.kord.core.kordLogger
 import dev.kord.gateway.Intent
 import dev.kord.gateway.builder.Shards
+import dev.kord.rest.builder.message.create.embed
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
@@ -20,6 +22,7 @@ import zt.minkinator.data.Guilds
 import zt.minkinator.data.MarkovConfigs
 import zt.minkinator.extension.*
 import zt.minkinator.extension.filter.FilterExtension
+import zt.minkinator.util.error
 import zt.minkinator.util.unaryPlus
 
 const val GPT_MODE = false
@@ -94,8 +97,12 @@ suspend fun main() {
 
         sharding(::Shards)
 
-        errorResponse { message, type ->
-            content = "> $message"
+        errorResponse { message, _ ->
+            embed {
+                color = Color.error
+                title = "Error"
+                description = message
+            }
         }
 
         hooks {

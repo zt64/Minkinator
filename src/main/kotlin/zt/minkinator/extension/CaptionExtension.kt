@@ -14,7 +14,7 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
-import io.ktor.utils.io.jvm.javaio.*
+import io.ktor.utils.io.*
 import org.koin.core.component.inject
 import zt.minkinator.util.mutateGif
 import zt.minkinator.util.mutateImage
@@ -71,27 +71,21 @@ object CaptionExtension : Extension() {
                     ).image
                 }
 
-                val inputStream = httpClient.get(attachment.url).bodyAsChannel().toInputStream()
+                val byteArray = httpClient.get(attachment.url).readBytes()
+
+                fun mutate(
+                    kFunction: (ByteArray, (frame: ImmutableImage) -> ImmutableImage) -> ByteReadChannel
+                ) = ChannelProvider { kFunction(byteArray, ::block) }
 
                 val file = if (attachment.filename.endsWith(".gif")) {
-                    val mutatedGif = mutateGif(
-                        inputStream = inputStream,
-                        block = { frame -> block(frame) }
-                    )
-
                     NamedFile(
                         name = "h.gif",
-                        contentProvider = ChannelProvider { mutatedGif.toByteReadChannel() }
+                        contentProvider = mutate(::mutateGif)
                     )
                 } else {
-                    val mutatedImage = mutateImage(
-                        inputStream = inputStream,
-                        block = { image -> block(image) }
-                    )
-
                     NamedFile(
                         name = "h.png",
-                        contentProvider = ChannelProvider { mutatedImage.toByteReadChannel() }
+                        contentProvider = mutate(::mutateImage)
                     )
                 }
 

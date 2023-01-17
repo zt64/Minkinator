@@ -18,7 +18,6 @@ import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
-import io.ktor.utils.io.jvm.javaio.*
 import org.koin.core.component.inject
 import zt.minkinator.util.chatCommand
 import zt.minkinator.util.mutateGif
@@ -47,25 +46,22 @@ object EffectsExtension : Extension() {
                 val avatar = user.avatar ?: user.defaultAvatar
 
                 val file = if (avatar.animated) {
-                    val mutatedGif = mutateGif(
-                        inputStream = avatar.getImage(Image.Format.GIF).data.inputStream(),
-                        block = { frame -> block(this@action.arguments, frame) }
-                    )
+                    val mutatedGif = mutateGif(avatar.getImage(Image.Format.GIF).data) { frame ->
+                        block(this@action.arguments, frame)
+                    }
 
                     NamedFile(
                         name = "${user.username}.gif",
-                        contentProvider = ChannelProvider(block = mutatedGif::toByteReadChannel)
+                        contentProvider = ChannelProvider { mutatedGif }
                     )
                 } else {
-                    val mutatedImage = mutateImage(
-                        inputStream = avatar.getImage().data.inputStream()
-                    ) { image ->
+                    val mutatedImage = mutateImage(avatar.getImage().data) { image ->
                         block(this@action.arguments, image)
                     }
 
                     NamedFile(
                         name = "${user.username}.png",
-                        contentProvider = ChannelProvider(block = mutatedImage::toByteReadChannel)
+                        contentProvider = ChannelProvider { mutatedImage }
                     )
                 }
 
@@ -84,7 +80,11 @@ object EffectsExtension : Extension() {
             image.filter(filter(this))
         }
 
-        suspend fun addFilterCommand(name: String, description: String, filter: Filter): PublicSlashCommand<BaseArgs, *> {
+        suspend fun addFilterCommand(
+            name: String,
+            description: String,
+            filter: Filter
+        ): PublicSlashCommand<BaseArgs, *> {
             return addCommand(name, description, ::BaseArgs) { image ->
                 image.filter(filter)
             }
@@ -104,30 +104,116 @@ object EffectsExtension : Extension() {
         addFilterCommand("dither", "Apply a dither filter to a user's avatar", DitherFilter())
         addFilterCommand("ripple", "Apply a ripple filter to a user's avatar", RippleFilter(RippleType.Noise))
 
+        class PixelateArgs : BaseArgs() {
+            val blockSize by defaultingInt {
+                name = "block-size"
+                description = "The number of pixels along each block edge"
+                defaultValue = 8
+                minValue = 0
+                maxValue = 512
+            }
+        }
+
         addFilterCommand("pixelate", "Pixelate a user's avatar", ::PixelateArgs) {
             PixelateFilter(blockSize)
+        }
+
+        class KaleidoscopeArgs : BaseArgs() {
+            val sides by defaultingInt {
+                name = "sides"
+                description = "The number of sides"
+                defaultValue = 5
+                minValue = 3
+                maxValue = 128
+            }
         }
 
         addFilterCommand("kaleidoscope", "Apply a kaleidoscope filter to a user's avatar", ::KaleidoscopeArgs) {
             KaleidoscopeFilter(sides)
         }
 
+        class TwirlArgs : BaseArgs() {
+            val angle by defaultingDecimal {
+                name = "angle"
+                description = "The angle in degrees"
+                defaultValue = 200.0
+
+                mutate { value -> value * (PI / 180) }
+            }
+            val radius by defaultingDecimal {
+                name = "radius"
+                description = "The radius"
+                defaultValue = 50.0
+                minValue = 0.0
+            }
+        }
+
         addFilterCommand("twirl", "Apply a twirl filter to a user's avatar", ::TwirlArgs) {
             TwirlFilter(angle.toFloat(), radius.toFloat())
+        }
+
+        class ThresholdArgs : BaseArgs() {
+            val threshold by defaultingInt {
+                name = "threshold"
+                description = "The threshold"
+                defaultValue = 127
+                minValue = 0
+                maxValue = 255
+            }
         }
 
         addFilterCommand("threshold", "Apply a threshold filter to a user's avatar", ::ThresholdArgs) {
             ThresholdFilter(threshold)
         }
 
+        class RotateArgs : BaseArgs() {
+            val degrees by int {
+                name = "degrees"
+                description = "How many degrees to rotate the avatar by"
+            }
+        }
+
         addCommand("rotate", "Rotate a user's avatar", ::RotateArgs) { image ->
             image.rotate(Degrees(degrees))
         }
 
+        class FlipArgs : BaseArgs() {
+            val axis by enum<Axis> {
+                name = "axis"
+                typeName = "axis"
+                description = "The axis to flip the avatar on"
+
+                autoComplete {
+                    suggestStringCollection(Axis.values().map(Axis::name))
+                }
+            }
+        }
+
         addCommand("flip", "Flip a user's avatar", ::FlipArgs) { image ->
             when (axis) {
-                FlipArgs.Axis.X -> image.flipX()
-                FlipArgs.Axis.Y -> image.flipY()
+                Axis.X -> image.flipX()
+                Axis.Y -> image.flipY()
+            }
+        }
+
+        class ResizeArgs : Arguments() {
+            val message by message {
+                name = "message"
+                description = "The message containing an image to resize"
+
+                validate {
+                    failIf("Message has no images") {
+                        value.embeds.none { embed ->
+                            embed.type is EmbedType.Image || embed.type is EmbedType.Gifv
+                        } && value.attachments.none(Attachment::isImage)
+                    }
+                }
+            }
+            val factor by decimal {
+                name = "factor"
+                description = "The factor to resize the image by"
+                minValue = 0.0
+                maxValue = 10.0
             }
         }
 
@@ -152,25 +238,20 @@ object EffectsExtension : Extension() {
                     animated to embed.url!!
                 }
 
-                val inputStream = httpClient.get(url).bodyAsChannel().toInputStream()
+                val byteArray = httpClient.get(url).readBytes()
+                val output = ChannelProvider {
+                    mutateImage(byteArray) { image -> image.scale(arguments.factor) }
+                }
 
                 val file = if (isAnimated) {
                     NamedFile(
                         name = "resized.gif",
-                        contentProvider = ChannelProvider {
-                            mutateGif(inputStream) { frame ->
-                                frame.scale(arguments.factor)
-                            }.toByteReadChannel()
-                        }
+                        contentProvider = output
                     )
                 } else {
                     NamedFile(
                         name = "resized.png",
-                        contentProvider = ChannelProvider {
-                            mutateImage(inputStream) { image ->
-                                image.scale(arguments.factor)
-                            }.toByteReadChannel()
-                        }
+                        contentProvider = output
                     )
                 }
 
@@ -188,93 +269,7 @@ object EffectsExtension : Extension() {
         }
     }
 
-    private class ResizeArgs : Arguments() {
-        val message by message {
-            name = "message"
-            description = "The message containing an image to resize"
-
-            validate {
-                failIf("Message has no images") {
-                    value.embeds.none { embed ->
-                        embed.type is EmbedType.Image || embed.type is EmbedType.Gifv
-                    } && value.attachments.none(Attachment::isImage)
-                }
-            }
-        }
-        val factor by decimal {
-            name = "factor"
-            description = "The factor to resize the image by"
-            minValue = 0.0
-            maxValue = 10.0
-        }
-    }
-
-    private class TwirlArgs : BaseArgs() {
-        val angle by defaultingDecimal {
-            name = "angle"
-            description = "The angle in degrees"
-            defaultValue = 200.0
-
-            mutate { value -> value * (PI / 180) }
-        }
-        val radius by defaultingDecimal {
-            name = "radius"
-            description = "The radius"
-            defaultValue = 50.0
-            minValue = 0.0
-        }
-    }
-
-    private class ThresholdArgs : BaseArgs() {
-        val threshold by defaultingInt {
-            name = "threshold"
-            description = "The threshold"
-            defaultValue = 127
-            minValue = 0
-            maxValue = 255
-        }
-    }
-
-    private class PixelateArgs : BaseArgs() {
-        val blockSize by defaultingInt {
-            name = "block-size"
-            description = "The number of pixels along each block edge"
-            defaultValue = 8
-            minValue = 0
-            maxValue = 512
-        }
-    }
-
-    private class KaleidoscopeArgs : BaseArgs() {
-        val sides by defaultingInt {
-            name = "sides"
-            description = "The number of sides"
-            defaultValue = 5
-            minValue = 3
-            maxValue = 128
-        }
-    }
-
-    private class RotateArgs : BaseArgs() {
-        val degrees by int {
-            name = "degrees"
-            description = "How many degrees to rotate the avatar by"
-        }
-    }
-
-    private class FlipArgs : BaseArgs() {
-        enum class Axis {
-            X, Y
-        }
-
-        val axis by enum<Axis> {
-            name = "axis"
-            typeName = "axis"
-            description = "The axis to flip the avatar on"
-
-            autoComplete {
-                suggestStringCollection(Axis.values().map(Axis::name))
-            }
-        }
+    private enum class Axis {
+        X, Y
     }
 }
