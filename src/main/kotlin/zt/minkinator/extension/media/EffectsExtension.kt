@@ -1,34 +1,22 @@
-package zt.minkinator.extension
+package zt.minkinator.extension.media
 
 import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.application.slash.PublicSlashCommand
 import com.kotlindiscord.kord.extensions.commands.converters.impl.*
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.types.respond
 import com.kotlindiscord.kord.extensions.utils.suggestStringCollection
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.angles.Degrees
+import com.sksamuel.scrimage.composite.SubtractComposite
 import com.sksamuel.scrimage.filter.*
-import dev.kord.common.entity.EmbedType
-import dev.kord.core.behavior.reply
-import dev.kord.core.entity.Attachment
 import dev.kord.rest.Image
 import dev.kord.rest.NamedFile
-import io.ktor.client.*
-import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
-import io.ktor.client.statement.*
-import org.koin.core.component.inject
-import zt.minkinator.util.chatCommand
-import zt.minkinator.util.mutateGif
-import zt.minkinator.util.mutateImage
 import zt.minkinator.util.publicSlashCommand
 import kotlin.math.PI
 
 object EffectsExtension : Extension() {
     override val name = "effects"
-
-    private val httpClient: HttpClient by inject()
 
     override suspend fun setup() {
         suspend fun <T : BaseArgs> addCommand(
@@ -45,30 +33,31 @@ object EffectsExtension : Extension() {
                 val user = this@action.arguments.user
                 val avatar = user.avatar ?: user.defaultAvatar
 
-                val file = if (avatar.animated) {
-                    val mutatedGif = mutateGif(avatar.getImage(Image.Format.GIF).data) { frame ->
+                val (extension, byteReadChannel) = if (avatar.animated) {
+                    "gif" to mutateGif(avatar.getImage(Image.Format.GIF).data) { frame ->
                         block(this@action.arguments, frame)
                     }
-
-                    NamedFile(
-                        name = "${user.username}.gif",
-                        contentProvider = ChannelProvider { mutatedGif }
-                    )
                 } else {
-                    val mutatedImage = mutateImage(avatar.getImage().data) { image ->
+                    "png" to mutateImage(avatar.getImage().data) { image ->
                         block(this@action.arguments, image)
                     }
-
-                    NamedFile(
-                        name = "${user.username}.png",
-                        contentProvider = ChannelProvider { mutatedImage }
-                    )
                 }
 
                 respond {
-                    files += file
+                    files += NamedFile(
+                        name = "${user.username}.$extension",
+                        contentProvider = ChannelProvider { byteReadChannel }
+                    )
                 }
             }
+        }
+
+        suspend fun addCommand(
+            name: String,
+            description: String,
+            block: (image: ImmutableImage) -> ImmutableImage
+        ) = addCommand(name, description, EffectsExtension::BaseArgs) {
+            block(it)
         }
 
         suspend fun <T : BaseArgs> addFilterCommand(
@@ -83,26 +72,26 @@ object EffectsExtension : Extension() {
         suspend fun addFilterCommand(
             name: String,
             description: String,
-            filter: Filter
-        ): PublicSlashCommand<BaseArgs, *> {
-            return addCommand(name, description, ::BaseArgs) { image ->
-                image.filter(filter)
-            }
+            filter: () -> Filter
+        ) = addCommand(name, description) { image ->
+            image.filter(filter())
         }
 
-        addFilterCommand("invert", "Invert the colors of a user's avatar", InvertFilter())
-        addFilterCommand("grayscale", "Convert a user's avatar to grayscale", GrayscaleFilter())
-        addFilterCommand("solarize", "Solarize a user's avatar", SolarizeFilter())
-        addFilterCommand("sepia", "Convert a user's avatar to sepia", SepiaFilter())
-        addFilterCommand("posterize", "Posterize a user's avatar", PosterizeFilter())
-        addFilterCommand("oil", "Apply an oil filter to a user's avatar", OilFilter())
-        addFilterCommand("emboss", "Emboss a user's avatar", EmbossFilter())
-        addFilterCommand("bump", "Apply a bump filter to a user's avatar", BumpFilter())
-        addFilterCommand("blur", "Blur a user's avatar", BlurFilter())
-        addFilterCommand("sharpen", "Sharpen a user's avatar", SharpenFilter())
-        addFilterCommand("edge", "Detect edges in a user's avatar", EdgeFilter())
-        addFilterCommand("dither", "Apply a dither filter to a user's avatar", DitherFilter())
-        addFilterCommand("ripple", "Apply a ripple filter to a user's avatar", RippleFilter(RippleType.Noise))
+        addFilterCommand("invert", "Invert the colors of a user's avatar", ::InvertFilter)
+        addFilterCommand("grayscale", "Convert a user's avatar to grayscale", ::GrayscaleFilter)
+        addFilterCommand("solarize", "Solarize a user's avatar", ::SolarizeFilter)
+        addFilterCommand("sepia", "Convert a user's avatar to sepia", ::SepiaFilter)
+        addFilterCommand("posterize", "Posterize a user's avatar", ::PosterizeFilter)
+        addFilterCommand("oil", "Apply an oil filter to a user's avatar", ::OilFilter)
+        addFilterCommand("emboss", "Emboss a user's avatar", ::EmbossFilter)
+        addFilterCommand("bump", "Apply a bump filter to a user's avatar", ::BumpFilter)
+        addFilterCommand("blur", "Blur a user's avatar", ::BlurFilter)
+        addFilterCommand("sharpen", "Sharpen a user's avatar", ::SharpenFilter)
+        addFilterCommand("edge", "Detect edges in a user's avatar", ::EdgeFilter)
+        addFilterCommand("dither", "Apply a dither filter to a user's avatar", ::DitherFilter)
+        addFilterCommand("ripple", "Apply a ripple filter to a user's avatar") {
+            RippleFilter(RippleType.Noise)
+        }
 
         class PixelateArgs : BaseArgs() {
             val blockSize by defaultingInt {
@@ -196,19 +185,7 @@ object EffectsExtension : Extension() {
             }
         }
 
-        class ResizeArgs : Arguments() {
-            val message by message {
-                name = "message"
-                description = "The message containing an image to resize"
-
-                validate {
-                    failIf("Message has no images") {
-                        value.embeds.none { embed ->
-                            embed.type is EmbedType.Image || embed.type is EmbedType.Gifv
-                        } && value.attachments.none(Attachment::isImage)
-                    }
-                }
-            }
+        class ResizeArgs : BaseArgs() {
             val factor by decimal {
                 name = "factor"
                 description = "The factor to resize the image by"
@@ -217,48 +194,14 @@ object EffectsExtension : Extension() {
             }
         }
 
-        chatCommand(
-            name = "resize",
-            description = "Resizes an image",
-            arguments = ::ResizeArgs
-        ) {
-            action {
-                val message = arguments.message
+        addCommand("resize", "Resizes an image", ::ResizeArgs) { image ->
+            image.scale(factor)
+        }
 
-                val (isAnimated, url) = if (message.attachments.isNotEmpty()) {
-                    val attachment = message.attachments.first { it.isImage }
+        addCommand("speech-bubble", "Adds a speech bubble to an image") { image ->
+            val speechBubble = ImmutableImage.loader().fromResource("/speech-bubble.png")
 
-                    attachment.filename.endsWith(".gif") to attachment.url
-                } else {
-                    val embed = message.embeds.first { embed ->
-                        embed.type is EmbedType.Image || embed.type is EmbedType.Gifv
-                    }
-                    val animated = embed.url!!.endsWith(".gif") || embed.type is EmbedType.Gifv
-
-                    animated to embed.url!!
-                }
-
-                val byteArray = httpClient.get(url).readBytes()
-                val output = ChannelProvider {
-                    mutateImage(byteArray) { image -> image.scale(arguments.factor) }
-                }
-
-                val file = if (isAnimated) {
-                    NamedFile(
-                        name = "resized.gif",
-                        contentProvider = output
-                    )
-                } else {
-                    NamedFile(
-                        name = "resized.png",
-                        contentProvider = output
-                    )
-                }
-
-                message.reply {
-                    files += file
-                }
-            }
+            image.composite(SubtractComposite(1.0), speechBubble)
         }
     }
 

@@ -1,5 +1,6 @@
 package zt.minkinator.extension
 
+import com.kotlindiscord.kord.extensions.commands.application.slash.EphemeralSlashCommandContext
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.types.editingPaginator
 import com.kotlindiscord.kord.extensions.types.respond
@@ -9,6 +10,7 @@ import dev.kord.gateway.Intent
 import dev.kord.rest.builder.message.create.embed
 import kotlinx.coroutines.flow.toList
 import zt.minkinator.util.ephemeralSlashCommand
+import zt.minkinator.util.field
 import zt.minkinator.util.isSuperuser
 import zt.minkinator.util.success
 import java.net.InetAddress
@@ -21,10 +23,11 @@ object RestrictedExtension : Extension() {
     private val testingGuildId = env("TESTING_GUILD_ID").toLong()
 
     override suspend fun setup() {
-        ephemeralSlashCommand(
-            name = "stop",
-            description = "Stop the bot"
-        ) {
+        suspend fun command(
+            name: String,
+            description: String,
+            block: suspend EphemeralSlashCommandContext<*, *>.() -> Unit
+        ) = ephemeralSlashCommand(name, description) {
             guild(testingGuildId)
 
             check {
@@ -32,70 +35,53 @@ object RestrictedExtension : Extension() {
             }
 
             action {
-                respond { content = "Stopping..." }
-
-                this@RestrictedExtension.kord.shutdown()
+                block()
             }
         }
 
-        ephemeralSlashCommand(
-            name = "stats",
-            description = "Get bot information"
-        ) {
-            guild(testingGuildId)
+        command("stop", "Stop the bot") {
+            respond { content = "Stopping..." }
 
-            check {
-                isSuperuser()
+            kord.shutdown()
+        }
+
+        command("stats", "Get bot information") {
+            respond {
+                embed {
+                    color = Color.success
+                    title = "Bot Stats"
+                    description = buildString {
+                        appendLine("IP: ${InetAddress.getLocalHost().hostAddress}")
+                        appendLine("Uptime: ${System.currentTimeMillis().milliseconds}}")
+                        appendLine("Hostname: ${InetAddress.getLocalHost().hostName}")
+                    }
+                }
             }
+        }
 
-            action {
-                respond {
-                    embed {
-                        title = "Bot Stats"
+        command("guilds", "Get guilds") {
+            val guilds = kord.guilds.toList()
+
+            editingPaginator {
+                guilds.chunked(10).forEach { guilds ->
+                    page {
                         color = Color.success
-                        description = buildString {
-                            appendLine("IP: ${InetAddress.getLocalHost().hostAddress}")
-                            appendLine("Uptime: ${System.currentTimeMillis().milliseconds}}")
-                            appendLine("Hostname: ${InetAddress.getLocalHost().hostName}")
+                        title = "Guilds (${guilds.size})"
+
+                        guilds.forEach { guild ->
+                            field(
+                                name = "${guild.name} (${guild.id.value})",
+                                value = "${guild.memberCount} members",
+                                inline = true
+                            )
                         }
                     }
                 }
-            }
+            }.send()
         }
 
-        ephemeralSlashCommand(
-            name = "guilds",
-            description = "Get guilds"
-        ) {
-            guild(testingGuildId)
-
-            check {
-                isSuperuser()
-            }
-
-            action {
-                val guilds = this@RestrictedExtension.kord.guilds.toList()
-                val guildCount = guilds.size
-
-                val paginator = editingPaginator {
-                    guilds.chunked(10).forEach { guilds ->
-                        page {
-                            color = Color.success
-                            title = "Guilds (${guildCount})"
-
-                            guilds.forEach { guild ->
-                                field {
-                                    name = "${guild.name} (${guild.id.value})"
-                                    value = "${guild.memberCount} members"
-                                    inline = true
-                                }
-                            }
-                        }
-                    }
-                }
-
-                paginator.send()
-            }
+        command("db", "Database related commands") {
+            respond { content = "Not implemented yet" }
         }
     }
 }

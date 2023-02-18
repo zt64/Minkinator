@@ -5,6 +5,7 @@ plugins {
     application
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
 }
 
 application {
@@ -28,6 +29,14 @@ repositories {
 
 kotlin {
     jvmToolchain(19)
+
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
+}
+
+ksp {
+    arg("komapper.enableEntityStoreContext", "true")
 }
 
 dependencies {
@@ -36,15 +45,21 @@ dependencies {
     implementation(libs.openai.client)
     implementation(libs.logback.classic)
     implementation(libs.ktor.client.encoding)
-    implementation(libs.sqlite.jdbc)
+
+    ksp(libs.komapper.processor)
 
     implementation(libs.bundles.scrimmage)
-    implementation(libs.bundles.exposed)
-    implementation(libs.bundles.kotlin.dl)
+    // implementation(libs.bundles.kotlin.dl)
+
+    implementation(libs.komapper.starter.r2dbc)
+    implementation(libs.komapper.dialect.h2.r2dbc)
 }
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        freeCompilerArgs += "-Xcontext-receivers"
+        freeCompilerArgs += listOf(
+            "-Xcontext-receivers",
+            "-opt-in=org.komapper.annotation.KomapperExperimentalAssociation"
+        )
     }
 }

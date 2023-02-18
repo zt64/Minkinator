@@ -57,7 +57,7 @@ class GptExtension(apiKey: String) : Extension() {
                     .trim()
 
                 val flagged = openAI.moderations(
-                    request = ModerationRequest(query)
+                    request = ModerationRequest(listOf(query))
                 ).results.single().flagged
 
                 if (flagged) return@action

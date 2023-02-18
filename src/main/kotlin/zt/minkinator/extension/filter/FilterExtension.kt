@@ -1,6 +1,5 @@
 package zt.minkinator.extension.filter
 
-import com.kotlindiscord.kord.extensions.DiscordRelayedException
 import com.kotlindiscord.kord.extensions.annotations.DoNotChain
 import com.kotlindiscord.kord.extensions.checks.anyGuild
 import com.kotlindiscord.kord.extensions.checks.guildFor
@@ -20,14 +19,32 @@ import dev.kord.common.entity.Permission
 import dev.kord.core.behavior.ban
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.rest.builder.message.create.embed
-import org.jetbrains.exposed.sql.transactions.transaction
-import zt.minkinator.data.Filter
-import zt.minkinator.data.Guild
+import org.koin.core.component.inject
+import org.komapper.core.dsl.Meta
+import org.komapper.core.dsl.QueryDsl
+import org.komapper.r2dbc.R2dbcDatabase
+import zt.minkinator.data.*
 import zt.minkinator.util.*
 import kotlin.time.Duration
 
+
 object FilterExtension : Extension() {
     override val name = "filter"
+
+    private val db: R2dbcDatabase by inject()
+
+    private suspend fun filters(): List<Filter> {
+        val store = db.runQuery {
+            QueryDsl
+                .from(Meta.guild)
+                .innerJoin(Meta.filter) {
+                    Meta.guild.id eq Meta.filter.guildId
+                }
+                .includeAll()
+        }
+
+        return store.guilds().singleOrNull()?.filters(store).orEmpty().toList()
+    }
 
     @OptIn(DoNotChain::class)
     override suspend fun setup() {
@@ -38,9 +55,7 @@ object FilterExtension : Extension() {
 
             action {
                 val message = event.message
-                val filters = transaction {
-                    Guild.findById(event.guildId!!.value.toLong())?.filters?.toList()
-                } ?: return@action
+                val filters = filters().takeUnless { it.isEmpty() } ?: return@action
 
                 filters.forEach { filter ->
                     val pattern = filter.pattern.toRegex()
@@ -55,7 +70,7 @@ object FilterExtension : Extension() {
                             var newResponse = filter.response!!
 
                             values.forEachIndexed { index, value ->
-                                newResponse = filter.response!!.replace("\$$index", value)
+                                newResponse = filter.response.replace("\$$index", value)
                             }
 
                             message.reply(newResponse)
@@ -68,23 +83,23 @@ object FilterExtension : Extension() {
                         FilterAction.TIMEOUT -> {
                             member.timeout(
                                 until = Duration.INFINITE,
-                                reason = "Triggered filter: ${filter.id.value}: ${message.content}"
+                                reason = "Triggered filter: ${filter.id}: ${message.content}"
                             )
                         }
 
                         FilterAction.KICK -> {
-                            member.kick("Triggered filter ${filter.id.value}: ${message.content}")
+                            member.kick("Triggered filter ${filter.id}: ${message.content}")
                         }
 
                         FilterAction.BAN -> {
                             member.ban {
-                                reason = "Triggered filter ${filter.id.value}: ${message.content}"
+                                reason = "Triggered filter ${filter.id}: ${message.content}"
                             }
                         }
                     }
 
                     if (filter.deleteMessage) {
-                        message.delete("Triggered filter ${filter.id.value}: ${message.content}")
+                        message.delete("Triggered filter ${filter.id}: ${message.content}")
                     }
                 }
             }
@@ -107,7 +122,7 @@ object FilterExtension : Extension() {
                     name: String,
                     description: String,
                     arguments: () -> T,
-                    initBlock: Filter.(arguments: T) -> Unit
+                    initBlock: T.(guildId: Long) -> Filter
                 ) {
                     ephemeralSubCommand(
                         name = name,
@@ -117,12 +132,10 @@ object FilterExtension : Extension() {
                         action {
                             val guildId = getGuild()!!.id.value.toLong()
 
-                            transaction {
-                                Filter.new {
-                                    guild = Guild.findById(guildId)!!
-
-                                    initBlock(this@action.arguments)
-                                }
+                            db.runQuery {
+                                QueryDsl
+                                    .insert(Meta.filter)
+                                    .single(initBlock(this@action.arguments, guildId))
                             }
 
                             respond {
@@ -139,21 +152,27 @@ object FilterExtension : Extension() {
                     name = "reply",
                     description = "Reply to a message with a message",
                     arguments = ::ReplyArgs
-                ) { arguments ->
-                    action = FilterAction.REPLY
-                    pattern = arguments.regex
-                    response = arguments.content
-                    deleteMessage = arguments.deleteMessage
+                ) { guildId ->
+                    Filter(
+                        guildId = guildId,
+                        action = FilterAction.REPLY,
+                        pattern = regex,
+                        response = content,
+                        deleteMessage = deleteMessage
+                    )
                 }
 
                 filterAction(
                     name = "timeout",
                     description = "Timeout a user for a duration",
                     arguments = ::TimeoutArgs
-                ) { arguments ->
-                    action = FilterAction.TIMEOUT
-                    pattern = arguments.regex
-                    deleteMessage = arguments.deleteMessage
+                ) { guildId ->
+                    Filter(
+                        guildId = guildId,
+                        action = FilterAction.TIMEOUT,
+                        pattern = regex,
+                        deleteMessage = deleteMessage
+                    )
                 }
             }
 
@@ -163,9 +182,13 @@ object FilterExtension : Extension() {
                 arguments = ::RemoveArgs
             ) {
                 action {
-                    val removed = transaction {
-                        Filter.findById(arguments.id)?.delete() == null
-                    }
+                    val removed = db.runQuery {
+                        QueryDsl
+                            .delete(Meta.filter)
+                            .where {
+                                Meta.filter.id eq arguments.id
+                            }
+                    } > 0
 
                     respond {
                         content = if (removed) "Removed filter" else "Filter not found"
@@ -174,8 +197,8 @@ object FilterExtension : Extension() {
             }
 
             fun Filter.print() = buildString {
-                appendLine("Filter ID: ${id.value}")
-                appendLine("Pattern: `${pattern}`")
+                appendLine("Filter ID: $id")
+                appendLine("Pattern: `$pattern`")
 
                 when (action) {
                     FilterAction.REPLY -> {
@@ -196,9 +219,7 @@ object FilterExtension : Extension() {
             ) {
                 action {
                     val guild = guildFor(event)!!
-                    val filters = transaction {
-                        Guild.findById(guild.id.value.toLong())?.filters?.toList().orEmpty()
-                    }
+                    val filters = filters()
 
                     if (filters.isEmpty()) {
                         respond {
@@ -213,7 +234,7 @@ object FilterExtension : Extension() {
 
                                     chunkedFilters.forEach { filter ->
                                         field(
-                                            name = "ID: ${filter.id.value}",
+                                            name = "ID: ${filter.id}",
                                             value = filter.print(),
                                             inline = true
                                         )
@@ -234,11 +255,7 @@ object FilterExtension : Extension() {
             ) {
                 action {
                     val guild = guildFor(event)!!
-                    val filters = transaction {
-                        Guild.findById(guild.id.value.toLong())?.filters?.toList().orEmpty()
-                    }
-
-                    val matchedFilters = filters.filter { filter ->
+                    val matchedFilters = filters().filter { filter ->
                         filter.pattern.toRegex().matches(arguments.message)
                     }
 
@@ -303,12 +320,6 @@ object FilterExtension : Extension() {
             name = "id"
             description = "The ID of the filter to remove"
             minValue = 0
-
-            validate {
-                transaction {
-                    Filter.findById(value)?.delete() ?: throw DiscordRelayedException("Filter not found")
-                }
-            }
         }
     }
 

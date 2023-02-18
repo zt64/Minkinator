@@ -2,7 +2,6 @@ package zt.minkinator
 
 import com.kotlindiscord.kord.extensions.ExtensibleBot
 import com.kotlindiscord.kord.extensions.utils.env
-import com.kotlindiscord.kord.extensions.utils.envOrNull
 import com.kotlindiscord.kord.extensions.utils.loadModule
 import dev.kord.common.Color
 import dev.kord.core.kordLogger
@@ -13,21 +12,26 @@ import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.module.dsl.singleOf
-import zt.minkinator.data.Filters
-import zt.minkinator.data.Guilds
-import zt.minkinator.data.MarkovConfigs
+import org.komapper.core.dsl.Meta
+import org.komapper.core.dsl.QueryDsl
+import org.komapper.r2dbc.R2dbcDatabase
+import zt.minkinator.data.filter
+import zt.minkinator.data.guild
+import zt.minkinator.data.markovConfig
 import zt.minkinator.extension.*
 import zt.minkinator.extension.filter.FilterExtension
+import zt.minkinator.extension.media.EffectsExtension
 import zt.minkinator.util.error
 import zt.minkinator.util.unaryPlus
 
-const val GPT_MODE = false
-
 suspend fun main() {
+    val db = R2dbcDatabase("r2dbc:h2:file:///./guh;DB_CLOSE_DELAY=-1")
+
+    db.withTransaction {
+        db.runQuery(QueryDsl.create(Meta.guild, Meta.filter, Meta.markovConfig))
+    }
+
     val bot = ExtensibleBot(env("TOKEN")) {
         intents(false) {
             +Intent.GuildMessages
@@ -41,12 +45,8 @@ suspend fun main() {
             +EventLogExtension
             +FilterExtension
 
-            if (GPT_MODE) {
-                envOrNull("OPENAI_KEY")?.let { key ->
-                    add {
-                        GptExtension(apiKey = key)
-                    }
-                }
+            if (env("GPT").toBoolean()) {
+                +GptExtension(apiKey = env("OPENAI_KEY"))
             } else {
                 +MarkovExtension
             }
@@ -113,7 +113,6 @@ suspend fun main() {
                         isLenient = true
                     }
 
-
                     fun provideHttpClient(json: Json) = HttpClient {
                         install(ContentNegotiation) {
                             json(json)
@@ -121,16 +120,11 @@ suspend fun main() {
                     }
 
                     singleOf(::provideJson)
+                    single { db }
                     singleOf(::provideHttpClient)
                 }
             }
         }
-    }
-
-    Database.connect(url = "jdbc:sqlite:./database.db", driver = "org.sqlite.JDBC")
-
-    transaction {
-        SchemaUtils.createMissingTablesAndColumns(Guilds, MarkovConfigs, Filters)
     }
 
     Runtime.getRuntime().addShutdownHook(

@@ -39,7 +39,11 @@ val Color.Companion.error
 val DiscordEmoji.Generic.partial: DiscordPartialEmoji
     get() = DiscordPartialEmoji(name = unicode)
 
-fun String.pluralize(count: Int) = if (count > 1) this + "s" else this
+fun String.pluralize(
+    count: Int,
+    plural: String = this + "s",
+    inclusive: Boolean = true
+) = (if (count > 1) plural else this).let { if (inclusive) "$count $it" else it }
 
 fun User.displayAvatar(): Icon = avatar ?: defaultAvatar
 fun Member.displayAvatar(): Icon = memberAvatar ?: avatar ?: defaultAvatar

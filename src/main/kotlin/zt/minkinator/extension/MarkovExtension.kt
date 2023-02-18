@@ -20,20 +20,25 @@ import dev.kord.common.entity.Permission
 import dev.kord.common.entity.optional.value
 import dev.kord.core.behavior.channel.asChannelOf
 import dev.kord.core.behavior.channel.asChannelOfOrNull
+import dev.kord.core.behavior.channel.createEmbed
 import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.channel.GuildChannel
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
+import dev.kord.core.event.message.MessageDeleteEvent
 import dev.kord.core.kordLogger
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import dev.kord.rest.builder.message.create.embed
 import kotlinx.coroutines.flow.*
-import org.jetbrains.exposed.sql.transactions.experimental.newSuspendedTransaction
-import org.jetbrains.exposed.sql.transactions.transaction
+import org.koin.core.component.inject
+import org.komapper.core.dsl.Meta
+import org.komapper.core.dsl.QueryDsl
+import org.komapper.r2dbc.R2dbcDatabase
 import zt.minkinator.data.Guild
+import zt.minkinator.data.guild
 import zt.minkinator.util.*
 import java.util.*
 import kotlin.random.Random
@@ -44,8 +49,12 @@ object MarkovExtension : Extension() {
     @OptIn(PrivilegedIntent::class)
     override val intents = mutableSetOf<Intent>(Intent.MessageContent)
 
-    private fun markov(text: String, outputSize: Int): String {
-        val words = text.lines().flatMap { line ->
+    private val db: R2dbcDatabase by inject()
+
+    private fun markov(messages: String, outputSize: Int): String {
+        if (messages.isBlank()) return ""
+
+        val words = messages.lines().flatMap { line ->
             line.split(' ').filter(String::isNotBlank)
         }
 
@@ -76,6 +85,16 @@ object MarkovExtension : Extension() {
         }
     }
 
+    private suspend fun getGuild(id: ULong) = db.runQuery {
+        QueryDsl
+            .from(Meta.guild)
+            .where { Meta.guild.id eq id.toLong() }
+    }.singleOrNull() ?: db.runQuery {
+        QueryDsl
+            .insert(Meta.guild)
+            .single(Guild(id.toLong()))
+    }
+
     override suspend fun setup() {
         event<MessageCreateEvent> {
             check {
@@ -85,30 +104,40 @@ object MarkovExtension : Extension() {
 
             action {
                 val message = event.message
-                val guild = event.getGuild()!!
+                val guild = event.getGuildOrNull()!!
+                val self = guild.selfMember()
 
-                val dbGuild = newSuspendedTransaction {
-                    Guild.findById(event.guildId!!.value.toLong()) ?: Guild.new(event.guildId!!.value.toLong()) { }
-                }
+                val dbGuild = getGuild(event.guildId!!.value)
 
-                newSuspendedTransaction {
-                    dbGuild.data += buildString {
-                        append(message.content.replace(guild.selfMember().mention, "").trim())
+                db.runQuery {
+                    QueryDsl
+                        .update(Meta.guild)
+                        .set {
+                            Meta.guild.data eq dbGuild.data + buildString {
+                                append(message.content.replace(self.mention, "").trim())
 
-                        if (message.attachments.isNotEmpty()) {
-                            append(" ${message.attachments.joinToString(" ") { it.url }}")
+                                if (message.attachments.isNotEmpty()) {
+                                    append(" ${message.attachments.joinToString(" ") { it.url }}")
+                                }
+
+                                appendLine()
+                            }
                         }
-
-                        appendLine()
-                    }
+                        .where {
+                            Meta.guild.id eq dbGuild.id
+                        }
                 }
 
                 if (
-                    !message.channel.asChannelOf<GuildChannel>().botHasPermissions(Permission.SendMessages)
+                    !message.channel
+                        .asChannelOf<GuildChannel>()
+                        .botHasPermissions(Permission.SendMessages)
                 ) return@action
 
                 if (message.mentions(kord.selfId)) {
                     val sentence = markov(dbGuild.data, (1..100).random())
+
+                    if (sentence.isBlank()) return@action
 
                     message.reply {
                         content = sentence
@@ -122,10 +151,31 @@ object MarkovExtension : Extension() {
                 } else if (Random.nextFloat() < 0.008) {
                     val sentence = markov(dbGuild.data, (1..100).random())
 
+                    if (sentence.isBlank()) return@action
+
                     message.channel.createMessage(sentence)
 
                     kordLogger.info("Sent markov sentence in ${guild.name}: $sentence")
                 }
+            }
+        }
+
+        event<MessageDeleteEvent> {
+            check {
+                anyGuild()
+            }
+
+            action {
+                val dbGuild = getGuild(event.guildId!!.value)
+
+                db.runQuery {
+                    QueryDsl
+                        .update(Meta.guild)
+                        .set {
+                            Meta.guild.data eq dbGuild.data.replaceFirst(event.message!!.content, "")
+                        }
+                        .where { Meta.guild.id eq dbGuild.id }
+                }.run { /* Kotlin bug(?) occurs when this is removed */ }
             }
         }
 
@@ -203,109 +253,126 @@ object MarkovExtension : Extension() {
                     }
                 }
             }
+        }
 
-            class TrainArguments : Arguments() {
-                val channel by channel {
-                    name = "channel"
-                    description = "Channel to train on"
-                }
+        class TrainArguments : Arguments() {
+            val channel by channel {
+                name = "channel"
+                description = "Channel to train on"
+            }
+        }
+
+        chatCommand(
+            name = "train-markov",
+            description = "Train markov on past messages",
+            arguments = ::TrainArguments
+        ) {
+            locking = true
+
+            check {
+                isSuperuser()
             }
 
-            chatCommand(
-                name = "train-markov",
-                description = "Train markov on past messages",
-                arguments = ::TrainArguments
-            ) {
-                check {
-                    isSuperuser()
+            action {
+                val channel = arguments.channel.asChannelOfOrNull<TextChannel>()
+                    ?: throw DiscordRelayedException("Channel must be a text channel.")
+                if (!channel.botHasPermissions(Permission.ReadMessageHistory, Permission.ViewChannel)) {
+                    throw DiscordRelayedException("Bot does not have permission to read message history in ${channel.mention}.")
                 }
 
-                action {
-                    val channel = arguments.channel.asChannelOfOrNull<TextChannel>()
-                        ?: throw DiscordRelayedException("Channel must be a text channel.")
-                    if (!channel.botHasPermissions(Permission.ReadMessageHistory)) {
-                        throw DiscordRelayedException("Bot does not have permission to read message history in ${channel.mention}.")
-                    }
+                if (channel.isNsfw) {
+                    throw DiscordRelayedException("NSFW channels are not allowed.")
+                }
 
-                    val msg = message.channel.createMessage("Training...")
-                    val messages = channel.getMessagesBefore(channel.lastMessageId!!, null).toList()
-                    val newData = messages.joinToString("\n", transform = Message::content)
-                    val guildId = channel.guildId
+                val msg = message.channel.createMessage("Training...")
+                val messages = channel.getMessagesBefore(channel.lastMessageId!!, null).toList()
+                val newData = messages.joinToString("\n", transform = Message::content)
+                val guild = getGuild(channel.guildId.value)
 
-                    transaction {
-                        val guild = Guild.findById(guildId.value.toLong()) ?: Guild.new(guildId.value.toLong()) { }
-                        guild.data += "\n$newData"
-                    }
+                db.runQuery {
+                    QueryDsl
+                        .update(Meta.guild)
+                        .set { Meta.guild.data eq guild.data + "\n$newData" }
+                        .where { Meta.guild.id eq guild.id }
+                }
 
-                    msg.edit {
-                        content = "Trained using ${messages.size} ${"message".pluralize(messages.size)}"
-                    }
+                msg.edit {
+                    content = "Trained using ${messages.size} ${"message".pluralize(messages.size)}"
                 }
             }
+        }
 
-            class TrainGuildArguments : Arguments() {
-                val guild by guild {
-                    name = "guild"
-                    description = "Guild to train on"
-                }
+        class TrainGuildArguments : Arguments() {
+            val guild by guild {
+                name = "guild"
+                description = "Guild to train on"
+            }
+        }
+
+        chatCommand(
+            name = "train-markov-guild",
+            description = "Train markov on past messages",
+            arguments = ::TrainGuildArguments
+        ) {
+            locking = true
+
+            check {
+                isSuperuser()
             }
 
-            chatCommand(
-                name = "train-markov-guild",
-                description = "Train markov on past messages",
-                arguments = ::TrainGuildArguments
-            ) {
-                check {
-                    isSuperuser()
+            action {
+                val channels = arguments.guild.channels
+                    .filterIsInstance<TextChannel>()
+                    .filter { it.botHasPermissions(Permission.ReadMessageHistory, Permission.ViewChannel) }
+                    .filterNot { it.isNsfw }
+                    .toList()
+
+                if (channels.isEmpty()) {
+                    throw DiscordRelayedException("Bot does not have permission to read message history in any channels in ${arguments.guild.name}.")
                 }
 
-                action {
-                    val channels = arguments.guild.channels
-                        .filterIsInstance<TextChannel>()
-                        .toList()
+                val msg = message.channel.createMessage(
+                    content = "Training on ${"channel".pluralize(channels.size)}..."
+                )
 
-                    if (channels.isEmpty()) {
-                        throw DiscordRelayedException("Bot does not have permission to read message history in any channels in ${arguments.guild.name}.")
-                    }
+                message.channel.createEmbed {
+                    title = "Training"
+                    description = "Training on ${"channel".pluralize(channels.size)}..."
+                }
 
-                    val msg =
-                        message.channel.createMessage("Training on ${channels.size} ${"channel".pluralize(channels.size)}...")
+                val guildId = message.getGuild().id
+                val guild = getGuild(guildId.value)
 
-                    val guildId = message.getGuild().id
-                    val guild = transaction {
-                        Guild.findById(guildId.value.toLong()) ?: Guild.new(guildId.value.toLong()) { }
-                    }
+                val totalMessages = channels.sumOf { channel -> channel.data.messageCount.orElse(0) }
+                var i = 0
 
-                    val totalMessages = channels.sumOf { channel -> channel.data.messageCount.orElse(0) }
-                    channels.forEach { channel ->
-                        channel.asChannelOfOrNull<TextChannel>() ?: return@forEach
+                channels.forEach { channel ->
+                    var buffer = ""
 
-                        if (!channel.botHasPermissions(Permission.ReadMessageHistory)) return@forEach
+                    channel
+                        .getMessagesBefore(channel.lastMessageId!!, null)
+                        .collectIndexed { index, message ->
+                            buffer += "${message.content}\n"
 
-                        var i = 0
-                        var s = ""
+                            if (index % 100 == 0) {
+                                i += 100
 
-                        channel.getMessagesBefore(channel.lastMessageId!!, null)
-                            .collectIndexed { index, message ->
-                                s += "${message.content}\n"
+                                db.runQuery {
+                                    QueryDsl
+                                        .update(Meta.guild)
+                                        .set { Meta.guild.data eq guild.data + "\n$buffer" }
+                                        .where { Meta.guild.id eq guild.id }
+                                }
 
-                                if (index % 100 == 0) {
-                                    i += 100
-
-                                    transaction {
-                                        guild.data += "\n$s"
-                                    }
-
-                                    msg.edit {
-                                        content = "Trained on $i / $totalMessages messages"
-                                    }
+                                msg.edit {
+                                    content = "Trained on $i messages"
                                 }
                             }
-                    }
+                        }
+                }
 
-                    msg.edit {
-                        content = "Finished training using $totalMessages messages"
-                    }
+                msg.edit {
+                    content = "Finished training using $totalMessages messages"
                 }
             }
         }
@@ -328,3 +395,4 @@ object MarkovExtension : Extension() {
         }
     }
 }
+

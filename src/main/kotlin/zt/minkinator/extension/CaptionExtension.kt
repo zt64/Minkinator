@@ -16,8 +16,8 @@ import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.utils.io.*
 import org.koin.core.component.inject
-import zt.minkinator.util.mutateGif
-import zt.minkinator.util.mutateImage
+import zt.minkinator.extension.media.mutateGif
+import zt.minkinator.extension.media.mutateImage
 import zt.minkinator.util.publicSlashCommand
 import java.awt.Font
 import kotlin.math.roundToInt

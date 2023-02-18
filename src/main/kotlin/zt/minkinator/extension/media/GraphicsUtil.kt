@@ -1,4 +1,4 @@
-package zt.minkinator.util
+package zt.minkinator.extension.media
 
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.nio.AnimatedGifReader
@@ -16,7 +16,10 @@ fun mutateImage(
 ): ByteReadChannel {
     val originalImage = ImmutableImage.loader().fromBytes(byteArray)
 
-    return block(originalImage).bytes(PngWriter.MinCompression).inputStream().toByteReadChannel()
+    return block(originalImage)
+        .bytes(PngWriter.MinCompression)
+        .inputStream()
+        .toByteReadChannel()
 }
 
 fun mutateGif(
@@ -35,5 +38,8 @@ fun mutateGif(
         }
     }
 
-    return outputStream.toByteArray().inputStream().toByteReadChannel()
+    return outputStream
+        .toByteArray()
+        .inputStream()
+        .toByteReadChannel()
 }

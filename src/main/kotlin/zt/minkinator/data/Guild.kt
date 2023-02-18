@@ -1,21 +1,16 @@
 package zt.minkinator.data
 
-import org.jetbrains.exposed.dao.LongEntity
-import org.jetbrains.exposed.dao.LongEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.LongIdTable
+import org.komapper.annotation.*
+import org.komapper.core.type.ClobString
 
-object Guilds : LongIdTable() {
-    val markovConfig = reference("markov_config", MarkovConfigs).clientDefault {
-        MarkovConfig.new { }.id
-    }
-    val data = text("data").default("")
-}
-
-class Guild(id: EntityID<Long>) : LongEntity(id) {
-    companion object : LongEntityClass<Guild>(Guilds)
-
-    var markovConfig by MarkovConfig referencedOn Guilds.markovConfig
-    var data by Guilds.data
-    val filters by Filter referrersOn Filters.guild
-}
+@KomapperEntity
+@KomapperAggregateRoot("guilds")
+@KomapperOneToOne(targetEntity = MarkovConfig::class)
+@KomapperOneToMany(targetEntity = Filter::class, navigator = "filters")
+data class Guild(
+    @KomapperId
+    @KomapperColumn("GUILD_ID")
+    val id: Long,
+    @KomapperColumn(alternateType = ClobString::class)
+    val data: String = ""
+)
