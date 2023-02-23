@@ -25,7 +25,7 @@ komapper-dialect-h2-r2dbc = { module = "org.komapper:komapper-dialect-h2-r2dbc",
 komapper-processor = { module = "org.komapper:komapper-processor", version.ref = "komapper" }
 
 logback-classic = "ch.qos.logback:logback-classic:1.4.5"
-openai-client = "com.aallam.openai:openai-client:3.0.0-beta01"
+openai-client = "com.aallam.openai:openai-client:3.0.0-beta02"
 ktor-client-encoding = "io.ktor:ktor-client-encoding:2.2.3"
 
 [bundles]

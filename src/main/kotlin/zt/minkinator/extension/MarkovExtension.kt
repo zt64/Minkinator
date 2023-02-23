@@ -1,7 +1,8 @@
 package zt.minkinator.extension
 
 import com.kotlindiscord.kord.extensions.DiscordRelayedException
-import com.kotlindiscord.kord.extensions.checks.*
+import com.kotlindiscord.kord.extensions.checks.anyGuild
+import com.kotlindiscord.kord.extensions.checks.isNotBot
 import com.kotlindiscord.kord.extensions.commands.Arguments
 import com.kotlindiscord.kord.extensions.commands.converters.impl.channel
 import com.kotlindiscord.kord.extensions.commands.converters.impl.guild
@@ -17,10 +18,11 @@ import com.kotlindiscord.kord.extensions.utils.selfMember
 import dev.kord.common.Color
 import dev.kord.common.entity.ButtonStyle
 import dev.kord.common.entity.Permission
-import dev.kord.common.entity.optional.value
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.asChannelOf
 import dev.kord.core.behavior.channel.asChannelOfOrNull
 import dev.kord.core.behavior.channel.createEmbed
+import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Message
@@ -28,9 +30,8 @@ import dev.kord.core.entity.channel.GuildChannel
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.event.message.MessageDeleteEvent
-import dev.kord.core.kordLogger
-import dev.kord.gateway.Intent
-import dev.kord.gateway.PrivilegedIntent
+import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
+import dev.kord.rest.builder.message.create.allowedMentions
 import dev.kord.rest.builder.message.create.embed
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
@@ -40,14 +41,10 @@ import org.komapper.r2dbc.R2dbcDatabase
 import zt.minkinator.data.Guild
 import zt.minkinator.data.guild
 import zt.minkinator.util.*
-import java.util.*
 import kotlin.random.Random
 
 object MarkovExtension : Extension() {
     override val name = "markov"
-
-    @OptIn(PrivilegedIntent::class)
-    override val intents = mutableSetOf<Intent>(Intent.MessageContent)
 
     private val db: R2dbcDatabase by inject()
 
@@ -55,7 +52,7 @@ object MarkovExtension : Extension() {
         if (messages.isBlank()) return ""
 
         val words = messages.lines().flatMap { line ->
-            line.split(' ').filter(String::isNotBlank)
+            line.split(" ").filter(String::isNotBlank)
         }
 
         val chain = mutableMapOf<List<String>, MutableList<String>>()
@@ -69,7 +66,7 @@ object MarkovExtension : Extension() {
             if (listOf(key1, key2) !in chain) {
                 chain[listOf(key1, key2)] = mutableListOf(word)
             } else {
-                chain[listOf(key1, key2)]!!.add(word)
+                chain[listOf(key1, key2)]!! += word
             }
         }
 
@@ -134,28 +131,24 @@ object MarkovExtension : Extension() {
                         .botHasPermissions(Permission.SendMessages)
                 ) return@action
 
-                if (message.mentions(kord.selfId)) {
-                    val sentence = markov(dbGuild.data, (1..100).random())
+                suspend fun generate(block: suspend (UserMessageCreateBuilder.() -> Unit) -> Message) {
+                    val sentence = markov(dbGuild.data, (1..100).random()).takeUnless(String::isBlank)
+                        ?: return
 
-                    if (sentence.isBlank()) return@action
-
-                    message.reply {
+                    block {
                         content = sentence
 
-//                        allowedMentions {
-//                            repliedUser = true
-//                        }
+                        allowedMentions {
+                            repliedUser = true
+                            users += Snowflake(373833473091436546L)
+                        }
                     }
+                }
 
-                    kordLogger.info("Sent markov sentence in ${guild.name}: $sentence")
+                if (message.mentions(kord.selfId)) {
+                    generate(message::reply)
                 } else if (Random.nextFloat() < 0.008) {
-                    val sentence = markov(dbGuild.data, (1..100).random())
-
-                    if (sentence.isBlank()) return@action
-
-                    message.channel.createMessage(sentence)
-
-                    kordLogger.info("Sent markov sentence in ${guild.name}: $sentence")
+                    generate(message.channel::createMessage)
                 }
             }
         }

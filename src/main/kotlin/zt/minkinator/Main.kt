@@ -6,6 +6,7 @@ import com.kotlindiscord.kord.extensions.utils.loadModule
 import dev.kord.common.Color
 import dev.kord.core.kordLogger
 import dev.kord.gateway.Intent
+import dev.kord.gateway.PrivilegedIntent
 import dev.kord.gateway.builder.Shards
 import dev.kord.rest.builder.message.create.embed
 import io.ktor.client.*
@@ -25,6 +26,7 @@ import zt.minkinator.extension.media.EffectsExtension
 import zt.minkinator.util.error
 import zt.minkinator.util.unaryPlus
 
+@OptIn(PrivilegedIntent::class)
 suspend fun main() {
     val db = R2dbcDatabase("r2dbc:h2:file:///./guh;DB_CLOSE_DELAY=-1")
 
@@ -35,6 +37,7 @@ suspend fun main() {
     val bot = ExtensibleBot(env("TOKEN")) {
         intents(false) {
             +Intent.GuildMessages
+            +Intent.MessageContent
         }
 
         kord {
