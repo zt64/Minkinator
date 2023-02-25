@@ -30,6 +30,7 @@ import dev.kord.core.entity.channel.GuildChannel
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.event.message.MessageDeleteEvent
+import dev.kord.core.kordLogger
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.create.allowedMentions
 import dev.kord.rest.builder.message.create.embed
@@ -43,44 +44,11 @@ import zt.minkinator.data.guild
 import zt.minkinator.util.*
 import kotlin.random.Random
 
+
 object MarkovExtension : Extension() {
     override val name = "markov"
 
     private val db: R2dbcDatabase by inject()
-
-    private fun markov(messages: String, outputSize: Int): String {
-        if (messages.isBlank()) return ""
-
-        val words = messages.lines().flatMap { line ->
-            line.split(" ").filter(String::isNotBlank)
-        }
-
-        val chain = mutableMapOf<List<String>, MutableList<String>>()
-
-        for ((index, key1) in words.withIndex()) {
-            if (words.size <= index + 2) continue
-
-            val key2 = words[index + 1]
-            val word = words[index + 2]
-
-            if (listOf(key1, key2) !in chain) {
-                chain[listOf(key1, key2)] = mutableListOf(word)
-            } else {
-                chain[listOf(key1, key2)]!! += word
-            }
-        }
-
-        return buildString {
-            val random = words.indices.random()
-            var key = listOf(words[random], words[random + 1])
-
-            while (length < outputSize) {
-                val w = chain[key]?.random() ?: break
-                append(" $w")
-                key = listOf(key[1], w)
-            }
-        }
-    }
 
     private suspend fun getGuild(id: ULong) = db.runQuery {
         QueryDsl
@@ -93,6 +61,14 @@ object MarkovExtension : Extension() {
     }
 
     override suspend fun setup() {
+        kordLogger.info("Generating dictionaries...")
+
+        val dictionaries = kord.guilds.toList().associate { guild ->
+            guild.id to Dictionary.generate(guild.id)
+        }
+
+        kordLogger.info("Dictionaries generated")
+
         event<MessageCreateEvent> {
             check {
                 anyGuild()
@@ -131,8 +107,9 @@ object MarkovExtension : Extension() {
                         .botHasPermissions(Permission.SendMessages)
                 ) return@action
 
+                val dictionary = dictionaries[guild.id] ?: return@action
                 suspend fun generate(block: suspend (UserMessageCreateBuilder.() -> Unit) -> Message) {
-                    val sentence = markov(dbGuild.data, (1..100).random()).takeUnless(String::isBlank)
+                    val sentence = dictionary.generateString((1..100).random()).takeUnless(String::isBlank)
                         ?: return
 
                     block {
@@ -385,6 +362,55 @@ object MarkovExtension : Extension() {
         val speakOnMention by optionalBoolean {
             name = "mention"
             description = "Whether pinging the bot should trigger markov"
+        }
+    }
+
+    private class Dictionary private constructor(
+        private val guildId: Snowflake
+    ) {
+        var words = listOf<String>()
+        var chain = mutableMapOf<List<String>, MutableList<String>>()
+
+        suspend fun reload() {
+            val messages = getGuild(guildId.value).data
+
+            words = messages.lines().flatMap { line ->
+                line.split(" ").filter(String::isNotBlank)
+            }
+
+            chain.clear()
+
+            for ((index, key1) in words.withIndex()) {
+                if (words.size <= index + 2) continue
+
+                val key2 = words[index + 1]
+                val word = words[index + 2]
+
+                if (listOf(key1, key2) !in chain) {
+                    chain[listOf(key1, key2)] = mutableListOf(word)
+                } else {
+                    chain[listOf(key1, key2)]!! += word
+                }
+            }
+        }
+
+        suspend fun generateString(outputSize: Int) = buildString {
+            if (words.isEmpty()) return@buildString
+
+            val random = words.indices.random()
+            var key = listOf(words[random], words[random + 1])
+
+            while (length < outputSize) {
+                val w = chain[key]?.random() ?: break
+                append(" $w")
+                key = listOf(key[1], w)
+            }
+        }
+
+        companion object {
+            suspend fun generate(guildId: Snowflake) = Dictionary(guildId).also {
+                it.reload()
+            }
         }
     }
 }
