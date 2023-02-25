@@ -26,7 +26,6 @@ import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Message
-import dev.kord.core.entity.channel.GuildChannel
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.event.message.MessageDeleteEvent
@@ -103,7 +102,7 @@ object MarkovExtension : Extension() {
 
                 if (
                     !message.channel
-                        .asChannelOf<GuildChannel>()
+                        .asChannelOf<TextChannel>()
                         .botHasPermissions(Permission.SendMessages)
                 ) return@action
 
