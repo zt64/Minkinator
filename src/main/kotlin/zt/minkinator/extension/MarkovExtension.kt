@@ -137,12 +137,13 @@ object MarkovExtension : Extension() {
 
             action {
                 val dbGuild = getGuild(event.guildId!!.value)
+                val message = event.message ?: return@action
 
                 db.runQuery {
                     QueryDsl
                         .update(Meta.guild)
                         .set {
-                            Meta.guild.data eq dbGuild.data.replaceFirst(event.message!!.content, "")
+                            Meta.guild.data eq dbGuild.data.replaceFirst(message.content, "")
                         }
                         .where { Meta.guild.id eq dbGuild.id }
                 }.run { /* Kotlin bug(?) occurs when this is removed */ }
@@ -394,7 +395,7 @@ object MarkovExtension : Extension() {
             }
         }
 
-        suspend fun generateString(outputSize: Int) = buildString {
+        fun generateString(outputSize: Int) = buildString {
             if (words.isEmpty()) return@buildString
 
             val random = words.indices.random()
