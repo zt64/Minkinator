@@ -28,7 +28,7 @@ import zt.minkinator.util.unaryPlus
 
 @OptIn(PrivilegedIntent::class)
 suspend fun main() {
-    val db = R2dbcDatabase("r2dbc:h2:file:///./guh;DB_CLOSE_DELAY=-1")
+    val db = R2dbcDatabase("r2dbc:h2:file:///./database;DB_CLOSE_DELAY=-1")
 
     db.withTransaction {
         db.runQuery(QueryDsl.create(Meta.guild, Meta.filter, Meta.markovConfig))
@@ -122,8 +122,8 @@ suspend fun main() {
                         }
                     }
 
-                    singleOf(::provideJson)
                     single { db }
+                    singleOf(::provideJson)
                     singleOf(::provideHttpClient)
                 }
             }
