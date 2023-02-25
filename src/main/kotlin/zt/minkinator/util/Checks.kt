@@ -7,7 +7,7 @@ import dev.kord.common.entity.Snowflake
 import dev.kord.core.event.Event
 
 suspend fun <T : Event> CheckContext<T>.isSuperuser() {
-    failIf("You must be superuser to use this command.") {
+    failIf {
         userFor(event)!!.id != Snowflake(env("SUPER_USER_ID"))
     }
 }

@@ -137,6 +137,20 @@ suspend fun <T : Arguments> Extension.chatCommand(
     return chatCommand(commandObj)
 }
 
+suspend fun Extension.chatCommand(
+    name: String,
+    description: String,
+    body: suspend ChatCommand<Arguments>.() -> Unit
+): ChatCommand<*> {
+    val commandObj = ChatCommand<Arguments>(this).apply {
+        this.name = name
+        this.description = description
+    }
+    body(commandObj)
+
+    return chatCommand(commandObj)
+}
+
 suspend fun Extension.ephemeralUserCommand(
     name: String,
     body: suspend EphemeralUserCommand<*>.() -> Unit
