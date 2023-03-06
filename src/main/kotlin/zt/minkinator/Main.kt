@@ -79,6 +79,9 @@ suspend fun main() {
             +GuessmojiExtension
             +TriviaExtension
             +ConnectFourExtension
+
+            helpExtensionBuilder.enableBundledExtension = false
+            sentryExtensionBuilder.enable = false
         }
 
         pluginBuilder.enabled = false
