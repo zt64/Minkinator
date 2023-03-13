@@ -26,13 +26,16 @@ import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Message
+import dev.kord.core.entity.channel.GuildMessageChannel
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.event.message.MessageDeleteEvent
 import dev.kord.core.kordLogger
+import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.create.allowedMentions
 import dev.kord.rest.builder.message.create.embed
+import dev.kord.rest.builder.message.modify.embed
 import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import org.komapper.core.dsl.Meta
@@ -95,14 +98,12 @@ object MarkovExtension : Extension() {
                                 appendLine()
                             }
                         }
-                        .where {
-                            Meta.guild.id eq dbGuild.id
-                        }
+                        .where { Meta.guild.id eq dbGuild.id }
                 }
 
                 if (
                     !message.channel
-                        .asChannelOf<TextChannel>()
+                        .asChannelOf<GuildMessageChannel>()
                         .botHasPermissions(Permission.SendMessages)
                 ) return@action
 
@@ -119,6 +120,8 @@ object MarkovExtension : Extension() {
                             users += Snowflake(373833473091436546L)
                         }
                     }
+
+                    kordLogger.info("${guild.name} ${message.author?.username}#${message.author?.discriminator} markov -> $sentence")
                 }
 
                 if (message.mentions(kord.selfId)) {
@@ -141,11 +144,11 @@ object MarkovExtension : Extension() {
                 db.runQuery {
                     QueryDsl
                         .update(Meta.guild)
-                        .set {
-                            Meta.guild.data eq dbGuild.data.replaceFirst(message.content, "")
-                        }
+                        .set { Meta.guild.data eq dbGuild.data.replaceFirst(message.content, "") }
                         .where { Meta.guild.id eq dbGuild.id }
-                }.run { /* Kotlin bug(?) occurs when this is removed */ }
+                }
+
+                Unit
             }
         }
 
@@ -244,13 +247,13 @@ object MarkovExtension : Extension() {
             }
 
             action {
-                val channel = arguments.channel.asChannelOfOrNull<TextChannel>()
+                val channel = arguments.channel.asChannelOfOrNull<GuildMessageChannel>()
                     ?: throw DiscordRelayedException("Channel must be a text channel.")
                 if (!channel.botHasPermissions(Permission.ReadMessageHistory, Permission.ViewChannel)) {
                     throw DiscordRelayedException("Bot does not have permission to read message history in ${channel.mention}.")
                 }
 
-                if (channel.isNsfw) {
+                if (channel is TextChannel && channel.isNsfw) {
                     throw DiscordRelayedException("NSFW channels are not allowed.")
                 }
 
@@ -301,19 +304,15 @@ object MarkovExtension : Extension() {
                     throw DiscordRelayedException("Bot does not have permission to read message history in any channels in ${arguments.guild.name}.")
                 }
 
-                val msg = message.channel.createMessage(
-                    content = "Training on ${"channel".pluralize(channels.size)}..."
-                )
-
-                message.channel.createEmbed {
-                    title = "Training"
-                    description = "Training on ${"channel".pluralize(channels.size)}..."
+                fun EmbedBuilder.configure(block: () -> Unit = {}) {
+                    title = "Training with ${"channel".pluralize(channels.size)}"
+                    block()
                 }
 
+                val msg = message.channel.createEmbed(EmbedBuilder::configure)
                 val guildId = message.getGuild().id
                 val guild = getGuild(guildId.value)
 
-                val totalMessages = channels.sumOf { channel -> channel.data.messageCount.orElse(0) }
                 var i = 0
 
                 channels.forEach { channel ->
@@ -321,28 +320,40 @@ object MarkovExtension : Extension() {
 
                     channel
                         .getMessagesBefore(channel.lastMessageId!!, null)
+                        .retry()
                         .collectIndexed { index, message ->
                             buffer += "${message.content}\n"
 
                             if (index % 100 == 0) {
                                 i += 100
 
-                                db.runQuery {
-                                    QueryDsl
-                                        .update(Meta.guild)
-                                        .set { Meta.guild.data eq guild.data + "\n$buffer" }
-                                        .where { Meta.guild.id eq guild.id }
-                                }
+                                try {
+                                    db.runQuery {
+                                        QueryDsl
+                                            .update(Meta.guild)
+                                            .set { Meta.guild.data eq guild.data + "\n$buffer" }
+                                            .where { Meta.guild.id eq guild.id }
+                                    }
 
-                                msg.edit {
-                                    content = "Trained on $i messages"
+                                    msg.edit {
+                                        embed {
+                                            configure()
+                                            description = "Trained on $i messages"
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
                                 }
                             }
                         }
                 }
 
                 msg.edit {
-                    content = "Finished training using $totalMessages messages"
+                    embed {
+                        configure {
+                            description = "Finished training on ${"channel".pluralize(channels.size)} with $i messages"
+                        }
+                    }
                 }
             }
         }
@@ -405,7 +416,7 @@ object MarkovExtension : Extension() {
                 append(" $w")
                 key = listOf(key[1], w)
             }
-        }
+        }.trim()
 
         companion object {
             suspend fun generate(guildId: Snowflake) = Dictionary(guildId).also {

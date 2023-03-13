@@ -16,24 +16,16 @@ import dev.kord.core.behavior.reply
 import dev.kord.rest.builder.message.create.embed
 import dev.kord.rest.builder.message.modify.embed
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.sync.withLock
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.datetime.TimeZone
+import zt.minkinator.util.pluralize
 import zt.minkinator.util.publicSlashCommand
 import zt.minkinator.util.success
 import zt.minkinator.util.toDiscord
-import kotlin.time.Duration
 
 object PollExtension : Extension() {
     override val name = "poll"
-
-    private val polls: MutableMap<Snowflake, Poll> = mutableMapOf()
-
-    private data class Poll(
-        val question: String,
-        val duration: Duration,
-        val choices: List<String>,
-        val votes: MutableMap<Int, Int>
-    )
 
     override suspend fun setup() {
         publicSlashCommand(
@@ -41,61 +33,64 @@ object PollExtension : Extension() {
             description = "Create a poll",
             arguments = ::PollArgs
         ) {
+            locking = true
+
+            check {
+                failIf("A poll is already in progress") {
+                    mutex!!.isLocked
+                }
+            }
+
             action {
-                val question = arguments.question
-                val choices = arguments.choices.split(", ")
-                val votes = mutableMapOf<Snowflake, String>()
-                val duration = arguments.duration.toDuration(TimeZone.UTC)
+                this@publicSlashCommand.mutex!!.withLock {
+                    val question = arguments.question
+                    val choices = arguments.choices.split(",", ";")
+                    val votes = mutableMapOf<Snowflake, Int>()
+                    val duration = arguments.duration.toDuration(TimeZone.UTC)
 
-                val response = respond {
-                    embed {
-                        color = Color.success
-                        title = question
+                    val response = respond {
+                        embed {
+                            color = Color.success
+                            title = question
+                            description = "Ending ${duration.toDiscord(TimestampType.RelativeTime)}"
+                        }
 
-                        description = "Ending ${duration.toDiscord(TimestampType.RelativeTime)}"
-                    }
-
-                    components(timeout = duration) {
-                        ephemeralSelectMenu {
-                            choices.forEachIndexed { index, choice ->
-                                option(choice, "$index") {
-                                    action {
-                                        votes[user.id] = choice
+                        components(timeout = duration) {
+                            ephemeralSelectMenu {
+                                choices.forEachIndexed { index, choice ->
+                                    option(choice, "$index") {
+                                        action {
+                                            votes[user.id] = value.toInt()
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
 
-                val poll = Poll(
-                    question = question,
-                    duration = duration,
-                    choices = choices,
-                    votes = mutableMapOf()
-                )
+                    delay(duration)
 
-                polls[response.id] = poll
-
-                delay(duration)
-
-                response.edit {
-                    embed {
-                        color = Color.success
-                        title = question
-                    }
-                }
-
-                response.message.reply {
-                    embed {
-                        color = Color.success
-                        title = "Poll Results"
-
-                        votes.map { (snowflake, vote) ->
-
+                    response.edit {
+                        embed {
+                            color = Color.success
+                            title = question
                         }
 
-                        description = choices.joinToString("\n") { choice -> "$choice: 0" }
+                        components { }
+                    }
+
+                    response.message.reply {
+                        embed {
+                            color = Color.success
+                            title = "Poll Results"
+                            description = if (votes.isEmpty()) "No votes were cast" else buildString {
+                                choices.zip(votes.values).forEach { (choice, votes) ->
+                                    val percentage = votes.toDouble() / choices.size * 100
+
+                                    appendLine("$choice - ${"vote".pluralize(votes)} ($percentage%)")
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -117,7 +112,10 @@ object PollExtension : Extension() {
 
             validate {
                 failIf("Maximum of 25 choices") {
-                    value.split(", ", ",").size > 25
+                    value.split(", ", ",", ";").size > 25
+                }
+                failIf("Choices can only be 100 characters long") {
+                    value.split(", ", ",", ";").any { it.length > 100 }
                 }
             }
         }

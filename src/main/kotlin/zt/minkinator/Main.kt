@@ -88,6 +88,7 @@ suspend fun main() {
 
         chatCommands {
             enabled = true
+            invokeOnMention = false
             defaultPrefix = ">"
         }
 

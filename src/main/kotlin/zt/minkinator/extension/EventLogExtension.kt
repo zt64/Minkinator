@@ -44,7 +44,7 @@ object EventLogExtension : Extension() {
                     }
 
                     append("${interaction.user.tag}: ")
-
+                    append("/")
 
                     if (command.parentGroup != null) {
                         append("${command.parentGroup!!.parent.name} ")

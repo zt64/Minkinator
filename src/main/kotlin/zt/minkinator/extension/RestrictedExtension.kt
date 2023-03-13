@@ -1,8 +1,11 @@
 package zt.minkinator.extension
 
 import com.kotlindiscord.kord.extensions.commands.Arguments
+import com.kotlindiscord.kord.extensions.commands.chat.ChatCommand
 import com.kotlindiscord.kord.extensions.commands.chat.ChatCommandContext
+import com.kotlindiscord.kord.extensions.commands.converters.impl.string
 import com.kotlindiscord.kord.extensions.extensions.Extension
+import com.kotlindiscord.kord.extensions.extensions.chatGroupCommand
 import com.kotlindiscord.kord.extensions.utils.env
 import dev.kord.common.Color
 import dev.kord.common.entity.Snowflake
@@ -14,26 +17,47 @@ import dev.kord.rest.builder.message.create.embed
 import dev.kord.rest.builder.message.modify.embed
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.toList
+import org.koin.core.component.inject
+import org.komapper.core.dsl.Meta
+import org.komapper.core.dsl.QueryDsl
+import org.komapper.r2dbc.R2dbcDatabase
 import zt.minkinator.util.*
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
 object RestrictedExtension : Extension() {
     override val name = "restricted"
     override val intents = mutableSetOf<Intent>(Intent.Guilds)
 
+    private val database: R2dbcDatabase by inject()
     private val testingGuildId = Snowflake(env("TESTING_GUILD_ID"))
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun setup() {
+        fun ChatCommand<*>.checkSuperuser() = check { isSuperuser() }
+
         suspend fun command(
             name: String,
             description: String,
             block: suspend ChatCommandContext<out Arguments>.() -> Unit
         ) = chatCommand(name, description) {
-            check {
-                isSuperuser()
+            checkSuperuser()
+
+            action {
+                block()
             }
+        }
+
+        suspend fun <T : Arguments> command(
+            name: String,
+            description: String,
+            arguments: () -> T,
+            block: suspend ChatCommandContext<out T>.() -> Unit
+        ) = chatCommand(name, description, arguments) {
+            checkSuperuser()
 
             action {
                 block()
@@ -63,28 +87,41 @@ object RestrictedExtension : Extension() {
         command("guilds", "Get guilds") {
             val guilds = kord.guilds.toList()
 
-            message.reply {
-                paginator {
-                    guilds.chunked(10).forEach { guilds ->
-                        page {
-                            color = Color.success
-                            title = "Guilds (${guilds.size})"
+            paginator(targetMessage = message) {
+                owner = message.author!!
 
-                            guilds.forEach { guild ->
-                                field(
-                                    name = "${guild.name} (${guild.id.value})",
-                                    value = "${guild.memberCount} members",
-                                    inline = true
-                                )
-                            }
+                guilds.chunked(10).forEach { guilds ->
+                    page {
+                        color = Color.success
+                        title = "Guilds (${guilds.size})"
+
+                        guilds.forEach { guild ->
+                            field(
+                                name = "${guild.name} (${guild.id.value})",
+                                value = "${guild.memberCount} members",
+                                inline = true
+                            )
                         }
                     }
-                }.send()
-            }
+                }
+            }.send()
         }
 
-        command("db", "Database related commands") {
-            message.reply("Not implemented yet")
+        chatGroupCommand {
+            name = "db"
+            description = "Database related commands"
+
+            checkSuperuser()
+
+            chatCommand {
+                name = "reset"
+
+                action {
+                    database.runQuery {
+                        QueryDsl.drop(Meta.all())
+                    }
+                }
+            }
         }
 
         command("exec", "Execute a command") {
@@ -95,7 +132,7 @@ object RestrictedExtension : Extension() {
 
                 val embed = message.reply {
                     embed {
-                        title = "Executing command..."
+                        description = "Executing command..."
                     }
                 }
 
@@ -136,6 +173,33 @@ object RestrictedExtension : Extension() {
                         description = lines.joinToString("\n")
                     }
                 }
+            }
+        }
+
+        class ReloadArgs : Arguments() {
+            val extension by string {
+                name = "extension"
+                description = "Extension to reload"
+
+                validate {
+                    failIf("Extension `$value` is not loaded") {
+                        !bot.extensions.contains(value)
+                    }
+                }
+            }
+        }
+
+        command("reload", "Reload an extension", ::ReloadArgs) {
+            val extension = arguments.extension
+            val response = message.reply("Reloading extension `$extension`...")
+
+            val duration = measureTime {
+                bot.unloadExtension(extension)
+                bot.loadExtension(extension)
+            }
+
+            response.edit {
+                content = "Finished reloading extension `$extension` in $duration"
             }
         }
     }

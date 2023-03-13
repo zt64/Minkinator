@@ -127,7 +127,7 @@ object EffectsExtension : Extension() {
                 description = "The angle in degrees"
                 defaultValue = 200.0
 
-                mutate { value -> value * (PI / 180) }
+                mutate { it * (PI / 180) }
             }
             val radius by defaultingDecimal {
                 name = "radius"

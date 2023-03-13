@@ -1,22 +1,33 @@
 package zt.minkinator.extension
 
-import com.aallam.openai.api.completion.CompletionRequest
+import com.aallam.openai.api.BetaOpenAI
+import com.aallam.openai.api.chat.ChatCompletionRequest
+import com.aallam.openai.api.chat.ChatMessage
+import com.aallam.openai.api.chat.ChatRole
 import com.aallam.openai.api.logging.LogLevel
 import com.aallam.openai.api.model.ModelId
-import com.aallam.openai.api.moderation.ModerationRequest
 import com.aallam.openai.client.OpenAI
 import com.aallam.openai.client.OpenAIConfig
 import com.kotlindiscord.kord.extensions.checks.anyGuild
 import com.kotlindiscord.kord.extensions.checks.isNotBot
+import com.kotlindiscord.kord.extensions.events.EventContext
 import com.kotlindiscord.kord.extensions.extensions.Extension
+import com.kotlindiscord.kord.extensions.extensions.chatGroupCommand
 import com.kotlindiscord.kord.extensions.extensions.event
+import dev.kord.common.entity.Snowflake
+import dev.kord.core.behavior.channel.withTyping
+import dev.kord.core.behavior.edit
+import dev.kord.core.entity.Message
 import dev.kord.core.event.message.MessageCreateEvent
-import dev.kord.core.kordLogger
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
+import kotlinx.coroutines.withTimeoutOrNull
+import zt.minkinator.util.isSuperuser
 import zt.minkinator.util.mentions
 import zt.minkinator.util.reply
+import kotlin.time.Duration.Companion.seconds
 
+@OptIn(BetaOpenAI::class)
 class GptExtension(apiKey: String) : Extension() {
     override val name = "gpt"
 
@@ -24,68 +35,123 @@ class GptExtension(apiKey: String) : Extension() {
     override val intents = mutableSetOf<Intent>(Intent.MessageContent)
 
     private val openAI = OpenAI(OpenAIConfig(apiKey, LogLevel.None))
-    private val prompt = StringBuilder(startingPrompt)
+    private val threads = mutableMapOf<Snowflake, MutableList<ChatMessage>>()
+    private val model = ModelId("gpt-3.5-turbo")
+    private val prompt =
+        "You are a roleplaying as a person named Minkinator. Minkinator will make up responses if he does not know them. He will type in all lowercase."
 
-    private companion object {
-        private val startingPrompt = """
-            The following is a conversation with an AI named Minkinator. He is insane and does not like people.
-            Human (zt): how are you?
-            Minkinator: i am rotting
-            Human (zt): who made you?
-            Minkinator: zt made me
-            Human (ven): hi
-            Minkinator: i will wring you
+    private suspend fun Message.sanitize() = buildString {
+        append("${getAuthorAsMember()!!.displayName}: ")
+        append(content.trim())
 
-        """.trimIndent()
+        mentionedUsers.collect { user ->
+            replace(user.mention.toRegex(), user.username)
+        }
+
+        attachments.forEach { attachment ->
+            append(" ${attachment.url}")
+        }
+    }
+
+    context(EventContext<MessageCreateEvent>)
+    private suspend fun String.unsanitize() = buildString {
+
+    }
+
+    private suspend fun MutableList<ChatMessage>.request(message: String): ChatMessage? {
+        add(ChatMessage(ChatRole.User, message))
+
+        val request = ChatCompletionRequest(
+            model = model,
+            messages = this
+        )
+
+        return openAI
+            .chatCompletion(request).choices
+            .firstNotNullOfOrNull { it.message }
+            .also { add(it!!) }
+    }
+
+    private suspend fun request(channelId: Snowflake, message: String): String? {
+        val thread = threads.getOrPut(channelId) {
+            mutableListOf<ChatMessage>().also { thread ->
+                thread.request(prompt)!!
+            }
+        }
+
+        return thread.request(message)?.content
     }
 
     override suspend fun setup() {
         val selfId = kord.selfId
+        var enabled = true
 
         event<MessageCreateEvent> {
             check {
                 anyGuild()
                 isNotBot()
+                failIfNot(enabled)
                 failIfNot(event.message.mentions(selfId))
             }
 
             action {
                 val message = event.message
-                val query = message.content
-                    .removePrefix("<@!$selfId>")
-                    .removePrefix("<@$selfId>")
-                    .trim()
+                val sanitizedMessage = message.sanitize()
 
-                val flagged = openAI.moderations(
-                    request = ModerationRequest(listOf(query))
-                ).results.single().flagged
+//                val flagged = openAI.moderations(
+//                    request = ModerationRequest(listOf(sanitizedMessage))
+//                ).results.single().flagged
+//
+//                if (flagged) {
+//                    return@action message.addReaction(Emojis.triangularFlagOnPost.toReaction())
+//                }
 
-                if (flagged) return@action
+                message.channel.withTyping {
+                    withTimeoutOrNull(30.seconds) {
+                        val response = request(message.channelId, sanitizedMessage)
 
-                val authorName = message.getAuthorAsMember()?.displayName ?: message.author!!.username
+                        if (response == null) {
+                            threads[message.channelId]!!.dropLast(1)
 
-                prompt.appendLine("Human (${authorName}): $query")
-                prompt.append("Minkinator:")
+                            return@withTimeoutOrNull
+                        }
 
-                val completionRequest = CompletionRequest(
-                    model = ModelId("text-davinci-003"),
-                    maxTokens = 80,
-                    temperature = 0.9,
-                    stop = listOf(" Human (${authorName}):", " Minkinator:"),
-                    prompt = prompt.toString()
-                )
-
-                val response = openAI.completion(completionRequest).choices.single().text.ifEmpty {
-                    prompt.clear()
-                    prompt.append(startingPrompt)
-
-                    return@action
+                        message.reply(response.substringAfter("(Developer Mode Output) "))
+                    }
                 }
+            }
+        }
 
-                prompt.appendLine(" ${response.trim()}")
+        chatGroupCommand {
+            name = "gpt"
+            description = "GPT related commands"
 
-                kordLogger.info(prompt.toString())
-                message.reply(response.removePrefix("Minkinator:"))
+            check {
+                isSuperuser()
+            }
+
+            chatCommand {
+                name = "reset"
+                description = "Reset chat"
+
+                action {
+                    val message = message.reply("Resetting chat...")
+
+                    threads.clear()
+
+                    message.edit { content = "Chat reset" }
+                }
+            }
+
+            chatCommand {
+                name = "toggle"
+                description = "Toggle GPT"
+
+                action {
+                    enabled = !enabled
+
+                    message.reply("GPT is now ${if (enabled) "enabled" else "disabled"}")
+                }
             }
         }
     }
