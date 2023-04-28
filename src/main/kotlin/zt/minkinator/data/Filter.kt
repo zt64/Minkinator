@@ -1,5 +1,6 @@
 package zt.minkinator.data
 
+import dev.kord.common.entity.Snowflake
 import org.komapper.annotation.*
 import zt.minkinator.extension.filter.FilterAction
 
@@ -9,7 +10,7 @@ data class Filter(
     @KomapperAutoIncrement
     @KomapperId
     val id: Int = 0,
-    val guildId: Long,
+    val guildId: Snowflake,
     @KomapperEnum(type = EnumType.NAME)
     val action: FilterAction,
     val pattern: String,

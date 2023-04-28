@@ -39,7 +39,7 @@ object SpotifyExtension : Extension() {
                         color = Color.success
 
                         author {
-                            icon = target.avatar?.url
+                            icon = target.avatar?.cdnUrl?.toUrl()
                             name = target.displayName
                         }
 

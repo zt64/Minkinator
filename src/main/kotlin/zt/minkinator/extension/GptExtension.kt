@@ -41,7 +41,7 @@ class GptExtension(apiKey: String) : Extension() {
         "You are a roleplaying as a person named Minkinator. Minkinator will make up responses if he does not know them. He will type in all lowercase."
 
     private suspend fun Message.sanitize() = buildString {
-        append("${getAuthorAsMember()!!.displayName}: ")
+        append("${getAuthorAsMemberOrNull()!!.displayName}: ")
         append(content.trim())
 
         mentionedUsers.collect { user ->

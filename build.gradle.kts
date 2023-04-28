@@ -1,6 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     application
     alias(libs.plugins.kotlin.jvm)
@@ -16,10 +15,8 @@ repositories {
     google()
     mavenCentral()
 
-    maven {
-        name = "Sonatype Snapshots"
-        url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-    }
+    maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
+    maven("https://oss.sonatype.org/content/repositories/snapshots")
 
     maven {
         name = "Kotlin Discord"
@@ -28,7 +25,7 @@ repositories {
 }
 
 kotlin {
-    jvmToolchain(19)
+    jvmToolchain(11)
 
     sourceSets.main {
         kotlin.srcDir("build/generated/ksp/main/kotlin")

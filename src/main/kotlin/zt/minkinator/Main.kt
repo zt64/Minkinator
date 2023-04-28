@@ -20,6 +20,7 @@ import org.komapper.r2dbc.R2dbcDatabase
 import zt.minkinator.data.filter
 import zt.minkinator.data.guild
 import zt.minkinator.data.markovConfig
+import zt.minkinator.data.message
 import zt.minkinator.extension.*
 import zt.minkinator.extension.filter.FilterExtension
 import zt.minkinator.extension.media.EffectsExtension
@@ -31,7 +32,7 @@ suspend fun main() {
     val db = R2dbcDatabase("r2dbc:h2:file:///./database;DB_CLOSE_DELAY=-1")
 
     db.withTransaction {
-        db.runQuery(QueryDsl.create(Meta.guild, Meta.filter, Meta.markovConfig))
+        db.runQuery(QueryDsl.create(Meta.guild, Meta.filter, Meta.markovConfig, Meta.message))
     }
 
     val bot = ExtensibleBot(env("TOKEN")) {
@@ -80,7 +81,7 @@ suspend fun main() {
             +TriviaExtension
             +ConnectFourExtension
 
-            helpExtensionBuilder.enableBundledExtension = false
+            helpExtensionBuilder.enableBundledExtension = true
             sentryExtensionBuilder.enable = false
         }
 

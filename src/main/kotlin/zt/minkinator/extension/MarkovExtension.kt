@@ -20,11 +20,11 @@ import dev.kord.common.entity.ButtonStyle
 import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.asChannelOf
-import dev.kord.core.behavior.channel.asChannelOfOrNull
 import dev.kord.core.behavior.channel.createEmbed
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.reply
+import dev.kord.core.entity.Member
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.channel.GuildMessageChannel
 import dev.kord.core.entity.channel.TextChannel
@@ -41,25 +41,34 @@ import org.koin.core.component.inject
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.r2dbc.R2dbcDatabase
+import zt.minkinator.data.DBMessage
 import zt.minkinator.data.Guild
 import zt.minkinator.data.guild
+import zt.minkinator.data.message
 import zt.minkinator.util.*
 import kotlin.random.Random
-
 
 object MarkovExtension : Extension() {
     override val name = "markov"
 
     private val db: R2dbcDatabase by inject()
 
-    private suspend fun getGuild(id: ULong) = db.runQuery {
+    private suspend fun getGuild(id: Snowflake) = db.runQuery {
         QueryDsl
             .from(Meta.guild)
-            .where { Meta.guild.id eq id.toLong() }
+            .where { Meta.guild.id eq id }
     }.singleOrNull() ?: db.runQuery {
         QueryDsl
             .insert(Meta.guild)
-            .single(Guild(id.toLong()))
+            .single(Guild(id))
+    }
+
+    private fun Message.sanitizedContent(self: Member) = buildString {
+        append(content.replace(self.mention, "").trim())
+
+        if (attachments.isNotEmpty()) {
+            append(" ${attachments.joinToString(" ") { it.url }}")
+        }
     }
 
     override suspend fun setup() {
@@ -82,23 +91,20 @@ object MarkovExtension : Extension() {
                 val guild = event.getGuildOrNull()!!
                 val self = guild.selfMember()
 
-                val dbGuild = getGuild(event.guildId!!.value)
+                val dbGuild = getGuild(event.guildId!!)
 
-                db.runQuery {
-                    QueryDsl
-                        .update(Meta.guild)
-                        .set {
-                            Meta.guild.data eq dbGuild.data + buildString {
-                                append(message.content.replace(self.mention, "").trim())
-
-                                if (message.attachments.isNotEmpty()) {
-                                    append(" ${message.attachments.joinToString(" ") { it.url }}")
-                                }
-
-                                appendLine()
-                            }
-                        }
-                        .where { Meta.guild.id eq dbGuild.id }
+                db.withTransaction {
+                    db.runQuery {
+                        QueryDsl
+                            .insert(Meta.message)
+                            .single(
+                                DBMessage(
+                                    id = message.id,
+                                    guildId = dbGuild.id,
+                                    content = message.sanitizedContent(self)
+                                )
+                            )
+                    }
                 }
 
                 if (
@@ -138,14 +144,12 @@ object MarkovExtension : Extension() {
             }
 
             action {
-                val dbGuild = getGuild(event.guildId!!.value)
-                val message = event.message ?: return@action
+                val messageId = event.message?.id ?: return@action
 
                 db.runQuery {
                     QueryDsl
-                        .update(Meta.guild)
-                        .set { Meta.guild.data eq dbGuild.data.replaceFirst(message.content, "") }
-                        .where { Meta.guild.id eq dbGuild.id }
+                        .delete(Meta.message)
+                        .where { Meta.message.id eq messageId }
                 }
 
                 Unit
@@ -174,52 +178,67 @@ object MarkovExtension : Extension() {
                     val frequency = arguments.frequency
                     val speakOnMention = arguments.speakOnMention
 
-                    if (enabled == null && frequency == null && speakOnMention == null) {
-                        throw DiscordRelayedException("You must specify at least one argument to change.")
-                    }
-
                     respond {
-                        fun configureEmbed() = embed {
-                            color = Color.success
-                            title = "Markov Configuration"
+                        if (enabled == null && frequency == null && speakOnMention == null) {
+                            embed {
+                                field(
+                                    name = "Enabled",
+                                    value = ""
+                                )
 
-                            description = buildString {
-                                appendLine("Save changes?")
+                                field(
+                                    name = "Frequency",
+                                    value = ""
+                                )
 
-                                if (enabled != null) {
-                                    appendLine("Enabled: $enabled")
-                                }
-
-                                if (frequency != null) {
-                                    appendLine("Frequency: $frequency")
-                                }
-
-                                if (speakOnMention != null) {
-                                    appendLine("Speak on mention: $speakOnMention")
-                                }
+                                field(
+                                    name = "Speak on mention",
+                                    value = ""
+                                )
                             }
-                        }
+                        } else {
+                            fun configureEmbed() = embed {
+                                color = Color.success
+                                title = "Markov Configuration"
 
-                        configureEmbed()
+                                description = buildString {
+                                    appendLine("Save changes?")
 
-                        components {
-                            ephemeralButton {
-                                style = ButtonStyle.Primary
-                                label = "Save"
+                                    if (enabled != null) {
+                                        appendLine("Enabled: $enabled")
+                                    }
 
-                                action {
-                                    respond {
-                                        content = "Saved!"
+                                    if (frequency != null) {
+                                        appendLine("Frequency: $frequency")
+                                    }
+
+                                    if (speakOnMention != null) {
+                                        appendLine("Speak on mention: $speakOnMention")
                                     }
                                 }
                             }
 
-                            ephemeralButton {
-                                style = ButtonStyle.Secondary
-                                label = "Cancel"
+                            configureEmbed()
 
-                                action {
+                            components {
+                                ephemeralButton {
+                                    style = ButtonStyle.Primary
+                                    label = "Save"
 
+                                    action {
+                                        respond {
+                                            content = "Saved!"
+                                        }
+                                    }
+                                }
+
+                                ephemeralButton {
+                                    style = ButtonStyle.Secondary
+                                    label = "Cancel"
+
+                                    action {
+
+                                    }
                                 }
                             }
                         }
@@ -235,45 +254,47 @@ object MarkovExtension : Extension() {
             }
         }
 
-        chatCommand(
-            name = "train-markov",
-            description = "Train markov on past messages",
-            arguments = ::TrainArguments
-        ) {
-            locking = true
-
-            check {
-                isSuperuser()
-            }
-
-            action {
-                val channel = arguments.channel.asChannelOfOrNull<GuildMessageChannel>()
-                    ?: throw DiscordRelayedException("Channel must be a text channel.")
-                if (!channel.botHasPermissions(Permission.ReadMessageHistory, Permission.ViewChannel)) {
-                    throw DiscordRelayedException("Bot does not have permission to read message history in ${channel.mention}.")
-                }
-
-                if (channel is TextChannel && channel.isNsfw) {
-                    throw DiscordRelayedException("NSFW channels are not allowed.")
-                }
-
-                val msg = message.channel.createMessage("Training...")
-                val messages = channel.getMessagesBefore(channel.lastMessageId!!, null).toList()
-                val newData = messages.joinToString("\n", transform = Message::content)
-                val guild = getGuild(channel.guildId.value)
-
-                db.runQuery {
-                    QueryDsl
-                        .update(Meta.guild)
-                        .set { Meta.guild.data eq guild.data + "\n$newData" }
-                        .where { Meta.guild.id eq guild.id }
-                }
-
-                msg.edit {
-                    content = "Trained using ${messages.size} ${"message".pluralize(messages.size)}"
-                }
-            }
-        }
+        // chatCommand(
+        //     name = "train-markov",
+        //     description = "Train markov on past messages",
+        //     arguments = ::TrainArguments
+        // ) {
+        //     locking = true
+        //
+        //     check {
+        //         isSuperuser()
+        //     }
+        //
+        //     action {
+        //         this@chatCommand.mutex!!.withLock {
+        //             val channel = arguments.channel.asChannelOfOrNull<GuildMessageChannel>()
+        //                 ?: throw DiscordRelayedException("Channel must be a text channel.")
+        //             if (!channel.botHasPermissions(Permission.ReadMessageHistory, Permission.ViewChannel)) {
+        //                 throw DiscordRelayedException("Bot does not have permission to read message history in ${channel.mention}.")
+        //             }
+        //
+        //             if (channel is TextChannel && channel.isNsfw) {
+        //                 throw DiscordRelayedException("NSFW channels are prohibited.")
+        //             }
+        //
+        //             val msg = message.channel.createMessage("Training...")
+        //             val messages = channel.getMessagesBefore(channel.lastMessageId!!, null).toList()
+        //             val newData = messages.joinToString("\n", transform = Message::content)
+        //             val guild = getGuild(channel.guildId.value)
+        //
+        //             db.runQuery {
+        //                 QueryDsl
+        //                     .update(Meta.guild)
+        //                     .set { Meta.guild.data eq guild.data + "\n$newData" }
+        //                     .where { Meta.guild.id eq guild.id }
+        //             }
+        //
+        //             msg.edit {
+        //                 content = "Trained using ${messages.size} ${"message".pluralize(messages.size)}"
+        //             }
+        //         }
+        //     }
+        // }
 
         class TrainGuildArguments : Arguments() {
             val guild by guild {
@@ -283,7 +304,7 @@ object MarkovExtension : Extension() {
         }
 
         chatCommand(
-            name = "train-markov-guild",
+            name = "train-markov",
             description = "Train markov on past messages",
             arguments = ::TrainGuildArguments
         ) {
@@ -304,6 +325,8 @@ object MarkovExtension : Extension() {
                     throw DiscordRelayedException("Bot does not have permission to read message history in any channels in ${arguments.guild.name}.")
                 }
 
+                val self = guild!!.selfMember()
+
                 fun EmbedBuilder.configure(block: () -> Unit = {}) {
                     title = "Training with ${"channel".pluralize(channels.size)}"
                     block()
@@ -311,41 +334,56 @@ object MarkovExtension : Extension() {
 
                 val msg = message.channel.createEmbed(EmbedBuilder::configure)
                 val guildId = message.getGuild().id
-                val guild = getGuild(guildId.value)
 
                 var i = 0
 
                 channels.forEach { channel ->
-                    var buffer = ""
+                    val messages = mutableSetOf<DBMessage>()
 
-                    channel
-                        .getMessagesBefore(channel.lastMessageId!!, null)
-                        .retry()
-                        .collectIndexed { index, message ->
-                            buffer += "${message.content}\n"
+                    try {
 
-                            if (index % 100 == 0) {
-                                i += 100
+                        channel
+                            .getMessagesBefore(channel.lastMessageId!!, null)
+                            .retry()
+                            .collectIndexed { index, message ->
+                                messages.add(
+                                    element = DBMessage(
+                                        id = message.id,
+                                        guildId = guildId,
+                                        content = message.sanitizedContent(self)
+                                    )
+                                )
 
-                                try {
-                                    db.runQuery {
-                                        QueryDsl
-                                            .update(Meta.guild)
-                                            .set { Meta.guild.data eq guild.data + "\n$buffer" }
-                                            .where { Meta.guild.id eq guild.id }
-                                    }
+                                if (index % 100 == 0) {
+                                    i += 100
 
-                                    msg.edit {
-                                        embed {
-                                            configure()
-                                            description = "Trained on $i messages"
+                                    try {
+                                        db.withTransaction {
+                                            db.runQuery {
+                                                QueryDsl
+                                                    .insert(Meta.message)
+                                                    .onDuplicateKeyIgnore(Meta.message.id)
+                                                    .multiple(messages.toList())
+                                            }
                                         }
+
+                                        msg.edit {
+                                            embed {
+                                                configure()
+                                                description = "Trained on $i messages"
+                                            }
+                                        }
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
                                     }
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
                                 }
+
+                                messages.clear()
                             }
-                        }
+                    } catch (e: Exception) {
+                        print("Guh")
+                        e.printStackTrace()
+                    }
                 }
 
                 msg.edit {
@@ -376,17 +414,19 @@ object MarkovExtension : Extension() {
         }
     }
 
-    private class Dictionary private constructor(
-        private val guildId: Snowflake
-    ) {
+    private class Dictionary private constructor(private val guildId: Snowflake) {
         var words = listOf<String>()
         var chain = mutableMapOf<List<String>, MutableList<String>>()
 
         suspend fun reload() {
-            val messages = getGuild(guildId.value).data
+            val messages = db.runQuery {
+                QueryDsl
+                    .from(Meta.message)
+                    .where { Meta.message.guildId eq guildId }
+            }
 
-            words = messages.lines().flatMap { line ->
-                line.split(" ").filter(String::isNotBlank)
+            words = messages.flatMap { line ->
+                line.content.split(" ").filter(String::isNotBlank)
             }
 
             chain.clear()

@@ -19,7 +19,7 @@ import dev.kord.common.Color
 import dev.kord.common.entity.DiscordPartialEmoji
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.reply
-import dev.kord.core.entity.Icon
+import dev.kord.core.entity.Asset
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.User
@@ -45,8 +45,8 @@ fun String.pluralize(
     inclusive: Boolean = true
 ) = (if (count > 1) plural else this).let { if (inclusive) "$count $it" else it }
 
-fun User.displayAvatar(): Icon = avatar ?: defaultAvatar
-fun Member.displayAvatar(): Icon = memberAvatar ?: avatar ?: defaultAvatar
+fun User.displayAvatar(): Asset = avatar ?: defaultAvatar
+fun Member.displayAvatar(): Asset = memberAvatar ?: avatar ?: defaultAvatar
 
 fun String.decodeEntities() = replace("&amp;", "&")
     .replace("&lt;", "<")

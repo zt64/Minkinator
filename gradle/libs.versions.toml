@@ -1,11 +1,11 @@
 [versions]
-kotlin = "1.8.10"
-scrimmage = "4.0.33"
+kotlin = "1.8.21"
+scrimmage = "4.0.34"
 kotlin-dl = "0.5.1"
-komapper = "1.8.0"
+komapper = "1.9.0"
 
 [libraries]
-kord-ex = "com.kotlindiscord.kord.extensions:kord-extensions:1.5.6-SNAPSHOT"
+kord-ex = "com.kotlindiscord.kord.extensions:kord-extensions:1.5.7-SNAPSHOT"
 kord-emoji = "dev.kord.x:emoji:0.5.0"
 
 scrimmage-core = { module = "com.sksamuel.scrimage:scrimage-core", version.ref = "scrimmage" }
@@ -16,17 +16,14 @@ kotlin-dl-tensorflow = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-ten
 kotlin-dl-onnx = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-onnx", version.ref = "kotlin-dl" }
 kotlin-dl-visualization = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-visualization", version.ref = "kotlin-dl" }
 
-komapper-starter-jdbc = { module = "org.komapper:komapper-starter-jdbc", version.ref = "komapper" }
 komapper-starter-r2dbc = { module = "org.komapper:komapper-starter-r2dbc", version.ref = "komapper" }
-
-komapper-dialect-h2-jdbc = { module = "org.komapper:komapper-dialect-h2-jdbc", version.ref = "komapper" }
 komapper-dialect-h2-r2dbc = { module = "org.komapper:komapper-dialect-h2-r2dbc", version.ref = "komapper" }
 
 komapper-processor = { module = "org.komapper:komapper-processor", version.ref = "komapper" }
 
-logback-classic = "ch.qos.logback:logback-classic:1.4.5"
-openai-client = "com.aallam.openai:openai-client:3.1.0"
-ktor-client-encoding = "io.ktor:ktor-client-encoding:2.2.4"
+logback-classic = "ch.qos.logback:logback-classic:1.4.6"
+openai-client = "com.aallam.openai:openai-client:3.2.1"
+ktor-client-encoding = "io.ktor:ktor-client-encoding:2.3.0"
 
 [bundles]
 scrimmage = ["scrimmage-core", "scrimmage-filters", "scrimmage-webp"]
@@ -35,4 +32,4 @@ kotlin-dl = ["kotlin-dl-tensorflow", "kotlin-dl-onnx", "kotlin-dl-visualization"
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version = "1.8.10-1.0.9" }
+ksp = { id = "com.google.devtools.ksp", version = "1.8.21-1.0.11" }

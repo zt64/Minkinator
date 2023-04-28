@@ -16,6 +16,7 @@ import com.kotlindiscord.kord.extensions.types.respond
 import com.kotlindiscord.kord.extensions.utils.timeout
 import dev.kord.common.Color
 import dev.kord.common.entity.Permission
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.ban
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.rest.builder.message.create.embed
@@ -26,7 +27,6 @@ import org.komapper.r2dbc.R2dbcDatabase
 import zt.minkinator.data.*
 import zt.minkinator.util.*
 import kotlin.time.Duration
-
 
 object FilterExtension : Extension() {
     override val name = "filter"
@@ -62,7 +62,7 @@ object FilterExtension : Extension() {
                     val matches = pattern.findAll(message.content).toList()
                     val match = matches.firstOrNull() ?: return@forEach
 
-                    val member = message.getAuthorAsMember()!!
+                    val member = message.getAuthorAsMemberOrNull()!!
 
                     when (filter.action) {
                         FilterAction.REPLY -> {
@@ -77,7 +77,6 @@ object FilterExtension : Extension() {
                         }
 
                         FilterAction.WARN -> {
-
                         }
 
                         FilterAction.TIMEOUT -> {
@@ -122,7 +121,7 @@ object FilterExtension : Extension() {
                     name: String,
                     description: String,
                     arguments: () -> T,
-                    initBlock: T.(guildId: Long) -> Filter
+                    initBlock: T.(guildId: Snowflake) -> Filter
                 ) {
                     ephemeralSubCommand(
                         name = name,
@@ -130,7 +129,7 @@ object FilterExtension : Extension() {
                         arguments = arguments
                     ) {
                         action {
-                            val guildId = getGuild()!!.id.value.toLong()
+                            val guildId = getGuild()!!.id
 
                             db.runQuery {
                                 QueryDsl

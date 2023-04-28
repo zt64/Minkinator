@@ -1,15 +1,15 @@
 package zt.minkinator.util
 
-import dev.kord.core.entity.Icon
+import dev.kord.core.entity.Asset
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.User
 import dev.kord.rest.builder.message.EmbedBuilder
 
 fun EmbedBuilder.author(member: Member) = author(member.displayAvatar(), member.displayName)
 fun EmbedBuilder.author(user: User) = author(user.displayAvatar(), user.username)
-fun EmbedBuilder.author(icon: Icon? = null, name: String) {
+fun EmbedBuilder.author(icon: Asset? = null, name: String) {
     author {
-        this.icon = icon?.url
+        this.icon = icon?.cdnUrl?.toUrl()
         this.name = name
     }
 }

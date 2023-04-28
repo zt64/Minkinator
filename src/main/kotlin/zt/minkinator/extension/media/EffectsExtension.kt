@@ -7,11 +7,13 @@ import com.kotlindiscord.kord.extensions.types.respond
 import com.kotlindiscord.kord.extensions.utils.suggestStringCollection
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.angles.Degrees
-import com.sksamuel.scrimage.composite.SubtractComposite
 import com.sksamuel.scrimage.filter.*
+import dev.kord.core.behavior.reply
 import dev.kord.rest.Image
 import dev.kord.rest.NamedFile
+import dev.kord.rest.builder.message.create.MessageCreateBuilder
 import io.ktor.client.request.forms.*
+import zt.minkinator.util.chatCommand
 import zt.minkinator.util.publicSlashCommand
 import kotlin.math.PI
 
@@ -24,30 +26,37 @@ object EffectsExtension : Extension() {
             description: String,
             arguments: () -> T,
             block: T.(image: ImmutableImage) -> ImmutableImage
-        ) = publicSlashCommand(
-            name = name,
-            description = description,
-            arguments = arguments
         ) {
-            action {
-                val user = this@action.arguments.user
+            suspend fun MessageCreateBuilder.processAvatar(arguments: T) {
+                val user = arguments.user
                 val avatar = user.avatar ?: user.defaultAvatar
+                val mutator = { frame: ImmutableImage -> block(arguments, frame) }
 
-                val (extension, byteReadChannel) = if (avatar.animated) {
-                    "gif" to mutateGif(avatar.getImage(Image.Format.GIF).data) { frame ->
-                        block(this@action.arguments, frame)
-                    }
+                val (extension, byteReadChannel) = if (avatar.isAnimated) {
+                    "gif" to mutateGif(avatar.getImage(Image.Format.GIF).data, mutator)
                 } else {
-                    "png" to mutateImage(avatar.getImage().data) { image ->
-                        block(this@action.arguments, image)
-                    }
+                    "png" to mutateImage(avatar.getImage().data, mutator)
                 }
 
-                respond {
-                    files += NamedFile(
-                        name = "${user.username}.$extension",
-                        contentProvider = ChannelProvider { byteReadChannel }
-                    )
+                files += NamedFile(
+                    name = "${user.username}.$extension",
+                    contentProvider = ChannelProvider { byteReadChannel }
+                )
+            }
+
+            publicSlashCommand(name, description, arguments) {
+                action {
+                    respond {
+                        processAvatar(this@action.arguments)
+                    }
+                }
+            }
+
+            chatCommand(name, description, arguments) {
+                action {
+                    message.reply {
+                        processAvatar(this@action.arguments)
+                    }
                 }
             }
         }
@@ -98,7 +107,7 @@ object EffectsExtension : Extension() {
                 name = "block-size"
                 description = "The number of pixels along each block edge"
                 defaultValue = 8
-                minValue = 0
+                minValue = 8
                 maxValue = 512
             }
         }
@@ -199,9 +208,38 @@ object EffectsExtension : Extension() {
         }
 
         addCommand("speech-bubble", "Adds a speech bubble to an image") { image ->
-            val speechBubble = ImmutableImage.loader().fromResource("/speech-bubble.png")
+            val scaledImage = image.scaleTo(512, 512)
+            val speechBubble = ImmutableImage.loader()
+                .fromResource("/speech-bubble.png")
+                .scaleToWidth(scaledImage.width)
 
-            image.composite(SubtractComposite(1.0), speechBubble)
+            scaledImage.overlay(speechBubble)
+        }
+
+        class MirrorArgs : BaseArgs() {
+            val axis by enum<Axis> {
+                name = "axis"
+                typeName = "axis"
+                description = "The axis to mirror the avatar on"
+
+                autoComplete {
+                    suggestStringCollection(Axis.values().map(Axis::name))
+                }
+            }
+        }
+
+        addCommand("mirror", "Mirrors an image", ::MirrorArgs) { image ->
+            when (axis) {
+                Axis.X -> {
+                    val half = image.takeRight(image.width / 2)
+                    image.overlay(half.flipX())
+                }
+
+                Axis.Y -> {
+                    val half = image.takeBottom(image.height / 2)
+                    image.overlay(half.flipY())
+                }
+            }
         }
     }
 

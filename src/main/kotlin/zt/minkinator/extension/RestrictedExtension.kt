@@ -25,6 +25,7 @@ import zt.minkinator.util.*
 import java.net.InetAddress
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
@@ -98,7 +99,7 @@ object RestrictedExtension : Extension() {
                         guilds.forEach { guild ->
                             field(
                                 name = "${guild.name} (${guild.id.value})",
-                                value = "${guild.memberCount} members",
+                                value = "member".pluralize(guild.memberCount!!),
                                 inline = true
                             )
                         }
@@ -147,7 +148,7 @@ object RestrictedExtension : Extension() {
                     }
                 }
 
-                val process = ProcessBuilder(argString.split(" "))
+                val process = ProcessBuilder("sh -c \"${argString}\"")
                     .redirectErrorStream(true)
                     .start()
 
@@ -158,7 +159,7 @@ object RestrictedExtension : Extension() {
                     }
                 }
 
-                process.inputReader().use {
+                process.inputStream.bufferedReader().use {
                     it.forEachLine { line -> lines += line }
                 }
 
@@ -199,7 +200,8 @@ object RestrictedExtension : Extension() {
             }
 
             response.edit {
-                content = "Finished reloading extension `$extension` in $duration"
+                content = "Finished reloading extension `$extension` in " +
+                    duration.toString(DurationUnit.SECONDS, decimals = 2)
             }
         }
     }

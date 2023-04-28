@@ -35,17 +35,17 @@ object GuildInfoExtension : Extension() {
                             name = guild.name
 
                             guild.iconHash?.let { iconHash ->
-                                icon = guild.getIconUrl(
-                                    if (iconHash.startsWith("a_")) Image.Format.GIF else Image.Format.PNG
-                                )
+                                icon = guild.icon?.cdnUrl?.toUrl {
+                                    format = if (iconHash.startsWith("a_")) Image.Format.GIF else Image.Format.PNG
+                                }
                             }
                         }
 
                         guild.bannerHash?.let { bannerHash ->
                             thumbnail(
-                                guild.getBannerUrl(
+                                guild.banner?.cdnUrl?.toUrl {
                                     format = if (bannerHash.startsWith("a_")) Image.Format.GIF else Image.Format.PNG
-                                )!!
+                                }!!
                             )
                         }
 

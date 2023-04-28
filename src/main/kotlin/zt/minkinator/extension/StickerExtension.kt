@@ -32,11 +32,11 @@ object StickerExtension : Extension() {
             description = "Create a sticker from an image or GIF",
             arguments = ::Args
         ) {
-            requireBotPermissions(Permission.ManageEmojisAndStickers)
+            requireBotPermissions(Permission.ManageGuildExpressions)
 
             check {
                 anyGuild()
-                hasPermission(Permission.ManageEmojisAndStickers)
+                hasPermission(Permission.ManageGuildExpressions)
                 failIf("Maximum number of stickers reached") {
                     val guild = guildFor(event)!!.fetchGuild()
 
