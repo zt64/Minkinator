@@ -19,14 +19,12 @@ import dev.kord.common.Color
 import dev.kord.common.entity.ButtonStyle
 import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
-import dev.kord.core.behavior.channel.asChannelOf
 import dev.kord.core.behavior.channel.createEmbed
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.Message
-import dev.kord.core.entity.channel.GuildMessageChannel
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.event.message.MessageDeleteEvent
@@ -88,6 +86,7 @@ object MarkovExtension : Extension() {
 
             action {
                 val message = event.message
+                val channel = message.channel
                 val guild = event.getGuildOrNull()!!
                 val self = guild.selfMember()
 
@@ -107,16 +106,12 @@ object MarkovExtension : Extension() {
                     }
                 }
 
-                if (
-                    !message.channel
-                        .asChannelOf<GuildMessageChannel>()
-                        .botHasPermissions(Permission.SendMessages)
-                ) return@action
+                if (channel !is TextChannel || !channel.botHasPermissions(Permission.SendMessages)) return@action
 
                 val dictionary = dictionaries[guild.id] ?: return@action
                 suspend fun generate(block: suspend (UserMessageCreateBuilder.() -> Unit) -> Message) {
-                    val sentence = dictionary.generateString((1..100).random()).takeUnless(String::isBlank)
-                        ?: return
+                    val sentence = dictionary.generateString((1..100).random())
+                        .takeUnless(String::isBlank) ?: return
 
                     block {
                         content = sentence
