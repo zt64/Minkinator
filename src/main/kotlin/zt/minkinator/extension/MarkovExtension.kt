@@ -25,6 +25,7 @@ import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.reply
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.Message
+import dev.kord.core.entity.channel.GuildChannel
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.event.message.MessageDeleteEvent
@@ -86,7 +87,7 @@ object MarkovExtension : Extension() {
 
             action {
                 val message = event.message
-                val channel = message.channel
+                val channel = message.channel.asChannel()
                 val guild = event.getGuildOrNull()!!
                 val self = guild.selfMember()
 
@@ -106,9 +107,10 @@ object MarkovExtension : Extension() {
                     }
                 }
 
-                if (channel !is TextChannel || !channel.botHasPermissions(Permission.SendMessages)) return@action
+                if (channel !is GuildChannel || !channel.botHasPermissions(Permission.SendMessages)) return@action
 
                 val dictionary = dictionaries[guild.id] ?: return@action
+
                 suspend fun generate(block: suspend (UserMessageCreateBuilder.() -> Unit) -> Message) {
                     val sentence = dictionary.generateString((1..100).random())
                         .takeUnless(String::isBlank) ?: return
@@ -125,10 +127,9 @@ object MarkovExtension : Extension() {
                     kordLogger.info("${guild.name} ${message.author?.username}#${message.author?.discriminator} markov -> $sentence")
                 }
 
-                if (message.mentions(kord.selfId)) {
-                    generate(message::reply)
-                } else if (Random.nextFloat() < 0.008) {
-                    generate(message.channel::createMessage)
+                when {
+                    message.mentions(kord.selfId) -> generate(message::reply)
+                    Random.nextFloat() < 0.008 -> generate(message.channel::createMessage)
                 }
             }
         }
