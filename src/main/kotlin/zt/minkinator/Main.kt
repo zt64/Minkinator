@@ -2,6 +2,7 @@ package zt.minkinator
 
 import com.kotlindiscord.kord.extensions.ExtensibleBot
 import com.kotlindiscord.kord.extensions.utils.env
+import com.kotlindiscord.kord.extensions.utils.envOrNull
 import com.kotlindiscord.kord.extensions.utils.loadModule
 import dev.kord.common.Color
 import dev.kord.core.kordLogger
@@ -12,15 +13,13 @@ import dev.kord.rest.builder.message.create.embed
 import io.ktor.client.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
+import io.r2dbc.spi.ConnectionFactoryOptions
+import io.r2dbc.spi.Option
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.singleOf
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import zt.minkinator.data.filter
-import zt.minkinator.data.guild
-import zt.minkinator.data.markovConfig
-import zt.minkinator.data.message
 import zt.minkinator.extension.*
 import zt.minkinator.extension.filter.FilterExtension
 import zt.minkinator.extension.media.EffectsExtension
@@ -29,10 +28,19 @@ import zt.minkinator.util.unaryPlus
 
 @OptIn(PrivilegedIntent::class)
 suspend fun main() {
-    val db = R2dbcDatabase("r2dbc:h2:file:///./database;DB_CLOSE_DELAY=-1")
+    val dbLocation = envOrNull("DB_LOCATION") ?: "./minkinator.db"
+
+    val options = ConnectionFactoryOptions.builder()
+        .option(ConnectionFactoryOptions.DRIVER, "h2")
+        .option(ConnectionFactoryOptions.PROTOCOL, "file")
+        .option(ConnectionFactoryOptions.DATABASE, dbLocation)
+        .option(Option.valueOf("DB_CLOSE_DELAY"), "-1")
+        .build()
+
+    val db = R2dbcDatabase(options)
 
     db.withTransaction {
-        db.runQuery(QueryDsl.create(Meta.guild, Meta.filter, Meta.markovConfig, Meta.message))
+        db.runQuery(QueryDsl.create(Meta.all()))
     }
 
     val bot = ExtensibleBot(env("TOKEN")) {
