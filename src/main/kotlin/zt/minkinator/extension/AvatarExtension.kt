@@ -40,7 +40,7 @@ object AvatarExtension : Extension() {
                 respond {
                     embed {
                         color = Color.success
-                        title = member.displayName
+                        title = member.effectiveName
                         this.url = url
                         image = url
                     }
@@ -56,7 +56,7 @@ object AvatarExtension : Extension() {
                 respond {
                     embed {
                         color = Color.success
-                        title = member.displayName
+                        title = member.effectiveName
                         this.url = url
                         image = url
                     }

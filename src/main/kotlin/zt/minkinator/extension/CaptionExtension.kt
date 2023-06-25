@@ -9,16 +9,15 @@ import com.kotlindiscord.kord.extensions.types.respond
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.Position
 import com.sksamuel.scrimage.canvas.drawables.Text
-import dev.kord.rest.NamedFile
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
-import io.ktor.utils.io.*
 import org.koin.core.component.inject
 import zt.minkinator.extension.media.mutateGif
 import zt.minkinator.extension.media.mutateImage
 import zt.minkinator.util.publicSlashCommand
+import java.awt.Color
 import java.awt.Font
 import kotlin.math.roundToInt
 
@@ -57,40 +56,37 @@ object CaptionExtension : Extension() {
                         /* targetWidth = */ width,
                         /* targetHeight = */ height + captionHeight,
                         /* position = */ Position.BottomLeft,
-                        /* background = */ if (dark) java.awt.Color.BLACK else java.awt.Color.WHITE
+                        /* background = */ if (dark) Color.BLACK else Color.WHITE
                     ).toCanvas().draw(
                         Text(
                             text,
                             (width - expectedWidth) / 2,
                             (captionHeight - metrics.height) / 2 + metrics.ascent
-                        ) { g ->
-                            g.font = baseFont
-                            g.color = if (dark) java.awt.Color.WHITE else java.awt.Color.BLACK
-                            g.setAntiAlias(true)
+                        ) {
+                            with(it) {
+                                font = baseFont
+                                color = if (dark) Color.WHITE else Color.BLACK
+                                setAntiAlias(true)
+                            }
                         }
                     ).image
                 }
 
-                val byteArray = httpClient.get(attachment.url).readBytes()
-
-                fun mutate(
-                    kFunction: (ByteArray, (frame: ImmutableImage) -> ImmutableImage) -> ByteReadChannel
-                ) = ChannelProvider { kFunction(byteArray, ::block) }
-
-                val file = if (attachment.filename.endsWith(".gif")) {
-                    NamedFile(
-                        name = "h.gif",
-                        contentProvider = mutate(::mutateGif)
-                    )
+                val (fileName, mutator) = if (attachment.filename.endsWith(".gif")) {
+                    "a.gif" to ::mutateGif
                 } else {
-                    NamedFile(
-                        name = "h.png",
-                        contentProvider = mutate(::mutateImage)
-                    )
+                    "a.png" to ::mutateImage
                 }
 
+                val byteArray = httpClient.get(attachment.url).readBytes()
+
                 respond {
-                    files += file
+                    addFile(
+                        name = fileName,
+                        contentProvider = ChannelProvider {
+                            mutator(byteArray, ::block)
+                        }
+                    )
                 }
             }
         }

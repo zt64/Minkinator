@@ -1,5 +1,6 @@
 package zt.minkinator.extension
 
+import com.kotlindiscord.kord.extensions.DiscordRelayedException
 import com.kotlindiscord.kord.extensions.commands.Arguments
 import com.kotlindiscord.kord.extensions.commands.chat.ChatCommand
 import com.kotlindiscord.kord.extensions.commands.chat.ChatCommandContext
@@ -177,7 +178,7 @@ object RestrictedExtension : Extension() {
             }
         }
 
-        class ReloadArgs : Arguments() {
+        class ExtensionArgs : Arguments() {
             val extension by string {
                 name = "extension"
                 description = "Extension to reload"
@@ -190,7 +191,7 @@ object RestrictedExtension : Extension() {
             }
         }
 
-        command("reload", "Reload an extension", ::ReloadArgs) {
+        command("reload", "Reload an extension", ::ExtensionArgs) {
             val extension = arguments.extension
             val response = message.reply("Reloading extension `$extension`...")
 
@@ -200,8 +201,35 @@ object RestrictedExtension : Extension() {
             }
 
             response.edit {
-                content = "Finished reloading extension `$extension` in " +
-                    duration.toString(DurationUnit.SECONDS, decimals = 2)
+                content = "Finished reloading extension `$extension` in ${duration.toString(DurationUnit.SECONDS, decimals = 2)}"
+            }
+        }
+
+        command("unload", "Unload an extension", ::ExtensionArgs) {
+            val extension = arguments.extension
+
+            if (extension !in bot.extensions) throw DiscordRelayedException("Extension `$extension` not loaded")
+
+            val response = message.reply("Unloading extension `$extension`...")
+
+            bot.unloadExtension(extension)
+
+            response.edit {
+                content = "Finished unloading extension `$extension`"
+            }
+        }
+
+        command("load", "Load an extension", ::ExtensionArgs) {
+            val extension = arguments.extension
+
+            if (extension in bot.extensions) throw DiscordRelayedException("Extension `$extension` already loaded")
+
+            val response = message.reply("Loading extension `$extension`...")
+
+            bot.loadExtension(extension)
+
+            response.edit {
+                content = "Finished loading extension `$extension`"
             }
         }
     }

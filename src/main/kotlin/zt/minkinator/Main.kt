@@ -61,11 +61,8 @@ suspend fun main() {
             +EventLogExtension
             +FilterExtension
 
-            if (env("GPT").toBoolean()) {
-                +GptExtension(apiKey = env("OPENAI_KEY"))
-            } else {
-                +MarkovExtension
-            }
+            +GptExtension(apiKey = env("OPENAI_KEY"))
+            +MarkovExtension
 
             +AvatarExtension
             +NameNormalizerExtension

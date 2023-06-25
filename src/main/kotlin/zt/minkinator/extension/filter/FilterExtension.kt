@@ -3,6 +3,7 @@ package zt.minkinator.extension.filter
 import com.kotlindiscord.kord.extensions.annotations.DoNotChain
 import com.kotlindiscord.kord.extensions.checks.anyGuild
 import com.kotlindiscord.kord.extensions.checks.guildFor
+import com.kotlindiscord.kord.extensions.checks.isNotBot
 import com.kotlindiscord.kord.extensions.commands.Arguments
 import com.kotlindiscord.kord.extensions.commands.application.slash.SlashGroup
 import com.kotlindiscord.kord.extensions.commands.converters.impl.defaultingBoolean
@@ -18,13 +19,16 @@ import dev.kord.common.Color
 import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.ban
+import dev.kord.core.entity.Guild
 import dev.kord.core.event.message.MessageCreateEvent
+import dev.kord.core.kordLogger
 import dev.kord.rest.builder.message.create.embed
 import org.koin.core.component.inject
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
 import org.komapper.r2dbc.R2dbcDatabase
-import zt.minkinator.data.*
+import zt.minkinator.data.Filter
+import zt.minkinator.data.filter
 import zt.minkinator.util.*
 import kotlin.time.Duration
 
@@ -33,17 +37,10 @@ object FilterExtension : Extension() {
 
     private val db: R2dbcDatabase by inject()
 
-    private suspend fun filters(): List<Filter> {
-        val store = db.runQuery {
-            QueryDsl
-                .from(Meta.guild)
-                .innerJoin(Meta.filter) {
-                    Meta.guild.id eq Meta.filter.guildId
-                }
-                .includeAll()
-        }
-
-        return store.guilds().singleOrNull()?.filters(store).orEmpty().toList()
+    private suspend fun Guild.filters(): List<Filter> = db.runQuery {
+        QueryDsl
+            .from(Meta.filter)
+            .where { Meta.filter.guildId eq id }
     }
 
     @OptIn(DoNotChain::class)
@@ -51,17 +48,17 @@ object FilterExtension : Extension() {
         event<MessageCreateEvent> {
             check {
                 anyGuild()
+                isNotBot()
             }
 
             action {
                 val message = event.message
-                val filters = filters().takeUnless { it.isEmpty() } ?: return@action
+                val filters = event.getGuildOrNull()!!.filters().takeUnless { it.isEmpty() } ?: return@action
 
-                filters.forEach { filter ->
+                filters.asSequence().forEach { filter ->
                     val pattern = filter.pattern.toRegex()
                     val matches = pattern.findAll(message.content).toList()
                     val match = matches.firstOrNull() ?: return@forEach
-
                     val member = message.getAuthorAsMemberOrNull()!!
 
                     when (filter.action) {
@@ -97,8 +94,10 @@ object FilterExtension : Extension() {
                         }
                     }
 
-                    if (filter.deleteMessage) {
+                    if (filter.deleteMessage) try {
                         message.delete("Triggered filter ${filter.id}: ${message.content}")
+                    } catch (e: Exception) {
+                        kordLogger.error(e) { "Failed to delete message" }
                     }
                 }
             }
@@ -218,7 +217,7 @@ object FilterExtension : Extension() {
             ) {
                 action {
                     val guild = guildFor(event)!!
-                    val filters = filters()
+                    val filters = guild.asGuild().filters()
 
                     if (filters.isEmpty()) {
                         respond {
@@ -254,7 +253,7 @@ object FilterExtension : Extension() {
             ) {
                 action {
                     val guild = guildFor(event)!!
-                    val matchedFilters = filters().filter { filter ->
+                    val matchedFilters = guild.asGuild().filters().filter { filter ->
                         filter.pattern.toRegex().matches(arguments.message)
                     }
 

@@ -51,7 +51,7 @@ object BanExtension : Extension() {
 
                         author(
                             icon = target.displayAvatar(),
-                            name = "Banned User: ${target.tag}"
+                            name = "Banned User: ${target.username}"
                         )
 
                         field(
@@ -88,7 +88,7 @@ object BanExtension : Extension() {
 
                         author(
                             icon = user.displayAvatar(),
-                            name = "Unbanned User: ${user.tag}"
+                            name = "Unbanned User: ${user.username}"
                         )
                     }
                 }

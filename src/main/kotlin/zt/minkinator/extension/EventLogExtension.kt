@@ -43,7 +43,7 @@ object EventLogExtension : Extension() {
                         append("${channel.getGuild().name} #${channel.name} ")
                     }
 
-                    append("${interaction.user.tag}: ")
+                    append("${interaction.user.username}: ")
                     append("/")
 
                     if (command.parentGroup != null) {
@@ -73,7 +73,7 @@ object EventLogExtension : Extension() {
                         append("${channel.getGuild().name} #${channel.name} ")
                     }
 
-                    append("${message.author!!.tag} ${message.content}")
+                    append("${message.author!!.username} ${message.content}")
                 }
             )
         }

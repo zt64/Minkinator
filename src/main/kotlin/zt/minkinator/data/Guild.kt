@@ -4,12 +4,12 @@ import dev.kord.common.entity.Snowflake
 import org.komapper.annotation.*
 import org.komapper.core.type.ClobString
 
-@KomapperEntity
+@KomapperEntity(["guild"])
 @KomapperAggregateRoot("guilds")
 @KomapperOneToOne(targetEntity = MarkovConfig::class)
 @KomapperOneToMany(targetEntity = Filter::class, navigator = "filters")
 @KomapperOneToMany(targetEntity = DBMessage::class, navigator = "messages")
-data class Guild(
+data class DBGuild(
     @KomapperId
     @KomapperColumn("GUILD_ID")
     val id: Snowflake
@@ -17,7 +17,7 @@ data class Guild(
 
 @KomapperEntity(["message"])
 @KomapperTable("message")
-@KomapperManyToOne(targetEntity = Guild::class)
+@KomapperManyToOne(targetEntity = DBGuild::class)
 data class DBMessage(
     @KomapperId
     @KomapperColumn("MESSAGE_ID")

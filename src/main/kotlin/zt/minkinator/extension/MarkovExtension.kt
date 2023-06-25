@@ -14,7 +14,6 @@ import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.types.respond
 import com.kotlindiscord.kord.extensions.utils.botHasPermissions
-import com.kotlindiscord.kord.extensions.utils.selfMember
 import dev.kord.common.Color
 import dev.kord.common.entity.ButtonStyle
 import dev.kord.common.entity.Permission
@@ -23,7 +22,6 @@ import dev.kord.core.behavior.channel.createEmbed
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.reply
-import dev.kord.core.entity.Member
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.channel.GuildChannel
 import dev.kord.core.entity.channel.TextChannel
@@ -39,11 +37,9 @@ import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
+import org.komapper.core.dsl.query.singleOrNull
 import org.komapper.r2dbc.R2dbcDatabase
-import zt.minkinator.data.DBMessage
-import zt.minkinator.data.Guild
-import zt.minkinator.data.guild
-import zt.minkinator.data.message
+import zt.minkinator.data.*
 import zt.minkinator.util.*
 import kotlin.random.Random
 
@@ -59,11 +55,13 @@ object MarkovExtension : Extension() {
     }.singleOrNull() ?: db.runQuery {
         QueryDsl
             .insert(Meta.guild)
-            .single(Guild(id))
+            .single(DBGuild(id))
     }
 
-    private fun Message.sanitizedContent(self: Member) = buildString {
-        append(content.replace(self.mention, "").trim())
+    private val selfMention by lazy { "<@!${kord.selfId}>" }
+
+    private fun Message.sanitizedContent() = buildString {
+        append(content.replace(selfMention, "").trim())
 
         if (attachments.isNotEmpty()) {
             append(" ${attachments.joinToString(" ") { it.url }}")
@@ -89,7 +87,6 @@ object MarkovExtension : Extension() {
                 val message = event.message
                 val channel = message.channel.asChannel()
                 val guild = event.getGuildOrNull()!!
-                val self = guild.selfMember()
 
                 val dbGuild = getGuild(event.guildId!!)
 
@@ -101,7 +98,7 @@ object MarkovExtension : Extension() {
                                 DBMessage(
                                     id = message.id,
                                     guildId = dbGuild.id,
-                                    content = message.sanitizedContent(self)
+                                    content = message.sanitizedContent()
                                 )
                             )
                     }
@@ -124,7 +121,7 @@ object MarkovExtension : Extension() {
                         }
                     }
 
-                    kordLogger.info("${guild.name} ${message.author?.username}#${message.author?.discriminator} markov -> $sentence")
+                    kordLogger.info("${guild.name} ${message.author?.username} markov -> $sentence")
                 }
 
                 when {
@@ -166,7 +163,7 @@ object MarkovExtension : Extension() {
                 arguments = ::ConfigArguments
             ) {
                 check {
-                    // Check if user has role to configure commands
+                    isSuperuser()
                 }
 
                 action {
@@ -176,6 +173,13 @@ object MarkovExtension : Extension() {
 
                     respond {
                         if (enabled == null && frequency == null && speakOnMention == null) {
+                            val config = db.runQuery {
+                                QueryDsl
+                                    .from(Meta.markovConfig)
+                                    .where { Meta.markovConfig.guildId eq guild!!.id }
+                                    .singleOrNull()
+                            }
+
                             embed {
                                 field(
                                     name = "Enabled",
@@ -233,7 +237,7 @@ object MarkovExtension : Extension() {
                                     label = "Cancel"
 
                                     action {
-
+                                        interactionResponse.delete()
                                     }
                                 }
                             }
@@ -321,8 +325,6 @@ object MarkovExtension : Extension() {
                     throw DiscordRelayedException("Bot does not have permission to read message history in any channels in ${arguments.guild.name}.")
                 }
 
-                val self = guild!!.selfMember()
-
                 fun EmbedBuilder.configure(block: () -> Unit = {}) {
                     title = "Training with ${"channel".pluralize(channels.size)}"
                     block()
@@ -337,7 +339,6 @@ object MarkovExtension : Extension() {
                     val messages = mutableSetOf<DBMessage>()
 
                     try {
-
                         channel
                             .getMessagesBefore(channel.lastMessageId!!, null)
                             .retry()
@@ -346,7 +347,7 @@ object MarkovExtension : Extension() {
                                     element = DBMessage(
                                         id = message.id,
                                         guildId = guildId,
-                                        content = message.sanitizedContent(self)
+                                        content = message.sanitizedContent()
                                     )
                                 )
 

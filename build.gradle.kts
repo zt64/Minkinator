@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     application
+
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
@@ -46,10 +47,8 @@ dependencies {
     ksp(libs.komapper.processor)
 
     implementation(libs.bundles.scrimmage)
+    implementation(libs.bundles.komapper)
     // implementation(libs.bundles.kotlin.dl)
-
-    implementation(libs.komapper.starter.r2dbc)
-    implementation(libs.komapper.dialect.h2.r2dbc)
 }
 
 tasks.withType<KotlinCompile> {

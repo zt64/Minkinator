@@ -40,7 +40,7 @@ object SpotifyExtension : Extension() {
 
                         author {
                             icon = target.avatar?.cdnUrl?.toUrl()
-                            name = target.displayName
+                            name = target.effectiveName
                         }
 
                         if (activity != null) {

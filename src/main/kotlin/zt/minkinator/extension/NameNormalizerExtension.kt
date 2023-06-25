@@ -32,11 +32,11 @@ object NameNormalizerExtension : Extension() {
     private fun String.isNormalized(form: Normalizer.Form = Normalizer.Form.NFD) = Normalizer.isNormalized(this, form)
 
     private suspend fun Member.normalizeName() {
-        val normalized = displayName.normalize(Normalizer.Form.NFD)
+        val normalized = effectiveName.normalize(Normalizer.Form.NFD)
 
         edit {
             nickname = normalized
-            reason = "Normalized name from $displayName to $normalized"
+            reason = "Normalized name from $effectiveName to $normalized"
         }
     }
 
@@ -49,9 +49,9 @@ object NameNormalizerExtension : Extension() {
             }
 
             action {
-                if (!event.member.displayName.isNormalized()) {
+                if (!event.member.effectiveName.isNormalized()) {
                     // event.member.normalizeName()
-                    kordLogger.info("Normalized name for ${event.member.displayName} (${event.member.id})")
+                    kordLogger.info("Normalized name for ${event.member.effectiveName} (${event.member.id})")
                 }
             }
         }
@@ -64,16 +64,16 @@ object NameNormalizerExtension : Extension() {
             }
 
             action {
-                if (event.old?.displayName != event.member.displayName && !event.member.displayName.isNormalized()) {
+                if (event.old?.effectiveName != event.member.effectiveName && !event.member.effectiveName.isNormalized()) {
                     // event.member.normalizeName()
-                    kordLogger.info("Normalized name for ${event.member.displayName} (${event.member.id})")
+                    kordLogger.info("Normalized name for ${event.member.effectiveName} (${event.member.id})")
                 }
             }
         }
 
         suspend fun EphemeralInteractionContext.normalize(member: Member) {
             respond {
-                content = if (!member.displayName.isNormalized()) {
+                content = if (!member.effectiveName.isNormalized()) {
                     member.normalizeName()
 
                     "Normalized name for ${member.mention}"

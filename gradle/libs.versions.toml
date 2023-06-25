@@ -1,11 +1,13 @@
 [versions]
-kotlin = "1.8.21"
-scrimmage = "4.0.34"
-kotlin-dl = "0.5.1"
-komapper = "1.9.0"
+kotlin = "1.8.22"
+ktor = "2.3.1"
+ksp = "1.8.22-1.0.11"
+scrimmage = "4.0.37"
+kotlin-dl = "0.5.2"
+komapper = "1.11.0"
 
 [libraries]
-kord-ex = "com.kotlindiscord.kord.extensions:kord-extensions:1.5.7-SNAPSHOT"
+kord-ex = "com.kotlindiscord.kord.extensions:kord-extensions:1.5.8-SNAPSHOT"
 kord-emoji = "dev.kord.x:emoji:0.5.0"
 
 scrimmage-core = { module = "com.sksamuel.scrimage:scrimage-core", version.ref = "scrimmage" }
@@ -21,15 +23,18 @@ komapper-dialect-h2-r2dbc = { module = "org.komapper:komapper-dialect-h2-r2dbc",
 
 komapper-processor = { module = "org.komapper:komapper-processor", version.ref = "komapper" }
 
-logback-classic = "ch.qos.logback:logback-classic:1.4.6"
-openai-client = "com.aallam.openai:openai-client:3.2.1"
-ktor-client-encoding = "io.ktor:ktor-client-encoding:2.3.0"
+ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
+
+logback-classic = "ch.qos.logback:logback-classic:1.4.8"
+openai-client = "com.aallam.openai:openai-client:3.3.1"
 
 [bundles]
 scrimmage = ["scrimmage-core", "scrimmage-filters", "scrimmage-webp"]
+komapper = ["komapper-starter-r2dbc", "komapper-dialect-h2-r2dbc"]
 kotlin-dl = ["kotlin-dl-tensorflow", "kotlin-dl-onnx", "kotlin-dl-visualization"]
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-ksp = { id = "com.google.devtools.ksp", version = "1.8.21-1.0.11" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+jib = { id = "com.google.cloud.tools.jib", version = "3.3.2" }

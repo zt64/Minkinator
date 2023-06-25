@@ -5,7 +5,7 @@ import org.komapper.annotation.*
 import zt.minkinator.extension.filter.FilterAction
 
 @KomapperEntity
-@KomapperManyToOne(targetEntity = Guild::class)
+@KomapperManyToOne(targetEntity = DBGuild::class)
 data class Filter(
     @KomapperAutoIncrement
     @KomapperId
