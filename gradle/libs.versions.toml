@@ -26,7 +26,7 @@ komapper-processor = { module = "org.komapper:komapper-processor", version.ref =
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 
 logback-classic = "ch.qos.logback:logback-classic:1.4.8"
-openai-client = "com.aallam.openai:openai-client:3.3.1"
+openai-client = "com.aallam.openai:openai-client:3.4.1"
 
 [bundles]
 scrimmage = ["scrimmage-core", "scrimmage-filters", "scrimmage-webp"]
