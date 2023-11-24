@@ -1,13 +1,14 @@
 [versions]
-kotlin = "1.9.0"
-ktor = "2.3.2"
-ksp = "1.9.0-1.0.11"
-scrimmage = "4.0.37"
+kotlin = "1.9.21"
+ktor = "2.3.6"
+kord = "1.6.0-SNAPSHOT"
+ksp = "1.9.20-1.0.14"
+scrimmage = "4.1.1"
 kotlin-dl = "0.5.2"
-komapper = "1.11.0"
+komapper = "1.15.0"
 
 [libraries]
-kord-ex = "com.kotlindiscord.kord.extensions:kord-extensions:1.5.8-SNAPSHOT"
+kord-ex = { module = "com.kotlindiscord.kord.extensions:kord-extensions", version.ref = "kord" }
 kord-emoji = "dev.kord.x:emoji:0.5.0"
 
 scrimmage-core = { module = "com.sksamuel.scrimage:scrimage-core", version.ref = "scrimmage" }
@@ -25,8 +26,8 @@ komapper-processor = { module = "org.komapper:komapper-processor", version.ref =
 
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 
-logback-classic = "ch.qos.logback:logback-classic:1.4.8"
-openai-client = "com.aallam.openai:openai-client:3.3.1"
+logback-classic = "ch.qos.logback:logback-classic:1.4.11"
+openai-client = "com.aallam.openai:openai-client:3.5.1"
 
 [bundles]
 scrimmage = ["scrimmage-core", "scrimmage-filters", "scrimmage-webp"]
@@ -37,4 +38,3 @@ kotlin-dl = ["kotlin-dl-tensorflow", "kotlin-dl-onnx", "kotlin-dl-visualization"
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-jib = { id = "com.google.cloud.tools.jib", version = "3.3.2" }

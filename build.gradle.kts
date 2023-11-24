@@ -1,61 +1,27 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 
 plugins {
-    application
-
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.ksp) apply false
 }
 
-application {
-    mainClass.set("zt.minkinator.MainKt")
-}
-
-repositories {
-    google()
-    mavenCentral()
-
-    maven("https://s01.oss.sonatype.org/content/repositories/snapshots")
-    maven("https://oss.sonatype.org/content/repositories/snapshots")
-
-    maven {
-        name = "Kotlin Discord"
-        url = uri("https://maven.kotlindiscord.com/repository/maven-public/")
+subprojects {
+    apply {
+        plugin("kotlin")
     }
-}
 
-kotlin {
-    jvmToolchain(17)
+    kotlinExtension.apply {
+        jvmToolchain(17)
 
-    sourceSets.main {
-        kotlin.srcDir("build/generated/ksp/main/kotlin")
+        sourceSets["main"].languageSettings {
+            enableLanguageFeature("ContextReceivers")
+        }
     }
-}
 
-ksp {
-    arg("komapper.enableEntityStoreContext", "true")
-}
+    dependencies {
+        val implementation by configurations
 
-dependencies {
-    implementation(libs.kord.ex)
-    implementation(libs.kord.emoji)
-    implementation(libs.openai.client)
-    implementation(libs.logback.classic)
-    implementation(libs.ktor.client.encoding)
-
-    ksp(libs.komapper.processor)
-
-    implementation(libs.bundles.scrimmage)
-    implementation(libs.bundles.komapper)
-    // implementation(libs.bundles.kotlin.dl)
-}
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs += listOf(
-            "-Xcontext-receivers",
-            "-opt-in=org.komapper.annotation.KomapperExperimentalAssociation"
-        )
+        implementation(rootProject.libs.kord.ex)
     }
 }
