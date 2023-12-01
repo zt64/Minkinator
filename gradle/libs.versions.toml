@@ -26,7 +26,7 @@ komapper-processor = { module = "org.komapper:komapper-processor", version.ref =
 
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 
-logback-classic = "ch.qos.logback:logback-classic:1.4.11"
+logback-classic = "ch.qos.logback:logback-classic:1.4.14"
 openai-client = "com.aallam.openai:openai-client:3.5.1"
 
 [bundles]
