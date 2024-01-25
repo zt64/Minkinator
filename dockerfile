@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17.0.7_7-jdk-alpine AS builder
+FROM eclipse-temurin:21.0.2_13-jdk-alpine AS builder
 
 COPY gradle /repo/gradle
 COPY src /repo/src
@@ -7,7 +7,7 @@ WORKDIR /repo
 
 RUN ./gradlew installDist --no-daemon
 
-FROM eclipse-temurin:17.0.7_7-jre-alpine AS runner
+FROM eclipse-temurin:21.0.2_13-jre-alpine AS runner
 
 COPY --from=builder /repo/build/install/Minkinator /app/
 ENTRYPOINT ["/app/bin/Minkinator"]
