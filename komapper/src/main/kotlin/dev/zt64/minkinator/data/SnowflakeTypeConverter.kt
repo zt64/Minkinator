@@ -8,5 +8,6 @@ internal class SnowflakeTypeConverter : DataTypeConverter<Snowflake, Long> {
     override val interiorClass = Long::class
 
     override fun unwrap(exterior: Snowflake) = exterior.value.toLong()
+
     override fun wrap(interior: Long) = Snowflake(interior)
 }

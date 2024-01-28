@@ -78,11 +78,15 @@ object PollExtension : Extension() {
                         embed {
                             color = Color.success
                             title = "Poll Results"
-                            description = if (votes.isEmpty()) "No votes were cast" else buildString {
-                                choices.zip(votes.values).forEach { (choice, votes) ->
-                                    val percentage = votes.toDouble() / choices.size * 100
+                            description = if (votes.isEmpty()) {
+                                "No votes were cast"
+                            } else {
+                                buildString {
+                                    choices.zip(votes.values).forEach { (choice, votes) ->
+                                        val percentage = votes.toDouble() / choices.size * 100
 
-                                    appendLine("$choice - ${"vote".pluralize(votes)} ($percentage%)")
+                                        appendLine("$choice - ${"vote".pluralize(votes)} ($percentage%)")
+                                    }
                                 }
                             }
                         }

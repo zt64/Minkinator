@@ -37,7 +37,9 @@ object PurgeExtension : Extension() {
             action {
                 val count = arguments.count
 
-                channel.messages.filter { message -> message.author == arguments.target }
+                channel
+                    .messages
+                    .filter { message -> message.author == arguments.target }
                     .take(count)
                     .collect { message ->
                         try {

@@ -7,7 +7,6 @@ import dev.kord.core.entity.channel.GuildChannel
 import dev.kord.core.event.gateway.ReadyEvent
 import dev.kord.core.event.guild.MemberJoinEvent
 import dev.kord.core.event.guild.MemberLeaveEvent
-import dev.kord.core.kordLogger
 import dev.zt64.minkinator.util.event
 
 object EventLogExtension : Extension() {
@@ -17,18 +16,20 @@ object EventLogExtension : Extension() {
         val self = kord.getSelf()
 
         event<ReadyEvent> {
-            kordLogger.info("Ready!")
+            bot.logger.info { "Ready!" }
         }
 
         event<MemberJoinEvent> {
             if (event.member == self) {
-                kordLogger.info("Added to ${event.getGuild().name}")
+                val guildName = event.getGuild().name
+                bot.logger.info { "Added to $guildName" }
             }
         }
 
         event<MemberLeaveEvent> {
             if (event.user == self) {
-                kordLogger.info("Removed from ${event.getGuild().name}")
+                val guildName = event.getGuild().name
+                bot.logger.info { "Removed from $guildName" }
             }
         }
 
@@ -54,28 +55,32 @@ object EventLogExtension : Extension() {
                 }
 
                 append(
-                    interaction.command.options.map { (name, optionValue) ->
-                        "$name: ${optionValue.value}"
-                    }.joinToString()
+                    interaction
+                        .command
+                        .options
+                        .map { (name, optionValue) ->
+                            "$name: ${optionValue.value}"
+                        }.joinToString()
                 )
             }
 
-            kordLogger.info(message)
+            bot.logger.info { message }
         }
 
         event<ChatCommandInvocationEvent> {
             val message = event.event.message
+            val guild = message.getGuild()
             val channel = message.getChannel()
 
-            kordLogger.info(
+            bot.logger.info {
                 buildString {
                     if (channel is GuildChannel) {
-                        append("${channel.getGuild().name} #${channel.name} ")
+                        append("${guild.name} #${channel.name} ")
                     }
 
                     append("${message.author!!.username} ${message.content}")
                 }
-            )
+            }
         }
     }
 }

@@ -13,8 +13,10 @@ object AvatarExtension : Extension() {
     override val name = "avatar"
 
     override suspend fun setup() {
-        fun Member.getAvatarUrl() = displayAvatar().cdnUrl.toUrl {
-            size = Image.Size.Size512
+        fun Member.getAvatarUrl(): String {
+            return displayAvatar.cdnUrl.toUrl {
+                size = Image.Size.Size512
+            }
         }
 
         class Args : Arguments() {

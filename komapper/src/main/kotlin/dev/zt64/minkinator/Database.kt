@@ -9,7 +9,8 @@ import org.komapper.core.dsl.QueryDsl
 import org.komapper.r2dbc.R2dbcDatabase
 
 suspend fun createDatabase(path: String): R2dbcDatabase {
-    val options = ConnectionFactoryOptions.builder()
+    val options = ConnectionFactoryOptions
+        .builder()
         .option(ConnectionFactoryOptions.DRIVER, "h2")
         .option(ConnectionFactoryOptions.PROTOCOL, "file")
         .option(ConnectionFactoryOptions.DATABASE, path)

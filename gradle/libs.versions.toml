@@ -1,11 +1,12 @@
 [versions]
-kotlin = "1.9.21"
-ktor = "2.3.6"
-kord = "1.6.0-SNAPSHOT"
-ksp = "1.9.20-1.0.14"
+kotlin = "1.9.22"
+ktor = "2.3.7"
+kord = "1.7.1-SNAPSHOT"
+ksp = "1.9.22-1.0.16"
 scrimmage = "4.1.1"
 kotlin-dl = "0.5.2"
-komapper = "1.15.0"
+komapper = "1.16.0"
+ktlint-plugin = "12.0.3"
 
 [libraries]
 kord-ex = { module = "com.kotlindiscord.kord.extensions:kord-extensions", version.ref = "kord" }
@@ -26,8 +27,9 @@ komapper-processor = { module = "org.komapper:komapper-processor", version.ref =
 
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 
-logback-classic = "ch.qos.logback:logback-classic:1.4.11"
-openai-client = "com.aallam.openai:openai-client:3.5.1"
+logback-classic = "ch.qos.logback:logback-classic:1.4.14"
+openai-client = "com.aallam.openai:openai-client:3.6.1"
+tess4j = "net.sourceforge.tess4j:tess4j:5.8.0"
 
 [bundles]
 scrimmage = ["scrimmage-core", "scrimmage-filters", "scrimmage-webp"]
@@ -38,3 +40,4 @@ kotlin-dl = ["kotlin-dl-tensorflow", "kotlin-dl-onnx", "kotlin-dl-visualization"
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-plugin" }

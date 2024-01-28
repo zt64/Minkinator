@@ -1,5 +1,6 @@
 package dev.zt64.minkinator.extension.media
 
+import com.kotlindiscord.kord.extensions.DiscordRelayedException
 import com.kotlindiscord.kord.extensions.commands.Argument
 import com.kotlindiscord.kord.extensions.commands.Arguments
 import com.kotlindiscord.kord.extensions.commands.CommandContext
@@ -8,7 +9,6 @@ import com.kotlindiscord.kord.extensions.commands.converters.SingleConverter
 import com.kotlindiscord.kord.extensions.commands.converters.impl.*
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.parser.StringParser
-
 import com.kotlindiscord.kord.extensions.utils.suggestStringCollection
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.angles.Degrees
@@ -21,9 +21,21 @@ import dev.kord.rest.builder.message.create.MessageCreateBuilder
 import dev.zt64.minkinator.util.chatCommand
 import dev.zt64.minkinator.util.displayAvatar
 import dev.zt64.minkinator.util.publicSlashCommand
+import io.ktor.client.*
+import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
+import io.ktor.client.statement.*
+import org.bytedeco.ffmpeg.avcodec.AVPacket
+import org.bytedeco.ffmpeg.avformat.AVFormatContext
+import org.bytedeco.ffmpeg.global.avcodec.*
+import org.bytedeco.ffmpeg.global.avformat.*
+import org.bytedeco.ffmpeg.global.avutil.AVMEDIA_TYPE_VIDEO
+import org.bytedeco.javacpp.BytePointer
+import org.bytedeco.javacpp.PointerPointer
 import thirdparty.jhlabs.image.ConvolveFilter
+import java.nio.ByteBuffer
 import kotlin.math.PI
+import kotlin.system.exitProcess
 
 object EffectsExtension : Extension() {
     override val name = "effects"
@@ -38,7 +50,7 @@ object EffectsExtension : Extension() {
             suspend fun MessageCreateBuilder.processAvatar(arguments: T) {
                 val user = arguments.user
                 val avatar = user.avatar ?: user.defaultAvatar
-                val mutator = { frame: ImmutableImage -> block(arguments, frame) }
+                val mutator = { frame: ImmutableImage -> arguments.block(frame) }
 
                 val (extension, byteReadChannel) = if (avatar.isAnimated) {
                     "gif" to mutateGif(avatar.getImage(Image.Format.GIF).data, mutator)
@@ -83,7 +95,7 @@ object EffectsExtension : Extension() {
             arguments: () -> T,
             filter: T.() -> Filter
         ) = addCommand(name, description, arguments) { image ->
-            image.filter(filter(this))
+            image.filter(filter())
         }
 
         suspend fun addFilterCommand(
@@ -217,7 +229,8 @@ object EffectsExtension : Extension() {
 
         addCommand("speech-bubble", "Adds a speech bubble to an image") { image ->
             val scaledImage = image.scaleTo(512, 512)
-            val speechBubble = ImmutableImage.loader()
+            val speechBubble = ImmutableImage
+                .loader()
                 .fromResource("/speech-bubble.png")
                 .scaleToWidth(scaledImage.width)
 
@@ -257,17 +270,80 @@ object EffectsExtension : Extension() {
             }
         }
 
-        addCommand("convolve", "Apply a convolution matrix to a user", ::ConvolveArgs) {
+        addCommand("convolve", "Apply a convolution matrix to a user", ::ConvolveArgs) { image ->
             val matrix = data.split(",").map(String::toFloat).toFloatArray()
-            val filter = ConvolveFilter(matrix)
+            val filter = ConvolveFilter(matrix).apply {
+                useAlpha = true
+                edgeAction = ConvolveFilter.CLAMP_EDGES
+            }
 
-            filter.useAlpha = true
-            filter.edgeAction = ConvolveFilter.CLAMP_EDGES
-
-            val input = it.awt()
-            val output = filter.filter(input, null)
+            val output = filter.filter(image.awt(), null)
 
             ImmutableImage.fromAwt(output)
+        }
+
+        class LoopArgs : Arguments() {
+            val url by string {
+                name = "url"
+                description = "The URL of the video to loop"
+            }
+        }
+
+        publicSlashCommand("loop", "Test", arguments = ::LoopArgs) {
+            action {
+                val bytes = HttpClient().get(arguments.url).readBytes()
+
+                val ctx = AVFormatContext(null)
+                val packet = AVPacket()
+
+                val bytePointer = BytePointer(ByteBuffer.wrap(bytes))
+                var ret = avformat_open_input(ctx, bytePointer, null, null)
+
+                if (ret < 0) {
+                    throw DiscordRelayedException("Failed to process video")
+                }
+
+                if (avformat_find_stream_info(ctx, null as PointerPointer<*>?) < 0) {
+                    exitProcess(-1)
+                }
+
+                av_dump_format(ctx, 0, bytePointer, 0)
+                var i = 0
+                var v_stream_idx = -1
+                while (i < ctx.nb_streams()) {
+                    if (ctx.streams(i).codecpar().codec_type() == AVMEDIA_TYPE_VIDEO) {
+                        v_stream_idx = i
+                        break
+                    }
+                    i++
+                }
+
+                if (v_stream_idx == -1) {
+                    println("Cannot find video stream")
+                    throw DiscordRelayedException("Failed to process video")
+                } else {
+                    System.out.printf(
+                        "Video stream %d with resolution %dx%d\n",
+                        v_stream_idx,
+                        ctx.streams(i).codecpar().width(),
+                        ctx.streams(i).codecpar().height()
+                    )
+                }
+
+                val codecCtx = avcodec_alloc_context3(null)
+                avcodec_parameters_to_context(codecCtx, ctx.streams(v_stream_idx).codecpar())
+
+                val codec = avcodec_find_decoder(codecCtx.codec_id())
+                if (codec == null) {
+                    println("Unsupported codec for video file")
+                    throw IllegalStateException()
+                }
+                ret = avcodec_open2(codecCtx, codec, null as PointerPointer<*>?)
+                if (ret < 0) {
+                    println("Can not open codec")
+                    throw IllegalStateException()
+                }
+            }
         }
     }
 
@@ -279,26 +355,39 @@ object EffectsExtension : Extension() {
     }
 
     private enum class Axis {
-        X, Y
+        X,
+        Y
     }
 }
 
 class MediaReferenceConverter : SingleConverter<String>() {
     override val signatureTypeString: String = "converters.string.signatureType"
 
-    override suspend fun parse(parser: StringParser?, context: CommandContext, named: String?): Boolean {
+    override suspend fun parse(
+        parser: StringParser?,
+        context: CommandContext,
+        named: String?
+    ): Boolean {
         context as ChatCommandContext<*>
 
         if (context.message.attachments.isNotEmpty()) {
-            context.message.attachments.first().url
+            context
+                .message
+                .attachments
+                .first()
+                .url
         }
 
         parser?.parseNext()
-        context.getMember()?.asMember()?.displayAvatar()
+        context.getMember()?.asMember()?.displayAvatar
 
         return false
     }
 
-    override suspend fun parseOption(context: CommandContext, option: OptionValue<*>) = TODO()
+    override suspend fun parseOption(
+        context: CommandContext,
+        option: OptionValue<*>
+    ) = TODO()
+
     override suspend fun toSlashOption(arg: Argument<*>) = TODO()
 }

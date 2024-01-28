@@ -8,6 +8,8 @@ import com.sksamuel.scrimage.nio.AnimatedGifReader
 import com.sksamuel.scrimage.nio.ImageSource
 import com.sksamuel.scrimage.nio.PngWriter
 import com.sksamuel.scrimage.webp.Gif2WebpWriter
+import dev.kord.core.entity.GuildEmoji
+import dev.kord.core.entity.StandardEmoji
 import dev.kord.gateway.Intent
 import dev.kord.rest.NamedFile
 import dev.zt64.minkinator.util.publicSlashCommand
@@ -34,31 +36,38 @@ object BigmojiExtension : Extension() {
             arguments = ::Args
         ) {
             action {
-                val emoji = arguments.emoji
-                val data = emoji.image.getImage().data
+                when (val emoji = arguments.emoji) {
+                    is GuildEmoji -> {
+                        val data = emoji.image.getImage().data
 
-                val file = if (emoji.isAnimated) {
-                    val gif = AnimatedGifReader.read(ImageSource.of(data))
+                        val file = if (emoji.isAnimated) {
+                            val gif = AnimatedGifReader.read(ImageSource.of(data))
 
-                    gif.frames.onEach { frame -> frame.scale(SCALE_FACTOR) }
+                            gif.frames.onEach { frame -> frame.scale(SCALE_FACTOR) }
 
-                    NamedFile(
-                        name = "${emoji.name}.webp",
-                        contentProvider = ChannelProvider { gif.bytes(Gif2WebpWriter.DEFAULT).inputStream().toByteReadChannel() }
-                    )
-                } else {
-                    val image = ImmutableImage.loader().fromBytes(data)
+                            NamedFile(
+                                name = "${emoji.name}.webp",
+                                contentProvider = ChannelProvider { gif.bytes(Gif2WebpWriter.DEFAULT).inputStream().toByteReadChannel() }
+                            )
+                        } else {
+                            val image = ImmutableImage.loader().fromBytes(data)
 
-                    image.scale(SCALE_FACTOR)
+                            image.scale(SCALE_FACTOR)
 
-                    NamedFile(
-                        name = "${emoji.name}.png",
-                        contentProvider = ChannelProvider { image.bytes(PngWriter.MinCompression).inputStream().toByteReadChannel() }
-                    )
-                }
+                            NamedFile(
+                                name = "${emoji.name}.png",
+                                contentProvider = ChannelProvider { image.bytes(PngWriter.MinCompression).inputStream().toByteReadChannel() }
+                            )
+                        }
 
-                respond {
-                    files += file
+                        respond {
+                            files += file
+                        }
+                    }
+
+                    is StandardEmoji -> {
+                        respond { content = emoji.mention }
+                    }
                 }
             }
         }

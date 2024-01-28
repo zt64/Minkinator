@@ -8,14 +8,6 @@ application {
     mainClass = "dev.zt64.minkinator.MainKt"
 }
 
-kotlin {
-    sourceSets.main {
-        languageSettings {
-            enableLanguageFeature("ContextReceivers")
-        }
-    }
-}
-
 dependencies {
     implementation(projects.komapper)
     implementation(projects.util)
@@ -38,4 +30,7 @@ dependencies {
     implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.4.2")
 
     implementation("space.kscience:kmath-ast:0.3.1")
+    implementation("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
+
+    implementation(libs.tess4j)
 }

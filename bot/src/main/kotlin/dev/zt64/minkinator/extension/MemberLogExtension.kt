@@ -89,9 +89,7 @@ object MemberLogExtension : Extension() {
 
                                 action {
                                     if (enabled) {
-
                                     } else {
-
                                     }
                                 }
                             }

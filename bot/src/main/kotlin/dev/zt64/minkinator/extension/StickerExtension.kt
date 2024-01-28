@@ -57,7 +57,7 @@ object StickerExtension : Extension() {
                     tags = arguments.relatedEmoji.mention,
                     file = NamedFile(
                         name = attachment.filename,
-                        contentProvider = ChannelProvider { channel },
+                        contentProvider = ChannelProvider { channel }
                     )
                 )
 

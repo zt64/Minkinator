@@ -51,7 +51,6 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
 import kotlin.time.measureTime
 
-
 object RestrictedExtension : Extension() {
     override val name = "restricted"
     override val intents = mutableSetOf<Intent>(Intent.Guilds)
@@ -299,21 +298,23 @@ object RestrictedExtension : Extension() {
         command("plot") { input ->
             val data = mapOf<String, Any>(
                 "x" to List(100) { x -> x },
-                "y" to List(100) { x -> log((x.toFloat().pow(2)), 2f) },
+                "y" to List(100) { x -> log((x.toFloat().pow(2)), 2f) }
             )
 
-            val plot = letsPlot(data) + geomLine(
-                color = "dark-green",
-                alpha = .3,
-                size = 2.0,
-            ) {
-                x = "x"
-                y = "y"
-            } + labs(
-                title = "Vendetta insanity over time",
-                x = "Week",
-                y = "Vendetta insanity"
-            )
+            val plot = letsPlot(data) +
+                geomLine(
+                    color = "dark-green",
+                    alpha = .3,
+                    size = 2.0
+                ) {
+                    x = "x"
+                    y = "y"
+                } +
+                labs(
+                    title = "Insanity over time",
+                    x = "Week",
+                    y = "Insanity"
+                )
 
             val rawSpec = plot.toSpec()
             val processedSpec = MonolithicCommon.processRawSpecs(rawSpec, frontendOnly = false)
@@ -330,9 +331,12 @@ object RestrictedExtension : Extension() {
 
             t.transcode(input, output)
             message.reply {
-                addFile("guh.jpg", ChannelProvider {
-                    ByteReadChannel(baos.toByteArray())
-                })
+                addFile(
+                    "guh.jpg",
+                    ChannelProvider {
+                        ByteReadChannel(baos.toByteArray())
+                    }
+                )
             }
         }
 
@@ -345,7 +349,8 @@ object RestrictedExtension : Extension() {
             val duration = measureTime {
                 res = scriptingHost.eval(
                     script = code.toScriptSource(),
-                    compilationConfiguration = ScriptCompilationConfiguration {
+                    compilationConfiguration =
+                    ScriptCompilationConfiguration {
                         defaultImports(
                             "dev.kord.core.behavior.*",
                             "dev.kord.core.entity.*",
@@ -355,14 +360,15 @@ object RestrictedExtension : Extension() {
                         )
                         implicitReceivers(ChatCommandContext::class)
                         providedProperties(
-                            "kord" to Kord::class,
+                            "kord" to Kord::class
                         )
 
                         jvm {
                             dependenciesFromCurrentContext(wholeClasspath = true)
                         }
                     },
-                    evaluationConfiguration = ScriptEvaluationConfiguration {
+                    evaluationConfiguration =
+                    ScriptEvaluationConfiguration {
                         implicitReceivers(this@command)
                         providedProperties("kord" to kord)
                     }
@@ -386,7 +392,8 @@ object RestrictedExtension : Extension() {
                             appendLine("```")
                         }
                     } else {
-                        res.reports
+                        res
+                            .reports
                             .filter { it.severity > ScriptDiagnostic.Severity.WARNING }
                             .joinToString("\n", transform = ScriptDiagnostic::render)
                     }

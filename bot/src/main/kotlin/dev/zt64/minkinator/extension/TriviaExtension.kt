@@ -34,7 +34,9 @@ object TriviaExtension : Extension() {
 
     private val httpClient: HttpClient by inject()
 
-    private enum class Emoji(val emoji: DiscordEmoji.Generic) {
+    private enum class Emoji(
+        val emoji: DiscordEmoji.Generic
+    ) {
         A(Emojis.regionalIndicatorA),
         B(Emojis.regionalIndicatorB),
         C(Emojis.regionalIndicatorC),
@@ -93,110 +95,114 @@ object TriviaExtension : Extension() {
                     this@publicSlashCommand.withLock {
                         val duration = 10.seconds
 
-                        games[channel.id] = channel.kord.launch {
-                            val totalQuestions = arguments.questions
+                        games[channel.id] =
+                            channel.kord.launch {
+                                val totalQuestions = arguments.questions
 
-                            val response: TriviaDBResponse = httpClient.get("https://opentdb.com/api.php") {
-                                parameter("amount", totalQuestions)
-                                parameter("category", arguments.category)
-                                parameter("difficulty", arguments.difficulty)
-                            }.body()
+                                val response: TriviaDBResponse = httpClient
+                                    .get("https://opentdb.com/api.php") {
+                                        parameter("amount", totalQuestions)
+                                        parameter("category", arguments.category)
+                                        parameter("difficulty", arguments.difficulty)
+                                    }.body()
 
-                            val score = mutableMapOf<User, Int>()
+                                val score = mutableMapOf<User, Int>()
 
-                            response.questions.forEachIndexed { index, question ->
-                                val category = question.category
-                                val formattedQuestion = question.question.decodeEntities()
-                                val incorrectAnswers = question.incorrectAnswers.map(String::decodeEntities)
-                                val correctAnswer = question.correctAnswer.decodeEntities()
-                                val participants = mutableMapOf<User, Boolean>()
+                                response.questions.forEachIndexed { index, question ->
+                                    val category = question.category
+                                    val formattedQuestion = question.question.decodeEntities()
+                                    val incorrectAnswers = question.incorrectAnswers.map(String::decodeEntities)
+                                    val correctAnswer = question.correctAnswer.decodeEntities()
+                                    val participants = mutableMapOf<User, Boolean>()
 
-                                val embedBuilder: EmbedBuilder.() -> Unit = {
-                                    color = Color.success
-                                    title = category
-                                    description = """
-                                        $formattedQuestion
+                                    val embedBuilder: EmbedBuilder.() -> Unit = {
+                                        color = Color.success
+                                        title = category
+                                        description = """
+                                            $formattedQuestion
 
-                                        Ending ${duration.toDiscord(TimestampType.RelativeTime)}
-                                    """.trimIndent()
+                                            Ending ${duration.toDiscord(TimestampType.RelativeTime)}
+                                            """.trimIndent()
 
-                                    footer("Question ${index + 1} of $totalQuestions")
-                                }
+                                        footer("Question ${index + 1} of $totalQuestions")
+                                    }
 
-                                val message = respond {
-                                    embed(embedBuilder)
+                                    val message =
+                                        respond {
+                                            embed(embedBuilder)
 
-                                    components(timeout = 10.seconds) {
-                                        if (question.type == QuestionType.BOOLEAN) {
-                                            publicButton {
-                                                style = ButtonStyle.Primary
-                                                label = "True"
+                                            components(timeout = 10.seconds) {
+                                                if (question.type == QuestionType.BOOLEAN) {
+                                                    publicButton {
+                                                        style = ButtonStyle.Primary
+                                                        label = "True"
 
-                                                action {
-                                                    participants[user.asUser()] = (correctAnswer == "True")
-                                                }
-                                            }
+                                                        action {
+                                                            participants[user.asUser()] = (correctAnswer == "True")
+                                                        }
+                                                    }
 
-                                            publicButton {
-                                                style = ButtonStyle.Danger
-                                                label = "False"
+                                                    publicButton {
+                                                        style = ButtonStyle.Danger
+                                                        label = "False"
 
-                                                action {
-                                                    participants[user.asUser()] = (correctAnswer == "False")
-                                                }
-                                            }
-                                        } else {
-                                            val choices = incorrectAnswers + correctAnswer
+                                                        action {
+                                                            participants[user.asUser()] = (correctAnswer == "False")
+                                                        }
+                                                    }
+                                                } else {
+                                                    val choices = incorrectAnswers + correctAnswer
 
-                                            choices.forEachIndexed { index, choice ->
-                                                publicButton {
-                                                    style = ButtonStyle.Secondary
-                                                    label = choice
-                                                    partialEmoji = Emoji.entries[index].emoji.partial
+                                                    choices.forEachIndexed { index, choice ->
+                                                        publicButton {
+                                                            style = ButtonStyle.Secondary
+                                                            label = choice
+                                                            partialEmoji = Emoji.entries[index].emoji.partial
 
-                                                    action {
-                                                        participants[user.asUser()] = (correctAnswer == choice)
+                                                            action {
+                                                                participants[user.asUser()] = (correctAnswer == choice)
+                                                            }
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
-                                    }
-                                }
 
-                                delay(10000)
+                                    delay(10000)
 
-                                message.edit {
-                                    embed {
-                                        embedBuilder()
-                                        description = """
-                                            $formattedQuestion
+                                    message.edit {
+                                        embed {
+                                            embedBuilder()
+                                            description = """
+                                                $formattedQuestion
 
-                                            The correct answer was ${correctAnswer.decodeEntities()}
-                                        """.trimIndent()
+                                                The correct answer was ${correctAnswer.decodeEntities()}
+                                                """.trimIndent()
 
-                                        if (participants.isNotEmpty()) {
-                                            field {
-                                                name = "Participants:"
-                                                value = participants.map { (user, correct) ->
-                                                    "${if (correct) Emojis.whiteCheckMark else Emojis.x} - ${user.mention}"
-                                                }.joinToString("\n")
+                                            if (participants.isNotEmpty()) {
+                                                field {
+                                                    name = "Participants:"
+                                                    value = participants
+                                                        .map { (user, correct) ->
+                                                            "${if (correct) Emojis.whiteCheckMark else Emojis.x} - ${user.mention}"
+                                                        }.joinToString("\n")
+                                                }
                                             }
                                         }
+
+                                        components { }
                                     }
+                                }
 
-                                    components { }
+                                games.remove(channel.id)
+
+                                respond {
+                                    embed {
+                                        color = Color.success
+                                        title = "Trivia Results"
+                                    }
                                 }
                             }
-
-                            games.remove(channel.id)
-
-                            respond {
-                                embed {
-                                    color = Color.success
-                                    title = "Trivia Results"
-                                }
-                            }
-                        }
                     }
                 }
             }
@@ -253,7 +259,6 @@ object TriviaExtension : Extension() {
                                 label = "Reset"
 
                                 action {
-
                                 }
                             }
                         }

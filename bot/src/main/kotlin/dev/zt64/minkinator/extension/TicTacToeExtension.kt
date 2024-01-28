@@ -16,6 +16,10 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.seconds
 
+class Guh<T> {
+    val t: T & Any = TODO()
+}
+
 object TicTacToeExtension : Extension() {
     override val name = "tic-tac-toe"
 
@@ -42,9 +46,9 @@ object TicTacToeExtension : Extension() {
                 respond {
                     embed {
                         title = "Tic Tac Toe"
-                        description = buildString {
-
-                        }
+                        description =
+                            buildString {
+                            }
 
                         footer("")
                     }
@@ -56,16 +60,15 @@ object TicTacToeExtension : Extension() {
                             emoji(Emojis.x.unicode)
 
                             action {
-
                             }
                         }
                     }
                 }
 
                 try {
-                    val opp = withTimeoutOrNull(timeoutDuration) {
-
-                    }
+                    val opp =
+                        withTimeoutOrNull(timeoutDuration) {
+                        }
                 } catch (e: TimeoutCancellationException) {
                     edit {
                         embed {

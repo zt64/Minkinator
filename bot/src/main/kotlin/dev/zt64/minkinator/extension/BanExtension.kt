@@ -46,7 +46,7 @@ object BanExtension : Extension() {
                         description = arguments.reason
 
                         author(
-                            icon = target.displayAvatar(),
+                            icon = target.displayAvatar,
                             name = "Banned User: ${target.username}"
                         )
 

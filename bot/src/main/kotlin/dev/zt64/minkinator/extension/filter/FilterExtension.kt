@@ -16,7 +16,6 @@ import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.ban
 import dev.kord.core.entity.Guild
 import dev.kord.core.event.message.MessageCreateEvent
-import dev.kord.core.kordLogger
 import dev.kord.rest.builder.message.embed
 import dev.zt64.minkinator.data.Filter
 import dev.zt64.minkinator.data.FilterAction
@@ -39,7 +38,6 @@ object FilterExtension : Extension() {
             .where { Meta.filter.guildId eq id }
     }
 
-    @OptIn(DoNotChain::class)
     override suspend fun setup() {
         event<MessageCreateEvent> {
             check {
@@ -73,6 +71,7 @@ object FilterExtension : Extension() {
                         }
 
                         FilterAction.TIMEOUT -> {
+                            @OptIn(DoNotChain::class)
                             member.timeout(
                                 until = Duration.INFINITE,
                                 reason = "Triggered filter: ${filter.id}: ${message.content}"
@@ -90,10 +89,12 @@ object FilterExtension : Extension() {
                         }
                     }
 
-                    if (filter.deleteMessage) try {
-                        message.delete("Triggered filter ${filter.id}: ${message.content}")
-                    } catch (e: Exception) {
-                        kordLogger.error(e) { "Failed to delete message" }
+                    if (filter.deleteMessage) {
+                        try {
+                            message.delete("Triggered filter ${filter.id}: ${message.content}")
+                        } catch (e: Exception) {
+                            bot.logger.error(e) { "Failed to delete message" }
+                        }
                     }
                 }
             }
@@ -129,7 +130,7 @@ object FilterExtension : Extension() {
                             db.runQuery {
                                 QueryDsl
                                     .insert(Meta.filter)
-                                    .single(initBlock(this@action.arguments, guildId))
+                                    .single(this@action.arguments.initBlock(guildId))
                             }
 
                             respond {
@@ -176,13 +177,14 @@ object FilterExtension : Extension() {
                 arguments = FilterExtension::RemoveArgs
             ) {
                 action {
-                    val removed = db.runQuery {
-                        QueryDsl
-                            .delete(Meta.filter)
-                            .where {
-                                Meta.filter.id eq arguments.id
-                            }
-                    } > 0
+                    val removed =
+                        db.runQuery {
+                            QueryDsl
+                                .delete(Meta.filter)
+                                .where {
+                                    Meta.filter.id eq arguments.id
+                                }
+                        } > 0
 
                     respond {
                         content = if (removed) "Removed filter" else "Filter not found"
@@ -190,20 +192,22 @@ object FilterExtension : Extension() {
                 }
             }
 
-            fun Filter.print() = buildString {
-                appendLine("Filter ID: $id")
-                appendLine("Pattern: `$pattern`")
+            fun Filter.print(): String {
+                return buildString {
+                    appendLine("Filter ID: $id")
+                    appendLine("Pattern: `$pattern`")
 
-                when (action) {
-                    FilterAction.REPLY -> {
-                        appendLine("Response: $response")
-                        appendLine("Delete message: $deleteMessage")
+                    when (action) {
+                        FilterAction.REPLY -> {
+                            appendLine("Response: $response")
+                            appendLine("Delete message: $deleteMessage")
+                        }
+
+                        FilterAction.WARN -> {}
+                        FilterAction.TIMEOUT -> {}
+                        FilterAction.KICK -> {}
+                        FilterAction.BAN -> {}
                     }
-
-                    FilterAction.WARN -> {}
-                    FilterAction.TIMEOUT -> {}
-                    FilterAction.KICK -> {}
-                    FilterAction.BAN -> {}
                 }
             }
 

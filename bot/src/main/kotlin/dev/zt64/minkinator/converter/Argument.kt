@@ -18,7 +18,10 @@ class ArgumentDelegate<T>(
     override val value: T
         get() = TODO("Not yet implemented")
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+    operator fun getValue(
+        thisRef: Any?,
+        property: KProperty<*>
+    ): T {
         TODO("Not yet implemented")
     }
 

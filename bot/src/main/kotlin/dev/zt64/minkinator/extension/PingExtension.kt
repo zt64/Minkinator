@@ -19,7 +19,10 @@ object PingExtension : Extension() {
                     embed {
                         color = Color.success
                         title = "Ping"
-                        description = this@PingExtension.kord.gateway.averagePing?.toString() ?: "Unknown"
+                        description = bot.kordRef
+                            .gateway
+                            .averagePing
+                            ?.toString() ?: "Unknown"
                     }
                 }
             }

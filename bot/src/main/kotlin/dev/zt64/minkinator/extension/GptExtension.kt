@@ -32,7 +32,9 @@ import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.seconds
 
 @OptIn(BetaOpenAI::class)
-class GptExtension(apiKey: String = env("OPENAI_KEY")) : Extension() {
+class GptExtension(
+    apiKey: String = env("OPENAI_KEY")
+) : Extension() {
     override val name = "gpt"
 
     @OptIn(PrivilegedIntent::class)
@@ -58,11 +60,15 @@ class GptExtension(apiKey: String = env("OPENAI_KEY")) : Extension() {
     }
 
     context(EventContext<MessageCreateEvent>)
-    private suspend fun String.unsanitize() = buildString {
-
+    private suspend fun String.unsanitize(): String {
+        return buildString {
+        }
     }
 
-    private suspend fun MutableList<ChatMessage>.request(message: String, name: String? = null): ChatMessage? {
+    private suspend fun MutableList<ChatMessage>.request(
+        message: String,
+        name: String? = null
+    ): ChatMessage? {
         add(ChatMessage(ChatRole.User, message, name))
 
         val request = ChatCompletionRequest(
@@ -71,7 +77,8 @@ class GptExtension(apiKey: String = env("OPENAI_KEY")) : Extension() {
         )
 
         return openAI
-            .chatCompletion(request).choices
+            .chatCompletion(request)
+            .choices
             .firstNotNullOfOrNull { it.message }
             .also { add(it!!) }
     }
@@ -90,9 +97,12 @@ class GptExtension(apiKey: String = env("OPENAI_KEY")) : Extension() {
                 val message = event.message
                 val sanitizedMessage = message.sanitize()
 
-                val flagged = openAI.moderations(
-                    request = ModerationRequest(listOf(sanitizedMessage))
-                ).results.single().flagged
+                val flagged = openAI
+                    .moderations(
+                        request = ModerationRequest(listOf(sanitizedMessage))
+                    ).results
+                    .single()
+                    .flagged
 
                 if (flagged) {
                     return@action message.addReaction(Emojis.triangularFlagOnPost.toReaction())
@@ -100,11 +110,13 @@ class GptExtension(apiKey: String = env("OPENAI_KEY")) : Extension() {
 
                 message.channel.withTyping {
                     withTimeoutOrNull(30.seconds) {
-                        val response = threads.getOrPut(message.channelId) {
-                            mutableListOf<ChatMessage>().also { thread ->
-                                thread.request(prompt)!!
-                            }
-                        }.request(sanitizedMessage)?.content
+                        val response = threads
+                            .getOrPut(message.channelId) {
+                                mutableListOf<ChatMessage>().also { thread ->
+                                    thread.request(prompt)!!
+                                }
+                            }.request(sanitizedMessage)
+                            ?.content
 
                         if (response == null) {
                             threads[message.channelId]!!.dropLast(1)

@@ -18,7 +18,6 @@ import io.ktor.client.statement.*
 import org.koin.core.component.inject
 import java.awt.Color
 import java.awt.Font
-import kotlin.math.roundToInt
 
 object CaptionExtension : Extension() {
     override val name = "caption"
@@ -30,7 +29,7 @@ object CaptionExtension : Extension() {
     override suspend fun setup() {
         publicSlashCommand(
             name = "caption",
-            description = "Caption an image",
+            description = "Caption an image or gif",
             arguments = CaptionExtension::CaptionArgs
         ) {
             action {
@@ -49,42 +48,54 @@ object CaptionExtension : Extension() {
 
                     val expectedWidth = vector.outline.bounds.width
                     val expectedHeight = vector.outline.bounds.height
-                    val captionHeight = (expectedHeight * 1.8).roundToInt()
 
-                    return image.resizeTo(
-                        /* targetWidth = */ width,
-                        /* targetHeight = */ height + captionHeight,
-                        /* position = */ Position.BottomLeft,
-                        /* background = */ if (dark) Color.BLACK else Color.WHITE
-                    ).toCanvas().draw(
-                        Text(
-                            text,
-                            (width - expectedWidth) / 2,
-                            (captionHeight - metrics.height) / 2 + metrics.ascent
-                        ) {
-                            with(it) {
-                                font = baseFont
-                                color = if (dark) Color.WHITE else Color.BLACK
-                                setAntiAlias(true)
-                            }
-                        }
-                    ).image
+                    val textFits = image.width >= expectedWidth && image.height >= expectedHeight
+
+                    val widthBasedFontSize = (baseFont.size2D * image.width) / expectedWidth
+                    val heightBasedFontSize = (baseFont.size2D * image.height) / expectedHeight
+
+                    val newFontSize = (if (widthBasedFontSize < heightBasedFontSize) widthBasedFontSize else heightBasedFontSize).toDouble()
+                    val newFont = baseFont.deriveFont(baseFont.style, newFontSize.toFloat())
+                    val captionHeight = expectedHeight * 3
+
+                    return image
+                        .resizeTo(
+                            // targetWidth =
+                            width,
+                            // targetHeight =
+                            height + captionHeight,
+                            // position =
+                            Position.Center,
+                            // background =
+                            if (dark) Color.BLACK else Color.WHITE
+                        ).toCanvas()
+                        .apply {
+                            drawInPlace(
+                                Text(
+                                    text,
+                                    (width - expectedWidth) / 2,
+                                    (captionHeight - metrics.height) / 2 + metrics.ascent
+                                ) { g ->
+                                    g.font = baseFont
+                                    g.color = if (dark) Color.WHITE else Color.BLACK
+                                    g.setAntiAlias(true)
+                                }
+                            )
+                        }.image
                 }
 
-                val (fileName, mutator) = if (attachment.filename.endsWith(".gif")) {
-                    "a.gif" to ::mutateGif
-                } else {
-                    "a.png" to ::mutateImage
+                val mutatedByteArray = httpClient.get(attachment.url).readBytes().let {
+                    if (attachment.filename.endsWith(".gif")) {
+                        mutateGif(it, ::block)
+                    } else {
+                        mutateImage(it, ::block)
+                    }
                 }
-
-                val byteArray = httpClient.get(attachment.url).readBytes()
 
                 respond {
                     addFile(
-                        name = fileName,
-                        contentProvider = ChannelProvider {
-                            mutator(byteArray, ::block)
-                        }
+                        name = attachment.filename,
+                        contentProvider = ChannelProvider { mutatedByteArray }
                     )
                 }
             }

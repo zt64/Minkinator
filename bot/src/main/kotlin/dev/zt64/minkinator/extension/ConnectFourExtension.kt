@@ -30,7 +30,6 @@ object ConnectFourExtension : Extension() {
                     embed {
                         title = "Connect Four"
                         description = buildString {
-
                         }
 
                         footer("")
@@ -38,7 +37,6 @@ object ConnectFourExtension : Extension() {
                 }
 
                 edit {
-
                 }
             }
         }

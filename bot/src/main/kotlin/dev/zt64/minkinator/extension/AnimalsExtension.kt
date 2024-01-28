@@ -25,7 +25,9 @@ object AnimalsExtension : Extension() {
     )
 
     @Serializable
-    private data class Dog(@SerialName("message") val url: String)
+    private data class Dog(
+        @SerialName("message") val url: String
+    )
 
     override suspend fun setup() {
         publicSlashCommand(
@@ -33,9 +35,11 @@ object AnimalsExtension : Extension() {
             description = "Gets an image of a cat"
         ) {
             action {
-                val cat = httpClient.get("https://api.thecatapi.com/v1/images/search") {
-                    parameter("size", "small")
-                }.body<List<Cat>>().single()
+                val cat = httpClient
+                    .get("https://api.thecatapi.com/v1/images/search") {
+                        parameter("size", "small")
+                    }.body<List<Cat>>()
+                    .single()
 
                 respond {
                     embed {

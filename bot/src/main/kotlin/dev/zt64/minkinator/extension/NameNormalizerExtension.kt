@@ -7,7 +7,6 @@ import com.kotlindiscord.kord.extensions.commands.converters.impl.member
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.extensions.event
 import com.kotlindiscord.kord.extensions.types.EphemeralInteractionContext
-
 import com.kotlindiscord.kord.extensions.utils.hasPermission
 import com.kotlindiscord.kord.extensions.utils.selfMember
 import dev.kord.common.entity.Permission
@@ -15,7 +14,6 @@ import dev.kord.core.behavior.edit
 import dev.kord.core.entity.Member
 import dev.kord.core.event.guild.MemberJoinEvent
 import dev.kord.core.event.guild.MemberUpdateEvent
-import dev.kord.core.kordLogger
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import dev.zt64.minkinator.util.ephemeralSlashCommand
@@ -29,6 +27,7 @@ object NameNormalizerExtension : Extension() {
     override val intents = mutableSetOf<Intent>(Intent.GuildMembers)
 
     private fun String.normalize(form: Normalizer.Form): String = Normalizer.normalize(this, form)
+
     private fun String.isNormalized(form: Normalizer.Form = Normalizer.Form.NFD) = Normalizer.isNormalized(this, form)
 
     private suspend fun Member.normalizeName() {
@@ -51,7 +50,7 @@ object NameNormalizerExtension : Extension() {
             action {
                 if (!event.member.effectiveName.isNormalized()) {
                     // event.member.normalizeName()
-                    kordLogger.info("Normalized name for ${event.member.effectiveName} (${event.member.id})")
+                    bot.logger.info { "Normalized name for ${event.member.effectiveName} (${event.member.id})" }
                 }
             }
         }
@@ -70,7 +69,7 @@ object NameNormalizerExtension : Extension() {
             action {
                 if (event.old?.effectiveName != event.member.effectiveName && !event.member.effectiveName.isNormalized()) {
                     // event.member.normalizeName()
-                    kordLogger.info("Normalized name for ${event.member.effectiveName} (${event.member.id})")
+                    bot.logger.info { "Normalized name for ${event.member.effectiveName} (${event.member.id})" }
                 }
             }
         }

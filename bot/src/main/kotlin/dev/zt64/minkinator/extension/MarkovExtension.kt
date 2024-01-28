@@ -23,7 +23,6 @@ import dev.kord.core.entity.channel.GuildChannel
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.event.message.MessageDeleteEvent
-import dev.kord.core.kordLogger
 import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.allowedMentions
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
@@ -44,11 +43,12 @@ object MarkovExtension : Extension() {
     private val db: R2dbcDatabase by inject()
 
     private suspend fun getGuild(id: Snowflake): DBGuild {
-        return db.runQuery {
-            QueryDsl
-                .from(Meta.guild)
-                .where { Meta.guild.id eq id }
-        }.singleOrNull() ?: db.runQuery {
+        return db
+            .runQuery {
+                QueryDsl
+                    .from(Meta.guild)
+                    .where { Meta.guild.id eq id }
+            }.singleOrNull() ?: db.runQuery {
             QueryDsl
                 .insert(Meta.guild)
                 .single(DBGuild(id))
@@ -57,23 +57,25 @@ object MarkovExtension : Extension() {
 
     private val selfMention by lazy { "<@!${kord.selfId}>" }
 
-    private fun Message.sanitizedContent() = buildString {
-        append(content.replace(selfMention, "").trim())
+    private val Message.sanitizedContent
+        get() =
+            buildString {
+                append(content.replace(selfMention, "").trim())
 
-        if (attachments.isNotEmpty()) {
-            append(" ${attachments.joinToString(" ") { it.url }}")
-        }
-    }
+                if (attachments.isNotEmpty()) {
+                    append(" ${attachments.joinToString(" ") { it.url }}")
+                }
+            }
 
     override suspend fun setup() {
-        kordLogger.info("Generating dictionaries...")
+        bot.logger.info { "Generating dictionaries..." }
 
         val dictionaries = runCatching {
             kord.guilds.toList().associate { guild ->
                 guild.id to Dictionary.generate(guild.id)
             }
         }.onSuccess {
-            kordLogger.info("Dictionaries generated")
+            bot.logger.info { "Dictionaries generated" }
         }.getOrDefault(emptyMap())
 
         event<MessageCreateEvent> {
@@ -96,7 +98,7 @@ object MarkovExtension : Extension() {
                             DBMessage(
                                 id = message.id,
                                 guildId = dbGuild.id,
-                                content = message.sanitizedContent()
+                                content = message.sanitizedContent
                             )
                         )
                 }
@@ -106,7 +108,8 @@ object MarkovExtension : Extension() {
                 val dictionary = dictionaries[guild.id] ?: return@action
 
                 suspend fun generate(block: suspend (UserMessageCreateBuilder.() -> Unit) -> Message) {
-                    val sentence = dictionary.generateString((1..100).random())
+                    val sentence = dictionary
+                        .generateString((1..100).random())
                         .takeUnless(String::isBlank) ?: return
 
                     block {
@@ -118,7 +121,7 @@ object MarkovExtension : Extension() {
                         }
                     }
 
-                    kordLogger.info("${guild.name} ${message.author?.username} markov -> $sentence")
+                    bot.logger.info { "${guild.name} ${message.author?.username} markov -> $sentence" }
                 }
 
                 when {
@@ -296,7 +299,7 @@ object MarkovExtension : Extension() {
         // }
 
         class TrainGuildArguments : Arguments() {
-            val guild by guild {
+            val guild by optionalGuild {
                 name = "guild"
                 description = "Guild to train on"
             }
@@ -314,70 +317,80 @@ object MarkovExtension : Extension() {
             }
 
             action {
-                val channels = arguments.guild.channels
+                val guild = arguments.guild ?: message.getGuild()
+
+                val channels = guild.channels
                     .filterIsInstance<TextChannel>()
-                    .filter { it.botHasPermissions(Permission.ReadMessageHistory, Permission.ViewChannel) }
-                    .filterNot { it.isNsfw }
+                    .filter { it.botHasPermissions(Permission.ReadMessageHistory, Permission.ViewChannel) && !it.isNsfw }
+                    .onEmpty {
+                        throw DiscordRelayedException("Bot does not have permission to read message history in any channels in ${guild.name}.")
+                    }
                     .toList()
 
-                if (channels.isEmpty()) {
-                    throw DiscordRelayedException("Bot does not have permission to read message history in any channels in ${arguments.guild.name}.")
-                }
+                var trainedMessages = 0
+                var line1 = ""
+                var line2 = ""
 
                 fun EmbedBuilder.configure(block: () -> Unit = {}) {
                     title = "Training with ${"channel".pluralize(channels.size)}"
+                    description = buildString {
+                        appendLine("Trained on $trainedMessages messages")
+
+                        if (line1.isNotBlank()) {
+                            appendLine(line1)
+                        }
+
+                        if (line2.isNotBlank()) {
+                            appendLine(line2)
+                        }
+                    }
                     block()
                 }
 
                 val msg = message.channel.createEmbed(EmbedBuilder::configure)
-                val guildId = message.getGuild().id
 
-                var i = 0
+                suspend fun updateEmbed() {
+                    msg.edit {
+                        embed(EmbedBuilder::configure)
+                    }
+                }
 
                 channels.forEach { channel ->
-                    val messages = mutableSetOf<DBMessage>()
+                    line1 = "Training on ${channel.mention}"
+                    updateEmbed()
 
                     try {
                         channel
-                            .getMessagesBefore(channel.lastMessageId!!, null)
+                            .getMessagesBefore(channel.lastMessageId!!)
                             .retry()
-                            .collectIndexed { index, message ->
-                                messages.add(
-                                    element = DBMessage(
-                                        id = message.id,
-                                        guildId = guildId,
-                                        content = message.sanitizedContent()
-                                    )
+                            .map { message ->
+                                DBMessage(
+                                    id = message.id,
+                                    guildId = guild.id,
+                                    content = message.sanitizedContent
                                 )
+                            }
+                            .chunked(100)
+                            .collect { messages ->
+                                bot.logger.info { messages.joinToString(",") { it.id.toString() } }
 
-                                if (index % 100 == 0) {
-                                    i += 100
-
-                                    try {
-                                        db.withTransaction {
-                                            db.runQuery {
-                                                QueryDsl
-                                                    .insert(Meta.message)
-                                                    .onDuplicateKeyIgnore(Meta.message.id)
-                                                    .multiple(messages.toList())
-                                            }
-                                        }
-
-                                        msg.edit {
-                                            embed {
-                                                configure()
-                                                description = "Trained on $i messages"
-                                            }
-                                        }
-                                    } catch (e: Exception) {
-                                        e.printStackTrace()
+                                try {
+                                    db.runQuery {
+                                        QueryDsl
+                                            .insert(Meta.message)
+                                            .onDuplicateKeyIgnore(Meta.message.id)
+                                            .multiple(messages)
                                     }
-                                }
 
-                                messages.clear()
+                                    trainedMessages += 100
+
+                                    updateEmbed()
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
                             }
                     } catch (e: Exception) {
-                        print("Guh")
+                        println("Guh")
                         e.printStackTrace()
                     }
                 }
@@ -385,7 +398,7 @@ object MarkovExtension : Extension() {
                 msg.edit {
                     embed {
                         configure {
-                            description = "Finished training on ${"channel".pluralize(channels.size)} with $i messages"
+                            description = "Finished training on ${"channel".pluralize(channels.size)} with $trainedMessages messages"
                         }
                     }
                 }
@@ -410,7 +423,9 @@ object MarkovExtension : Extension() {
         }
     }
 
-    private class Dictionary private constructor(private val guildId: Snowflake) {
+    private class Dictionary private constructor(
+        private val guildId: Snowflake
+    ) {
         var words = listOf<String>()
         var chain = mutableMapOf<List<String>, MutableList<String>>()
 
@@ -441,24 +456,42 @@ object MarkovExtension : Extension() {
             }
         }
 
-        fun generateString(outputSize: Int) = buildString {
-            if (words.isEmpty()) return@buildString
+        fun generateString(outputSize: Int): String {
+            return buildString {
+                if (words.isEmpty()) return@buildString
 
-            val random = words.indices.random()
-            var key = listOf(words[random], words[random + 1])
+                val random = words.indices.random()
+                var key = listOf(words[random], words[random + 1])
 
-            while (length < outputSize) {
-                val w = chain[key]?.random() ?: break
-                append(" $w")
-                key = listOf(key[1], w)
-            }
-        }.trim()
+                while (length < outputSize) {
+                    val w = chain[key]?.random() ?: break
+                    append(" $w")
+                    key = listOf(key[1], w)
+                }
+            }.trim()
+        }
 
         companion object {
-            suspend fun generate(guildId: Snowflake) = Dictionary(guildId).also {
-                it.reload()
+            suspend fun generate(guildId: Snowflake): Dictionary {
+                return Dictionary(guildId).also {
+                    it.reload()
+                }
             }
         }
     }
 }
 
+fun <T> Flow<T>.chunked(chunkSize: Int): Flow<List<T>> {
+    val buffer = ArrayList<T>(chunkSize)
+    return flow {
+        this@chunked.collect {
+            buffer += it
+            if (buffer.size == chunkSize) {
+                emit(buffer.toList())
+                buffer.clear()
+            }
+        }
+
+        if (buffer.isNotEmpty()) emit(buffer.toList())
+    }
+}

@@ -7,7 +7,6 @@ kotlin {
         kotlin.srcDir("build/generated/ksp/main/kotlin")
 
         languageSettings {
-            enableLanguageFeature("ContextReceivers")
             optIn("org.komapper.annotation.KomapperExperimentalAssociation")
         }
     }
@@ -18,7 +17,13 @@ ksp {
 }
 
 dependencies {
-    api(libs.komapper.dialect.h2.r2dbc)
+    api(
+        libs
+            .komapper
+            .dialect
+            .h2
+            .r2dbc
+    )
     implementation(libs.komapper.starter.r2dbc)
     ksp(libs.komapper.processor)
 }
