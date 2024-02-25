@@ -4,7 +4,7 @@ ktor = "2.3.8"
 kord = "1.7.1-SNAPSHOT"
 ksp = "1.9.22-1.0.16"
 scrimmage = "4.1.1"
-kotlin-dl = "0.5.2"
+kotlindl = "0.5.2"
 komapper = "1.16.1"
 ktlint-plugin = "12.0.3"
 
@@ -16,9 +16,9 @@ scrimmage-core = { module = "com.sksamuel.scrimage:scrimage-core", version.ref =
 scrimmage-filters = { module = "com.sksamuel.scrimage:scrimage-filters", version.ref = "scrimmage" }
 scrimmage-webp = { module = "com.sksamuel.scrimage:scrimage-webp", version.ref = "scrimmage" }
 
-kotlin-dl-tensorflow = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow", version.ref = "kotlin-dl" }
-kotlin-dl-onnx = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-onnx", version.ref = "kotlin-dl" }
-kotlin-dl-visualization = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-visualization", version.ref = "kotlin-dl" }
+kotlindl-tensorflow = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow", version.ref = "kotlindl" }
+kotlindl-onnx = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-onnx", version.ref = "kotlindl" }
+kotlindl-visualization = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-visualization", version.ref = "kotlindl" }
 
 komapper-starter-r2dbc = { module = "org.komapper:komapper-starter-r2dbc", version.ref = "komapper" }
 komapper-dialect-h2-r2dbc = { module = "org.komapper:komapper-dialect-h2-r2dbc", version.ref = "komapper" }
@@ -34,7 +34,7 @@ tess4j = "net.sourceforge.tess4j:tess4j:5.8.0"
 [bundles]
 scrimmage = ["scrimmage-core", "scrimmage-filters", "scrimmage-webp"]
 komapper = ["komapper-starter-r2dbc", "komapper-dialect-h2-r2dbc"]
-kotlin-dl = ["kotlin-dl-tensorflow", "kotlin-dl-onnx", "kotlin-dl-visualization"]
+kotlindl = ["kotlindl-tensorflow", "kotlindl-onnx", "kotlindl-visualization"]
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
