@@ -6,7 +6,7 @@ ksp = "1.9.22-1.0.16"
 scrimmage = "4.1.1"
 kotlindl = "0.5.2"
 komapper = "1.16.1"
-ktlint-plugin = "12.0.3"
+ktlint-plugin = "12.1.1"
 
 [libraries]
 kord-ex = { module = "com.kotlindiscord.kord.extensions:kord-extensions", version.ref = "kord" }
