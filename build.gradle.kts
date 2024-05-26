@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
@@ -5,25 +6,30 @@ plugins {
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.ksp) apply false
-    alias(libs.plugins.ktlint)
+    alias(libs.plugins.ktlint) apply false
+}
+
+allprojects {
+    apply {
+        plugin("org.jlleitschuh.gradle.ktlint")
+    }
+
+    configure<KtlintExtension> {
+        version = rootProject.libs.versions.ktlint
+    }
 }
 
 subprojects {
     apply {
         plugin("kotlin")
-        plugin("org.jlleitschuh.gradle.ktlint")
     }
 
     kotlinExtension.apply {
         jvmToolchain(17)
 
         sourceSets["main"].languageSettings {
-            enableLanguageFeature("ContextReceivers")
+            enableLanguageFeature(LanguageFeature.ContextReceivers.name)
         }
-    }
-
-    configure<KtlintExtension> {
-        version = "1.1.0"
     }
 
     dependencies {

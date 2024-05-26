@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.*
 import org.koin.core.component.inject
 import org.komapper.core.dsl.Meta
 import org.komapper.core.dsl.QueryDsl
-import org.komapper.core.dsl.query.singleOrNull
+import org.komapper.core.dsl.query.single
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.random.Random
 
@@ -58,14 +58,13 @@ object MarkovExtension : Extension() {
     private val selfMention by lazy { "<@!${kord.selfId}>" }
 
     private val Message.sanitizedContent
-        get() =
-            buildString {
-                append(content.replace(selfMention, "").trim())
+        get() = buildString {
+            append(content.replace(selfMention, "").trim())
 
-                if (attachments.isNotEmpty()) {
-                    append(" ${attachments.joinToString(" ") { it.url }}")
-                }
+            if (attachments.isNotEmpty()) {
+                append(" ${attachments.joinToString(" ") { it.url }}")
             }
+        }
 
     override suspend fun setup() {
         bot.logger.info { "Generating dictionaries..." }
@@ -177,23 +176,23 @@ object MarkovExtension : Extension() {
                                 QueryDsl
                                     .from(Meta.markovConfig)
                                     .where { Meta.markovConfig.guildId eq guild!!.id }
-                                    .singleOrNull()
+                                    .single()
                             }
 
                             embed {
                                 field(
                                     name = "Enabled",
-                                    value = ""
+                                    value = config.enabled.toString()
                                 )
 
                                 field(
                                     name = "Frequency",
-                                    value = ""
+                                    value = config.frequency.toString()
                                 )
 
                                 field(
                                     name = "Speak on mention",
-                                    value = ""
+                                    value = config.handleMention.toString()
                                 )
                             }
                         } else {
@@ -319,13 +318,13 @@ object MarkovExtension : Extension() {
             action {
                 val guild = arguments.guild ?: message.getGuild()
 
-                val channels = guild.channels
+                val channels = guild
+                    .channels
                     .filterIsInstance<TextChannel>()
                     .filter { it.botHasPermissions(Permission.ReadMessageHistory, Permission.ViewChannel) && !it.isNsfw }
                     .onEmpty {
                         throw DiscordRelayedException("Bot does not have permission to read message history in any channels in ${guild.name}.")
-                    }
-                    .toList()
+                    }.toList()
 
                 var trainedMessages = 0
                 var line1 = ""
@@ -369,8 +368,7 @@ object MarkovExtension : Extension() {
                                     guildId = guild.id,
                                     content = message.sanitizedContent
                                 )
-                            }
-                            .chunked(100)
+                            }.chunked(100)
                             .collect { messages ->
                                 bot.logger.info { messages.joinToString(",") { it.id.toString() } }
 

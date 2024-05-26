@@ -31,6 +31,4 @@ dependencies {
 
     implementation("space.kscience:kmath-ast:0.3.1")
     implementation("org.bytedeco:ffmpeg-platform:6.0-1.5.9")
-
-    implementation(libs.tess4j)
 }

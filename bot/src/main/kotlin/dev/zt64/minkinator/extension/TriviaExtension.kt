@@ -122,7 +122,7 @@ object TriviaExtension : Extension() {
                                             $formattedQuestion
 
                                             Ending ${duration.toDiscord(TimestampType.RelativeTime)}
-                                            """.trimIndent()
+                                        """.trimIndent()
 
                                         footer("Question ${index + 1} of $totalQuestions")
                                     }
@@ -177,7 +177,7 @@ object TriviaExtension : Extension() {
                                                 $formattedQuestion
 
                                                 The correct answer was ${correctAnswer.decodeEntities()}
-                                                """.trimIndent()
+                                            """.trimIndent()
 
                                             if (participants.isNotEmpty()) {
                                                 field {

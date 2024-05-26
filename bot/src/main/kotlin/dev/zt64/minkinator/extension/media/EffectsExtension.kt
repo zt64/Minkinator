@@ -5,7 +5,7 @@ import com.kotlindiscord.kord.extensions.commands.Argument
 import com.kotlindiscord.kord.extensions.commands.Arguments
 import com.kotlindiscord.kord.extensions.commands.CommandContext
 import com.kotlindiscord.kord.extensions.commands.chat.ChatCommandContext
-import com.kotlindiscord.kord.extensions.commands.converters.SingleConverter
+import com.kotlindiscord.kord.extensions.commands.converters.OptionalConverter
 import com.kotlindiscord.kord.extensions.commands.converters.impl.*
 import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.kotlindiscord.kord.extensions.parser.StringParser
@@ -309,29 +309,29 @@ object EffectsExtension : Extension() {
 
                 av_dump_format(ctx, 0, bytePointer, 0)
                 var i = 0
-                var v_stream_idx = -1
+                var vStreamIdx = -1
                 while (i < ctx.nb_streams()) {
                     if (ctx.streams(i).codecpar().codec_type() == AVMEDIA_TYPE_VIDEO) {
-                        v_stream_idx = i
+                        vStreamIdx = i
                         break
                     }
                     i++
                 }
 
-                if (v_stream_idx == -1) {
+                if (vStreamIdx == -1) {
                     println("Cannot find video stream")
                     throw DiscordRelayedException("Failed to process video")
                 } else {
                     System.out.printf(
                         "Video stream %d with resolution %dx%d\n",
-                        v_stream_idx,
+                        vStreamIdx,
                         ctx.streams(i).codecpar().width(),
                         ctx.streams(i).codecpar().height()
                     )
                 }
 
                 val codecCtx = avcodec_alloc_context3(null)
-                avcodec_parameters_to_context(codecCtx, ctx.streams(v_stream_idx).codecpar())
+                avcodec_parameters_to_context(codecCtx, ctx.streams(vStreamIdx).codecpar())
 
                 val codec = avcodec_find_decoder(codecCtx.codec_id())
                 if (codec == null) {
@@ -360,7 +360,7 @@ object EffectsExtension : Extension() {
     }
 }
 
-class MediaReferenceConverter : SingleConverter<String>() {
+class MediaReferenceConverter : OptionalConverter<String>() {
     override val signatureTypeString: String = "converters.string.signatureType"
 
     override suspend fun parse(
@@ -387,7 +387,9 @@ class MediaReferenceConverter : SingleConverter<String>() {
     override suspend fun parseOption(
         context: CommandContext,
         option: OptionValue<*>
-    ) = TODO()
+    ): Boolean {
+        return false
+    }
 
     override suspend fun toSlashOption(arg: Argument<*>) = TODO()
 }

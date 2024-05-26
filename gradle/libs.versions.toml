@@ -1,12 +1,13 @@
 [versions]
-kotlin = "1.9.22"
-ktor = "2.3.8"
-kord = "1.7.1-SNAPSHOT"
-ksp = "1.9.22-1.0.16"
-scrimmage = "4.1.1"
+kotlin = "2.0.0"
+ktor = "2.3.11"
+kord = "1.8.0-SNAPSHOT"
+ksp = "2.0.0-1.0.21"
+scrimmage = "4.1.3"
 kotlindl = "0.5.2"
-komapper = "1.16.1"
-ktlint-plugin = "12.0.3"
+komapper = "1.18.0"
+ktlintGradle = "12.1.1"
+ktlint = "1.2.1"
 
 [libraries]
 kord-ex = { module = "com.kotlindiscord.kord.extensions:kord-extensions", version.ref = "kord" }
@@ -40,4 +41,4 @@ kotlindl = ["kotlindl-tensorflow", "kotlindl-onnx", "kotlindl-visualization"]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint-plugin" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintGradle" }

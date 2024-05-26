@@ -42,30 +42,29 @@ object GuessmojiExtension : Extension() {
         private const val STRAWBERRY = "\uD83C\uDF53"
         private const val TOMATO = "\uD83C\uDF45"
 
-        val all =
-            listOf(
-                TORNADO,
-                SNOWFLAKE,
-                FIRE,
-                CLOUD,
-                JOY,
-                SAD,
-                ANGRY,
-                CRY,
-                HEART,
-                CAT,
-                SUN,
-                MOON,
-                RAIN,
-                EGG,
-                CHEESE,
-                BANANA,
-                APPLE,
-                PEACH,
-                CHERRY,
-                STRAWBERRY,
-                TOMATO
-            )
+        val all = listOf(
+            TORNADO,
+            SNOWFLAKE,
+            FIRE,
+            CLOUD,
+            JOY,
+            SAD,
+            ANGRY,
+            CRY,
+            HEART,
+            CAT,
+            SUN,
+            MOON,
+            RAIN,
+            EGG,
+            CHEESE,
+            BANANA,
+            APPLE,
+            PEACH,
+            CHERRY,
+            STRAWBERRY,
+            TOMATO
+        )
     }
 
     override suspend fun setup() {

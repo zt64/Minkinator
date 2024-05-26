@@ -17,7 +17,7 @@ import dev.kord.core.behavior.ban
 import dev.kord.core.entity.Guild
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.rest.builder.message.embed
-import dev.zt64.minkinator.data.Filter
+import dev.zt64.minkinator.data.DBFilter
 import dev.zt64.minkinator.data.FilterAction
 import dev.zt64.minkinator.data.filter
 import dev.zt64.minkinator.util.*
@@ -32,7 +32,7 @@ object FilterExtension : Extension() {
 
     private val db: R2dbcDatabase by inject()
 
-    private suspend fun Guild.filters(): List<Filter> = db.runQuery {
+    private suspend fun Guild.filters(): List<DBFilter> = db.runQuery {
         QueryDsl
             .from(Meta.filter)
             .where { Meta.filter.guildId eq id }
@@ -47,7 +47,9 @@ object FilterExtension : Extension() {
 
             action {
                 val message = event.message
-                val filters = event.getGuildOrNull()!!.filters().takeUnless { it.isEmpty() } ?: return@action
+                val filters = event.getGuildOrNull()!!.filters()
+
+                if (filters.isEmpty()) return@action
 
                 filters.asSequence().forEach { filter ->
                     val pattern = filter.pattern.toRegex()
@@ -117,7 +119,7 @@ object FilterExtension : Extension() {
                     name: String,
                     description: String,
                     arguments: () -> T,
-                    initBlock: T.(guildId: Snowflake) -> Filter
+                    initBlock: T.(guildId: Snowflake) -> DBFilter
                 ) {
                     ephemeralSubCommand(
                         name = name,
@@ -148,7 +150,7 @@ object FilterExtension : Extension() {
                     description = "Reply to a message with a message",
                     arguments = FilterExtension::ReplyArgs
                 ) { guildId ->
-                    Filter(
+                    DBFilter(
                         guildId = guildId,
                         action = FilterAction.REPLY,
                         pattern = regex,
@@ -162,7 +164,7 @@ object FilterExtension : Extension() {
                     description = "Timeout a user for a duration",
                     arguments = FilterExtension::TimeoutArgs
                 ) { guildId ->
-                    Filter(
+                    DBFilter(
                         guildId = guildId,
                         action = FilterAction.TIMEOUT,
                         pattern = regex,
@@ -192,7 +194,7 @@ object FilterExtension : Extension() {
                 }
             }
 
-            fun Filter.print(): String {
+            fun DBFilter.print(): String {
                 return buildString {
                     appendLine("Filter ID: $id")
                     appendLine("Pattern: `$pattern`")
@@ -204,8 +206,11 @@ object FilterExtension : Extension() {
                         }
 
                         FilterAction.WARN -> {}
+
                         FilterAction.TIMEOUT -> {}
+
                         FilterAction.KICK -> {}
+
                         FilterAction.BAN -> {}
                     }
                 }
@@ -264,7 +269,7 @@ object FilterExtension : Extension() {
                                 description = "No filters matched"
                             } else {
                                 color = Color.success
-                                description = matchedFilters.joinToString(transform = Filter::print)
+                                description = matchedFilters.joinToString(transform = DBFilter::print)
                             }
                         }
                     }

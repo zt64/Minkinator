@@ -3,9 +3,10 @@ package dev.zt64.minkinator.data
 import dev.kord.common.entity.Snowflake
 import org.komapper.annotation.*
 
-@KomapperEntity
+@KomapperEntity(["filter"])
+@KomapperTable("filter")
 @KomapperManyToOne(targetEntity = DBGuild::class)
-data class Filter(
+data class DBFilter(
     @KomapperAutoIncrement
     @KomapperId
     val id: Int = 0,

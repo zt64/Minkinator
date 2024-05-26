@@ -309,12 +309,11 @@ object RestrictedExtension : Extension() {
                 ) {
                     x = "x"
                     y = "y"
-                } +
-                labs(
-                    title = "Insanity over time",
-                    x = "Week",
-                    y = "Insanity"
-                )
+                } + labs(
+                title = "Insanity over time",
+                x = "Week",
+                y = "Insanity"
+            )
 
             val rawSpec = plot.toSpec()
             val processedSpec = MonolithicCommon.processRawSpecs(rawSpec, frontendOnly = false)
@@ -349,8 +348,7 @@ object RestrictedExtension : Extension() {
             val duration = measureTime {
                 res = scriptingHost.eval(
                     script = code.toScriptSource(),
-                    compilationConfiguration =
-                    ScriptCompilationConfiguration {
+                    compilationConfiguration = ScriptCompilationConfiguration {
                         defaultImports(
                             "dev.kord.core.behavior.*",
                             "dev.kord.core.entity.*",

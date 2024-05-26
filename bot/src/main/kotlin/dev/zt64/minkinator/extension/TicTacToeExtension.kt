@@ -16,10 +16,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.seconds
 
-class Guh<T> {
-    val t: T & Any = TODO()
-}
-
 object TicTacToeExtension : Extension() {
     override val name = "tic-tac-toe"
 

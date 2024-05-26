@@ -17,13 +17,15 @@ ksp {
 }
 
 dependencies {
-    api(
-        libs
-            .komapper
-            .dialect
-            .h2
-            .r2dbc
-    )
+    api(libs.komapper.dialect.h2.r2dbc)
     implementation(libs.komapper.starter.r2dbc)
     ksp(libs.komapper.processor)
+}
+
+ktlint {
+    filter {
+        exclude { entry ->
+            "generated" in entry.file.toString()
+        }
+    }
 }
