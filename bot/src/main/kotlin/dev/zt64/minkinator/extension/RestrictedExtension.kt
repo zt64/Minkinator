@@ -310,10 +310,10 @@ object RestrictedExtension : Extension() {
                     x = "x"
                     y = "y"
                 } + labs(
-                title = "Insanity over time",
-                x = "Week",
-                y = "Insanity"
-            )
+                    title = "Insanity over time",
+                    x = "Week",
+                    y = "Insanity"
+                )
 
             val rawSpec = plot.toSpec()
             val processedSpec = MonolithicCommon.processRawSpecs(rawSpec, frontendOnly = false)
@@ -366,10 +366,10 @@ object RestrictedExtension : Extension() {
                         }
                     },
                     evaluationConfiguration =
-                    ScriptEvaluationConfiguration {
-                        implicitReceivers(this@command)
-                        providedProperties("kord" to kord)
-                    }
+                        ScriptEvaluationConfiguration {
+                            implicitReceivers(this@command)
+                            providedProperties("kord" to kord)
+                        }
                 )
             }
 

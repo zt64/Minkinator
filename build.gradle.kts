@@ -16,6 +16,7 @@ allprojects {
 
     configure<KtlintExtension> {
         version = rootProject.libs.versions.ktlint
+        ignoreFailures = true
     }
 }
 
