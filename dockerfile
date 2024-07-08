@@ -1,13 +1,10 @@
-FROM eclipse-temurin:21-jdk-alpine AS builder
+FROM eclipse-temurin:17-jdk-alpine AS builder
 
-COPY gradle /repo/gradle
-COPY src /repo/src
-COPY gradlew gradlew.bat build.gradle.kts settings.gradle.kts /repo/
+COPY . /repo
 WORKDIR /repo
+RUN ./gradlew :bot:installDist --no-daemon --no-configuration-cache
 
-RUN ./gradlew installDist --no-daemon
+FROM eclipse-temurin:17-jre-alpine AS runner
 
-FROM eclipse-temurin:21-jre-alpine AS runner
-
-COPY --from=builder /repo/build/install/Minkinator /app/
-ENTRYPOINT ["/app/bin/Minkinator"]
+COPY --from=builder /repo/bot/build/install/bot /app/
+ENTRYPOINT ["/app/bin/bot"]
