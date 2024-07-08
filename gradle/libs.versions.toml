@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.0.0"
-ktor = "2.3.11"
+ktor = "2.3.12"
 kord = "1.8.0-SNAPSHOT"
 ksp = "2.0.0-1.0.22"
 scrimmage = "4.1.3"
