@@ -26,7 +26,7 @@ subprojects {
     }
 
     kotlinExtension.apply {
-        jvmToolchain(17)
+        jvmToolchain(21)
 
         sourceSets["main"].languageSettings {
             enableLanguageFeature(LanguageFeature.ContextReceivers.name)
