@@ -39,10 +39,12 @@ object UserInfoExtension : Extension() {
             )
         }
 
-        field(
-            name = "Joined At:",
-            value = target.joinedAt.toMessageFormat()
-        )
+        target.joinedAt?.let {
+            field(
+                name = "Joined At:",
+                value = it.toMessageFormat()
+            )
+        }
 
         field(
             name = "Created At:",

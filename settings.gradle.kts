@@ -33,6 +33,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Minkinator"
 
-include(":bot")
-include(":komapper")
-include("util")
+include("bot", "komapper", "util")
