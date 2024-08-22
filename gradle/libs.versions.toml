@@ -2,7 +2,7 @@
 kotlin = "2.0.10"
 ktor = "2.3.12"
 kord-ex = "1.9.0-SNAPSHOT"
-ksp = "2.0.10-1.0.24"
+ksp = "2.0.20-1.0.24"
 scrimmage = "4.2.0"
 kotlindl = "0.5.2"
 komapper = "2.2.0"
