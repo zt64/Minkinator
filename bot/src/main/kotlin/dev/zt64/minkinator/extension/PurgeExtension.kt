@@ -1,17 +1,17 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.DiscordRelayedException
-import com.kotlindiscord.kord.extensions.checks.anyGuild
-import com.kotlindiscord.kord.extensions.checks.hasPermission
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.int
-import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalMember
-import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalString
-import com.kotlindiscord.kord.extensions.extensions.Extension
 import dev.kord.common.Color
 import dev.kord.common.entity.Permission
 import dev.kord.rest.builder.message.embed
 import dev.kord.rest.request.RestRequestException
+import dev.kordex.core.DiscordRelayedException
+import dev.kordex.core.checks.anyGuild
+import dev.kordex.core.checks.hasPermission
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.converters.impl.int
+import dev.kordex.core.commands.converters.impl.optionalMember
+import dev.kordex.core.commands.converters.impl.optionalString
+import dev.kordex.core.extensions.Extension
 import dev.zt64.minkinator.util.ephemeralSlashCommand
 import dev.zt64.minkinator.util.pluralize
 import dev.zt64.minkinator.util.success

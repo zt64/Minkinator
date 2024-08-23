@@ -1,11 +1,5 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.checks.anyGuild
-import com.kotlindiscord.kord.extensions.checks.hasPermission
-import com.kotlindiscord.kord.extensions.components.components
-import com.kotlindiscord.kord.extensions.components.ephemeralButton
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.extensions.event
 import dev.kord.common.Color
 import dev.kord.common.entity.ButtonStyle
 import dev.kord.common.entity.Permission
@@ -14,6 +8,12 @@ import dev.kord.core.event.guild.MemberLeaveEvent
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import dev.kord.rest.builder.message.embed
+import dev.kordex.core.checks.anyGuild
+import dev.kordex.core.checks.hasPermission
+import dev.kordex.core.components.components
+import dev.kordex.core.components.ephemeralButton
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.extensions.event
 import dev.zt64.minkinator.util.ephemeralSlashCommand
 import dev.zt64.minkinator.util.ephemeralSubCommand
 import dev.zt64.minkinator.util.success

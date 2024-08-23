@@ -1,6 +1,6 @@
 package dev.zt64.minkinator.converter
 
-import com.kotlindiscord.kord.extensions.commands.Arguments
+import dev.kordex.core.commands.Arguments
 import kotlin.reflect.KProperty
 
 interface Argument<T> {

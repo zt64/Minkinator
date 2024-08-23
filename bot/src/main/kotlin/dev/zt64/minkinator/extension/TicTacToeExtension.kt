@@ -1,14 +1,14 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.checks.anyGuild
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalMember
-import com.kotlindiscord.kord.extensions.components.components
-import com.kotlindiscord.kord.extensions.components.ephemeralButton
-import com.kotlindiscord.kord.extensions.components.types.emoji
-import com.kotlindiscord.kord.extensions.extensions.Extension
 import dev.kord.rest.builder.message.embed
 import dev.kord.x.emoji.Emojis
+import dev.kordex.core.checks.anyGuild
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.converters.impl.optionalMember
+import dev.kordex.core.components.components
+import dev.kordex.core.components.ephemeralButton
+import dev.kordex.core.components.types.emoji
+import dev.kordex.core.extensions.Extension
 import dev.zt64.minkinator.util.footer
 import dev.zt64.minkinator.util.publicSlashCommand
 import kotlinx.coroutines.TimeoutCancellationException

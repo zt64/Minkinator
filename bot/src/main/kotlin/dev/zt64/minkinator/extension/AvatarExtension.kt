@@ -1,12 +1,12 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalMember
-import com.kotlindiscord.kord.extensions.extensions.Extension
 import dev.kord.common.Color
 import dev.kord.core.entity.Member
 import dev.kord.rest.Image
 import dev.kord.rest.builder.message.embed
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.converters.impl.optionalMember
+import dev.kordex.core.extensions.Extension
 import dev.zt64.minkinator.util.*
 
 object AvatarExtension : Extension() {

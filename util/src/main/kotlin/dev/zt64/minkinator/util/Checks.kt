@@ -1,10 +1,10 @@
 package dev.zt64.minkinator.util
 
-import com.kotlindiscord.kord.extensions.checks.types.CheckContext
-import com.kotlindiscord.kord.extensions.checks.userFor
-import com.kotlindiscord.kord.extensions.utils.env
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.event.Event
+import dev.kordex.core.checks.types.CheckContext
+import dev.kordex.core.checks.userFor
+import dev.kordex.core.utils.env
 
 suspend fun <T : Event> CheckContext<T>.isSuperuser() {
     failIf {

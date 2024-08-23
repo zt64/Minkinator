@@ -1,15 +1,5 @@
 package dev.zt64.minkinator.util
 
-import com.kotlindiscord.kord.extensions.DISCORD_GREEN
-import com.kotlindiscord.kord.extensions.DISCORD_RED
-import com.kotlindiscord.kord.extensions.DISCORD_YELLOW
-import com.kotlindiscord.kord.extensions.builders.ExtensibleBotBuilder
-import com.kotlindiscord.kord.extensions.events.EventContext
-import com.kotlindiscord.kord.extensions.events.EventHandler
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.time.TimestampType
-import com.kotlindiscord.kord.extensions.time.toDiscord
-import com.kotlindiscord.kord.extensions.utils.any
 import dev.kord.common.Color
 import dev.kord.common.entity.DiscordPartialEmoji
 import dev.kord.common.entity.Snowflake
@@ -17,9 +7,19 @@ import dev.kord.core.behavior.reply
 import dev.kord.core.entity.*
 import dev.kord.core.event.Event
 import dev.kord.x.emoji.DiscordEmoji
+import dev.kordex.core.DISCORD_GREEN
+import dev.kordex.core.DISCORD_RED
+import dev.kordex.core.DISCORD_YELLOW
+import dev.kordex.core.builders.ExtensibleBotBuilder
+import dev.kordex.core.events.EventContext
+import dev.kordex.core.events.EventHandler
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.time.TimestampType
+import dev.kordex.core.time.toDiscord
+import dev.kordex.core.utils.any
 import kotlinx.datetime.Clock
 import kotlin.time.Duration
-import com.kotlindiscord.kord.extensions.extensions.event as event1
+import dev.kordex.core.extensions.event as event1
 
 val Color.Companion.success
     get() = DISCORD_GREEN

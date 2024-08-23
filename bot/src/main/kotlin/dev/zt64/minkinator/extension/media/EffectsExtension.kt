@@ -1,15 +1,5 @@
 package dev.zt64.minkinator.extension.media
 
-import com.kotlindiscord.kord.extensions.DiscordRelayedException
-import com.kotlindiscord.kord.extensions.commands.Argument
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.CommandContext
-import com.kotlindiscord.kord.extensions.commands.chat.ChatCommandContext
-import com.kotlindiscord.kord.extensions.commands.converters.OptionalConverter
-import com.kotlindiscord.kord.extensions.commands.converters.impl.*
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.parser.StringParser
-import com.kotlindiscord.kord.extensions.utils.suggestStringCollection
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.angles.Degrees
 import com.sksamuel.scrimage.filter.*
@@ -18,6 +8,16 @@ import dev.kord.core.entity.interaction.OptionValue
 import dev.kord.rest.Image
 import dev.kord.rest.NamedFile
 import dev.kord.rest.builder.message.create.MessageCreateBuilder
+import dev.kordex.core.DiscordRelayedException
+import dev.kordex.core.commands.Argument
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.CommandContext
+import dev.kordex.core.commands.chat.ChatCommandContext
+import dev.kordex.core.commands.converters.OptionalConverter
+import dev.kordex.core.commands.converters.impl.*
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.utils.suggestStringCollection
+import dev.kordex.parser.StringParser
 import dev.zt64.minkinator.util.chatCommand
 import dev.zt64.minkinator.util.displayAvatar
 import dev.zt64.minkinator.util.publicSlashCommand

@@ -1,12 +1,12 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.commands.events.ChatCommandInvocationEvent
-import com.kotlindiscord.kord.extensions.commands.events.SlashCommandInvocationEvent
-import com.kotlindiscord.kord.extensions.extensions.Extension
 import dev.kord.core.entity.channel.GuildChannel
 import dev.kord.core.event.gateway.ReadyEvent
 import dev.kord.core.event.guild.MemberJoinEvent
 import dev.kord.core.event.guild.MemberLeaveEvent
+import dev.kordex.core.commands.events.ChatCommandInvocationEvent
+import dev.kordex.core.commands.events.SlashCommandInvocationEvent
+import dev.kordex.core.extensions.Extension
 import dev.zt64.minkinator.util.event
 
 object EventLogExtension : Extension() {

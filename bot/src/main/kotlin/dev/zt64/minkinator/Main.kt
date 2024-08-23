@@ -1,15 +1,15 @@
 package dev.zt64.minkinator
 
-import com.kotlindiscord.kord.extensions.ExtensibleBot
-import com.kotlindiscord.kord.extensions.checks.userFor
-import com.kotlindiscord.kord.extensions.utils.env
-import com.kotlindiscord.kord.extensions.utils.envOrNull
-import com.kotlindiscord.kord.extensions.utils.loadModule
 import dev.kord.common.Color
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import dev.kord.gateway.builder.Shards
 import dev.kord.rest.builder.message.embed
+import dev.kordex.core.ExtensibleBot
+import dev.kordex.core.checks.userFor
+import dev.kordex.core.utils.env
+import dev.kordex.core.utils.envOrNull
+import dev.kordex.core.utils.loadModule
 import dev.zt64.minkinator.extension.*
 import dev.zt64.minkinator.extension.filter.FilterExtension
 import dev.zt64.minkinator.extension.media.EffectsExtension
@@ -42,7 +42,7 @@ suspend fun main() {
                 +SvgExtension
                 +EventLogExtension
                 +FilterExtension
-                +MarkovExtension
+                // +MarkovExtension
                 +AvatarExtension
                 +NameNormalizerExtension
                 +AnimalsExtension

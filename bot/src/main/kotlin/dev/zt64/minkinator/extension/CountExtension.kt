@@ -1,8 +1,8 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.extensions.event
 import dev.kord.core.event.message.MessageCreateEvent
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.extensions.event
 import dev.zt64.minkinator.util.chatCommand
 import dev.zt64.minkinator.util.chatGroupCommand
 import org.koin.core.component.inject

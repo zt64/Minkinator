@@ -1,15 +1,5 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.DiscordRelayedException
-import com.kotlindiscord.kord.extensions.checks.anyGuild
-import com.kotlindiscord.kord.extensions.checks.isNotBot
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.*
-import com.kotlindiscord.kord.extensions.components.components
-import com.kotlindiscord.kord.extensions.components.ephemeralButton
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.extensions.event
-import com.kotlindiscord.kord.extensions.utils.botHasPermissions
 import dev.kord.common.Color
 import dev.kord.common.entity.ButtonStyle
 import dev.kord.common.entity.Permission
@@ -27,6 +17,16 @@ import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.allowedMentions
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.embed
+import dev.kordex.core.DiscordRelayedException
+import dev.kordex.core.checks.anyGuild
+import dev.kordex.core.checks.isNotBot
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.converters.impl.*
+import dev.kordex.core.components.components
+import dev.kordex.core.components.ephemeralButton
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.extensions.event
+import dev.kordex.core.utils.botHasPermissions
 import dev.zt64.minkinator.data.*
 import dev.zt64.minkinator.util.*
 import kotlinx.coroutines.flow.*

@@ -1,17 +1,17 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.checks.anyGuild
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.optionalMember
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.utils.createdAt
-import com.kotlindiscord.kord.extensions.utils.profileLink
 import dev.kord.common.Color
 import dev.kord.common.toMessageFormat
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.Role
 import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.embed
+import dev.kordex.core.checks.anyGuild
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.converters.impl.optionalMember
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.utils.createdAt
+import dev.kordex.core.utils.profileLink
 import dev.zt64.minkinator.util.*
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.toList

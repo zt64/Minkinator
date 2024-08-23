@@ -1,13 +1,13 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.attachment
-import com.kotlindiscord.kord.extensions.commands.converters.impl.defaultingBoolean
-import com.kotlindiscord.kord.extensions.commands.converters.impl.string
-import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.Position
 import com.sksamuel.scrimage.canvas.drawables.Text
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.converters.impl.attachment
+import dev.kordex.core.commands.converters.impl.defaultingBoolean
+import dev.kordex.core.commands.converters.impl.string
+import dev.kordex.core.extensions.Extension
 import dev.zt64.minkinator.extension.media.mutateGif
 import dev.zt64.minkinator.extension.media.mutateImage
 import dev.zt64.minkinator.util.publicSlashCommand

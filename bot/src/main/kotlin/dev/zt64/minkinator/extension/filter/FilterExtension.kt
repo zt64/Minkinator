@@ -1,15 +1,5 @@
 package dev.zt64.minkinator.extension.filter
 
-import com.kotlindiscord.kord.extensions.annotations.DoNotChain
-import com.kotlindiscord.kord.extensions.checks.anyGuild
-import com.kotlindiscord.kord.extensions.checks.guildFor
-import com.kotlindiscord.kord.extensions.checks.isNotBot
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.application.slash.SlashGroup
-import com.kotlindiscord.kord.extensions.commands.converters.impl.*
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.extensions.event
-import com.kotlindiscord.kord.extensions.utils.timeout
 import dev.kord.common.Color
 import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Snowflake
@@ -17,6 +7,16 @@ import dev.kord.core.behavior.ban
 import dev.kord.core.entity.Guild
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.rest.builder.message.embed
+import dev.kordex.core.annotations.DoNotChain
+import dev.kordex.core.checks.anyGuild
+import dev.kordex.core.checks.guildFor
+import dev.kordex.core.checks.isNotBot
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.application.slash.SlashGroup
+import dev.kordex.core.commands.converters.impl.*
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.extensions.event
+import dev.kordex.core.utils.timeout
 import dev.zt64.minkinator.data.DBFilter
 import dev.zt64.minkinator.data.FilterAction
 import dev.zt64.minkinator.data.filter

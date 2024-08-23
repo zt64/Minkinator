@@ -1,18 +1,18 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.defaultingDuration
-import com.kotlindiscord.kord.extensions.commands.converters.impl.string
-import com.kotlindiscord.kord.extensions.components.components
-import com.kotlindiscord.kord.extensions.components.ephemeralStringSelectMenu
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.time.TimestampType
-import com.kotlindiscord.kord.extensions.utils.toDuration
 import dev.kord.common.Color
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.interaction.followup.edit
 import dev.kord.core.behavior.reply
 import dev.kord.rest.builder.message.embed
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.converters.impl.defaultingDuration
+import dev.kordex.core.commands.converters.impl.string
+import dev.kordex.core.components.components
+import dev.kordex.core.components.ephemeralStringSelectMenu
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.time.TimestampType
+import dev.kordex.core.utils.toDuration
 import dev.zt64.minkinator.util.*
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.withLock

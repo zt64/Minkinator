@@ -9,13 +9,6 @@ import com.aallam.openai.api.model.ModelId
 import com.aallam.openai.api.moderation.ModerationRequest
 import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
-import com.kotlindiscord.kord.extensions.checks.anyGuild
-import com.kotlindiscord.kord.extensions.checks.isNotBot
-import com.kotlindiscord.kord.extensions.events.EventContext
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.extensions.chatGroupCommand
-import com.kotlindiscord.kord.extensions.extensions.event
-import com.kotlindiscord.kord.extensions.utils.env
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.behavior.channel.withTyping
 import dev.kord.core.behavior.edit
@@ -25,6 +18,13 @@ import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import dev.kord.x.emoji.Emojis
 import dev.kord.x.emoji.toReaction
+import dev.kordex.core.checks.anyGuild
+import dev.kordex.core.checks.isNotBot
+import dev.kordex.core.events.EventContext
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.extensions.chatGroupCommand
+import dev.kordex.core.extensions.event
+import dev.kordex.core.utils.env
 import dev.zt64.minkinator.util.isSuperuser
 import dev.zt64.minkinator.util.mentions
 import dev.zt64.minkinator.util.reply

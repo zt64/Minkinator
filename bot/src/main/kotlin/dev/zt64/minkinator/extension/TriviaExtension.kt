@@ -1,13 +1,5 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.checks.anyGuild
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.application.slash.converters.impl.optionalStringChoice
-import com.kotlindiscord.kord.extensions.commands.converters.impl.defaultingInt
-import com.kotlindiscord.kord.extensions.components.components
-import com.kotlindiscord.kord.extensions.components.publicButton
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.time.TimestampType
 import dev.kord.common.Color
 import dev.kord.common.entity.ButtonStyle
 import dev.kord.common.entity.Permission
@@ -18,6 +10,14 @@ import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.embed
 import dev.kord.x.emoji.DiscordEmoji
 import dev.kord.x.emoji.Emojis
+import dev.kordex.core.checks.anyGuild
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.application.slash.converters.impl.optionalStringChoice
+import dev.kordex.core.commands.converters.impl.defaultingInt
+import dev.kordex.core.components.components
+import dev.kordex.core.components.publicButton
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.time.TimestampType
 import dev.zt64.minkinator.util.*
 import io.ktor.client.*
 import io.ktor.client.call.*

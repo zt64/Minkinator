@@ -1,25 +1,26 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.DiscordRelayedException
-import com.kotlindiscord.kord.extensions.checks.userFor
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.chat.ChatCommand
-import com.kotlindiscord.kord.extensions.commands.chat.ChatCommandContext
-import com.kotlindiscord.kord.extensions.commands.converters.impl.string
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.extensions.chatGroupCommand
-import com.kotlindiscord.kord.extensions.utils.envOrNull
 import dev.kord.common.Color
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
 import dev.kord.core.behavior.edit
 import dev.kord.core.behavior.reply
 import dev.kord.gateway.Intent
+import dev.kord.rest.NamedFile
 import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.embed
+import dev.kordex.core.DiscordRelayedException
+import dev.kordex.core.checks.userFor
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.chat.ChatCommand
+import dev.kordex.core.commands.chat.ChatCommandContext
+import dev.kordex.core.commands.converters.impl.string
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.utils.envOrNull
 import dev.zt64.minkinator.util.*
 import io.ktor.client.request.forms.*
 import io.ktor.utils.io.*
+import io.ktor.utils.io.jvm.javaio.*
 import io.r2dbc.spi.R2dbcException
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.toList
@@ -74,7 +75,7 @@ object RestrictedExtension : Extension() {
         ) = chatCommand(name, description) {
             checkSuperuser()
 
-            action { block(argString.substringAfter(" ")) }
+            action { block(argString) }
         }
 
         suspend fun <T : Arguments> command(
@@ -85,7 +86,7 @@ object RestrictedExtension : Extension() {
         ) = chatCommand(name, description, arguments) {
             checkSuperuser()
 
-            action { block() }
+            action(block)
         }
 
         command("stop", "Stop the bot") {
@@ -131,10 +132,10 @@ object RestrictedExtension : Extension() {
             }.send()
         }
 
-        chatGroupCommand {
-            name = "db"
+        chatGroupCommand(
+            name = "db",
             description = "Database related commands"
-
+        ) {
             checkSuperuser()
 
             chatCommand {
@@ -310,10 +311,10 @@ object RestrictedExtension : Extension() {
                     x = "x"
                     y = "y"
                 } + labs(
-                    title = "Insanity over time",
-                    x = "Week",
-                    y = "Insanity"
-                )
+                title = "Insanity over time",
+                x = "Week",
+                y = "Insanity"
+            )
 
             val rawSpec = plot.toSpec()
             val processedSpec = MonolithicCommon.processRawSpecs(rawSpec, frontendOnly = false)
@@ -341,13 +342,21 @@ object RestrictedExtension : Extension() {
 
         val scriptingHost = BasicJvmScriptingHost()
 
-        command("eval", "Evaluate code") { input ->
+        command("eval", "Evaluate Kotlin code") { input ->
+            if (input.isEmpty()) throw DiscordRelayedException("Input cannot be empty")
+
             val code = input.removeSurrounding(prefix = "```kt", suffix = "```").trim()
 
+            val source = code.toScriptSource()
             val res: ResultWithDiagnostics<EvaluationResult>
+
+            val reply = message.reply {
+                content = "Processing..."
+            }
+
             val duration = measureTime {
                 res = scriptingHost.eval(
-                    script = code.toScriptSource(),
+                    script = source,
                     compilationConfiguration = ScriptCompilationConfiguration {
                         defaultImports(
                             "dev.kord.core.behavior.*",
@@ -364,36 +373,47 @@ object RestrictedExtension : Extension() {
                         jvm {
                             dependenciesFromCurrentContext(wholeClasspath = true)
                         }
+                        compilerOptions("-language-version=1.9")
                     },
-                    evaluationConfiguration =
-                        ScriptEvaluationConfiguration {
-                            implicitReceivers(this@command)
-                            providedProperties("kord" to kord)
-                        }
+                    evaluationConfiguration = ScriptEvaluationConfiguration {
+                        implicitReceivers(this@command)
+                        providedProperties("kord" to kord)
+                    }
                 )
             }
 
             val returnValue = res.valueOrNull()?.returnValue
 
-            message.reply {
+            reply.edit {
                 embed {
-                    description = if (returnValue != null) {
-                        buildString {
-                            appendLine("```")
-                            appendLine(returnValue.toString())
 
-                            if (length > 4093) {
-                                removeRange(4093, length)
-                                footer("Output truncated")
-                            }
+                    footer("Finished in ${duration.toComponents { s, ns -> "${s}s ${ns / 1e+6}ms" }}")
 
-                            appendLine("```")
+                    description = when (returnValue) {
+                        is ResultValue.Error -> {
+                            color = Color.error
+
+                            res
+                                .reports
+                                .filter { it.severity > ScriptDiagnostic.Severity.WARNING }
+                                .joinToString("\n", transform = ScriptDiagnostic::render)
                         }
-                    } else {
-                        res
-                            .reports
-                            .filter { it.severity > ScriptDiagnostic.Severity.WARNING }
-                            .joinToString("\n", transform = ScriptDiagnostic::render)
+
+                        is ResultValue.Value -> {
+                            color = Color.success
+
+                            val str = returnValue.value.toString()
+
+                            if (str.length > 3994) {
+                                this@edit.files += NamedFile("output.txt", ChannelProvider { str.byteInputStream().toByteReadChannel() })
+
+                                "Output uploaded as file"
+                            } else {
+                                "```\n$str\n``` "
+                            }
+                        }
+
+                        else -> "No output"
                     }
                 }
             }

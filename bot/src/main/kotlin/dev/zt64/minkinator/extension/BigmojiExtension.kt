@@ -1,8 +1,5 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.emoji
-import com.kotlindiscord.kord.extensions.extensions.Extension
 import com.sksamuel.scrimage.ImmutableImage
 import com.sksamuel.scrimage.nio.AnimatedGifReader
 import com.sksamuel.scrimage.nio.ImageSource
@@ -12,6 +9,9 @@ import dev.kord.core.entity.GuildEmoji
 import dev.kord.core.entity.StandardEmoji
 import dev.kord.gateway.Intent
 import dev.kord.rest.NamedFile
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.converters.impl.emoji
+import dev.kordex.core.extensions.Extension
 import dev.zt64.minkinator.util.publicSlashCommand
 import io.ktor.client.request.forms.*
 import io.ktor.utils.io.jvm.javaio.*

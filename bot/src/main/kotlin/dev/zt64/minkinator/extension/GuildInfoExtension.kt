@@ -1,10 +1,10 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.checks.anyGuild
-import com.kotlindiscord.kord.extensions.extensions.Extension
 import dev.kord.common.Color
 import dev.kord.rest.Image
 import dev.kord.rest.builder.message.embed
+import dev.kordex.core.checks.anyGuild
+import dev.kordex.core.extensions.Extension
 import dev.zt64.minkinator.util.*
 
 object GuildInfoExtension : Extension() {

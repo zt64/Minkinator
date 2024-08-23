@@ -1,14 +1,5 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.checks.anyGuild
-import com.kotlindiscord.kord.extensions.checks.hasPermission
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.member
-import com.kotlindiscord.kord.extensions.extensions.Extension
-import com.kotlindiscord.kord.extensions.extensions.event
-import com.kotlindiscord.kord.extensions.types.EphemeralInteractionContext
-import com.kotlindiscord.kord.extensions.utils.hasPermission
-import com.kotlindiscord.kord.extensions.utils.selfMember
 import dev.kord.common.entity.Permission
 import dev.kord.core.behavior.edit
 import dev.kord.core.entity.Member
@@ -16,6 +7,15 @@ import dev.kord.core.event.guild.MemberJoinEvent
 import dev.kord.core.event.guild.MemberUpdateEvent
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
+import dev.kordex.core.checks.anyGuild
+import dev.kordex.core.checks.hasPermission
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.converters.impl.member
+import dev.kordex.core.extensions.Extension
+import dev.kordex.core.extensions.event
+import dev.kordex.core.types.EphemeralInteractionContext
+import dev.kordex.core.utils.hasPermission
+import dev.kordex.core.utils.selfMember
 import dev.zt64.minkinator.util.ephemeralSlashCommand
 import dev.zt64.minkinator.util.ephemeralUserCommand
 import java.text.Normalizer

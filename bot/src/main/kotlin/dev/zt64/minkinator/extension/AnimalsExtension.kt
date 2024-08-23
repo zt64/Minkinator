@@ -1,8 +1,8 @@
 package dev.zt64.minkinator.extension
 
-import com.kotlindiscord.kord.extensions.extensions.Extension
 import dev.kord.common.Color
 import dev.kord.rest.builder.message.embed
+import dev.kordex.core.extensions.Extension
 import dev.zt64.minkinator.util.footer
 import dev.zt64.minkinator.util.publicSlashCommand
 import dev.zt64.minkinator.util.success

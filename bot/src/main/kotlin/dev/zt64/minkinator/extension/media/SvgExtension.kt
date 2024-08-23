@@ -1,10 +1,10 @@
 package dev.zt64.minkinator.extension.media
 
-import com.kotlindiscord.kord.extensions.DiscordRelayedException
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.converters.impl.string
-import com.kotlindiscord.kord.extensions.extensions.Extension
 import dev.kord.core.behavior.reply
+import dev.kordex.core.DiscordRelayedException
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.converters.impl.string
+import dev.kordex.core.extensions.Extension
 import dev.zt64.minkinator.util.chatCommand
 import io.ktor.client.request.forms.*
 import io.ktor.utils.io.*

@@ -1,11 +1,11 @@
 package dev.zt64.minkinator.util
 
-import com.kotlindiscord.kord.extensions.commands.Arguments
-import com.kotlindiscord.kord.extensions.commands.application.slash.*
-import com.kotlindiscord.kord.extensions.commands.application.user.EphemeralUserCommand
-import com.kotlindiscord.kord.extensions.commands.chat.ChatCommand
-import com.kotlindiscord.kord.extensions.commands.chat.ChatGroupCommand
-import com.kotlindiscord.kord.extensions.extensions.*
+import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.application.slash.*
+import dev.kordex.core.commands.application.user.EphemeralUserCommand
+import dev.kordex.core.commands.chat.ChatCommand
+import dev.kordex.core.commands.chat.ChatGroupCommand
+import dev.kordex.core.extensions.*
 
 suspend inline fun <T : Arguments> Extension.publicSlashCommand(
     name: String,
