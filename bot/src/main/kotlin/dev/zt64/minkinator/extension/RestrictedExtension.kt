@@ -385,8 +385,8 @@ object RestrictedExtension : Extension() {
             val returnValue = res.valueOrNull()?.returnValue
 
             reply.edit {
+                content = ""
                 embed {
-
                     footer("Finished in ${duration.toComponents { s, ns -> "${s}s ${ns / 1e+6}ms" }}")
 
                     description = when (returnValue) {
