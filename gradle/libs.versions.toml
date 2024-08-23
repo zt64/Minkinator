@@ -30,7 +30,7 @@ ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = 
 
 logback-classic = "ch.qos.logback:logback-classic:1.5.7"
 openai-client = "com.aallam.openai:openai-client:3.8.2"
-tess4j = "net.sourceforge.tess4j:tess4j:5.12.0"
+tess4j = "net.sourceforge.tess4j:tess4j:5.13.0"
 
 [bundles]
 scrimmage = ["scrimmage-core", "scrimmage-filters", "scrimmage-webp"]
