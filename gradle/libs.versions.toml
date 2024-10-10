@@ -1,5 +1,5 @@
 [versions]
-kotlin = "2.0.20"
+kotlin = "2.0.21"
 ktor = "2.3.12"
 kord-ex = "2.1.0-SNAPSHOT"
 ksp = "2.0.20-1.0.25"
