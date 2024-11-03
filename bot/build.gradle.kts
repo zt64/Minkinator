@@ -1,11 +1,18 @@
+import dev.kordex.gradle.plugins.kordex.DataCollection
+
 plugins {
     application
 
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.kordEx)
 }
 
-application {
-    mainClass = "dev.zt64.minkinator.MainKt"
+kordEx {
+    bot {
+        dataCollection(DataCollection.Standard)
+
+        mainClass = "dev.zt64.minkinator.MainKt"
+    }
 }
 
 dependencies {
