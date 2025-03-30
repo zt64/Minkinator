@@ -3,6 +3,7 @@ package dev.zt64.minkinator.extension
 import dev.kord.common.Color
 import dev.kord.rest.builder.message.embed
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.zt64.minkinator.util.publicSlashCommand
 import dev.zt64.minkinator.util.success
 
@@ -16,8 +17,8 @@ object CoinTossExtension : Extension() {
 
     override suspend fun setup() {
         publicSlashCommand(
-            name = "coin-toss",
-            description = "Toss a coin, and see if it lands on heads, or tails"
+            name = "coin-toss".toKey(),
+            description = "Toss a coin, and see if it lands on heads, or tails".toKey()
         ) {
             action {
                 respond {

@@ -36,9 +36,10 @@ object EventLogExtension : Extension() {
         event<SlashCommandInvocationEvent<*>> {
             val interaction = event.event.interaction
             val command = event.command
-            val channel = interaction.getChannel()
 
             val message = buildString {
+                val channel = interaction.channel
+
                 if (channel is GuildChannel) {
                     append("${channel.getGuild().name} #${channel.name} ")
                 }
@@ -47,20 +48,19 @@ object EventLogExtension : Extension() {
                 append("/")
 
                 if (command.parentGroup != null) {
-                    append("${command.parentGroup!!.parent.name} ")
-                    append("${command.parentGroup!!.name} ")
+                    append("${command.parentGroup!!.parent.name.translate()} ")
+                    append("${command.parentGroup!!.name.translate()} ")
                 } else {
-                    command.parentCommand?.let { append("${it.name} ") }
-                    append("${command.name} ")
+                    command.parentCommand?.let { append("${it.name.translate()} ") }
+                    append("${command.name.translate()} ")
                 }
 
                 append(
                     interaction
                         .command
                         .options
-                        .map { (name, optionValue) ->
-                            "$name: ${optionValue.value}"
-                        }.joinToString()
+                        .map { (name, optionValue) -> "$name=${optionValue.value}" }
+                        .joinToString()
                 )
             }
 
@@ -74,9 +74,7 @@ object EventLogExtension : Extension() {
 
             bot.logger.info {
                 buildString {
-                    if (channel is GuildChannel) {
-                        append("${guild.name} #${channel.name} ")
-                    }
+                    if (channel is GuildChannel) append("${guild.name} #${channel.name} ")
 
                     append("${message.author!!.username} ${message.content}")
                 }

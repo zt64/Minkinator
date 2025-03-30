@@ -9,6 +9,7 @@ import dev.kordex.core.components.components
 import dev.kordex.core.components.ephemeralButton
 import dev.kordex.core.components.types.emoji
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.zt64.minkinator.util.footer
 import dev.zt64.minkinator.util.publicSlashCommand
 import kotlinx.coroutines.TimeoutCancellationException
@@ -23,8 +24,8 @@ object TicTacToeExtension : Extension() {
 
     override suspend fun setup() {
         publicSlashCommand(
-            name = "tic-tac-toe",
-            description = "Play a game of tic-tac-toe",
+            name = "tic-tac-toe".toKey(),
+            description = "Play a game of tic-tac-toe".toKey(),
             arguments = TicTacToeExtension::Args
         ) {
             locking = true
@@ -36,9 +37,9 @@ object TicTacToeExtension : Extension() {
             action {
                 this@publicSlashCommand.unlock()
 
-                val opponent = arguments.player
+                arguments.player
 
-                val mutex = Mutex()
+                Mutex()
                 respond {
                     embed {
                         title = "Tic Tac Toe"
@@ -51,7 +52,7 @@ object TicTacToeExtension : Extension() {
 
                     components {
                         ephemeralButton {
-                            label = "Cancel"
+                            label = "Cancel".toKey()
 
                             emoji(Emojis.x.unicode)
 
@@ -62,9 +63,8 @@ object TicTacToeExtension : Extension() {
                 }
 
                 try {
-                    val opp =
-                        withTimeoutOrNull(timeoutDuration) {
-                        }
+                    withTimeoutOrNull(timeoutDuration) {
+                    }
                 } catch (e: TimeoutCancellationException) {
                     edit {
                         embed {
@@ -81,8 +81,8 @@ object TicTacToeExtension : Extension() {
 
     private class Args : Arguments() {
         val player by optionalMember {
-            name = "player"
-            description = "The user to play against"
+            name = "player".toKey()
+            description = "The user to play against".toKey()
         }
     }
 }

@@ -9,7 +9,9 @@ import dev.kordex.core.checks.hasPermission
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.*
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.kordex.core.utils.toDuration
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.*
 import kotlinx.datetime.TimeZone
 
@@ -18,8 +20,8 @@ object BanExtension : Extension() {
 
     override suspend fun setup() {
         publicSlashCommand(
-            name = "ban",
-            description = "Ban a user",
+            name = Translations.Command.ban,
+            description = Translations.Command.Description.ban,
             arguments = BanExtension::BanArguments
         ) {
             requireBotPermissions(Permission.BanMembers)
@@ -60,8 +62,8 @@ object BanExtension : Extension() {
         }
 
         publicSlashCommand(
-            name = "unban",
-            description = "Unban a user",
+            name = Translations.Command.unban,
+            description = Translations.Command.Description.unban,
             arguments = BanExtension::UnbanArguments
         ) {
             requireBotPermissions(Permission.BanMembers)
@@ -83,7 +85,7 @@ object BanExtension : Extension() {
                         description = arguments.reason
 
                         author(
-                            icon = user.displayAvatar(),
+                            icon = user.displayAvatar,
                             name = "Unbanned User: ${user.username}"
                         )
                     }
@@ -94,17 +96,17 @@ object BanExtension : Extension() {
 
     private class BanArguments : Arguments() {
         val member by member {
-            name = "member"
-            description = "The member to ban"
+            name = Translations.Common.member
+            description = "The member to ban".toKey()
         }
         val reason by optionalString {
-            name = "reason"
-            description = "The reason to ban"
+            name = Translations.Common.reason
+            description = "The reason to ban".toKey()
             maxLength = 512
         }
         val duration by optionalDuration {
-            name = "duration"
-            description = "Duration of messages to delete"
+            name = Translations.Common.duration
+            description = "Duration of messages to delete".toKey()
 
             validate {
                 failIf {
@@ -116,12 +118,12 @@ object BanExtension : Extension() {
 
     private class UnbanArguments : Arguments() {
         val user by user {
-            name = "user"
-            description = "The user to unban"
+            name = Translations.Common.user
+            description = "The user to unban".toKey()
         }
         val reason by optionalString {
-            name = "reason"
-            description = "The reason to unban"
+            name = Translations.Common.reason
+            description = "The reason to unban".toKey()
             maxLength = 512
         }
     }

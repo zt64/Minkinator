@@ -8,6 +8,7 @@ import dev.kordex.core.checks.anyGuild
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.optionalMember
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.kordex.core.time.TimestampType
 import dev.kordex.core.time.toDiscord
 import dev.zt64.minkinator.util.*
@@ -20,8 +21,8 @@ object SpotifyExtension : Extension() {
 
     override suspend fun setup() {
         publicSlashCommand(
-            name = "spotify",
-            description = "Get information on a users current Spotify status",
+            name = "spotify".toKey(),
+            description = "Get information on a users current Spotify status".toKey(),
             arguments = SpotifyExtension::SpotifyArguments
         ) {
             check {
@@ -74,8 +75,8 @@ object SpotifyExtension : Extension() {
 
     private class SpotifyArguments : Arguments() {
         val member by optionalMember {
-            name = "member"
-            description = "The user to check spotify info"
+            name = "member".toKey()
+            description = "The user to check spotify info".toKey()
         }
     }
 }

@@ -9,6 +9,7 @@ import dev.kordex.core.checks.hasPermission
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.*
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.zt64.minkinator.util.ephemeralSlashCommand
 import io.ktor.client.*
 import io.ktor.client.request.*
@@ -24,8 +25,8 @@ object StickerExtension : Extension() {
 
     override suspend fun setup() {
         ephemeralSlashCommand(
-            name = "create-sticker",
-            description = "Create a sticker from an image or GIF",
+            name = "create-sticker".toKey(),
+            description = "Create a sticker from an image or GIF".toKey(),
             arguments = StickerExtension::Args
         ) {
             requireBotPermissions(Permission.ManageGuildExpressions)
@@ -70,17 +71,17 @@ object StickerExtension : Extension() {
 
     private class Args : Arguments() {
         val name by string {
-            name = "name"
-            description = "The name of the sticker"
+            name = "name".toKey()
+            description = "The name of the sticker".toKey()
             maxLength = 30
         }
         val relatedEmoji by emoji {
-            name = "related-emoji"
-            description = "The emoji related to the sticker"
+            name = "related-emoji".toKey()
+            description = "The emoji related to the sticker".toKey()
         }
         val attachment by attachment {
-            name = "attachment"
-            description = "The attachment to use"
+            name = "attachment".toKey()
+            description = "The attachment to use".toKey()
 
             validate {
                 failIfNot("Attachment must be either a PNG or APNG") {
@@ -92,8 +93,8 @@ object StickerExtension : Extension() {
             }
         }
         val description by optionalString {
-            name = "description"
-            description = "The description of the sticker"
+            name = "description".toKey()
+            description = "The description of the sticker".toKey()
             maxLength = 100
         }
     }

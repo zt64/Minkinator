@@ -2,11 +2,13 @@ package dev.zt64.minkinator.extension
 
 import dev.kord.common.Color
 import dev.kord.core.entity.Member
+import dev.kord.core.entity.effectiveName
 import dev.kord.rest.Image
 import dev.kord.rest.builder.message.embed
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.optionalMember
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.zt64.minkinator.util.*
 
 object AvatarExtension : Extension() {
@@ -21,19 +23,19 @@ object AvatarExtension : Extension() {
 
         class Args : Arguments() {
             val member by optionalMember {
-                name = "member"
-                description = "The member to get the avatar of"
+                name = "member".toKey()
+                description = "The member to get the avatar of".toKey()
             }
         }
 
         publicSlashCommand(
-            name = "avatar",
-            description = "Get the users avatar",
+            name = "avatar".toKey(),
+            description = "Get the users avatar".toKey(),
             arguments = ::Args
         ) {
             action {
-                val member = arguments.member ?: getMember()!!.fetchMember()
-                val url = member.getAvatarUrl()
+                val member = arguments.member ?: getMember()?.fetchMember() ?: getUser().fetchUser()
+                val url = member.displayAvatar.cdnUrl.toUrl()
 
                 respond {
                     embed {
@@ -46,7 +48,7 @@ object AvatarExtension : Extension() {
             }
         }
 
-        ephemeralUserCommand("avatar") {
+        ephemeralUserCommand("avatar".toKey()) {
             action {
                 val member = targetUsers.first().fetchMember(guild!!.id)
                 val url = member.getAvatarUrl()

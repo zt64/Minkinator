@@ -10,7 +10,6 @@ import dev.kord.x.emoji.DiscordEmoji
 import dev.kordex.core.DISCORD_GREEN
 import dev.kordex.core.DISCORD_RED
 import dev.kordex.core.DISCORD_YELLOW
-import dev.kordex.core.builders.ExtensibleBotBuilder
 import dev.kordex.core.events.EventContext
 import dev.kordex.core.events.EventHandler
 import dev.kordex.core.extensions.Extension
@@ -31,13 +30,11 @@ val Color.Companion.error
 val DiscordEmoji.Generic.partial: DiscordPartialEmoji
     get() = DiscordPartialEmoji(name = unicode)
 
-fun String.pluralize(
-    count: Int,
-    plural: String = this + "s",
-    inclusive: Boolean = true
-) = (if (count > 1) plural else this).let { if (inclusive) "$count $it" else it }
+fun String.pluralize(count: Int, plural: String = this + "s", inclusive: Boolean = true) =
+    (if (count > 1) plural else this).let { if (inclusive) "$count $it" else it }
 
-fun User.displayAvatar(): Asset = avatar ?: defaultAvatar
+val User.displayAvatar: Asset
+    get() = avatar ?: defaultAvatar
 
 val Member.displayAvatar: Asset
     get() = memberAvatar ?: avatar ?: defaultAvatar
@@ -63,6 +60,3 @@ suspend inline fun <reified T : Event> Extension.event(noinline actionBody: susp
         actionBody()
     }
 }
-
-context(ExtensibleBotBuilder.ExtensionsBuilder)
-operator fun Extension.unaryPlus() = extensions.add { this }

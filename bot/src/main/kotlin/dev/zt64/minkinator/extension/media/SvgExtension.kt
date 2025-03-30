@@ -5,6 +5,7 @@ import dev.kordex.core.DiscordRelayedException
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.string
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.zt64.minkinator.util.chatCommand
 import io.ktor.client.request.forms.*
 import io.ktor.utils.io.*
@@ -23,7 +24,7 @@ object SvgExtension : Extension() {
     override suspend fun setup() {
         val transcoder = PNGTranscoder()
 
-        chatCommand("svg", "", ::SvgArgs) {
+        chatCommand("svg".toKey(), "".toKey(), ::SvgArgs) {
             action {
                 val input = if (arguments.data.startsWith("https") || arguments.data.startsWith("http")) {
                     TranscoderInput(arguments.data)
@@ -36,7 +37,7 @@ object SvgExtension : Extension() {
                             .newDocumentBuilder()
                             .parse(input)
                     } catch (e: SAXException) {
-                        throw DiscordRelayedException("An error occurred while parsing the SVG. ${e.message}")
+                        throw DiscordRelayedException("An error occurred while parsing the SVG. ${e.message}".toKey())
                     }
 
                     TranscoderInput(doc)
@@ -59,8 +60,8 @@ object SvgExtension : Extension() {
 
     private class SvgArgs : Arguments() {
         val data by string {
-            name = "data"
-            description = "SVG to convert"
+            name = "data".toKey()
+            description = "SVG to convert".toKey()
         }
     }
 }

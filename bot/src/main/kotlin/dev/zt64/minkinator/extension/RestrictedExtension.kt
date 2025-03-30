@@ -10,12 +10,11 @@ import dev.kord.rest.NamedFile
 import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.embed
 import dev.kordex.core.DiscordRelayedException
-import dev.kordex.core.checks.userFor
 import dev.kordex.core.commands.Arguments
-import dev.kordex.core.commands.chat.ChatCommand
 import dev.kordex.core.commands.chat.ChatCommandContext
 import dev.kordex.core.commands.converters.impl.string
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.kordex.core.utils.envOrNull
 import dev.zt64.minkinator.util.*
 import io.ktor.client.request.forms.*
@@ -60,30 +59,19 @@ object RestrictedExtension : Extension() {
     private val testingGuildId = envOrNull("TESTING_GUILD_ID")?.let(::Snowflake)
 
     override suspend fun setup() {
-        fun ChatCommand<*>.checkSuperuser() = check {
-            failIfNot {
-                userFor(event)!!.id.value.let {
-                    it == 295190422244950017uL || it == 289556910426816513uL
-                }
+        suspend fun command(name: String, description: String? = null, block: suspend ChatCommandContext<out Arguments>.(input: String) -> Unit) =
+            chatCommand(name.toKey(), description?.toKey()) {
+                checkSuperuser()
+
+                action { block(argString) }
             }
-        }
-
-        suspend fun command(
-            name: String,
-            description: String? = null,
-            block: suspend ChatCommandContext<out Arguments>.(input: String) -> Unit
-        ) = chatCommand(name, description) {
-            checkSuperuser()
-
-            action { block(argString) }
-        }
 
         suspend fun <T : Arguments> command(
             name: String,
             description: String? = null,
             arguments: () -> T,
             block: suspend ChatCommandContext<out T>.() -> Unit
-        ) = chatCommand(name, description, arguments) {
+        ) = chatCommand(name.toKey(), description?.toKey(), arguments) {
             checkSuperuser()
 
             action(block)
@@ -133,13 +121,13 @@ object RestrictedExtension : Extension() {
         }
 
         chatGroupCommand(
-            name = "db",
-            description = "Database related commands"
+            name = "db".toKey(),
+            description = "Database related commands".toKey()
         ) {
             checkSuperuser()
 
             chatCommand {
-                name = "reset"
+                name = "reset".toKey()
 
                 action {
                     database.runQuery {
@@ -149,7 +137,7 @@ object RestrictedExtension : Extension() {
             }
 
             chatCommand {
-                name = "exec"
+                name = "exec".toKey()
 
                 action {
                     val sql = argString.substringAfter("exec")
@@ -238,8 +226,8 @@ object RestrictedExtension : Extension() {
 
         class ExtensionArgs : Arguments() {
             val extension by string {
-                name = "extension"
-                description = "Extension to reload"
+                name = "extension".toKey()
+                description = "Extension to reload".toKey()
 
                 validate {
                     failIf("Extension `$value` is not loaded") {
@@ -271,7 +259,7 @@ object RestrictedExtension : Extension() {
         command("unload", "Unload an extension", ::ExtensionArgs) {
             val extension = arguments.extension
 
-            if (extension !in bot.extensions) throw DiscordRelayedException("Extension `$extension` not loaded")
+            if (extension !in bot.extensions) throw DiscordRelayedException("Extension `$extension` not loaded".toKey())
 
             val response = message.reply("Unloading extension `$extension`...")
 
@@ -285,7 +273,7 @@ object RestrictedExtension : Extension() {
         command("load", "Load an extension", ::ExtensionArgs) {
             val extension = arguments.extension
 
-            if (extension in bot.extensions) throw DiscordRelayedException("Extension `$extension` already loaded")
+            if (extension in bot.extensions) throw DiscordRelayedException("Extension `$extension` already loaded".toKey())
 
             val response = message.reply("Loading extension `$extension`...")
 
@@ -311,10 +299,10 @@ object RestrictedExtension : Extension() {
                     x = "x"
                     y = "y"
                 } + labs(
-                title = "Insanity over time",
-                x = "Week",
-                y = "Insanity"
-            )
+                    title = "Insanity over time",
+                    x = "Week",
+                    y = "Insanity"
+                )
 
             val rawSpec = plot.toSpec()
             val processedSpec = MonolithicCommon.processRawSpecs(rawSpec, frontendOnly = false)
@@ -343,7 +331,7 @@ object RestrictedExtension : Extension() {
         val scriptingHost = BasicJvmScriptingHost()
 
         command("eval", "Evaluate Kotlin code") { input ->
-            if (input.isEmpty()) throw DiscordRelayedException("Input cannot be empty")
+            if (input.isEmpty()) throw DiscordRelayedException("Input cannot be empty".toKey())
 
             val code = input.removeSurrounding(prefix = "```kt", suffix = "```").trim()
 
@@ -413,7 +401,9 @@ object RestrictedExtension : Extension() {
                             }
                         }
 
-                        else -> "No output"
+                        else -> {
+                            "No output"
+                        }
                     }
                 }
             }

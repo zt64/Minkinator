@@ -16,6 +16,8 @@ import dev.kordex.core.commands.application.slash.SlashGroup
 import dev.kordex.core.commands.converters.impl.*
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.extensions.event
+import dev.kordex.core.i18n.toKey
+import dev.kordex.core.i18n.types.Key
 import dev.kordex.core.utils.timeout
 import dev.zt64.minkinator.data.DBFilter
 import dev.zt64.minkinator.data.FilterAction
@@ -103,8 +105,8 @@ object FilterExtension : Extension() {
         }
 
         ephemeralSlashCommand(
-            name = "filter",
-            description = "Manage server filters"
+            name = "filter".toKey(),
+            description = "Manage server filters".toKey()
         ) {
             check {
                 anyGuild()
@@ -112,12 +114,12 @@ object FilterExtension : Extension() {
             }
 
             group(
-                name = "add",
-                description = "Add a filter"
+                name = "add".toKey(),
+                description = "Add a filter".toKey()
             ) {
                 suspend fun <T : Arguments> SlashGroup.filterAction(
-                    name: String,
-                    description: String,
+                    name: Key,
+                    description: Key,
                     arguments: () -> T,
                     initBlock: T.(guildId: Snowflake) -> DBFilter
                 ) {
@@ -146,8 +148,8 @@ object FilterExtension : Extension() {
                 }
 
                 filterAction(
-                    name = "reply",
-                    description = "Reply to a message with a message",
+                    name = "reply".toKey(),
+                    description = "Reply to a message with a message".toKey(),
                     arguments = FilterExtension::ReplyArgs
                 ) { guildId ->
                     DBFilter(
@@ -160,8 +162,8 @@ object FilterExtension : Extension() {
                 }
 
                 filterAction(
-                    name = "timeout",
-                    description = "Timeout a user for a duration",
+                    name = "timeout".toKey(),
+                    description = "Timeout a user for a duration".toKey(),
                     arguments = FilterExtension::TimeoutArgs
                 ) { guildId ->
                     DBFilter(
@@ -174,19 +176,16 @@ object FilterExtension : Extension() {
             }
 
             ephemeralSubCommand(
-                name = "remove",
-                description = "Remove a filter",
+                name = "remove".toKey(),
+                description = "Remove a filter".toKey(),
                 arguments = FilterExtension::RemoveArgs
             ) {
                 action {
-                    val removed =
-                        db.runQuery {
-                            QueryDsl
-                                .delete(Meta.filter)
-                                .where {
-                                    Meta.filter.id eq arguments.id
-                                }
-                        } > 0
+                    val removed = db.runQuery {
+                        QueryDsl
+                            .delete(Meta.filter)
+                            .where { Meta.filter.id eq arguments.id }
+                    } > 0
 
                     respond {
                         content = if (removed) "Removed filter" else "Filter not found"
@@ -217,8 +216,8 @@ object FilterExtension : Extension() {
             }
 
             ephemeralSubCommand(
-                name = "list",
-                description = "List all configured filters"
+                name = "list".toKey(),
+                description = "List all configured filters".toKey()
             ) {
                 action {
                     val guild = guildFor(event)!!
@@ -252,8 +251,8 @@ object FilterExtension : Extension() {
             }
 
             ephemeralSubCommand(
-                name = "test",
-                description = "Test for any matches of a given string",
+                name = "test".toKey(),
+                description = "Test for any matches of a given string".toKey(),
                 arguments = FilterExtension::TestArgs
             ) {
                 action {
@@ -280,14 +279,14 @@ object FilterExtension : Extension() {
 
     private open class AddArgs : Arguments() {
         val regex by string {
-            name = "regex"
-            description = "The filter to add. This can be a regex expression for more control"
+            name = "regex".toKey()
+            description = "The filter to add. This can be a regex expression for more control".toKey()
 
             validate {
                 try {
                     value.toRegex()
                 } catch (e: Exception) {
-                    fail(e.message)
+                    fail(e.message ?: "Failed")
                 }
             }
         }
@@ -295,41 +294,41 @@ object FilterExtension : Extension() {
 
     private class ReplyArgs : AddArgs() {
         val content by string {
-            name = "content"
-            description = "The message content to reply with"
+            name = "content".toKey()
+            description = "The message content to reply with".toKey()
             maxLength = 2000
         }
         val deleteMessage by defaultingBoolean {
-            name = "delete-message"
-            description = "Whether the message should be deleted"
+            name = "delete-message".toKey()
+            description = "Whether the message should be deleted".toKey()
             defaultValue = false
         }
     }
 
     private class TimeoutArgs : AddArgs() {
         val duration by duration {
-            name = "duration"
-            description = "The duration to timeout the user for"
+            name = "duration".toKey()
+            description = "The duration to timeout the user for".toKey()
         }
         val deleteMessage by defaultingBoolean {
-            name = "delete-message"
-            description = "Whether the message should be deleted"
+            name = "delete-message".toKey()
+            description = "Whether the message should be deleted".toKey()
             defaultValue = false
         }
     }
 
     private class RemoveArgs : Arguments() {
         val id by int {
-            name = "id"
-            description = "The ID of the filter to remove"
+            name = "id".toKey()
+            description = "The ID of the filter to remove".toKey()
             minValue = 0
         }
     }
 
     private class TestArgs : Arguments() {
         val message by string {
-            name = "message"
-            description = "The message to test"
+            name = "message".toKey()
+            description = "The message to test".toKey()
         }
     }
 }

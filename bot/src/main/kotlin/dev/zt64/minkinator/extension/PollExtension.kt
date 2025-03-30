@@ -11,6 +11,7 @@ import dev.kordex.core.commands.converters.impl.string
 import dev.kordex.core.components.components
 import dev.kordex.core.components.ephemeralStringSelectMenu
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.kordex.core.time.TimestampType
 import dev.kordex.core.utils.toDuration
 import dev.zt64.minkinator.util.*
@@ -24,16 +25,14 @@ object PollExtension : Extension() {
 
     override suspend fun setup() {
         publicSlashCommand(
-            name = "poll",
-            description = "Create a poll",
+            name = "poll".toKey(),
+            description = "Create a poll".toKey(),
             arguments = PollExtension::PollArgs
         ) {
             locking = true
 
             check {
-                failIf("A poll is already in progress") {
-                    mutex!!.isLocked
-                }
+                failIf("A poll is already in progress") { mutex!!.isLocked }
             }
 
             action {
@@ -53,7 +52,7 @@ object PollExtension : Extension() {
                         components(timeout = duration) {
                             ephemeralStringSelectMenu {
                                 choices.forEachIndexed { index, choice ->
-                                    option(choice, "$index") {
+                                    option(choice.toKey(), "$index") {
                                         action {
                                             votes[user.id] = value.toInt()
                                         }
@@ -98,14 +97,14 @@ object PollExtension : Extension() {
 
     private class PollArgs : Arguments() {
         val question by string {
-            name = "question"
-            description = "The question"
+            name = "question".toKey()
+            description = "The question".toKey()
             maxLength = 256
         }
 
         val choices by string {
-            name = "choices"
-            description = "Choices to show"
+            name = "choices".toKey()
+            description = "Choices to show".toKey()
 
             mutate { value -> value.replace(",", ", ") }
 
@@ -120,8 +119,8 @@ object PollExtension : Extension() {
         }
 
         val duration by defaultingDuration {
-            name = "duration"
-            description = "How long should the poll last"
+            name = "duration".toKey()
+            description = "How long should the poll last".toKey()
             defaultValue = DateTimePeriod(seconds = 60)
             positiveOnly = true
             longHelp = true

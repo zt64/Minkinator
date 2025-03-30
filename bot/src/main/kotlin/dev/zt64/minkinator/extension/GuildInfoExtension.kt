@@ -5,6 +5,7 @@ import dev.kord.rest.Image
 import dev.kord.rest.builder.message.embed
 import dev.kordex.core.checks.anyGuild
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.zt64.minkinator.util.*
 
 object GuildInfoExtension : Extension() {
@@ -12,8 +13,8 @@ object GuildInfoExtension : Extension() {
 
     override suspend fun setup() {
         ephemeralSlashCommand(
-            name = "guild-info",
-            description = "Get information about the current guild"
+            name = "guild-info".toKey(),
+            description = "Get information about the current guild".toKey()
         ) {
             check {
                 anyGuild()

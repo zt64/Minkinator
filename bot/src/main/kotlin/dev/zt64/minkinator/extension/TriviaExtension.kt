@@ -10,6 +10,7 @@ import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.embed
 import dev.kord.x.emoji.DiscordEmoji
 import dev.kord.x.emoji.Emojis
+import dev.kordex.core.DiscordRelayedException
 import dev.kordex.core.checks.anyGuild
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.application.slash.converters.impl.optionalStringChoice
@@ -17,7 +18,9 @@ import dev.kordex.core.commands.converters.impl.defaultingInt
 import dev.kordex.core.components.components
 import dev.kordex.core.components.publicButton
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.kordex.core.time.TimestampType
+import dev.zt64.minkinator.i18n.Translations.Command
 import dev.zt64.minkinator.util.*
 import io.ktor.client.*
 import io.ktor.client.call.*
@@ -26,7 +29,6 @@ import kotlinx.coroutines.*
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import org.koin.core.component.inject
-import kotlin.collections.set
 import kotlin.time.Duration.Companion.seconds
 
 object TriviaExtension : Extension() {
@@ -34,9 +36,7 @@ object TriviaExtension : Extension() {
 
     private val httpClient: HttpClient by inject()
 
-    private enum class Emoji(
-        val emoji: DiscordEmoji.Generic
-    ) {
+    private enum class Emoji(val emoji: DiscordEmoji.Generic) {
         A(Emojis.regionalIndicatorA),
         B(Emojis.regionalIndicatorB),
         C(Emojis.regionalIndicatorC),
@@ -73,12 +73,12 @@ object TriviaExtension : Extension() {
         val games = mutableMapOf<Snowflake, Job>()
 
         publicSlashCommand(
-            name = "trivia",
-            description = "Play a game of trivia!"
+            name = Command.trivia,
+            description = Command.Description.trivia
         ) {
             publicSubCommand(
-                name = "start",
-                description = "Start the trivia game",
+                name = Command.Subcommand.Trivia.start,
+                description = Command.Subcommand.Trivia.Description.start,
                 arguments = TriviaExtension::StartArguments
             ) {
                 locking = true
@@ -95,121 +95,124 @@ object TriviaExtension : Extension() {
                     this@publicSlashCommand.withLock {
                         val duration = 10.seconds
 
-                        games[channel.id] =
-                            channel.kord.launch {
-                                val totalQuestions = arguments.questions
+                        games[channel.id] = channel.kord.launch {
+                            val totalQuestions = arguments.questions
 
-                                val response: TriviaDBResponse = httpClient
+                            val response: TriviaDBResponse = try {
+                                httpClient
                                     .get("https://opentdb.com/api.php") {
                                         parameter("amount", totalQuestions)
                                         parameter("category", arguments.category)
                                         parameter("difficulty", arguments.difficulty)
                                     }.body()
+                            } catch (e: Exception) {
+                                throw DiscordRelayedException("An error has occured while starting trivia".toKey())
+                            }
 
-                                val score = mutableMapOf<User, Int>()
+                            mutableMapOf<User, Int>()
 
-                                response.questions.forEachIndexed { index, question ->
-                                    val category = question.category
-                                    val formattedQuestion = question.question.decodeEntities()
-                                    val incorrectAnswers = question.incorrectAnswers.map(String::decodeEntities)
-                                    val correctAnswer = question.correctAnswer.decodeEntities()
-                                    val participants = mutableMapOf<User, Boolean>()
+                            response.questions.forEachIndexed { index, question ->
+                                val category = question.category
+                                val formattedQuestion = question.question.decodeEntities()
+                                val incorrectAnswers = question.incorrectAnswers.map(String::decodeEntities)
+                                val correctAnswer = question.correctAnswer.decodeEntities()
+                                val participants = mutableMapOf<User, Boolean>()
 
-                                    val embedBuilder: EmbedBuilder.() -> Unit = {
-                                        color = Color.success
-                                        title = category
-                                        description = """
+                                val embedBuilder: EmbedBuilder.() -> Unit = {
+                                    color = Color.success
+                                    title = category
+                                    description = """
                                             $formattedQuestion
 
                                             Ending ${duration.toDiscord(TimestampType.RelativeTime)}
-                                        """.trimIndent()
+                                    """.trimIndent()
 
-                                        footer("Question ${index + 1} of $totalQuestions")
-                                    }
+                                    footer("Question ${index + 1} of $totalQuestions")
+                                }
 
-                                    val message =
-                                        respond {
-                                            embed(embedBuilder)
+                                val message =
+                                    respond {
+                                        embed(embedBuilder)
 
-                                            components(timeout = 10.seconds) {
-                                                if (question.type == QuestionType.BOOLEAN) {
+                                        components(timeout = 10.seconds) {
+                                            if (question.type == QuestionType.BOOLEAN) {
+                                                publicButton {
+                                                    style = ButtonStyle.Primary
+                                                    label = "True".toKey()
+
+                                                    action {
+                                                        participants[user.asUser()] = (correctAnswer == "True")
+                                                    }
+                                                }
+
+                                                publicButton {
+                                                    style = ButtonStyle.Danger
+                                                    label = "False".toKey()
+
+                                                    action {
+                                                        participants[user.asUser()] = (correctAnswer == "False")
+                                                    }
+                                                }
+                                            } else {
+                                                val choices = incorrectAnswers + correctAnswer
+
+                                                choices.forEachIndexed { index, choice ->
                                                     publicButton {
-                                                        style = ButtonStyle.Primary
-                                                        label = "True"
+                                                        style = ButtonStyle.Secondary
+                                                        label = choice.toKey()
+                                                        partialEmoji = Emoji.entries[index].emoji.partial
 
                                                         action {
-                                                            participants[user.asUser()] = (correctAnswer == "True")
-                                                        }
-                                                    }
-
-                                                    publicButton {
-                                                        style = ButtonStyle.Danger
-                                                        label = "False"
-
-                                                        action {
-                                                            participants[user.asUser()] = (correctAnswer == "False")
-                                                        }
-                                                    }
-                                                } else {
-                                                    val choices = incorrectAnswers + correctAnswer
-
-                                                    choices.forEachIndexed { index, choice ->
-                                                        publicButton {
-                                                            style = ButtonStyle.Secondary
-                                                            label = choice
-                                                            partialEmoji = Emoji.entries[index].emoji.partial
-
-                                                            action {
-                                                                participants[user.asUser()] = (correctAnswer == choice)
-                                                            }
+                                                            participants[user.asUser()] = (correctAnswer == choice)
                                                         }
                                                     }
                                                 }
                                             }
                                         }
+                                    }
 
-                                    delay(10000)
+                                delay(10000)
 
-                                    message.edit {
-                                        embed {
-                                            embedBuilder()
-                                            description = """
+                                message.edit {
+                                    embed {
+                                        embedBuilder()
+                                        description = """
                                                 $formattedQuestion
 
                                                 The correct answer was ${correctAnswer.decodeEntities()}
-                                            """.trimIndent()
+                                        """.trimIndent()
 
-                                            if (participants.isNotEmpty()) {
-                                                field {
-                                                    name = "Participants:"
-                                                    value = participants
-                                                        .map { (user, correct) ->
-                                                            "${if (correct) Emojis.whiteCheckMark else Emojis.x} - ${user.mention}"
-                                                        }.joinToString("\n")
-                                                }
+                                        if (participants.isNotEmpty()) {
+                                            field {
+                                                name = "Participants:"
+                                                value = participants
+                                                    .map { (user, correct) ->
+                                                        "${if (correct) Emojis.whiteCheckMark else Emojis.x} - ${user.mention}"
+                                                    }.joinToString("\n")
                                             }
                                         }
-
-                                        components { }
                                     }
-                                }
 
-                                games.remove(channel.id)
-
-                                respond {
-                                    embed {
-                                        color = Color.success
-                                        title = "Trivia Results"
-                                    }
+                                    components { }
                                 }
                             }
+
+                            games.remove(channel.id)
+
+                            respond {
+                                embed {
+                                    color = Color.success
+                                    title = "Trivia Results"
+                                }
+                            }
+                        }
                     }
                 }
             }
 
             publicSubCommand(
-                name = "stop",
-                description = "Stops any ongoing trivia game in the current channel"
+                name = "stop".toKey(),
+                description = "Stops any ongoing trivia game in the current channel".toKey()
             ) {
                 check {
                     failIf("No trivia game is currently running in this channel!") {
@@ -234,8 +237,8 @@ object TriviaExtension : Extension() {
             }
 
             ephemeralSubCommand(
-                name = "config",
-                description = "Change trivia game config"
+                name = "config".toKey(),
+                description = "Change trivia game config".toKey()
             ) {
                 check {
                     anyGuild()
@@ -256,7 +259,7 @@ object TriviaExtension : Extension() {
                         components {
                             publicButton {
                                 style = ButtonStyle.Danger
-                                label = "Reset"
+                                label = "Reset".toKey()
 
                                 action {
                                 }
@@ -270,15 +273,15 @@ object TriviaExtension : Extension() {
 
     private class StartArguments : Arguments() {
         val questions by defaultingInt {
-            name = "questions"
-            description = "The number of questions to ask"
+            name = "questions".toKey()
+            description = "The number of questions to ask".toKey()
             minValue = 1
             maxValue = 50
             defaultValue = 10
         }
         val category by optionalStringChoice {
-            name = "category"
-            description = "The category of questions"
+            name = "category".toKey()
+            description = "The category of questions".toKey()
             choices = mutableMapOf(
                 "General Knowledge" to "9",
                 "Entertainment: Books" to "10",
@@ -303,15 +306,15 @@ object TriviaExtension : Extension() {
                 "Entertainment: Comics" to "29",
                 "Science: Gadgets" to "30",
                 "Entertainment: Cartoon & Animations" to "32"
-            )
+            ).mapKeys { (k, v) -> k.toKey() }.toMutableMap()
         }
         val difficulty by optionalStringChoice {
-            name = "difficulty"
-            description = "The difficulty of the questions"
+            name = "difficulty".toKey()
+            description = "The difficulty of the questions".toKey()
             choices = mutableMapOf(
-                "Easy" to "easy",
-                "Medium" to "medium",
-                "Hard" to "hard"
+                "Easy".toKey() to "easy",
+                "Medium".toKey() to "medium",
+                "Hard".toKey() to "hard"
             )
         }
     }

@@ -7,12 +7,9 @@ import dev.kord.rest.builder.message.EmbedBuilder
 
 fun EmbedBuilder.author(member: Member) = author(member.displayAvatar, member.effectiveName)
 
-fun EmbedBuilder.author(user: User) = author(user.displayAvatar(), user.username)
+fun EmbedBuilder.author(user: User) = author(user.displayAvatar, user.username)
 
-fun EmbedBuilder.author(
-    icon: Asset? = null,
-    name: String
-) {
+fun EmbedBuilder.author(icon: Asset? = null, name: String) {
     author {
         this.icon = icon?.cdnUrl?.toUrl()
         this.name = name
@@ -31,11 +28,7 @@ fun EmbedBuilder.thumbnail(url: String) {
     }
 }
 
-fun EmbedBuilder.field(
-    name: String,
-    value: String,
-    inline: Boolean = false
-) {
+fun EmbedBuilder.field(name: String, value: String, inline: Boolean = false) {
     field {
         this.name = name
         this.value = value

@@ -10,6 +10,7 @@ import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.member
 import dev.kordex.core.commands.converters.impl.optionalString
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.zt64.minkinator.util.*
 
 object KickExtension : Extension() {
@@ -17,8 +18,8 @@ object KickExtension : Extension() {
 
     override suspend fun setup() {
         ephemeralSlashCommand(
-            name = "kick",
-            description = "Kick a member from the server",
+            name = "kick".toKey(),
+            description = "Kick a member from the server".toKey(),
             arguments = KickExtension::KickArguments
         ) {
             check {
@@ -60,12 +61,12 @@ object KickExtension : Extension() {
 
     private class KickArguments : Arguments() {
         val member by member {
-            name = "member"
-            description = "The member to kick"
+            name = "member".toKey()
+            description = "The member to kick".toKey()
         }
         val reason by optionalString {
-            name = "reason"
-            description = "The reason for kick"
+            name = "reason".toKey()
+            description = "The reason for kick".toKey()
             maxLength = 1000
         }
     }

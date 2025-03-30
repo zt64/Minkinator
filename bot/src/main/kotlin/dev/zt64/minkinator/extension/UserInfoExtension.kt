@@ -10,6 +10,7 @@ import dev.kordex.core.checks.anyGuild
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.optionalMember
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.kordex.core.utils.createdAt
 import dev.kordex.core.utils.profileLink
 import dev.zt64.minkinator.util.*
@@ -54,8 +55,8 @@ object UserInfoExtension : Extension() {
 
     override suspend fun setup() {
         ephemeralSlashCommand(
-            name = "user-info",
-            description = "Lookup details on a specific user, defaulting to yourself",
+            name = "user-info".toKey(),
+            description = "Lookup details on a specific user, defaulting to yourself".toKey(),
             arguments = UserInfoExtension::UserArgs
         ) {
             check {
@@ -71,7 +72,7 @@ object UserInfoExtension : Extension() {
             }
         }
 
-        ephemeralUserCommand("user-info") {
+        ephemeralUserCommand("user-info".toKey()) {
             action {
                 respond {
                     embed { buildUserInfoEmbed(member!!.asMember()) }
@@ -82,8 +83,8 @@ object UserInfoExtension : Extension() {
 
     private class UserArgs : Arguments() {
         val target by optionalMember {
-            name = "target"
-            description = "The user to lookup"
+            name = "target".toKey()
+            description = "The user to lookup".toKey()
         }
     }
 }

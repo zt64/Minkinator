@@ -26,6 +26,7 @@ import dev.kordex.core.components.components
 import dev.kordex.core.components.ephemeralButton
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.extensions.event
+import dev.kordex.core.i18n.toKey
 import dev.kordex.core.utils.botHasPermissions
 import dev.zt64.minkinator.data.*
 import dev.zt64.minkinator.util.*
@@ -41,6 +42,7 @@ object MarkovExtension : Extension() {
     override val name = "markov"
 
     private val db: R2dbcDatabase by inject()
+    private val selfMention by lazy { "<@!${kord.selfId}>" }
 
     private suspend fun getGuild(id: Snowflake): DBGuild {
         return db
@@ -54,8 +56,6 @@ object MarkovExtension : Extension() {
                 .single(DBGuild(id))
         }
     }
-
-    private val selfMention by lazy { "<@!${kord.selfId}>" }
 
     private val Message.sanitizedContent
         get() = buildString {
@@ -149,22 +149,18 @@ object MarkovExtension : Extension() {
         }
 
         publicSlashCommand(
-            name = "markov",
-            description = "Markov commands"
+            name = "markov".toKey(),
+            description = "Markov commands".toKey()
         ) {
             check {
                 anyGuild()
             }
 
             ephemeralSubCommand(
-                name = "config",
-                description = "Markov configuration",
+                name = "config".toKey(),
+                description = "Markov configuration".toKey(),
                 arguments = MarkovExtension::ConfigArguments
             ) {
-                check {
-                    isSuperuser()
-                }
-
                 action {
                     val enabled = arguments.enabled
                     val frequency = arguments.frequency
@@ -224,7 +220,7 @@ object MarkovExtension : Extension() {
                             components {
                                 ephemeralButton {
                                     style = ButtonStyle.Primary
-                                    label = "Save"
+                                    label = "Save".toKey()
 
                                     action {
                                         respond {
@@ -235,7 +231,7 @@ object MarkovExtension : Extension() {
 
                                 ephemeralButton {
                                     style = ButtonStyle.Secondary
-                                    label = "Cancel"
+                                    label = "Cancel".toKey()
 
                                     action {
                                         interactionResponse.delete()
@@ -250,8 +246,8 @@ object MarkovExtension : Extension() {
 
         class TrainArguments : Arguments() {
             val channel by channel {
-                name = "channel"
-                description = "Channel to train on"
+                name = "channel".toKey()
+                description = "Channel to train on".toKey()
             }
         }
 
@@ -297,106 +293,109 @@ object MarkovExtension : Extension() {
         //     }
         // }
 
-        class TrainGuildArguments : Arguments() {
-            val guild by optionalGuild {
-                name = "guild"
-                description = "Guild to train on"
-            }
-        }
-
-        chatCommand(
-            name = "train-markov",
-            description = "Train markov on past messages",
-            arguments = ::TrainGuildArguments
+        chatGroupCommand(
+            "markov".toKey(),
+            "Markov commands".toKey()
         ) {
-            locking = true
+            checkSuperuser()
 
-            check {
-                isSuperuser()
+            class TrainGuildArguments : Arguments() {
+                val guild by optionalGuild {
+                    name = "guild".toKey()
+                    description = "Guild to train on".toKey()
+                }
             }
 
-            action {
-                val guild = arguments.guild ?: message.getGuild()
+            chatCommand(
+                name = "train".toKey(),
+                description = "Train markov on past messages".toKey(),
+                arguments = ::TrainGuildArguments
+            ) {
+                locking = true
 
-                val channels = guild
-                    .channels
-                    .filterIsInstance<TextChannel>()
-                    .filter { it.botHasPermissions(Permission.ReadMessageHistory, Permission.ViewChannel) && !it.isNsfw }
-                    .onEmpty {
-                        throw DiscordRelayedException("Bot does not have permission to read message history in any channels in ${guild.name}.")
-                    }.toList()
+                action {
+                    val guild = arguments.guild ?: message.getGuild()
 
-                var trainedMessages = 0
-                var line1 = ""
-                var line2 = ""
+                    val channels = guild
+                        .channels
+                        .filterIsInstance<TextChannel>()
+                        .filter { it.botHasPermissions(Permission.ReadMessageHistory, Permission.ViewChannel) && !it.isNsfw }
+                        .onEmpty {
+                            throw DiscordRelayedException("Bot does not have permission to read message history in any channels in ${guild.name}.".toKey())
+                        }.toList()
 
-                fun EmbedBuilder.configure(block: () -> Unit = {}) {
-                    title = "Training with ${"channel".pluralize(channels.size)}"
-                    description = buildString {
-                        appendLine("Trained on $trainedMessages messages")
+                    var trainedMessages = 0
+                    var line1 = ""
+                    var line2 = ""
 
-                        if (line1.isNotBlank()) {
-                            appendLine(line1)
-                        }
+                    fun EmbedBuilder.configure(block: () -> Unit = {}) {
+                        title = "Training with ${"channel".pluralize(channels.size)}"
+                        description = buildString {
+                            appendLine("Trained on $trainedMessages messages")
 
-                        if (line2.isNotBlank()) {
-                            appendLine(line2)
-                        }
-                    }
-                    block()
-                }
-
-                val msg = message.channel.createEmbed(EmbedBuilder::configure)
-
-                suspend fun updateEmbed() {
-                    msg.edit {
-                        embed(EmbedBuilder::configure)
-                    }
-                }
-
-                channels.forEach { channel ->
-                    line1 = "Training on ${channel.mention}"
-                    updateEmbed()
-
-                    try {
-                        channel
-                            .getMessagesBefore(channel.lastMessageId!!)
-                            .retry()
-                            .map { message ->
-                                DBMessage(
-                                    id = message.id,
-                                    guildId = guild.id,
-                                    content = message.sanitizedContent
-                                )
-                            }.chunked(100)
-                            .collect { messages ->
-                                bot.logger.info { messages.joinToString(",") { it.id.toString() } }
-
-                                try {
-                                    db.runQuery {
-                                        QueryDsl
-                                            .insert(Meta.message)
-                                            .onDuplicateKeyIgnore(Meta.message.id)
-                                            .multiple(messages)
-                                    }
-
-                                    trainedMessages += 100
-
-                                    updateEmbed()
-                                } catch (e: Exception) {
-                                    e.printStackTrace()
-                                }
+                            if (line1.isNotBlank()) {
+                                appendLine(line1)
                             }
-                    } catch (e: Exception) {
-                        println("Guh")
-                        e.printStackTrace()
-                    }
-                }
 
-                msg.edit {
-                    embed {
-                        configure {
-                            description = "Finished training on ${"channel".pluralize(channels.size)} with $trainedMessages messages"
+                            if (line2.isNotBlank()) {
+                                appendLine(line2)
+                            }
+                        }
+                        block()
+                    }
+
+                    val msg = message.channel.createEmbed(EmbedBuilder::configure)
+
+                    suspend fun updateEmbed() {
+                        msg.edit {
+                            embed(EmbedBuilder::configure)
+                        }
+                    }
+
+                    channels.forEach { channel ->
+                        line1 = "Training on ${channel.mention}"
+                        updateEmbed()
+
+                        try {
+                            channel
+                                .getMessagesBefore(channel.lastMessageId!!)
+                                .retry()
+                                .map { message ->
+                                    DBMessage(
+                                        id = message.id,
+                                        guildId = guild.id,
+                                        content = message.sanitizedContent
+                                    )
+                                }.chunked(100)
+                                .collect { messages ->
+                                    bot.logger.info { messages.joinToString(",") { it.id.toString() } }
+
+                                    try {
+                                        db.runQuery {
+                                            QueryDsl
+                                                .insert(Meta.message)
+                                                .onDuplicateKeyIgnore(Meta.message.id)
+                                                .multiple(messages)
+                                        }
+
+                                        trainedMessages += 100
+
+                                        updateEmbed()
+                                    } catch (e: Exception) {
+                                        e.printStackTrace()
+                                    }
+                                }
+                        } catch (e: Exception) {
+                            println("Guh")
+                            e.printStackTrace()
+                        }
+                    }
+
+                    msg.edit {
+                        embed {
+                            configure {
+                                description = "Finished training on ${"channel".pluralize(channels.size)} with $trainedMessages messages"
+                            }
                         }
                     }
                 }
@@ -406,24 +405,22 @@ object MarkovExtension : Extension() {
 
     private class ConfigArguments : Arguments() {
         val enabled by optionalBoolean {
-            name = "enabled"
-            description = "Whether to store messages for generating strings"
+            name = "enabled".toKey()
+            description = "Whether to store messages for generating strings".toKey()
         }
         val frequency by optionalInt {
-            name = "frequency"
-            description = "How often to speak"
+            name = "frequency".toKey()
+            description = "How often to speak".toKey()
             minValue = 0
             maxValue = 100
         }
         val speakOnMention by optionalBoolean {
-            name = "mention"
-            description = "Whether pinging the bot should trigger markov"
+            name = "mention".toKey()
+            description = "Whether pinging the bot should trigger markov".toKey()
         }
     }
 
-    private class Dictionary private constructor(
-        private val guildId: Snowflake
-    ) {
+    private class Dictionary private constructor(private val guildId: Snowflake) {
         var words = listOf<String>()
         var chain = mutableMapOf<List<String>, MutableList<String>>()
 
@@ -479,7 +476,7 @@ object MarkovExtension : Extension() {
     }
 }
 
-fun <T> Flow<T>.chunked(chunkSize: Int): Flow<List<T>> {
+private fun <T> Flow<T>.chunked(chunkSize: Int): Flow<List<T>> {
     val buffer = ArrayList<T>(chunkSize)
     return flow {
         this@chunked.collect {

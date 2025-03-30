@@ -12,6 +12,8 @@ import dev.kord.rest.NamedFile
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.emoji
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.publicSlashCommand
 import io.ktor.client.request.forms.*
 import io.ktor.utils.io.jvm.javaio.*
@@ -25,14 +27,14 @@ object BigmojiExtension : Extension() {
     override suspend fun setup() {
         class Args : Arguments() {
             val emoji by emoji {
-                name = "emoji"
-                description = "The emoji"
+                name = Translations.Common.emoji
+                description = "The emoji".toKey()
             }
         }
 
         publicSlashCommand(
-            name = "bigmoji",
-            description = "Resize an emoji to a bigger size",
+            name = Translations.Command.bigmoji,
+            description = Translations.Command.Description.bigmoji,
             arguments = ::Args
         ) {
             action {

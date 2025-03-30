@@ -14,6 +14,7 @@ import dev.kordex.core.components.components
 import dev.kordex.core.components.ephemeralButton
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.extensions.event
+import dev.kordex.core.i18n.toKey
 import dev.zt64.minkinator.util.ephemeralSlashCommand
 import dev.zt64.minkinator.util.ephemeralSubCommand
 import dev.zt64.minkinator.util.success
@@ -28,34 +29,34 @@ object MemberLogExtension : Extension() {
         event<MemberJoinEvent> {
             check {
                 failIf {
-                    val guild = event.getGuild()
+                    event.getGuild()
 
                     true
                 }
             }
 
             action {
-                val guild = event.getGuild()
+                event.getGuild()
             }
         }
 
         event<MemberLeaveEvent> {
             check {
                 failIf {
-                    val guild = event.getGuild()
+                    event.getGuild()
 
                     true
                 }
             }
 
             action {
-                val guild = event.getGuild()
+                event.getGuild()
             }
         }
 
         ephemeralSlashCommand(
-            name = "member-log",
-            description = "Commands relating to the member-log feature"
+            name = "member-log".toKey(),
+            description = "Commands relating to the member-log feature".toKey()
         ) {
             check {
                 anyGuild()
@@ -63,8 +64,8 @@ object MemberLogExtension : Extension() {
             }
 
             ephemeralSubCommand(
-                name = "config",
-                description = "Change member log options"
+                name = "config".toKey(),
+                description = "Change member log options".toKey()
             ) {
                 action {
                     // Implement database functionality eventually
@@ -84,7 +85,7 @@ object MemberLogExtension : Extension() {
                                     "Enable" to ButtonStyle.Primary
                                 }
 
-                                label = text
+                                label = text.toKey()
                                 style = buttonStyle
 
                                 action {

@@ -8,6 +8,7 @@ import dev.kordex.core.commands.converters.impl.attachment
 import dev.kordex.core.commands.converters.impl.defaultingBoolean
 import dev.kordex.core.commands.converters.impl.string
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.zt64.minkinator.extension.media.mutateGif
 import dev.zt64.minkinator.extension.media.mutateImage
 import dev.zt64.minkinator.util.publicSlashCommand
@@ -28,8 +29,8 @@ object CaptionExtension : Extension() {
 
     override suspend fun setup() {
         publicSlashCommand(
-            name = "caption",
-            description = "Caption an image or gif",
+            name = "caption".toKey(),
+            description = "Caption an image or gif".toKey(),
             arguments = CaptionExtension::CaptionArgs
         ) {
             action {
@@ -49,13 +50,13 @@ object CaptionExtension : Extension() {
                     val expectedWidth = vector.outline.bounds.width
                     val expectedHeight = vector.outline.bounds.height
 
-                    val textFits = image.width >= expectedWidth && image.height >= expectedHeight
+                    image.width >= expectedWidth && image.height >= expectedHeight
 
                     val widthBasedFontSize = (baseFont.size2D * image.width) / expectedWidth
                     val heightBasedFontSize = (baseFont.size2D * image.height) / expectedHeight
 
                     val newFontSize = (if (widthBasedFontSize < heightBasedFontSize) widthBasedFontSize else heightBasedFontSize).toDouble()
-                    val newFont = baseFont.deriveFont(baseFont.style, newFontSize.toFloat())
+                    baseFont.deriveFont(baseFont.style, newFontSize.toFloat())
                     val captionHeight = expectedHeight * 3
 
                     return image
@@ -84,7 +85,7 @@ object CaptionExtension : Extension() {
                         }.image
                 }
 
-                val mutatedByteArray = httpClient.get(attachment.url).readBytes().let {
+                val mutatedByteArray = httpClient.get(attachment.url).readRawBytes().let {
                     if (attachment.filename.endsWith(".gif")) {
                         mutateGif(it, ::block)
                     } else {
@@ -100,12 +101,23 @@ object CaptionExtension : Extension() {
                 }
             }
         }
+
+        publicSlashCommand(
+            "uncaption".toKey(),
+            "Remove the caption from an image or gif".toKey()
+        ) {
+            action {
+                respond {
+                    content = "This command is not yet implemented"
+                }
+            }
+        }
     }
 
     private class CaptionArgs : Arguments() {
         val attachment by attachment {
-            name = "attachment"
-            description = "The image to caption"
+            name = "attachment".toKey()
+            description = "The image to caption".toKey()
 
             validate {
                 //                failIf("GIFs are not supported at this time") {
@@ -118,15 +130,15 @@ object CaptionExtension : Extension() {
             }
         }
         val text by string {
-            name = "text"
-            description = "The text to caption with"
+            name = "text".toKey()
+            description = "The text to caption with".toKey()
             minLength = 1
             maxLength = 64
         }
 
         val dark by defaultingBoolean {
-            name = "dark"
-            description = "Whether to use a dark background"
+            name = "dark".toKey()
+            description = "Whether to use a dark background".toKey()
             defaultValue = false
         }
     }

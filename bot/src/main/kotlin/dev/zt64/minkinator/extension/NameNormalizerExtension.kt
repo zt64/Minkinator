@@ -13,6 +13,7 @@ import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.member
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.extensions.event
+import dev.kordex.core.i18n.toKey
 import dev.kordex.core.types.EphemeralInteractionContext
 import dev.kordex.core.utils.hasPermission
 import dev.kordex.core.utils.selfMember
@@ -60,7 +61,7 @@ object NameNormalizerExtension : Extension() {
                 failIfNot {
                     try {
                         event.guild.selfMember().hasPermission(Permission.ManageNicknames)
-                    } catch (e: Exception) {
+                    } catch (_: Exception) {
                         false
                     }
                 }
@@ -68,7 +69,7 @@ object NameNormalizerExtension : Extension() {
 
             action {
                 if (event.old?.effectiveName != event.member.effectiveName && !event.member.effectiveName.isNormalized()) {
-                    // event.member.normalizeName()
+                    event.member.normalizeName()
                     bot.logger.info { "Normalized name for ${event.member.effectiveName} (${event.member.id})" }
                 }
             }
@@ -87,8 +88,8 @@ object NameNormalizerExtension : Extension() {
         }
 
         ephemeralSlashCommand(
-            name = "normalize",
-            description = "Normalize a members display name",
+            name = "normalize".toKey(),
+            description = "Normalize a members display name".toKey(),
             arguments = NameNormalizerExtension::NormalizeArgs
         ) {
             requireBotPermissions(Permission.ManageNicknames)
@@ -103,7 +104,7 @@ object NameNormalizerExtension : Extension() {
             }
         }
 
-        ephemeralUserCommand("normalize") {
+        ephemeralUserCommand("normalize".toKey()) {
             requireBotPermissions(Permission.ManageNicknames)
 
             check {
@@ -119,8 +120,8 @@ object NameNormalizerExtension : Extension() {
 
     private class NormalizeArgs : Arguments() {
         val member by member {
-            name = "member"
-            description = "The member whose display name to normalize"
+            name = "member".toKey()
+            description = "The member whose display name to normalize".toKey()
         }
     }
 }

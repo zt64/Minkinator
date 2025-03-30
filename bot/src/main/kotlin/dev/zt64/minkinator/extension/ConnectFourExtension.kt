@@ -5,6 +5,7 @@ import dev.kordex.core.checks.anyGuild
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.optionalUser
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.i18n.toKey
 import dev.zt64.minkinator.util.footer
 import dev.zt64.minkinator.util.publicSlashCommand
 
@@ -13,8 +14,8 @@ object ConnectFourExtension : Extension() {
 
     override suspend fun setup() {
         publicSlashCommand(
-            name = "connect-four",
-            description = "Play a game of connect four",
+            name = "connect-four".toKey(),
+            description = "Play a game of connect four".toKey(),
             arguments = ConnectFourExtension::Args
         ) {
             locking = true
@@ -24,7 +25,7 @@ object ConnectFourExtension : Extension() {
             }
 
             action {
-                val player = arguments.player
+                arguments.player
 
                 respond {
                     embed {
@@ -44,8 +45,8 @@ object ConnectFourExtension : Extension() {
 
     private class Args : Arguments() {
         val player by optionalUser {
-            name = "player"
-            description = "The player to play against"
+            name = "player".toKey()
+            description = "The player to play against".toKey()
         }
     }
 }
