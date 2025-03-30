@@ -1,4 +1,3 @@
-import org.jetbrains.kotlin.config.LanguageFeature
 import org.jetbrains.kotlin.gradle.dsl.kotlinExtension
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
@@ -27,10 +26,10 @@ subprojects {
 
     kotlinExtension.apply {
         jvmToolchain(21)
+    }
 
-        sourceSets["main"].languageSettings {
-            enableLanguageFeature(LanguageFeature.ContextReceivers.name)
-        }
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+        compilerOptions.freeCompilerArgs = listOf("-Xcontext-receivers")
     }
 
     dependencies {
