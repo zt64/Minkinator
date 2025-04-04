@@ -45,7 +45,7 @@ suspend fun main() {
             +SvgExtension
             +EventLogExtension
             +FilterExtension
-            add { GptExtension() }
+            // add { GptExtension() }
             // +MarkovExtension
             +AvatarExtension
             +NameNormalizerExtension
