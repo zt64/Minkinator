@@ -2,7 +2,7 @@
 kotlin = "2.1.20"
 ktor = "3.1.2"
 kord-ex = "2.3.1-SNAPSHOT"
-kord-ex-plugin = "1.6.1"
+kord-ex-plugin = "1.7.0"
 ksp = "2.1.20-1.0.32"
 scrimmage = "4.3.0"
 kotlindl = "0.5.2"
