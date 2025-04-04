@@ -60,7 +60,7 @@ object EventLogExtension : Extension() {
                         .command
                         .options
                         .map { (name, optionValue) -> "$name=${optionValue.value}" }
-                        .joinToString()
+                        .joinToString(" ")
                 )
             }
 
