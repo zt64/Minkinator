@@ -9,8 +9,10 @@ plugins {
 
 kordEx {
     jvmTarget = 21
+    ignoreIncompatibleKotlinVersion = true
+
     bot {
-        dataCollection(DataCollection.Standard)
+        dataCollection(DataCollection.None)
 
         mainClass = "dev.zt64.minkinator.MainKt"
     }
