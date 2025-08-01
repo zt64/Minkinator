@@ -5,6 +5,7 @@ import com.sksamuel.scrimage.nio.AnimatedGifReader
 import com.sksamuel.scrimage.nio.ImageSource
 import com.sksamuel.scrimage.nio.PngWriter
 import com.sksamuel.scrimage.webp.Gif2WebpWriter
+import dev.kord.core.entity.ApplicationEmoji
 import dev.kord.core.entity.GuildEmoji
 import dev.kord.core.entity.StandardEmoji
 import dev.kord.gateway.Intent
@@ -18,8 +19,8 @@ import dev.zt64.minkinator.util.publicSlashCommand
 import io.ktor.client.request.forms.*
 import io.ktor.utils.io.jvm.javaio.*
 
-object BigmojiExtension : Extension() {
-    override val name = "bigmoji"
+object EmojiExtension : Extension() {
+    override val name = "emoji"
     override val intents = mutableSetOf<Intent>(Intent.GuildEmojis)
 
     private const val SCALE_FACTOR = 2.0
@@ -69,6 +70,12 @@ object BigmojiExtension : Extension() {
 
                     is StandardEmoji -> {
                         respond { content = emoji.mention }
+                    }
+
+                    is ApplicationEmoji -> {
+                        respond {
+                            content = emoji.mention
+                        }
                     }
                 }
             }

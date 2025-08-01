@@ -65,7 +65,7 @@ suspend fun main() {
             +RoleBoardExtension
             +MemberLogExtension
             +CaptionExtension
-            +BigmojiExtension
+            +EmojiExtension
 
             // Games
             +TicTacToeExtension
