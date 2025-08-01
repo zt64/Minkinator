@@ -29,28 +29,30 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.utils.io.*
+import org.koin.core.component.inject
 import thirdparty.jhlabs.image.ConvolveFilter
+import java.awt.AlphaComposite
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.time.Duration
 import javax.imageio.ImageIO
 import kotlin.jvm.optionals.getOrNull
-import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.ceil
+import kotlin.math.*
 
 object EffectsExtension : Extension() {
     override val name = "effects"
 
-    val selection = hashMapOf<Snowflake, String>()
+    private val httpClient: HttpClient by inject()
+
+    private val selection = hashMapOf<Snowflake, String>()
 
     override suspend fun setup() {
         suspend fun <T : BaseArgs> addCommand(name: String, description: String, arguments: () -> T, block: T.(image: ImmutableImage) -> ImmutableImage) {
             suspend fun PublicSlashCommandContext<*, *>.processImage(arguments: T): NamedFile {
                 val image = when {
                     arguments.link != null -> {
-                        HttpClient().get(arguments.link!!).readRawBytes()
+                        httpClient.get(arguments.link!!).readRawBytes()
                     }
 
                     arguments.member != null -> {
@@ -63,11 +65,11 @@ object EffectsExtension : Extension() {
                     }
 
                     arguments.attachment != null -> {
-                        HttpClient().get(arguments.attachment!!.url).readRawBytes()
+                        httpClient.get(arguments.attachment!!.url).readRawBytes()
                     }
 
                     selection.contains(user.id) -> {
-                        HttpClient().get(selection[user.id]!!).readRawBytes()
+                        httpClient.get(selection[user.id]!!).readRawBytes()
                     }
 
                     else -> {
@@ -558,6 +560,66 @@ object EffectsExtension : Extension() {
             }
         }
 
+        class SphereArgs : BaseArgs() {
+            val rotations by defaultingInt {
+                name = "rotations".toKey()
+                description = "Number of complete rotations".toKey()
+                defaultValue = 1
+                minValue = 1
+                maxValue = 5
+            }
+
+            val quality by defaultingInt {
+                name = "quality".toKey()
+                description = "Quality of the sphere (higher = smoother)".toKey()
+                defaultValue = 32
+                minValue = 16
+                maxValue = 64
+            }
+
+            val frameRate by defaultingInt {
+                name = "framerate".toKey()
+                description = "Frames per second".toKey()
+                defaultValue = 24
+                minValue = 24
+                maxValue = 24
+            }
+        }
+
+        publicSlashCommand("sphere".toKey(), "Map an image onto a spinning 3D sphere".toKey(), ::SphereArgs) {
+            action {
+                val os = ByteArrayOutputStream()
+                val bytes = extractImage() ?: throw DiscordRelayedException("Invalid image".toKey())
+                val image = ImageIO.read(ByteArrayInputStream(bytes))
+
+                // Parameters
+                val width = 256
+                val height = 256
+                val framesPerRotation = arguments.frameRate * 2
+                val totalFrames = framesPerRotation * arguments.rotations
+                val frameDuration = (1000 / arguments.frameRate).toLong()
+
+                val gif = StreamingGifWriter().prepareStream(os, BufferedImage.TYPE_INT_ARGB)
+
+                // Generate sphere frames
+                repeat(totalFrames) { frameIndex ->
+                    val angle = 360.0 * frameIndex / framesPerRotation
+                    val frame = renderSphereFrame(image, width, height, angle, arguments.quality)
+
+                    gif.writeFrame(
+                        ImmutableImage.fromAwt(frame),
+                        Duration.ofMillis(frameDuration)
+                    )
+                }
+
+                gif.close()
+
+                respond {
+                    files += NamedFile("sphere.gif", ChannelProvider { ByteReadChannel(os.toByteArray()) })
+                }
+            }
+        }
+
         class LoopArgs : BaseArgs() {
             val count by defaultingInt {
                 name = "count".toKey()
@@ -605,10 +667,10 @@ object EffectsExtension : Extension() {
 
     private suspend fun <T : BaseArgs> PublicSlashCommandContext<T, *>.extractImage(): ByteArray? {
         val bytes = when {
-            arguments.link != null -> HttpClient().get(arguments.link!!).readRawBytes()
-            arguments.attachment != null -> HttpClient().get(arguments.attachment!!.url).readRawBytes()
+            arguments.link != null -> httpClient.get(arguments.link!!).readRawBytes()
+            arguments.attachment != null -> httpClient.get(arguments.attachment!!.url).readRawBytes()
             arguments.member != null -> arguments.member!!.displayAvatar.getImage().data
-            selection[user.id] != null -> HttpClient().get(selection[user.id]!!).readRawBytes()
+            selection[user.id] != null -> httpClient.get(selection[user.id]!!).readRawBytes()
             else -> throw DiscordRelayedException("No image provided".toKey())
         }
 
@@ -657,4 +719,93 @@ private fun rotateImageAroundCenter(image: BufferedImage, angle: Double): Buffer
     g2d.dispose()
 
     return rotatedImage
+}
+
+private fun renderSphereFrame(texture: BufferedImage, width: Int, height: Int, rotation: Double, quality: Int): BufferedImage {
+    val frame = BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB)
+    frame.createGraphics().apply {
+        // Clear background with transparency
+        composite = AlphaComposite.getInstance(AlphaComposite.CLEAR)
+        fillRect(0, 0, width, height)
+        composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER)
+        dispose()
+    }
+
+    val radius = width.coerceAtMost(height) / 2 - 20
+    val centerX = width / 2
+    val centerY = height / 2
+
+    // Calculate sphere points
+    val rotRad = Math.toRadians(rotation)
+    val cosRotation = cos(rotRad)
+    val sinRotation = sin(rotRad)
+
+    // Z-buffer approach with depth tracking
+    val zBuffer = Array(width) { FloatArray(height) { Float.NEGATIVE_INFINITY } }
+
+    // Z-buffer approach - scan all pixels in the output image
+    for (screenY in 0 until height) {
+        for (screenX in 0 until width) {
+            // Calculate 2D vector from center
+            val dx = (screenX - centerX).toDouble() / radius
+            val dy = (screenY - centerY).toDouble() / radius
+
+            // Calculate distance from center (squared)
+            val distSquared = dx * dx + dy * dy
+
+            // Only process points inside the circle
+            if (distSquared <= 1.0) {
+                // Calculate Z coordinate on the sphere
+                val dz = sqrt(1.0 - distSquared)
+
+                // Calculate 3D coordinates on unit sphere (before rotation)
+                val x3d = dx
+                val z3d = dz
+
+                // Rotate around Y axis
+                val rotX = x3d * cosRotation - z3d * sinRotation
+                val rotZ = x3d * sinRotation + z3d * cosRotation
+
+                // Z-buffer check - only draw if this point is closer to the viewer
+                if (rotZ > zBuffer[screenX][screenY]) {
+                    zBuffer[screenX][screenY] = rotZ.toFloat()
+
+                    // Calculate texture coordinates from the 3D point
+                    val longitude = atan2(rotZ, rotX)
+                    val latitude = asin(dy)
+
+                    // Map longitude from -π to π range to 0 to texture.width
+                    val u = ((longitude + PI) / (2 * PI)) * texture.width
+                    val texX = (u % texture.width).toInt()
+                    // Fix negative modulo result
+                    val wrappedTexX = if (texX < 0) texture.width + texX else texX
+
+                    // Map latitude from -π/2 to π/2 range to 0 to texture.height
+                    val texY = ((latitude + PI / 2) / PI * texture.height)
+                        .toInt()
+                        .coerceIn(0, texture.height - 1)
+
+                    // Apply pixel from texture to the sphere
+                    val color = texture.getRGB(wrappedTexX, texY)
+
+                    // Lighting effect based on Z component (facing the viewer)
+                    val lighting = rotZ * 0.5 + 0.5 // 0.5 to 1.0
+                    val colorWithLighting = applyLighting(color, lighting)
+
+                    frame.setRGB(screenX, screenY, colorWithLighting)
+                }
+            }
+        }
+    }
+
+    return frame
+}
+
+private fun applyLighting(color: Int, factor: Double): Int {
+    val alpha = color shr 24 and 0xFF
+    val r = ((color shr 16 and 0xFF) * factor).toInt().coerceIn(0, 255)
+    val g = ((color shr 8 and 0xFF) * factor).toInt().coerceIn(0, 255)
+    val b = ((color and 0xFF) * factor).toInt().coerceIn(0, 255)
+
+    return (alpha shl 24) or (r shl 16) or (g shl 8) or b
 }
