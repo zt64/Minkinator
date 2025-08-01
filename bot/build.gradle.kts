@@ -44,7 +44,7 @@ dependencies {
     implementation("org.jetbrains.lets-plot:lets-plot-common:4.5.1")
     implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.9.0")
 
-    implementation("space.kscience:kmath-ast:0.3.1")
+    implementation("space.kscience:kmath-ast:0.4.2")
     implementation("org.bytedeco:ffmpeg-platform:7.1-1.5.11")
 
     implementation("com.twelvemonkeys.imageio:imageio-webp:3.12.0")
