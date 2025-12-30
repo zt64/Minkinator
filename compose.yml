@@ -1,0 +1,9 @@
+services:
+  minkinator:
+    image: ghcr.io/zt64/minkinator:latest
+    container_name: minkinator
+    environment:
+      - TOKEN=${TOKEN}
+      - OPENAI_KEY=${OPENAI_KEY}
+      - TESTING_GUILD_ID=${TESTING_GUILD_ID}
+    restart: unless-stopped

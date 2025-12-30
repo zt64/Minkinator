@@ -10,6 +10,7 @@ import dev.kordex.core.components.ephemeralButton
 import dev.kordex.core.components.types.emoji
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.i18n.toKey
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.footer
 import dev.zt64.minkinator.util.publicSlashCommand
 import kotlinx.coroutines.TimeoutCancellationException
@@ -81,8 +82,8 @@ object TicTacToeExtension : Extension() {
 
     private class Args : Arguments() {
         val player by optionalMember {
-            name = "player".toKey()
-            description = "The user to play against".toKey()
+            name = Translations.Argument.player
+            description = Translations.Argument.Description.playerTicTacToe
         }
     }
 }

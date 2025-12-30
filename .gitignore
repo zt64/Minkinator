@@ -4,4 +4,5 @@
 .kotlin
 .env
 build
+data
 /*.db

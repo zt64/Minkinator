@@ -6,6 +6,7 @@ import dev.kord.gateway.PrivilegedIntent
 import dev.kord.gateway.builder.Shards
 import dev.kord.rest.builder.message.embed
 import dev.kordex.core.ExtensibleBot
+import dev.kordex.core.annotations.warnings.ReplacingDefaultErrorResponseBuilder
 import dev.kordex.core.checks.userFor
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.utils.env
@@ -22,7 +23,7 @@ import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
 import org.koin.core.module.dsl.singleOf
 
-@OptIn(PrivilegedIntent::class)
+@OptIn(PrivilegedIntent::class, ReplacingDefaultErrorResponseBuilder::class)
 suspend fun main() {
     val db = createDatabase(envOrNull("DB_LOCATION") ?: "./minkinator")
 
@@ -60,12 +61,13 @@ suspend fun main() {
             +BanExtension
             +CoinTossExtension
             +EffectsExtension
-            +PollExtension
             +KickExtension
             +RoleBoardExtension
             +MemberLogExtension
             +CaptionExtension
             +EmojiExtension
+            +SpaceExtension
+            +OcrExtension
 
             // Games
             +TicTacToeExtension
@@ -74,7 +76,6 @@ suspend fun main() {
             +ConnectFourExtension
             +CountExtension
 
-            helpExtensionBuilder.enableBundledExtension = true
             sentryExtensionBuilder.enable = false
         }
 

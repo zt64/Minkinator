@@ -29,7 +29,7 @@ subprojects {
     }
 
     tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        compilerOptions.freeCompilerArgs = listOf("-Xcontext-receivers")
+        compilerOptions.freeCompilerArgs = listOf("-Xcontext-parameters")
     }
 
     dependencies {

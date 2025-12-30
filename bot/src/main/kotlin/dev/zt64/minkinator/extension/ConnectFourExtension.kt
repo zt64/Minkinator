@@ -6,6 +6,7 @@ import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.optionalUser
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.i18n.toKey
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.footer
 import dev.zt64.minkinator.util.publicSlashCommand
 
@@ -45,8 +46,8 @@ object ConnectFourExtension : Extension() {
 
     private class Args : Arguments() {
         val player by optionalUser {
-            name = "player".toKey()
-            description = "The player to play against".toKey()
+            name = Translations.Argument.player
+            description = Translations.Argument.Description.player
         }
     }
 }

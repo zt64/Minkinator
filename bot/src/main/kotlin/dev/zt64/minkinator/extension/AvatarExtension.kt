@@ -8,7 +8,7 @@ import dev.kord.rest.builder.message.embed
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.optionalMember
 import dev.kordex.core.extensions.Extension
-import dev.kordex.core.i18n.toKey
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.*
 
 object AvatarExtension : Extension() {
@@ -23,14 +23,14 @@ object AvatarExtension : Extension() {
 
         class Args : Arguments() {
             val member by optionalMember {
-                name = "member".toKey()
-                description = "The member to get the avatar of".toKey()
+                name = Translations.Argument.member
+                description = Translations.Argument.Description.member
             }
         }
 
         publicSlashCommand(
-            name = "avatar".toKey(),
-            description = "Get the users avatar".toKey(),
+            name = Translations.Command.avatar,
+            description = Translations.Command.Description.avatar,
             arguments = ::Args
         ) {
             action {
@@ -48,7 +48,7 @@ object AvatarExtension : Extension() {
             }
         }
 
-        ephemeralUserCommand("avatar".toKey()) {
+        ephemeralUserCommand(Translations.Command.avatar) {
             action {
                 val member = targetUsers.first().fetchMember(guild!!.id)
                 val url = member.getAvatarUrl()

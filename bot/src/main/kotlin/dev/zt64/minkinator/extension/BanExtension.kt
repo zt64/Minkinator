@@ -9,7 +9,6 @@ import dev.kordex.core.checks.hasPermission
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.*
 import dev.kordex.core.extensions.Extension
-import dev.kordex.core.i18n.toKey
 import dev.kordex.core.utils.toDuration
 import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.*
@@ -96,17 +95,17 @@ object BanExtension : Extension() {
 
     private class BanArguments : Arguments() {
         val member by member {
-            name = Translations.Common.member
-            description = "The member to ban".toKey()
+            name = Translations.Argument.member
+            description = Translations.Argument.Description.memberToBan
         }
         val reason by optionalString {
-            name = Translations.Common.reason
-            description = "The reason to ban".toKey()
+            name = Translations.Argument.reason
+            description = Translations.Argument.Description.reasonToBan
             maxLength = 512
         }
         val duration by optionalDuration {
-            name = Translations.Common.duration
-            description = "Duration of messages to delete".toKey()
+            name = Translations.Argument.duration
+            description = Translations.Argument.Description.duration
 
             validate {
                 failIf {
@@ -118,12 +117,12 @@ object BanExtension : Extension() {
 
     private class UnbanArguments : Arguments() {
         val user by user {
-            name = Translations.Common.user
-            description = "The user to unban".toKey()
+            name = Translations.Argument.user
+            description = Translations.Argument.Description.userToUnban
         }
         val reason by optionalString {
-            name = Translations.Common.reason
-            description = "The reason to unban".toKey()
+            name = Translations.Argument.reason
+            description = Translations.Argument.Description.reasonToUnban
             maxLength = 512
         }
     }

@@ -16,8 +16,9 @@ import dev.kordex.core.extensions.Extension
 import dev.kordex.core.time.TimestampType
 import dev.kordex.core.time.toDiscord
 import dev.kordex.core.utils.any
-import kotlinx.datetime.Clock
+import kotlin.time.Clock
 import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 import dev.kordex.core.extensions.event as event1
 
 val Color.Companion.success
@@ -53,6 +54,7 @@ suspend fun Message.mentions(user: User) = mentionedUsers.any { it.id == user.id
 
 suspend fun Message.reply(content: String) = reply { this.content = content }
 
+@OptIn(ExperimentalTime::class)
 fun Duration.toDiscord(format: TimestampType) = (Clock.System.now() + this).toDiscord(format)
 
 suspend inline fun <reified T : Event> Extension.event(noinline actionBody: suspend EventContext<T>.() -> Unit): EventHandler<T> = event1 {

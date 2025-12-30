@@ -11,11 +11,14 @@ import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.embed
 import dev.kordex.core.DiscordRelayedException
 import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.application.slash.SlashCommandContext
+import dev.kordex.core.commands.chat.ChatCommand
 import dev.kordex.core.commands.chat.ChatCommandContext
 import dev.kordex.core.commands.converters.impl.string
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.i18n.toKey
 import dev.kordex.core.utils.envOrNull
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.*
 import io.ktor.client.request.forms.*
 import io.ktor.utils.io.*
@@ -59,12 +62,17 @@ object RestrictedExtension : Extension() {
     private val testingGuildId = envOrNull("TESTING_GUILD_ID")?.let(::Snowflake)
 
     override suspend fun setup() {
-        suspend fun command(name: String, description: String? = null, block: suspend ChatCommandContext<out Arguments>.(input: String) -> Unit) =
-            chatCommand(name.toKey(), description?.toKey()) {
+        suspend fun command(
+            name: String,
+            description: String? = null,
+            block: suspend ChatCommandContext<out Arguments>.(input: String) -> Unit
+        ): ChatCommand<Arguments> {
+            return chatCommand(name.toKey(), description?.toKey()) {
                 checkSuperuser()
 
                 action { block(argString) }
             }
+        }
 
         suspend fun <T : Arguments> command(
             name: String,
@@ -121,13 +129,13 @@ object RestrictedExtension : Extension() {
         }
 
         chatGroupCommand(
-            name = "db".toKey(),
-            description = "Database related commands".toKey()
+            name = Translations.Command.db,
+            description = Translations.Command.Description.db
         ) {
             checkSuperuser()
 
             chatCommand {
-                name = "reset".toKey()
+                name = Translations.Command.Subcommand.Db.reset
 
                 action {
                     database.runQuery {
@@ -137,7 +145,7 @@ object RestrictedExtension : Extension() {
             }
 
             chatCommand {
-                name = "exec".toKey()
+                name = Translations.Command.Subcommand.Db.exec
 
                 action {
                     val sql = argString.substringAfter("exec")
@@ -226,8 +234,8 @@ object RestrictedExtension : Extension() {
 
         class ExtensionArgs : Arguments() {
             val extension by string {
-                name = "extension".toKey()
-                description = "Extension to reload".toKey()
+                name = Translations.Argument.extension
+                description = Translations.Argument.Description.extension
 
                 validate {
                     failIf("Extension `$value` is not loaded") {
@@ -259,7 +267,7 @@ object RestrictedExtension : Extension() {
         command("unload", "Unload an extension", ::ExtensionArgs) {
             val extension = arguments.extension
 
-            if (extension !in bot.extensions) throw DiscordRelayedException("Extension `$extension` not loaded".toKey())
+            if (extension !in bot.extensions) throw DiscordRelayedException(Translations.Error.extensionNotLoaded)
 
             val response = message.reply("Unloading extension `$extension`...")
 
@@ -273,7 +281,7 @@ object RestrictedExtension : Extension() {
         command("load", "Load an extension", ::ExtensionArgs) {
             val extension = arguments.extension
 
-            if (extension in bot.extensions) throw DiscordRelayedException("Extension `$extension` already loaded".toKey())
+            if (extension in bot.extensions) throw DiscordRelayedException(Translations.Error.extensionAlreadyLoaded)
 
             val response = message.reply("Loading extension `$extension`...")
 
@@ -298,7 +306,8 @@ object RestrictedExtension : Extension() {
                 ) {
                     x = "x"
                     y = "y"
-                } + labs(
+                } +
+                labs(
                     title = "Insanity over time",
                     x = "Week",
                     y = "Insanity"
@@ -330,8 +339,103 @@ object RestrictedExtension : Extension() {
 
         val scriptingHost = BasicJvmScriptingHost()
 
+        class Args : Arguments() {
+            val script by string {
+                name = Translations.Argument.script
+                description = Translations.Argument.Description.script
+            }
+        }
+
+        publicSlashCommand(Translations.Command.eval, Translations.Command.Description.eval, ::Args) {
+            checkSuperuser()
+
+            action {
+                if (arguments.script.isEmpty()) throw DiscordRelayedException(Translations.Error.inputEmpty)
+
+                val code = arguments.script.removeSurrounding(prefix = "```kt", suffix = "```").trim()
+
+                println("Code: $code")
+
+                val source = code.toScriptSource()
+                val res: ResultWithDiagnostics<EvaluationResult>
+
+                respond {
+                    content = "Processing..."
+                }
+
+                val duration = measureTime {
+                    res = scriptingHost.eval(
+                        script = source,
+                        compilationConfiguration = ScriptCompilationConfiguration {
+                            defaultImports(
+                                "dev.kord.core.behavior.*",
+                                "dev.kord.core.entity.*",
+                                "dev.kord.core.event.*",
+                                "kotlinx.coroutines.*",
+                                "kotlin.random.*",
+                                "kotlin.math.*",
+                                "zt.minkinator.util.*"
+                            )
+
+                            implicitReceivers(SlashCommandContext::class)
+                            providedProperties(
+                                "kord" to Kord::class
+                            )
+
+                            jvm {
+                                dependenciesFromCurrentContext(wholeClasspath = true)
+                            }
+                            compilerOptions("-language-version=2.0")
+                        },
+                        evaluationConfiguration = ScriptEvaluationConfiguration {
+                            implicitReceivers(this@action)
+                            providedProperties("kord" to this@RestrictedExtension.kord)
+                        }
+                    )
+                }
+
+                val returnValue = res.valueOrNull()?.returnValue
+
+                edit {
+                    content = ""
+                    embed {
+                        footer("Finished in ${duration.toComponents { s, ns -> "${s}s ${ns / 1e+6}ms" }}")
+
+                        description = when (returnValue) {
+                            is ResultValue.Error -> {
+                                color = Color.error
+
+                                res
+                                    .reports
+                                    .filter { it.severity > ScriptDiagnostic.Severity.WARNING }
+                                    .joinToString("\n", transform = ScriptDiagnostic::render)
+                            }
+
+                            is ResultValue.Value -> {
+                                color = Color.success
+
+                                val str = returnValue.value.toString()
+
+                                if (str.length > 3994) {
+                                    this@edit.files += NamedFile("output.txt", ChannelProvider { str.byteInputStream().toByteReadChannel() })
+
+                                    "Output uploaded as file"
+                                } else {
+                                    "```\n$str\n``` "
+                                }
+                            }
+
+                            else -> {
+                                "No output"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         command("eval", "Evaluate Kotlin code") { input ->
-            if (input.isEmpty()) throw DiscordRelayedException("Input cannot be empty".toKey())
+            if (input.isEmpty()) throw DiscordRelayedException(Translations.Error.inputEmpty)
 
             val code = input.removeSurrounding(prefix = "```kt", suffix = "```").trim()
 
@@ -361,7 +465,7 @@ object RestrictedExtension : Extension() {
                         jvm {
                             dependenciesFromCurrentContext(wholeClasspath = true)
                         }
-                        compilerOptions("-language-version=1.9")
+                        compilerOptions("-language-version=2.0")
                     },
                     evaluationConfiguration = ScriptEvaluationConfiguration {
                         implicitReceivers(this@command)

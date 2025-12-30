@@ -17,15 +17,18 @@ fun mutateImage(byteArray: ByteArray, block: (image: ImmutableImage) -> Immutabl
         .toByteReadChannel()
 }
 
-fun mutateGif(byteArray: ByteArray, block: (frame: ImmutableImage) -> ImmutableImage): ByteReadChannel {
+fun mutateGif(byteArray: ByteArray, block: (frame: ImmutableImage) -> ImmutableImage, delayMs: Int? = null, loop: Int? = null): ByteReadChannel {
     val gif = AnimatedGifReader.read(ImageSource.of(byteArray))
-
-    val gifWriter = StreamingGifWriter(gif.getDelay(0), true, true)
+    val baseDelay = delayMs?.let { Duration.ofMillis(it.toLong()) } ?: gif.getDelay(0)
+    val gifWriter = StreamingGifWriter(baseDelay, loop != null, loop == -1)
     val outputStream = ByteArrayOutputStream()
     val stream = gifWriter.prepareStream(outputStream, BufferedImage.TYPE_INT_ARGB)
 
     stream.use {
-        gif.frames.onEach { image -> stream.writeFrame(block(image)) }
+        gif.frames.forEach { frame ->
+            val transformed = block(frame)
+            stream.writeFrame(transformed)
+        }
     }
 
     return ByteReadChannel(outputStream.toByteArray())

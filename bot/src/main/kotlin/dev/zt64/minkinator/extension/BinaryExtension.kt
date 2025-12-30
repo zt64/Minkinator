@@ -8,7 +8,7 @@ import dev.kordex.core.commands.application.slash.converters.impl.optionalEnumCh
 import dev.kordex.core.commands.converters.impl.string
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.i18n.toKey
-import dev.kordex.core.i18n.types.Key
+import dev.kordex.i18n.Key
 import dev.zt64.minkinator.util.publicSlashCommand
 import dev.zt64.minkinator.util.publicSubCommand
 import dev.zt64.minkinator.util.success

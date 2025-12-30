@@ -1,21 +1,24 @@
 package dev.zt64.minkinator.extension
 
 import dev.kord.common.Color
+import dev.kord.rest.builder.message.MessageBuilder
 import dev.kord.rest.builder.message.embed
 import dev.kordex.core.components.components
 import dev.kordex.core.components.publicButton
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.i18n.toKey
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.field
 import dev.zt64.minkinator.util.publicSlashCommand
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import kotlinx.datetime.Instant
 import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.serialization.Serializable
 import org.koin.core.component.inject
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 object GeneralExtension : Extension() {
     override val name: String = "general"
@@ -23,6 +26,9 @@ object GeneralExtension : Extension() {
     private val start = System.currentTimeMillis()
     private val httpClient: HttpClient by inject()
 
+    private const val VNC_BASE_URL = "https://computernewb.com/vncresolver/api/v1"
+
+    @OptIn(ExperimentalTime::class)
     override suspend fun setup() {
         publicSlashCommand(
             name = "stats".toKey(),
@@ -74,54 +80,63 @@ object GeneralExtension : Extension() {
             action {
                 @Serializable
                 data class VNC(
+                    val asn: String,
+                    val desktop_name: String?,
+                    val geo_city: String,
+                    val geo_country: String,
+                    val geo_state: String,
+                    val height: Int,
                     val id: Int,
-                    val ip: String,
+                    val ip_address: String,
+                    val password: String,
                     val port: Int,
-                    val city: String,
-                    val state: String,
-                    val country: String,
-                    val clientname: String,
-                    val screenres: String,
-                    val hostname: String?,
-                    val osname: String = "unknown",
-                    val openports: String = "none",
-                    val username: String = "unknown",
-                    val password: String?,
-                    val createdat: Long
+                    val rdns_hostname: String?,
+                    val scanned_on: Int,
+                    val width: Int
                 )
 
-                val vnc = httpClient.get("https://computernewb.com/vncresolver/api/scans/vnc/random").body<VNC>()
+                var vnc = httpClient.get("$VNC_BASE_URL/random").body<VNC>()
 
                 respond {
-                    embed {
-                        image = "https://computernewb.com/vncresolver/api/scans/vnc/screenshot/${vnc.id}"
+                    fun MessageBuilder.updateEmbed() {
+                        embed {
+                            image = "$VNC_BASE_URL/screenshot/${vnc.id}"
+                            title = "${vnc.ip_address}:${vnc.port}"
+                            url = "https://computernewb.com/vncresolver/browse#id/${vnc.id}"
 
-                        field("IP", vnc.ip.toString(), true)
-                        field("Port", vnc.port.toString(), true)
-                        field("City", vnc.city, true)
-                        field("State", vnc.state, true)
-                        field("Country", vnc.country, true)
-                        field("Client Name", vnc.clientname.ifEmpty { "unknown" }, true)
-                        field("Screen Resolution", vnc.screenres, true)
-                        field("Hostname", vnc.hostname ?: "unknown", true)
-                        field("OS Name", vnc.osname, true)
-                        field("Open Ports", vnc.openports, true)
-                        field("Username", vnc.username, true)
-                        field("Password", vnc.password ?: "NO PASSWORD", true)
-                        field(
-                            "Created At",
-                            Instant.fromEpochMilliseconds(vnc.createdat).format(
-                                DateTimeComponents.Formats.RFC_1123
-                            ),
-                            true
-                        )
+                            field("Where", "${vnc.geo_city}, ${vnc.geo_state}, ${vnc.geo_country}", true)
+                            field("Desktop Name", vnc.desktop_name.orEmpty().ifEmpty { "Unknown" }, true)
+                            field("Screen Resolution", "${vnc.width}x${vnc.height}", true)
+                            field("Hostname", vnc.rdns_hostname ?: "Unknown", true)
+
+                            footer {
+                                text = Instant.fromEpochMilliseconds(vnc.scanned_on.toLong()).format(
+                                    DateTimeComponents.Formats.RFC_1123
+                                )
+                            }
+                        }
                     }
+                    updateEmbed()
 
                     components {
                         publicButton {
-                            label = "Refresh".toKey()
-                            action { }
+                            label = Translations.Button.refresh
+                            action {
+                                vnc = httpClient.get("$VNC_BASE_URL/random").body<VNC>()
+                                edit {
+                                    updateEmbed()
+                                }
+                            }
                         }
+                    }
+                }
+            }
+        }
+
+        publicSlashCommand(Translations.Command.map, Translations.Command.Description.map) {
+            action {
+                respond {
+                    embed {
                     }
                 }
             }

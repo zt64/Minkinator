@@ -3,7 +3,7 @@ package dev.zt64.minkinator.extension
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.extensions.event
-import dev.kordex.core.i18n.toKey
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.chatCommand
 import dev.zt64.minkinator.util.chatGroupCommand
 import org.koin.core.component.inject
@@ -16,18 +16,18 @@ object CountExtension : Extension() {
     private val db: R2dbcDatabase by inject()
 
     override suspend fun setup() {
-        chatGroupCommand("count".toKey(), "Count related commands".toKey()) {
-            chatCommand("start".toKey(), "Configure and start channel for counting".toKey()) {
+        chatGroupCommand(Translations.Command.count, Translations.Command.Description.count) {
+            chatCommand(Translations.Command.Subcommand.Count.start, Translations.Command.Subcommand.Count.Description.start) {
                 action {
                 }
             }
 
-            chatCommand("stop".toKey(), "Stop counting in the current channel".toKey()) {
+            chatCommand(Translations.Command.Subcommand.Count.stop, Translations.Command.Subcommand.Count.Description.stop) {
                 action {
                 }
             }
 
-            chatCommand("score".toKey(), "Get the current score".toKey()) {
+            chatCommand(Translations.Command.Subcommand.Count.score, Translations.Command.Subcommand.Count.Description.score) {
                 action {
                 }
             }

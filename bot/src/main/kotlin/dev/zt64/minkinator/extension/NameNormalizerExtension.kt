@@ -17,6 +17,7 @@ import dev.kordex.core.i18n.toKey
 import dev.kordex.core.types.EphemeralInteractionContext
 import dev.kordex.core.utils.hasPermission
 import dev.kordex.core.utils.selfMember
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.ephemeralSlashCommand
 import dev.zt64.minkinator.util.ephemeralUserCommand
 import java.text.Normalizer
@@ -120,8 +121,8 @@ object NameNormalizerExtension : Extension() {
 
     private class NormalizeArgs : Arguments() {
         val member by member {
-            name = "member".toKey()
-            description = "The member whose display name to normalize".toKey()
+            name = Translations.Argument.member
+            description = Translations.Argument.Description.memberForNormalize
         }
     }
 }

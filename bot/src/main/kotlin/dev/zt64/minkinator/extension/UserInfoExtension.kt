@@ -13,13 +13,16 @@ import dev.kordex.core.extensions.Extension
 import dev.kordex.core.i18n.toKey
 import dev.kordex.core.utils.createdAt
 import dev.kordex.core.utils.profileLink
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.*
 import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.toList
+import kotlin.time.ExperimentalTime
 
 object UserInfoExtension : Extension() {
     override val name = "user-info"
 
+    @OptIn(ExperimentalTime::class)
     private suspend fun EmbedBuilder.buildUserInfoEmbed(target: Member) {
         color = target.accentColor ?: Color.success
         url = target.profileLink
@@ -83,8 +86,8 @@ object UserInfoExtension : Extension() {
 
     private class UserArgs : Arguments() {
         val target by optionalMember {
-            name = "target".toKey()
-            description = "The user to lookup".toKey()
+            name = Translations.Argument.target
+            description = Translations.Argument.Description.target
         }
     }
 }

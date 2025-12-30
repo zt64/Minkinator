@@ -12,7 +12,7 @@ import dev.kordex.core.commands.converters.impl.int
 import dev.kordex.core.commands.converters.impl.optionalMember
 import dev.kordex.core.commands.converters.impl.optionalString
 import dev.kordex.core.extensions.Extension
-import dev.kordex.core.i18n.toKey
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.ephemeralSlashCommand
 import dev.zt64.minkinator.util.pluralize
 import dev.zt64.minkinator.util.success
@@ -24,8 +24,8 @@ object PurgeExtension : Extension() {
 
     override suspend fun setup() {
         ephemeralSlashCommand(
-            name = "purge".toKey(),
-            description = "Delete a certain number of messages".toKey(),
+            name = Translations.Command.purge,
+            description = Translations.Command.Description.purge,
             arguments = PurgeExtension::PurgeArguments
         ) {
             requireBotPermissions(Permission.ManageMessages)
@@ -46,7 +46,7 @@ object PurgeExtension : Extension() {
                         try {
                             message.delete(arguments.reason)
                         } catch (error: RestRequestException) {
-                            throw DiscordRelayedException("Failed to purge messages".toKey())
+                            throw DiscordRelayedException(Translations.Error.purgeFailed)
                         }
                     }
 
@@ -62,18 +62,18 @@ object PurgeExtension : Extension() {
 
     private class PurgeArguments : Arguments() {
         val count by int {
-            name = "count".toKey()
-            description = "The number of messages to delete".toKey()
+            name = Translations.Argument.count
+            description = Translations.Argument.Description.count
             minValue = 0
             maxValue = 100
         }
         val target by optionalMember {
-            name = "target".toKey()
-            description = "The user to delete messages for".toKey()
+            name = Translations.Argument.target
+            description = Translations.Argument.Description.targetForPurge
         }
         val reason by optionalString {
-            name = "reason".toKey()
-            description = "The reason to delete messages".toKey()
+            name = Translations.Argument.reason
+            description = Translations.Argument.Description.reasonForPurge
             maxLength = 500
         }
     }

@@ -11,6 +11,7 @@ import dev.kordex.core.components.types.emoji
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.i18n.toKey
 import dev.kordex.core.time.TimestampType
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.*
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
@@ -70,8 +71,8 @@ object GuessmojiExtension : Extension() {
 
     override suspend fun setup() {
         publicSlashCommand(
-            name = "guess".toKey(),
-            description = "Start a game of guessmoji".toKey(),
+            name = Translations.Command.guess,
+            description = Translations.Command.Description.guess,
             arguments = GuessmojiExtension::Args
         ) {
             locking = true
@@ -153,10 +154,10 @@ object GuessmojiExtension : Extension() {
 
     private class Args : Arguments() {
         val emojis by int {
-            name = "emojis".toKey()
-            description = "The number of emojis to guess".toKey()
+            name = Translations.Argument.emojis
+            description = Translations.Argument.Description.emojis
             minValue = 2
-            maxValue = 20
+            maxValue = 10
         }
     }
 }

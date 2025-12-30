@@ -27,6 +27,11 @@ dependencyResolutionManagement {
         }
 
         maven {
+            name = "Kord (Snapshots)"
+            url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+        }
+
+        maven {
             name = "Sonatype Snapshots (Legacy)"
             url = uri("https://oss.sonatype.org/content/repositories/snapshots")
         }
@@ -35,4 +40,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Minkinator"
 
-include("bot", "komapper", "util")
+include("bot", "komapper", "sstv", "translate", "util")

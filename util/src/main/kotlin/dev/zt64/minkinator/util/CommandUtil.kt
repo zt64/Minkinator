@@ -5,8 +5,9 @@ import dev.kordex.core.commands.application.slash.*
 import dev.kordex.core.commands.application.user.EphemeralUserCommand
 import dev.kordex.core.commands.chat.ChatCommand
 import dev.kordex.core.commands.chat.ChatGroupCommand
+import dev.kordex.core.components.forms.ModalForm
 import dev.kordex.core.extensions.*
-import dev.kordex.core.i18n.types.Key
+import dev.kordex.i18n.Key
 
 suspend inline fun <T : Arguments> Extension.publicSlashCommand(
     name: Key,
@@ -19,19 +20,29 @@ suspend inline fun <T : Arguments> Extension.publicSlashCommand(
     body()
 }
 
-suspend inline fun Extension.publicSlashCommand(name: Key, description: Key, crossinline body: suspend PublicSlashCommand<Arguments, *>.() -> Unit) =
-    publicSlashCommand {
+suspend inline fun Extension.publicSlashCommand(
+    name: Key,
+    description: Key,
+    crossinline body: suspend PublicSlashCommand<Arguments, *>.() -> Unit
+): PublicSlashCommand<Arguments, ModalForm> {
+    return publicSlashCommand {
         this.name = name
         this.description = description
         body()
     }
+}
 
-suspend inline fun Extension.ephemeralSlashCommand(name: Key, description: Key, crossinline body: suspend EphemeralSlashCommand<Arguments, *>.() -> Unit) =
-    ephemeralSlashCommand {
+suspend inline fun Extension.ephemeralSlashCommand(
+    name: Key,
+    description: Key,
+    crossinline body: suspend EphemeralSlashCommand<Arguments, *>.() -> Unit
+): EphemeralSlashCommand<Arguments, ModalForm> {
+    return ephemeralSlashCommand {
         this.name = name
         this.description = description
         body()
     }
+}
 
 suspend inline fun <T : Arguments> Extension.ephemeralSlashCommand(
     name: Key,

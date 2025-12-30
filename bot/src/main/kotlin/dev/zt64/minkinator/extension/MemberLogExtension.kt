@@ -15,6 +15,7 @@ import dev.kordex.core.components.ephemeralButton
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.extensions.event
 import dev.kordex.core.i18n.toKey
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.ephemeralSlashCommand
 import dev.zt64.minkinator.util.ephemeralSubCommand
 import dev.zt64.minkinator.util.success
@@ -55,8 +56,8 @@ object MemberLogExtension : Extension() {
         }
 
         ephemeralSlashCommand(
-            name = "member-log".toKey(),
-            description = "Commands relating to the member-log feature".toKey()
+            name = Translations.Command.memberLog,
+            description = Translations.Command.Description.memberLog
         ) {
             check {
                 anyGuild()
@@ -64,8 +65,8 @@ object MemberLogExtension : Extension() {
             }
 
             ephemeralSubCommand(
-                name = "config".toKey(),
-                description = "Change member log options".toKey()
+                name = Translations.Command.Subcommand.MemberLog.config,
+                description = Translations.Command.Subcommand.MemberLog.Description.config
             ) {
                 action {
                     // Implement database functionality eventually

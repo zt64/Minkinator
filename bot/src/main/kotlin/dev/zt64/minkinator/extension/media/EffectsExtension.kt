@@ -20,8 +20,8 @@ import dev.kordex.core.commands.converters.impl.*
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.extensions.ephemeralMessageCommand
 import dev.kordex.core.i18n.toKey
-import dev.kordex.core.i18n.types.Key
 import dev.kordex.core.utils.suggestStringCollection
+import dev.kordex.i18n.Key
 import dev.zt64.minkinator.util.displayAvatar
 import dev.zt64.minkinator.util.publicSlashCommand
 import io.ktor.client.*
@@ -649,17 +649,30 @@ object EffectsExtension : Extension() {
             name = "select".toKey()
 
             action {
-                val attachments = this.targetMessages.single().attachments.filter { it.isImage }
-                if (attachments.isEmpty()) {
-                    respond {
-                        content = "This message has no attachments!"
-                    }
-                } else {
-                    selection[user.id] = attachments.first().url
+                val targetMessage = targetMessages.single()
+                val attachments = targetMessage.attachments.filter { it.isImage }
+                val embed = targetMessage.embeds.firstOrNull()
 
-                    respond {
-                        content = "Selected"
+                when {
+                    attachments.isNotEmpty() -> {
+                        selection[user.id] = attachments.first().url
                     }
+
+                    embed != null && embed.image != null -> {
+                        selection[user.id] = embed.image!!.url!!
+                    }
+
+                    else -> {
+                        respond {
+                            content = "No media found"
+                        }
+
+                        return@action
+                    }
+                }
+
+                respond {
+                    content = "Selected image"
                 }
             }
         }

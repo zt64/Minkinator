@@ -11,7 +11,9 @@ import dev.kordex.core.extensions.Extension
 import dev.kordex.core.i18n.toKey
 import dev.kordex.core.time.TimestampType
 import dev.kordex.core.time.toDiscord
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.*
+import kotlin.time.ExperimentalTime
 
 object SpotifyExtension : Extension() {
     override val name = "spotify"
@@ -19,6 +21,7 @@ object SpotifyExtension : Extension() {
     @OptIn(PrivilegedIntent::class)
     override val intents = mutableSetOf<Intent>(Intent.GuildPresences)
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun setup() {
         publicSlashCommand(
             name = "spotify".toKey(),
@@ -75,8 +78,8 @@ object SpotifyExtension : Extension() {
 
     private class SpotifyArguments : Arguments() {
         val member by optionalMember {
-            name = "member".toKey()
-            description = "The user to check spotify info".toKey()
+            name = Translations.Argument.member
+            description = Translations.Argument.Description.memberForSpotify
         }
     }
 }

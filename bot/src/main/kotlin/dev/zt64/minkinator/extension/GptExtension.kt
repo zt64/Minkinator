@@ -13,39 +13,30 @@ import com.aallam.openai.api.image.ImageCreation
 import com.aallam.openai.api.image.ImageSize
 import com.aallam.openai.api.logging.LogLevel
 import com.aallam.openai.api.model.ModelId
-import com.aallam.openai.api.moderation.ModerationRequest
 import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
 import dev.kord.common.Color
 import dev.kord.common.entity.Snowflake
-import dev.kord.core.behavior.channel.withTyping
 import dev.kord.core.entity.Message
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.gateway.Intent
 import dev.kord.gateway.PrivilegedIntent
 import dev.kord.rest.NamedFile
 import dev.kord.rest.builder.message.embed
-import dev.kord.x.emoji.Emojis
-import dev.kord.x.emoji.toReaction
-import dev.kordex.core.checks.anyGuild
-import dev.kordex.core.checks.isNotBot
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.defaultingString
 import dev.kordex.core.commands.converters.impl.optionalString
 import dev.kordex.core.commands.converters.impl.string
 import dev.kordex.core.events.EventContext
 import dev.kordex.core.extensions.Extension
-import dev.kordex.core.extensions.event
 import dev.kordex.core.i18n.toKey
 import dev.kordex.core.utils.env
 import dev.zt64.minkinator.util.*
 import io.ktor.client.request.forms.*
 import io.ktor.http.*
 import io.ktor.utils.io.*
-import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.core.component.inject
 import org.komapper.r2dbc.R2dbcDatabase
-import kotlin.time.Duration.Companion.seconds
 
 @OptIn(BetaOpenAI::class)
 class GptExtension(apiKey: String = env("OPENAI_KEY")) : Extension() {
@@ -85,7 +76,7 @@ class GptExtension(apiKey: String = env("OPENAI_KEY")) : Extension() {
         }
     }
 
-    context(EventContext<MessageCreateEvent>)
+    context(_: EventContext<MessageCreateEvent>)
     private suspend fun String.unsanitize(): String {
         return buildString {
         }
@@ -104,7 +95,7 @@ class GptExtension(apiKey: String = env("OPENAI_KEY")) : Extension() {
     }
 
     override suspend fun setup() {
-        val selfId = kord.selfId
+        kord.selfId
 
         assistant = openAI.assistant(AssistantId("asst_9LHtp1UtVO0myatfKErzsNXq")) ?: run {
             openAI
@@ -127,48 +118,48 @@ class GptExtension(apiKey: String = env("OPENAI_KEY")) : Extension() {
         //     )
         // )
 
-        event<MessageCreateEvent> {
-            check {
-                anyGuild()
-                isNotBot()
-                failIfNot(event.message.mentions(selfId))
-            }
-
-            action {
-                val message = event.message
-                val sanitizedMessage = message.sanitize()
-
-                val flagged = openAI
-                    .moderations(ModerationRequest(listOf(sanitizedMessage)))
-                    .results
-                    .single()
-                    .flagged
-
-                if (flagged) {
-                    return@action message.addReaction(Emojis.triangularFlagOnPost.toReaction())
-                }
-
-                message.channel.withTyping {
-                    withTimeoutOrNull(30.seconds) {
-                        val response = threads
-                            .getOrPut(message.channelId) {
-                                mutableListOf<ChatMessage>().also { thread ->
-                                    thread.request(prompt)!!
-                                }
-                            }.request(sanitizedMessage)
-                            ?.content
-
-                        if (response == null) {
-                            threads[message.channelId]!!.dropLast(1)
-
-                            return@withTimeoutOrNull
-                        }
-
-                        message.reply(response.substringAfter("(Developer Mode Output) "))
-                    }
-                }
-            }
-        }
+        // event<MessageCreateEvent> {
+        //     check {
+        //         anyGuild()
+        //         isNotBot()
+        //         failIfNot(event.message.mentions(selfId))
+        //     }
+        //
+        //     action {
+        //         val message = event.message
+        //         val sanitizedMessage = message.sanitize()
+        //
+        //         val flagged = openAI
+        //             .moderations(ModerationRequest(listOf(sanitizedMessage)))
+        //             .results
+        //             .single()
+        //             .flagged
+        //
+        //         if (flagged) {
+        //             return@action message.addReaction(Emojis.triangularFlagOnPost.toReaction())
+        //         }
+        //
+        //         message.channel.withTyping {
+        //             withTimeoutOrNull(30.seconds) {
+        //                 val response = threads
+        //                     .getOrPut(message.channelId) {
+        //                         mutableListOf<ChatMessage>().also { thread ->
+        //                             thread.request(prompt)!!
+        //                         }
+        //                     }.request(sanitizedMessage)
+        //                     ?.content
+        //
+        //                 if (response == null) {
+        //                     threads[message.channelId]!!.dropLast(1)
+        //
+        //                     return@withTimeoutOrNull
+        //                 }
+        //
+        //                 message.reply(response.substringAfter("(Developer Mode Output) "))
+        //             }
+        //         }
+        //     }
+        // }
 
         publicSlashCommand(
             name = "gpt".toKey(),
@@ -259,9 +250,9 @@ class GptExtension(apiKey: String = env("OPENAI_KEY")) : Extension() {
                 action {
                     val response = openAI.speech(
                         request = SpeechRequest(
-                            model = ModelId("tts-1"),
+                            model = ModelId("gpt-4o-mini-tts"),
                             input = arguments.text,
-                            voice = Voice.Shimmer
+                            voice = Voice("cedar")
                         )
                     )
 
@@ -270,6 +261,25 @@ class GptExtension(apiKey: String = env("OPENAI_KEY")) : Extension() {
                             name = "speech.mp3",
                             contentProvider = ChannelProvider { ByteReadChannel(response) }
                         )
+                    }
+                }
+            }
+
+            class MessageArgs : Arguments() {
+                val text by string {
+                    name = "text".toKey()
+                    description = "The message to send".toKey()
+                    maxLength = 200
+                }
+            }
+
+            publicSubCommand(
+                name = "message".toKey(),
+                description = "Chat".toKey(),
+                ::MessageArgs
+            ) {
+                action {
+                    respond {
                     }
                 }
             }

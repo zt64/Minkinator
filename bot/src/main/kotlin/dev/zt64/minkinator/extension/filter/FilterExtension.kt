@@ -17,11 +17,12 @@ import dev.kordex.core.commands.converters.impl.*
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.extensions.event
 import dev.kordex.core.i18n.toKey
-import dev.kordex.core.i18n.types.Key
 import dev.kordex.core.utils.timeout
+import dev.kordex.i18n.Key
 import dev.zt64.minkinator.data.DBFilter
 import dev.zt64.minkinator.data.FilterAction
 import dev.zt64.minkinator.data.filter
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.*
 import org.koin.core.component.inject
 import org.komapper.core.dsl.Meta
@@ -105,8 +106,8 @@ object FilterExtension : Extension() {
         }
 
         ephemeralSlashCommand(
-            name = "filter".toKey(),
-            description = "Manage server filters".toKey()
+            name = Translations.Command.filter,
+            description = Translations.Command.Description.filter
         ) {
             check {
                 anyGuild()
@@ -114,8 +115,8 @@ object FilterExtension : Extension() {
             }
 
             group(
-                name = "add".toKey(),
-                description = "Add a filter".toKey()
+                name = Translations.Command.Subcommand.Filter.add,
+                description = Translations.Command.Subcommand.Filter.Description.add
             ) {
                 suspend fun <T : Arguments> SlashGroup.filterAction(
                     name: Key,
@@ -148,8 +149,8 @@ object FilterExtension : Extension() {
                 }
 
                 filterAction(
-                    name = "reply".toKey(),
-                    description = "Reply to a message with a message".toKey(),
+                    name = Translations.Command.Subcommand.Filter.reply,
+                    description = Translations.Command.Subcommand.Filter.Description.reply,
                     arguments = FilterExtension::ReplyArgs
                 ) { guildId ->
                     DBFilter(
@@ -162,8 +163,8 @@ object FilterExtension : Extension() {
                 }
 
                 filterAction(
-                    name = "timeout".toKey(),
-                    description = "Timeout a user for a duration".toKey(),
+                    name = Translations.Command.Subcommand.Filter.timeout,
+                    description = Translations.Command.Subcommand.Filter.Description.timeout,
                     arguments = FilterExtension::TimeoutArgs
                 ) { guildId ->
                     DBFilter(
@@ -176,8 +177,8 @@ object FilterExtension : Extension() {
             }
 
             ephemeralSubCommand(
-                name = "remove".toKey(),
-                description = "Remove a filter".toKey(),
+                name = Translations.Command.Subcommand.Filter.remove,
+                description = Translations.Command.Subcommand.Filter.Description.remove,
                 arguments = FilterExtension::RemoveArgs
             ) {
                 action {
@@ -307,12 +308,12 @@ object FilterExtension : Extension() {
 
     private class TimeoutArgs : AddArgs() {
         val duration by duration {
-            name = "duration".toKey()
-            description = "The duration to timeout the user for".toKey()
+            name = Translations.Argument.duration
+            description = Translations.Argument.Description.durationForTimeout
         }
         val deleteMessage by defaultingBoolean {
-            name = "delete-message".toKey()
-            description = "Whether the message should be deleted".toKey()
+            name = Translations.Argument.deleteMessage
+            description = Translations.Argument.Description.deleteMessage
             defaultValue = false
         }
     }
@@ -327,8 +328,8 @@ object FilterExtension : Extension() {
 
     private class TestArgs : Arguments() {
         val message by string {
-            name = "message".toKey()
-            description = "The message to test".toKey()
+            name = Translations.Argument.message
+            description = Translations.Argument.Description.messageToTest
         }
     }
 }

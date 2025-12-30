@@ -7,7 +7,7 @@ import dev.kordex.core.checks.anyGuild
 import dev.kordex.core.checks.hasPermission
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.extensions.Extension
-import dev.kordex.core.i18n.toKey
+import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.publicSlashCommand
 import dev.zt64.minkinator.util.publicSubCommand
 import dev.zt64.minkinator.util.warn
@@ -17,8 +17,8 @@ object RoleBoardExtension : Extension() {
 
     override suspend fun setup() {
         publicSlashCommand(
-            name = "role-board".toKey(),
-            description = "Manage role-boards".toKey()
+            name = Translations.Command.roleBoard,
+            description = Translations.Command.Description.roleBoard
         ) {
             requireBotPermissions(Permission.ManageRoles)
 
@@ -28,8 +28,8 @@ object RoleBoardExtension : Extension() {
             }
 
             publicSubCommand(
-                name = "create".toKey(),
-                description = "Create a role-board in the current channel".toKey(),
+                name = Translations.Command.Subcommand.RoleBoard.create,
+                description = Translations.Command.Subcommand.RoleBoard.Description.create,
                 arguments = RoleBoardExtension::CreateArgs
             ) {
                 action {
