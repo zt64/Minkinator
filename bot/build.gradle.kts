@@ -35,7 +35,7 @@ dependencies {
     implementation(libs.ktor.client.encoding)
     implementation(libs.tess4j)
     implementation("org.bytedeco:tesseract:5.3.4-1.5.10")
-    implementation("org.bytedeco:tesseract-platform:5.3.4-1.5.10")
+    implementation("org.bytedeco:tesseract-platform:5.5.1-1.5.12")
     implementation(libs.bundles.scrimmage)
 
     implementation("org.jetbrains.kotlin:kotlin-scripting-common")
