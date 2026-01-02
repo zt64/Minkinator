@@ -42,7 +42,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-scripting-jvm")
     implementation("org.jetbrains.kotlin:kotlin-scripting-jvm-host")
 
-    implementation("org.jetbrains.lets-plot:lets-plot-batik:4.5.1")
+    implementation("org.jetbrains.lets-plot:lets-plot-batik:4.8.2")
     implementation("org.jetbrains.lets-plot:lets-plot-common:4.5.1")
     implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.9.0")
 
