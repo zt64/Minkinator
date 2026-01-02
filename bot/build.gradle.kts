@@ -49,5 +49,5 @@ dependencies {
     implementation("org.bytedeco:ffmpeg-platform:7.1-1.5.11")
 
     implementation("com.twelvemonkeys.imageio:imageio-webp:3.12.0")
-    implementation("com.twelvemonkeys.imageio:imageio-core:3.12.0")
+    implementation("com.twelvemonkeys.imageio:imageio-core:3.13.0")
 }
