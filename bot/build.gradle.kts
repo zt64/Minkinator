@@ -43,7 +43,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-scripting-jvm-host")
 
     implementation("org.jetbrains.lets-plot:lets-plot-batik:4.8.2")
-    implementation("org.jetbrains.lets-plot:lets-plot-common:4.5.1")
+    implementation("org.jetbrains.lets-plot:lets-plot-common:4.8.2")
     implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.12.1")
 
     implementation("org.bytedeco:ffmpeg-platform:7.1-1.5.11")
