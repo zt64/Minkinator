@@ -21,8 +21,10 @@ object EventLogExtension : Extension() {
 
         event<MemberJoinEvent> {
             if (event.member == self) {
-                val guildName = event.getGuild().name
-                bot.logger.info { "Added to $guildName" }
+                val guild = event.getGuild()
+                bot.logger.info { "Added to ${guild.name} (#${guild.id})" }
+            } else {
+                // TODO: Add server logging
             }
         }
 

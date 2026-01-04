@@ -15,15 +15,15 @@ import dev.kord.rest.NamedFile
 import dev.kordex.core.DiscordRelayedException
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.application.slash.PublicSlashCommandContext
+import dev.kordex.core.commands.application.slash.SlashGroup
 import dev.kordex.core.commands.application.slash.converters.ChoiceEnum
+import dev.kordex.core.commands.application.slash.group
 import dev.kordex.core.commands.converters.impl.*
 import dev.kordex.core.extensions.Extension
-import dev.kordex.core.extensions.ephemeralMessageCommand
 import dev.kordex.core.i18n.toKey
 import dev.kordex.core.utils.suggestStringCollection
 import dev.kordex.i18n.Key
-import dev.zt64.minkinator.util.displayAvatar
-import dev.zt64.minkinator.util.publicSlashCommand
+import dev.zt64.minkinator.util.*
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
@@ -44,290 +44,660 @@ object EffectsExtension : Extension() {
     override val name = "effects"
 
     private val httpClient: HttpClient by inject()
-
     private val selection = hashMapOf<Snowflake, String>()
 
     override suspend fun setup() {
-        suspend fun <T : BaseArgs> addCommand(name: String, description: String, arguments: () -> T, block: T.(image: ImmutableImage) -> ImmutableImage) {
-            suspend fun PublicSlashCommandContext<*, *>.processImage(arguments: T): NamedFile {
-                val image = when {
-                    arguments.link != null -> {
-                        httpClient.get(arguments.link!!).readRawBytes()
-                    }
+        publicSlashCommand("image".toKey(), "Group of commands to modify images and gifs".toKey()) {
+            suspend fun <T : BaseArgs> SlashGroup.addCommand(
+                name: String,
+                description: String,
+                arguments: () -> T,
+                block: T.(image: ImmutableImage) -> ImmutableImage
+            ) {
+                publicSubCommand(name.toKey(), description.toKey(), arguments) {
+                    action {
+                        val arguments = this@action.arguments
+                        val image = when {
+                            arguments.link != null -> {
+                                httpClient.get(arguments.link!!).readRawBytes()
+                            }
+                            arguments.member != null -> {
+                                val avatar = arguments.member!!.avatar ?: arguments.member!!.defaultAvatar
+                                if (avatar.isAnimated) {
+                                    avatar.getImage(Image.Format.GIF)
+                                } else {
+                                    avatar.getImage()
+                                }.data
+                            }
+                            arguments.attachment != null -> {
+                                httpClient.get(arguments.attachment!!.url).readRawBytes()
+                            }
+                            selection.contains(user.id) -> {
+                                httpClient.get(selection[user.id]!!).readRawBytes()
+                            }
+                            else -> {
+                                throw DiscordRelayedException("No image provided".toKey())
+                            }
+                        }
+                        val format = FormatDetector.detect(image).getOrNull() ?: throw DiscordRelayedException("No image provided".toKey())
+                        val mutator = { frame: ImmutableImage -> arguments.block(frame) }
 
-                    arguments.member != null -> {
-                        val avatar = arguments.member!!.avatar ?: arguments.member!!.defaultAvatar
-                        if (avatar.isAnimated) {
-                            avatar.getImage(Image.Format.GIF).data
+                        val (extension, byteReadChannel) = if (format == Format.GIF) {
+                            "gif" to mutateGif(image, mutator)
                         } else {
-                            avatar.getImage().data
+                            "png" to mutateImage(image, mutator)
+                        }
+
+                        val response = respond {
+                            files += NamedFile(
+                                name = "a.$extension",
+                                contentProvider = ChannelProvider { byteReadChannel }
+                            )
+                        }
+
+                        selection[user.id] = response.message.attachments.single().url
+                    }
+                }
+            }
+
+            suspend fun SlashGroup.addCommand(name: String, description: String, block: (image: ImmutableImage) -> ImmutableImage) {
+                addCommand(name, description, EffectsExtension::BaseArgs) { block(it) }
+            }
+
+            suspend fun <T : BaseArgs> SlashGroup.addFilterCommand(name: String, description: String, arguments: () -> T, filter: T.() -> Filter) {
+                addCommand(name, description, arguments) { image -> image.filter(filter()) }
+            }
+
+            suspend fun SlashGroup.addFilterCommand(name: String, description: String, filter: () -> Filter) {
+                addCommand(name, description) { image -> image.filter(filter()) }
+            }
+
+            group("edit".toKey()) {
+                description = "Commands for editing images part 1".toKey()
+
+                addFilterCommand("invert", "Invert the colors of an image", ::InvertFilter)
+                addFilterCommand("grayscale", "Convert an image to grayscale", ::GrayscaleFilter)
+                addFilterCommand("solarize", "Solarize an image", ::SolarizeFilter)
+                addFilterCommand("sepia", "Convert an image to sepia", ::SepiaFilter)
+                addFilterCommand("posterize", "Posterize an image", ::PosterizeFilter)
+                addFilterCommand("oil", "Apply an oil filter to an image", ::OilFilter)
+                addFilterCommand("emboss", "Emboss an image", ::EmbossFilter)
+                addFilterCommand("bump", "Apply a bump filter to an image", ::BumpFilter)
+
+                class BlurArgs : BaseArgs() {
+                    val radius by defaultingDecimal {
+                        name = "radius".toKey()
+                        description = "Radius of the blur".toKey()
+                        defaultValue = 5.0
+                        minValue = 0.0
+                        maxValue = 255.0
+                    }
+                    val bloom by defaultingDecimal {
+                        name = "bloom".toKey()
+                        description = "Bloom to apply".toKey()
+                        defaultValue = 2.0
+                        minValue = 0.0
+                        maxValue = 255.0
+                    }
+                    val bloomThreshold by defaultingDecimal {
+                        name = "bloom-threshold".toKey()
+                        description = "Bloom threshold".toKey()
+                        defaultValue = 255.0
+                        minValue = 0.0
+                        maxValue = 255.0
+                    }
+                    val sides by defaultingInt {
+                        name = "sides".toKey()
+                        description = "Number of sides".toKey()
+                        defaultValue = 5
+                        minValue = 1
+                        maxValue = 255
+                    }
+                }
+
+                addFilterCommand("blur", "Blur an image", ::BlurArgs) {
+                    LensBlurFilter(radius.toFloat(), bloom.toFloat(), bloomThreshold.toFloat(), sides)
+                }
+
+                addFilterCommand("sharpen", "Sharpen an image", ::SharpenFilter)
+                addFilterCommand("edge", "Detect edges in a an image", ::EdgeFilter)
+                addFilterCommand("dither", "Apply a dither filter to a an image", ::DitherFilter)
+                addFilterCommand("glow", "Apply a glow filter to an image", ::GlowFilter)
+                addFilterCommand("chrome", "Apply a chrome filter to an image", ::ChromeFilter)
+                addFilterCommand("sparkle", "Apply a sparkle filter to an image", ::SparkleFilter)
+                addFilterCommand("quantize", "Apply a quantize filter to an image", ::QuantizeFilter)
+                addFilterCommand("dissolve", "Apply a dissolve filter to an image") {
+                    DissolveFilter(0.5f)
+                }
+                addFilterCommand("crystallize", "Apply a crystallize filter to an image") {
+                    CrystallizeFilter(6.0, 0.25, 0x000000, 0.7)
+                }
+                addFilterCommand("ripple", "Apply a ripple filter to a an image") {
+                    RippleFilter(RippleType.Noise)
+                }
+
+                class PixelateArgs : BaseArgs() {
+                    val blockSize by defaultingInt {
+                        name = "block-size".toKey()
+                        description = "The number of pixels along each block edge".toKey()
+                        defaultValue = 8
+                        minValue = 8
+                        maxValue = 512
+                    }
+                }
+
+                addFilterCommand("pixelate", "Pixelate a image", ::PixelateArgs) {
+                    PixelateFilter(blockSize)
+                }
+
+                class KaleidoscopeArgs : BaseArgs() {
+                    val sides by defaultingInt {
+                        name = "sides".toKey()
+                        description = "The number of sides".toKey()
+                        defaultValue = 5
+                        minValue = 3
+                        maxValue = 128
+                    }
+                }
+
+                addFilterCommand("kaleidoscope", "Apply a kaleidoscope filter to an image", ::KaleidoscopeArgs) {
+                    KaleidoscopeFilter(sides)
+                }
+
+                addFilterCommand("rays", "Apply a rays filter to an image") {
+                    RaysFilter()
+                }
+
+                addFilterCommand("television", "Apply a television filter to an image") {
+                    TelevisionFilter()
+                }
+
+                class TwirlArgs : BaseArgs() {
+                    val angle by defaultingDecimal {
+                        name = "angle".toKey()
+                        description = "The angle in degrees".toKey()
+                        defaultValue = 200.0
+
+                        mutate { it * (PI / 180) }
+                    }
+                    val radius by defaultingDecimal {
+                        name = "radius".toKey()
+                        description = "The radius".toKey()
+                        defaultValue = 50.0
+                        minValue = 0.0
+                    }
+                }
+
+                addFilterCommand("twirl", "Apply a twirl filter to an image", ::TwirlArgs) {
+                    TwirlFilter(angle.toFloat(), radius.toFloat())
+                }
+
+                class ThresholdArgs : BaseArgs() {
+                    val threshold by defaultingInt {
+                        name = "threshold".toKey()
+                        description = "The threshold".toKey()
+                        defaultValue = 127
+                        minValue = 0
+                        maxValue = 255
+                    }
+                }
+
+                addFilterCommand("threshold", "Apply a threshold filter to an image", ::ThresholdArgs) {
+                    ThresholdFilter(threshold)
+                }
+            }
+
+            group("edit2".toKey()) {
+                description = "Second group of commands for editing".toKey()
+
+                class RotateArgs : BaseArgs() {
+                    val degrees by defaultingInt {
+                        name = "degrees".toKey()
+                        description = "How many degrees to rotate the avatar by".toKey()
+                        defaultValue = 0
+                    }
+                }
+
+                class ContrastArgs : BaseArgs() {
+                    val factor by defaultingDecimal {
+                        name = "factor".toKey()
+                        description = "Contrast factor (1.0 = no change, <1.0 = less contrast, >1.0 = more contrast)".toKey()
+                        defaultValue = 1.5
+                        minValue = 0.0
+                        maxValue = 3.0
+                    }
+                }
+
+                addFilterCommand("contrast", "Adjust the contrast of an image", ::ContrastArgs) {
+                    ContrastFilter(factor)
+                }
+
+                class MotionBlurArgs : BaseArgs() {
+                    val distance by defaultingDecimal {
+                        name = "distance".toKey()
+                        description = "Distance of the blur".toKey()
+                        defaultValue = 10.0
+                        minValue = 0.0
+                        maxValue = 100.0
+                    }
+                    val angle by defaultingDecimal {
+                        name = "angle".toKey()
+                        description = "Angle of the blur in degrees".toKey()
+                        defaultValue = 0.0
+                        minValue = 0.0
+                        maxValue = 360.0
+                        mutate { it * (PI / 180) }
+                    }
+                    val zoom by defaultingDecimal {
+                        name = "zoom".toKey()
+                        description = "Zoom factor".toKey()
+                        defaultValue = 0.0
+                        minValue = 0.0
+                        maxValue = 1.0
+                    }
+                }
+
+                addFilterCommand("motion-blur", "Apply motion blur to an image", ::MotionBlurArgs) {
+                    MotionBlurFilter(angle, distance, 0.0, zoom)
+                }
+
+                addFilterCommand("vintage", "Apply a vintage filter to an image", ::VintageFilter)
+
+                addCommand("rotate", "Rotate an image", ::RotateArgs) { image ->
+                    image.rotate(Degrees(degrees))
+                }
+
+                class FlipArgs : BaseArgs() {
+                    val axis by defaultingEnum<Axis> {
+                        name = "axis".toKey()
+                        typeName = "axis".toKey()
+                        description = "The axis to flip the avatar on".toKey()
+                        defaultValue = Axis.X
+
+                        autoComplete {
+                            suggestStringCollection(Axis.entries.map(Axis::name))
                         }
                     }
+                }
 
-                    arguments.attachment != null -> {
-                        httpClient.get(arguments.attachment!!.url).readRawBytes()
-                    }
-
-                    selection.contains(user.id) -> {
-                        httpClient.get(selection[user.id]!!).readRawBytes()
-                    }
-
-                    else -> {
-                        throw DiscordRelayedException("No image provided".toKey())
+                addCommand("flip", "Flip an image", ::FlipArgs) { image ->
+                    when (axis) {
+                        Axis.X -> image.flipX()
+                        Axis.Y -> image.flipY()
                     }
                 }
-                val format = FormatDetector.detect(image).getOrNull() ?: throw DiscordRelayedException("No image provided".toKey())
-                val mutator = { frame: ImmutableImage -> arguments.block(frame) }
 
-                val (extension, byteReadChannel) = if (format == Format.GIF) {
-                    "gif" to mutateGif(image, mutator)
-                } else {
-                    "png" to mutateImage(image, mutator)
+                class ResizeArgs : BaseArgs() {
+                    val factor by defaultingDecimal {
+                        name = "factor".toKey()
+                        description = "The factor to resize the image by".toKey()
+                        minValue = 0.0
+                        maxValue = 10.0
+                        defaultValue = 2.0
+                    }
                 }
 
-                return NamedFile(
-                    name = "a.$extension",
-                    contentProvider = ChannelProvider { byteReadChannel }
-                )
-            }
+                addCommand("resize", "Resizes an image", ::ResizeArgs) { image ->
+                    image.scale(factor)
+                }
 
-            publicSlashCommand(name.toKey(), description.toKey(), arguments) {
-                action {
-                    val response = respond {
-                        val f = processImage(this@action.arguments)
+                addCommand("speech-bubble", "Adds a speech bubble to an image") { image ->
+                    val scaledImage = image.scaleTo(512, 512)
+                    val speechBubble = ImmutableImage
+                        .loader()
+                        .fromResource("/speech-bubble.png")
+                        .scaleToWidth(scaledImage.width)
 
-                        files += f
+                    scaledImage.overlay(speechBubble)
+                }
+
+                class MirrorArgs : BaseArgs() {
+                    val axis by defaultingEnum<Axis> {
+                        name = "axis".toKey()
+                        typeName = "axis".toKey()
+                        description = "The axis to mirror the avatar on".toKey()
+                        defaultValue = Axis.X
+                        autoComplete {
+                            suggestStringCollection(Axis.entries.map(Axis::name))
+                        }
+                    }
+                }
+
+                addCommand("mirror", "Mirrors an image", ::MirrorArgs) { image ->
+                    when (axis) {
+                        Axis.X -> {
+                            val half = image.takeRight(image.width / 2)
+                            image.overlay(half.flipX())
+                        }
+                        Axis.Y -> {
+                            val half = image.takeBottom(image.height / 2)
+                            image.overlay(half.flipY())
+                        }
+                    }
+                }
+
+                class ConvolveArgs : BaseArgs() {
+                    val data by defaultingString {
+                        name = "matrix".toKey()
+                        description = "The matrix to convolve the image with. In the format of a 2D array such as 0,0,0,0,1,0,0,0,0".toKey()
+                        defaultValue = "0,0,0,0,1,0,0,0,0"
+                    }
+                }
+
+                addCommand("convolve", "Apply a convolution matrix to a user", ::ConvolveArgs) { image ->
+                    val matrix = data.split(",").map(String::toFloat).toFloatArray()
+                    val filter = ConvolveFilter(matrix).apply {
+                        useAlpha = true
+                        edgeAction = ConvolveFilter.CLAMP_EDGES
                     }
 
-                    selection[user.id] = response.message.attachments.single().url
-                }
-            }
-
-            // chatCommand(name.toKey(), description.toKey(), arguments) {
-            //     action {
-            //         message.reply {
-            //             processAvatar(this@action.arguments)
-            //         }
-            //     }
-            // }
-        }
-
-        suspend fun addCommand(name: String, description: String, block: (image: ImmutableImage) -> ImmutableImage) {
-            addCommand(name, description, EffectsExtension::BaseArgs) { block(it) }
-        }
-
-        suspend fun <T : BaseArgs> addFilterCommand(name: String, description: String, arguments: () -> T, filter: T.() -> Filter) =
-            addCommand(name, description, arguments) { image ->
-                image.filter(filter())
-            }
-
-        suspend fun addFilterCommand(name: String, description: String, filter: () -> Filter) {
-            addCommand(name, description) { image -> image.filter(filter()) }
-        }
-
-        addFilterCommand("invert", "Invert the colors of an image", ::InvertFilter)
-        addFilterCommand("grayscale", "Convert an image to grayscale", ::GrayscaleFilter)
-        addFilterCommand("solarize", "Solarize an image", ::SolarizeFilter)
-        addFilterCommand("sepia", "Convert an image to sepia", ::SepiaFilter)
-        addFilterCommand("posterize", "Posterize an image", ::PosterizeFilter)
-        addFilterCommand("oil", "Apply an oil filter to an image", ::OilFilter)
-        addFilterCommand("emboss", "Emboss an image", ::EmbossFilter)
-        addFilterCommand("bump", "Apply a bump filter to an image", ::BumpFilter)
-        addFilterCommand("blur", "Blur an image", ::LensBlurFilter)
-        addFilterCommand("sharpen", "Sharpen an image", ::SharpenFilter)
-        addFilterCommand("edge", "Detect edges in a an image", ::EdgeFilter)
-        addFilterCommand("dither", "Apply a dither filter to a an image", ::DitherFilter)
-        addFilterCommand("glow", "Apply a glow filter to an image", ::GlowFilter)
-        addFilterCommand("chrome", "Apply a chrome filter to an image", ::ChromeFilter)
-        addFilterCommand("sparkle", "Apply a sparkle filter to an image", ::SparkleFilter)
-        addFilterCommand("quantize", "Apply a quantize filter to an image", ::QuantizeFilter)
-        addFilterCommand("dissolve", "Apply a dissolve filter to an image") {
-            DissolveFilter(0.5f)
-        }
-        addFilterCommand("crystallize", "Apply a crystallize filter to an image") {
-            CrystallizeFilter(6.0, 0.25, 0x000000, 0.7)
-        }
-        addFilterCommand("ripple", "Apply a ripple filter to a an image") {
-            RippleFilter(RippleType.Noise)
-        }
-
-        class PixelateArgs : BaseArgs() {
-            val blockSize by defaultingInt {
-                name = "block-size".toKey()
-                description = "The number of pixels along each block edge".toKey()
-                defaultValue = 8
-                minValue = 8
-                maxValue = 512
-            }
-        }
-
-        addFilterCommand("pixelate", "Pixelate a image", ::PixelateArgs) {
-            PixelateFilter(blockSize)
-        }
-
-        class KaleidoscopeArgs : BaseArgs() {
-            val sides by defaultingInt {
-                name = "sides".toKey()
-                description = "The number of sides".toKey()
-                defaultValue = 5
-                minValue = 3
-                maxValue = 128
-            }
-        }
-
-        addFilterCommand("kaleidoscope", "Apply a kaleidoscope filter to an image", ::KaleidoscopeArgs) {
-            KaleidoscopeFilter(sides)
-        }
-
-        addFilterCommand("rays", "Apply a rays filter to an image") {
-            RaysFilter()
-        }
-
-        addFilterCommand("television", "Apply a television filter to an image") {
-            TelevisionFilter()
-        }
-
-        class TwirlArgs : BaseArgs() {
-            val angle by defaultingDecimal {
-                name = "angle".toKey()
-                description = "The angle in degrees".toKey()
-                defaultValue = 200.0
-
-                mutate { it * (PI / 180) }
-            }
-            val radius by defaultingDecimal {
-                name = "radius".toKey()
-                description = "The radius".toKey()
-                defaultValue = 50.0
-                minValue = 0.0
-            }
-        }
-
-        addFilterCommand("twirl", "Apply a twirl filter to an image", ::TwirlArgs) {
-            TwirlFilter(angle.toFloat(), radius.toFloat())
-        }
-
-        class ThresholdArgs : BaseArgs() {
-            val threshold by defaultingInt {
-                name = "threshold".toKey()
-                description = "The threshold".toKey()
-                defaultValue = 127
-                minValue = 0
-                maxValue = 255
-            }
-        }
-
-        addFilterCommand("threshold", "Apply a threshold filter to an image", ::ThresholdArgs) {
-            ThresholdFilter(threshold)
-        }
-
-        class RotateArgs : BaseArgs() {
-            val degrees by defaultingInt {
-                name = "degrees".toKey()
-                description = "How many degrees to rotate the avatar by".toKey()
-                defaultValue = 0
-            }
-        }
-
-        addCommand("rotate", "Rotate an image", ::RotateArgs) { image ->
-            image.rotate(Degrees(degrees))
-        }
-
-        class FlipArgs : BaseArgs() {
-            val axis by defaultingEnum<Axis> {
-                name = "axis".toKey()
-                typeName = "axis".toKey()
-                description = "The axis to flip the avatar on".toKey()
-                defaultValue = Axis.X
-
-                autoComplete {
-                    suggestStringCollection(Axis.entries.map(Axis::name))
-                }
-            }
-        }
-
-        addCommand("flip", "Flip an image", ::FlipArgs) { image ->
-            when (axis) {
-                Axis.X -> image.flipX()
-                Axis.Y -> image.flipY()
-            }
-        }
-
-        class ResizeArgs : BaseArgs() {
-            val factor by defaultingDecimal {
-                name = "factor".toKey()
-                description = "The factor to resize the image by".toKey()
-                minValue = 0.0
-                maxValue = 10.0
-                defaultValue = 2.0
-            }
-        }
-
-        addCommand("resize", "Resizes an image", ::ResizeArgs) { image ->
-            image.scale(factor)
-        }
-
-        addCommand("speech-bubble", "Adds a speech bubble to an image") { image ->
-            val scaledImage = image.scaleTo(512, 512)
-            val speechBubble = ImmutableImage
-                .loader()
-                .fromResource("/speech-bubble.png")
-                .scaleToWidth(scaledImage.width)
-
-            scaledImage.overlay(speechBubble)
-        }
-
-        class MirrorArgs : BaseArgs() {
-            val axis by defaultingEnum<Axis> {
-                name = "axis".toKey()
-                typeName = "axis".toKey()
-                description = "The axis to mirror the avatar on".toKey()
-                defaultValue = Axis.X
-                autoComplete {
-                    suggestStringCollection(Axis.entries.map(Axis::name))
-                }
-            }
-        }
-
-        addCommand("mirror", "Mirrors an image", ::MirrorArgs) { image ->
-            when (axis) {
-                Axis.X -> {
-                    val half = image.takeRight(image.width / 2)
-                    image.overlay(half.flipX())
+                    ImmutableImage.fromAwt(filter.filter(image.awt(), null))
                 }
 
-                Axis.Y -> {
-                    val half = image.takeBottom(image.height / 2)
-                    image.overlay(half.flipY())
+                class BounceArgs : BaseArgs() {
+                    val heightMultiplier by defaultingDecimal {
+                        name = "height".toKey()
+                        description = "How high to bounce (1.5 = 1.5x the image height)".toKey()
+                        defaultValue = 2.0
+                        minValue = 2.0
+                        maxValue = 4.0
+                    }
+
+                    val speedMultiplier by defaultingDecimal {
+                        name = "speed".toKey()
+                        description = "Speed multiplier (0.5 = half speed, 2 = double speed)".toKey()
+                        defaultValue = 1.0
+                        minValue = 0.1
+                        maxValue = 10.0
+                    }
                 }
-            }
-        }
 
-        class ConvolveArgs : BaseArgs() {
-            val data by defaultingString {
-                name = "matrix".toKey()
-                description = "The matrix to convolve the image with. In the format of a 2D array such as 0,0,0,0,1,0,0,0,0".toKey()
-                defaultValue = "0,0,0,0,1,0,0,0,0"
-            }
-        }
+                publicSubCommand("bounce".toKey(), "Make an image bounce up and down".toKey(), ::BounceArgs) {
+                    action {
+                        val os = ByteArrayOutputStream()
+                        val gif = StreamingGifWriter().prepareStream(os, BufferedImage.TYPE_INT_ARGB)
 
-        addCommand("convolve", "Apply a convolution matrix to a user", ::ConvolveArgs) { image ->
-            val matrix = data.split(",").map(String::toFloat).toFloatArray()
-            val filter = ConvolveFilter(matrix).apply {
-                useAlpha = true
-                edgeAction = ConvolveFilter.CLAMP_EDGES
-            }
+                        val bytes = extractImage() ?: throw DiscordRelayedException("Invalid image".toKey())
 
-            ImmutableImage.fromAwt(filter.filter(image.awt(), null))
-        }
+                        val image = ImageIO.read(ByteArrayInputStream(bytes))
+                        val baseFps = 24.0 // Desired smoothness
+                        val baseFrameCount = 24 // Number of frames at base speed
 
-        class SpeedArgs : BaseArgs() {
-            val multiplier by defaultingDecimal {
-                name = "multiplier".toKey()
-                description = "Speed multiplier (0.5 = half speed, 2 = double speed)".toKey()
-                defaultValue = 1.0
-                minValue = 0.1
-                maxValue = 5.0
+                        val adjustedFps = (baseFps * arguments.speedMultiplier).coerceAtLeast(1.0)
+                        val frameDuration = (1000.0 / adjustedFps).toLong()
+                        val frameCount = (baseFrameCount / arguments.speedMultiplier).toInt().coerceAtLeast(1)
+
+                        val bounceHeight = (image.height * (arguments.heightMultiplier - 1.0)).toInt()
+
+                        fun calculateNaturalOffset(frame: Int): Int {
+                            val t = frame.toDouble() / frameCount
+                            val cycle = (t * 2) % 2 // Complete cycle takes 2 units
+
+                            return if (cycle < 1) {
+                                val easeOut = 1 - (1 - cycle) * (1 - cycle)
+                                (bounceHeight * easeOut).toInt()
+                            } else {
+                                val easeIn = (cycle - 1) * (cycle - 1)
+                                (bounceHeight * (1 - easeIn)).toInt()
+                            }
+                        }
+                        if (FormatDetector.detect(bytes).getOrNull() == Format.GIF) {
+                            // Handle animated GIF input
+                            val sourceGif = AnimatedGifReader.read(ImageSource.of(bytes))
+                            val sourceFrameCount = sourceGif.frameCount
+
+                            // Total number of frames for the bounce animation
+                            val totalDuration = sourceGif.frames.withIndex().sumOf { sourceGif.getDelay(it.index).toMillis() }
+                            val totalBounceFrames = (totalDuration / frameDuration).toInt()
+
+                            repeat(totalBounceFrames) { bounceFrameIndex ->
+                                // Determine the offset for the bounce
+                                val offset = calculateNaturalOffset(bounceFrameIndex % frameCount)
+
+                                // Calculate the current inner GIF frame based on elapsed time
+                                val elapsedTime = bounceFrameIndex * frameDuration
+                                var cumulativeTime = 0L
+                                var innerFrameIndex = 0
+
+                                while (innerFrameIndex < sourceFrameCount) {
+                                    cumulativeTime += sourceGif.getDelay(innerFrameIndex).toMillis()
+                                    if (cumulativeTime > elapsedTime) break
+                                    innerFrameIndex++
+                                }
+                                innerFrameIndex %= sourceFrameCount
+
+                                // Get the inner GIF frame
+                                val sourceFrame = sourceGif.getFrame(innerFrameIndex)
+
+                                // Create a new frame with bounce effect
+                                val bounceImage = BufferedImage(
+                                    sourceFrame.width,
+                                    sourceFrame.height + bounceHeight,
+                                    BufferedImage.TYPE_INT_ARGB
+                                )
+                                val g2d = bounceImage.createGraphics()
+
+                                // Clear the background and draw the image with the offset
+                                g2d.clearRect(0, 0, bounceImage.width, bounceImage.height)
+                                g2d.drawImage(
+                                    sourceFrame.awt(),
+                                    0,
+                                    bounceImage.height - sourceFrame.height - offset,
+                                    null
+                                )
+                                g2d.dispose()
+
+                                gif.writeFrame(
+                                    ImmutableImage.fromAwt(bounceImage),
+                                    Duration.ofMillis(frameDuration)
+                                )
+                            }
+                        } else {
+                            repeat(frameCount) { frameIndex ->
+                                val offset = calculateNaturalOffset(frameIndex)
+
+                                // Create frame with room for bounce
+                                val bounceFrame = BufferedImage(image.width, image.height + bounceHeight, BufferedImage.TYPE_INT_ARGB)
+                                val g2d = bounceFrame.createGraphics()
+
+                                // Draw image at the bottom, offset by bounce height
+                                g2d.clearRect(0, 0, bounceFrame.width, bounceFrame.height)
+                                g2d.drawImage(
+                                    image,
+                                    0,
+                                    bounceFrame.height - image.height - offset,
+                                    null
+                                )
+                                g2d.dispose()
+
+                                gif.writeFrame(
+                                    ImmutableImage.fromAwt(bounceFrame),
+                                    Duration.ofMillis(frameDuration)
+                                )
+                            }
+                        }
+                        gif.close()
+
+                        respond {
+                            files += NamedFile("bounce.gif", ChannelProvider { ByteReadChannel(os.toByteArray()) })
+                        }
+                    }
+                }
+
+                class SpinArgs : BaseArgs() {
+                    val degreesPerSecond by defaultingInt {
+                        name = "degrees-per-second".toKey()
+                        description = "How many degrees to rotate per second, positive is clockwise, and negative is counter-clockwise".toKey()
+                        defaultValue = 240
+                    }
+                }
+
+                publicSubCommand("spin".toKey(), "Make an image spin".toKey(), ::SpinArgs) {
+                    action {
+                        val os = ByteArrayOutputStream()
+                        val gif = StreamingGifWriter().prepareStream(os, BufferedImage.TYPE_INT_ARGB)
+
+                        val bytes = extractImage()
+                        val frameDuration = 50L // 50ms per frame (20 FPS)
+                        val fps = 1000 / frameDuration // Frames per second
+                        val degreesPerFrame = arguments.degreesPerSecond / fps.toDouble()
+                        val framesForFullRotation = ceil(360.0 / abs(degreesPerFrame)).toInt()
+
+                        val sourceFormat = FormatDetector.detect(bytes).getOrNull()
+                        val sourceGif = if (sourceFormat == Format.GIF) {
+                            GifSequenceReader().apply {
+                                read(ByteArrayInputStream(bytes))
+                            }
+                        } else {
+                            null
+                        }
+
+                        if (sourceGif != null) {
+                            // Handle GIFs
+                            repeat(sourceGif.frameCount) { sourceFrameIndex ->
+                                val sourceFrame = sourceGif.getFrame(sourceFrameIndex)
+                                val delay = sourceGif.getDelay(sourceFrameIndex)
+
+                                // Rotate each frame
+                                repeat(fps.toInt()) { subFrameIndex ->
+                                    val totalDegrees = (sourceFrameIndex * fps + subFrameIndex) * degreesPerFrame
+                                    gif.writeFrame(
+                                        ImmutableImage.fromAwt(rotateImageAroundCenter(sourceFrame, totalDegrees)),
+                                        Duration.ofMillis(delay / fps) // Split delay evenly
+                                    )
+                                }
+                            }
+                        } else {
+                            // Handle static images
+                            val image = ImageIO.read(ByteArrayInputStream(bytes))
+                            repeat(framesForFullRotation) { frameIndex ->
+                                val totalDegrees = frameIndex * degreesPerFrame
+                                gif.writeFrame(
+                                    ImmutableImage.fromAwt(rotateImageAroundCenter(image, totalDegrees)),
+                                    Duration.ofMillis(frameDuration)
+                                )
+                            }
+                        }
+
+                        gif.close()
+
+                        respond {
+                            files += NamedFile("spinny.gif", ChannelProvider { ByteReadChannel(os.toByteArray()) })
+                        }
+                    }
+                }
+
+                class SpeedArgs : BaseArgs() {
+                    val multiplier by defaultingDecimal {
+                        name = "multiplier".toKey()
+                        description = "Speed multiplier (0.5 = half speed, 2 = double speed)".toKey()
+                        defaultValue = 1.0
+                        minValue = 0.1
+                        maxValue = 5.0
+                    }
+                }
+
+                publicSubCommand("speed".toKey(), "Modify the speed of a GIF".toKey(), ::SpeedArgs) {
+                    action {
+                        respond {
+                            val image = extractImage() ?: throw DiscordRelayedException("Invalid image".toKey())
+
+                            val gif = AnimatedGifReader.read(ImageSource.of(image))
+                            val newDelay = (gif.getDelay(0).toMillis() / arguments.multiplier).toInt()
+
+                            files += NamedFile(
+                                name = "speed.gif",
+                                contentProvider = ChannelProvider {
+                                    mutateGifFormat(image, delay = newDelay)
+                                }
+                            )
+                        }
+                    }
+                }
+
+                class SphereArgs : BaseArgs() {
+                    val rotations by defaultingInt {
+                        name = "rotations".toKey()
+                        description = "Number of complete rotations".toKey()
+                        defaultValue = 1
+                        minValue = 1
+                        maxValue = 5
+                    }
+
+                    val quality by defaultingInt {
+                        name = "quality".toKey()
+                        description = "Quality of the sphere (higher = smoother)".toKey()
+                        defaultValue = 32
+                        minValue = 16
+                        maxValue = 64
+                    }
+
+                    val frameRate by defaultingInt {
+                        name = "framerate".toKey()
+                        description = "Frames per second".toKey()
+                        defaultValue = 24
+                        minValue = 24
+                        maxValue = 24
+                    }
+                }
+                publicSubCommand("sphere".toKey(), "Map an image onto a spinning 3D sphere".toKey(), ::SphereArgs) {
+                    action {
+                        val os = ByteArrayOutputStream()
+                        val bytes = extractImage() ?: throw DiscordRelayedException("Invalid image".toKey())
+                        val image = ImageIO.read(ByteArrayInputStream(bytes))
+
+                        // Parameters
+                        val width = 256
+                        val height = 256
+                        val framesPerRotation = arguments.frameRate * 2
+                        val totalFrames = framesPerRotation * arguments.rotations
+                        val frameDuration = (1000 / arguments.frameRate).toLong()
+
+                        val gif = StreamingGifWriter().prepareStream(os, BufferedImage.TYPE_INT_ARGB)
+
+                        // Generate sphere frames
+                        repeat(totalFrames) { frameIndex ->
+                            val angle = 360.0 * frameIndex / framesPerRotation
+                            val frame = renderSphereFrame(image, width, height, angle, arguments.quality)
+
+                            gif.writeFrame(
+                                ImmutableImage.fromAwt(frame),
+                                Duration.ofMillis(frameDuration)
+                            )
+                        }
+
+                        gif.close()
+
+                        respond {
+                            files += NamedFile("sphere.gif", ChannelProvider { ByteReadChannel(os.toByteArray()) })
+                        }
+                    }
+                }
+
+                class LoopArgs : BaseArgs() {
+                    val count by defaultingInt {
+                        name = "count".toKey()
+                        description = "Number of times to loop (-1 for infinite)".toKey()
+                        defaultValue = -1
+                        minValue = -1
+                        maxValue = 100
+                    }
+                }
+
+                publicSubCommand("loop".toKey(), "Change how many times a GIF loops".toKey(), ::LoopArgs) {
+                    action {
+                        respond {
+                            val image = extractImage() ?: throw DiscordRelayedException("Invalid image".toKey())
+
+                            files += NamedFile(
+                                name = "loop.gif",
+                                contentProvider = ChannelProvider {
+                                    mutateGifFormat(image, loop = arguments.count)
+                                }
+                            )
+                        }
+                    }
+                }
             }
         }
 
@@ -346,308 +716,7 @@ object EffectsExtension : Extension() {
         //     }
         // }
 
-        class BounceArgs : BaseArgs() {
-            val heightMultiplier by defaultingDecimal {
-                name = "height".toKey()
-                description = "How high to bounce (1.5 = 1.5x the image height)".toKey()
-                defaultValue = 2.0
-                minValue = 2.0
-                maxValue = 4.0
-            }
-
-            val speedMultiplier by defaultingDecimal {
-                name = "speed".toKey()
-                description = "Speed multiplier (0.5 = half speed, 2 = double speed)".toKey()
-                defaultValue = 1.0
-                minValue = 0.1
-                maxValue = 10.0
-            }
-        }
-
-        publicSlashCommand("bounce".toKey(), "Make an image bounce up and down".toKey(), ::BounceArgs) {
-            action {
-                val os = ByteArrayOutputStream()
-                val gif = StreamingGifWriter().prepareStream(os, BufferedImage.TYPE_INT_ARGB)
-
-                val bytes = extractImage() ?: throw DiscordRelayedException("Invalid image".toKey())
-
-                val image = ImageIO.read(ByteArrayInputStream(bytes))
-                val baseFps = 24.0 // Desired smoothness
-                val baseFrameCount = 24 // Number of frames at base speed
-                (1000.0 / baseFps).toLong() // Base frame duration in ms
-
-                val adjustedFps = (baseFps * arguments.speedMultiplier).coerceAtLeast(1.0)
-                val frameDuration = (1000.0 / adjustedFps).toLong()
-                val frameCount = (baseFrameCount / arguments.speedMultiplier).toInt().coerceAtLeast(1)
-
-                val bounceHeight = (image.height * (arguments.heightMultiplier - 1.0)).toInt()
-
-                fun calculateNaturalOffset(frame: Int): Int {
-                    val t = frame.toDouble() / frameCount
-                    val cycle = (t * 2) % 2 // Complete cycle takes 2 units
-
-                    return if (cycle < 1) {
-                        // Going up: slow down at peak
-                        val easeOut = 1 - (1 - cycle) * (1 - cycle)
-                        (bounceHeight * easeOut).toInt()
-                    } else {
-                        // Coming down: accelerate and bounce
-                        val easeIn = (cycle - 1) * (cycle - 1)
-                        (bounceHeight * (1 - easeIn)).toInt()
-                    }
-                }
-                if (FormatDetector.detect(bytes).getOrNull() == Format.GIF) {
-                    // Handle animated GIF input
-                    val sourceGif = AnimatedGifReader.read(ImageSource.of(bytes))
-                    val sourceFrameCount = sourceGif.frameCount
-
-                    // Total number of frames for the bounce animation
-                    val totalDuration = sourceGif.frames.withIndex().sumOf { sourceGif.getDelay(it.index).toMillis() }
-                    val totalBounceFrames = (totalDuration / frameDuration).toInt()
-
-                    repeat(totalBounceFrames) { bounceFrameIndex ->
-                        // Determine the offset for the bounce
-                        val offset = calculateNaturalOffset(bounceFrameIndex % frameCount)
-
-                        // Calculate the current inner GIF frame based on elapsed time
-                        val elapsedTime = bounceFrameIndex * frameDuration
-                        var cumulativeTime = 0L
-                        var innerFrameIndex = 0
-
-                        while (innerFrameIndex < sourceFrameCount) {
-                            cumulativeTime += sourceGif.getDelay(innerFrameIndex).toMillis()
-                            if (cumulativeTime > elapsedTime) break
-                            innerFrameIndex++
-                        }
-                        innerFrameIndex %= sourceFrameCount
-
-                        // Get the inner GIF frame
-                        val sourceFrame = sourceGif.getFrame(innerFrameIndex)
-
-                        // Create a new frame with bounce effect
-                        val bounceImage = BufferedImage(
-                            sourceFrame.width,
-                            sourceFrame.height + bounceHeight,
-                            BufferedImage.TYPE_INT_ARGB
-                        )
-                        val g2d = bounceImage.createGraphics()
-
-                        // Clear the background and draw the image with the offset
-                        g2d.clearRect(0, 0, bounceImage.width, bounceImage.height)
-                        g2d.drawImage(
-                            sourceFrame.awt(),
-                            0,
-                            bounceImage.height - sourceFrame.height - offset,
-                            null
-                        )
-                        g2d.dispose()
-
-                        gif.writeFrame(
-                            ImmutableImage.fromAwt(bounceImage),
-                            Duration.ofMillis(frameDuration)
-                        )
-                    }
-                } else {
-                    repeat(frameCount) { frameIndex ->
-                        val offset = calculateNaturalOffset(frameIndex)
-
-                        // Create frame with room for bounce
-                        val bounceFrame = BufferedImage(image.width, image.height + bounceHeight, BufferedImage.TYPE_INT_ARGB)
-                        val g2d = bounceFrame.createGraphics()
-
-                        // Draw image at the bottom, offset by bounce height
-                        g2d.clearRect(0, 0, bounceFrame.width, bounceFrame.height)
-                        g2d.drawImage(
-                            image,
-                            0,
-                            bounceFrame.height - image.height - offset,
-                            null
-                        )
-                        g2d.dispose()
-
-                        gif.writeFrame(
-                            ImmutableImage.fromAwt(bounceFrame),
-                            Duration.ofMillis(frameDuration)
-                        )
-                    }
-                }
-                gif.close()
-
-                respond {
-                    files += NamedFile("bounce.gif", ChannelProvider { ByteReadChannel(os.toByteArray()) })
-                }
-            }
-        }
-
-        class SpinArgs : BaseArgs() {
-            val degreesPerSecond by defaultingInt {
-                name = "degrees-per-second".toKey()
-                description = "How many degrees to rotate per second, positive is clockwise, and negative is counter-clockwise".toKey()
-                defaultValue = 240
-            }
-        }
-
-        publicSlashCommand("spin".toKey(), "Make an image spin".toKey(), ::SpinArgs) {
-            action {
-                val os = ByteArrayOutputStream()
-                val gif = StreamingGifWriter().prepareStream(os, BufferedImage.TYPE_INT_ARGB)
-
-                val bytes = extractImage()
-                val frameDuration = 50L // 50ms per frame (20 FPS)
-                val fps = 1000 / frameDuration // Frames per second
-                val degreesPerFrame = arguments.degreesPerSecond / fps.toDouble()
-                val framesForFullRotation = ceil(360.0 / abs(degreesPerFrame)).toInt()
-
-                val sourceFormat = FormatDetector.detect(bytes).getOrNull()
-                val sourceGif = if (sourceFormat == Format.GIF) {
-                    GifSequenceReader().apply {
-                        read(ByteArrayInputStream(bytes))
-                    }
-                } else {
-                    null
-                }
-
-                if (sourceGif != null) {
-                    // Handle GIFs
-                    repeat(sourceGif.frameCount) { sourceFrameIndex ->
-                        val sourceFrame = sourceGif.getFrame(sourceFrameIndex)
-                        val delay = sourceGif.getDelay(sourceFrameIndex)
-
-                        // Rotate each frame
-                        repeat(fps.toInt()) { subFrameIndex ->
-                            val totalDegrees = (sourceFrameIndex * fps + subFrameIndex) * degreesPerFrame
-                            gif.writeFrame(
-                                ImmutableImage.fromAwt(rotateImageAroundCenter(sourceFrame, totalDegrees)),
-                                Duration.ofMillis(delay / fps) // Split delay evenly
-                            )
-                        }
-                    }
-                } else {
-                    // Handle static images
-                    val image = ImageIO.read(ByteArrayInputStream(bytes))
-                    repeat(framesForFullRotation) { frameIndex ->
-                        val totalDegrees = frameIndex * degreesPerFrame
-                        gif.writeFrame(
-                            ImmutableImage.fromAwt(rotateImageAroundCenter(image, totalDegrees)),
-                            Duration.ofMillis(frameDuration)
-                        )
-                    }
-                }
-
-                gif.close()
-
-                respond {
-                    files += NamedFile("spinny.gif", ChannelProvider { ByteReadChannel(os.toByteArray()) })
-                }
-            }
-        }
-
-        publicSlashCommand("speed".toKey(), "Modify the speed of a GIF".toKey(), ::SpeedArgs) {
-            action {
-                respond {
-                    val image = extractImage() ?: throw DiscordRelayedException("Invalid image".toKey())
-
-                    val gif = AnimatedGifReader.read(ImageSource.of(image))
-                    val newDelay = (gif.getDelay(0).toMillis() / arguments.multiplier).toInt()
-
-                    files += NamedFile(
-                        name = "speed.gif",
-                        contentProvider = ChannelProvider {
-                            mutateGifFormat(image, delay = newDelay)
-                        }
-                    )
-                }
-            }
-        }
-
-        class SphereArgs : BaseArgs() {
-            val rotations by defaultingInt {
-                name = "rotations".toKey()
-                description = "Number of complete rotations".toKey()
-                defaultValue = 1
-                minValue = 1
-                maxValue = 5
-            }
-
-            val quality by defaultingInt {
-                name = "quality".toKey()
-                description = "Quality of the sphere (higher = smoother)".toKey()
-                defaultValue = 32
-                minValue = 16
-                maxValue = 64
-            }
-
-            val frameRate by defaultingInt {
-                name = "framerate".toKey()
-                description = "Frames per second".toKey()
-                defaultValue = 24
-                minValue = 24
-                maxValue = 24
-            }
-        }
-
-        publicSlashCommand("sphere".toKey(), "Map an image onto a spinning 3D sphere".toKey(), ::SphereArgs) {
-            action {
-                val os = ByteArrayOutputStream()
-                val bytes = extractImage() ?: throw DiscordRelayedException("Invalid image".toKey())
-                val image = ImageIO.read(ByteArrayInputStream(bytes))
-
-                // Parameters
-                val width = 256
-                val height = 256
-                val framesPerRotation = arguments.frameRate * 2
-                val totalFrames = framesPerRotation * arguments.rotations
-                val frameDuration = (1000 / arguments.frameRate).toLong()
-
-                val gif = StreamingGifWriter().prepareStream(os, BufferedImage.TYPE_INT_ARGB)
-
-                // Generate sphere frames
-                repeat(totalFrames) { frameIndex ->
-                    val angle = 360.0 * frameIndex / framesPerRotation
-                    val frame = renderSphereFrame(image, width, height, angle, arguments.quality)
-
-                    gif.writeFrame(
-                        ImmutableImage.fromAwt(frame),
-                        Duration.ofMillis(frameDuration)
-                    )
-                }
-
-                gif.close()
-
-                respond {
-                    files += NamedFile("sphere.gif", ChannelProvider { ByteReadChannel(os.toByteArray()) })
-                }
-            }
-        }
-
-        class LoopArgs : BaseArgs() {
-            val count by defaultingInt {
-                name = "count".toKey()
-                description = "Number of times to loop (-1 for infinite)".toKey()
-                defaultValue = -1
-                minValue = -1
-                maxValue = 100
-            }
-        }
-
-        publicSlashCommand("loop".toKey(), "Change how many times a GIF loops".toKey(), ::LoopArgs) {
-            action {
-                respond {
-                    val image = extractImage() ?: throw DiscordRelayedException("Invalid image".toKey())
-
-                    files += NamedFile(
-                        name = "loop.gif",
-                        contentProvider = ChannelProvider {
-                            mutateGifFormat(image, loop = arguments.count)
-                        }
-                    )
-                }
-            }
-        }
-
-        ephemeralMessageCommand {
-            name = "select".toKey()
-
+        ephemeralMessageCommand("select".toKey()) {
             action {
                 val targetMessage = targetMessages.single()
                 val attachments = targetMessage.attachments.filter { it.isImage }
@@ -657,11 +726,9 @@ object EffectsExtension : Extension() {
                     attachments.isNotEmpty() -> {
                         selection[user.id] = attachments.first().url
                     }
-
                     embed != null && embed.image != null -> {
                         selection[user.id] = embed.image!!.url!!
                     }
-
                     else -> {
                         respond {
                             content = "No media found"

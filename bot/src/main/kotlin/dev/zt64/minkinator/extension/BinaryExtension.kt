@@ -9,9 +9,8 @@ import dev.kordex.core.commands.converters.impl.string
 import dev.kordex.core.extensions.Extension
 import dev.kordex.core.i18n.toKey
 import dev.kordex.i18n.Key
-import dev.zt64.minkinator.util.publicSlashCommand
-import dev.zt64.minkinator.util.publicSubCommand
-import dev.zt64.minkinator.util.success
+import dev.zt64.minkinator.util.*
+import kotlin.io.encoding.Base64
 
 object BinaryExtension : Extension() {
     override val name = "binary"
@@ -19,7 +18,7 @@ object BinaryExtension : Extension() {
     override suspend fun setup() {
         publicSlashCommand(
             name = "binary".toKey(),
-            description = "Various commands for dealing with numbers".toKey()
+            description = "Various commands for dealing with binary data".toKey()
         ) {
             class ConvertArgs : Arguments() {
                 val number by string {
@@ -76,6 +75,51 @@ object BinaryExtension : Extension() {
                                         value = decimal.toString(base.radix)
                                         inline = true
                                     }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            group("base64".toKey(), "Base64 encoding and decoding commands".toKey()) {
+                class Base64Args : Arguments() {
+                    val text by string {
+                        name = "text".toKey()
+                        description = "The text to encode/decode".toKey()
+                    }
+                }
+
+                publicSubCommand(
+                    name = "encode".toKey(),
+                    description = "Encode text to Base64".toKey(),
+                    arguments = ::Base64Args
+                ) {
+                    action {
+                        respond {
+                            embed {
+                                color = Color.success
+                                title = "Base64 Encoded"
+                                description = Base64.encode(arguments.text.toByteArray())
+                            }
+                        }
+                    }
+                }
+
+                publicSubCommand(
+                    name = "decode".toKey(),
+                    description = "Decode Base64 to text".toKey(),
+                    arguments = ::Base64Args
+                ) {
+                    action {
+                        respond {
+                            embed {
+                                color = Color.success
+                                title = "Base64 Decoded"
+                                description = try {
+                                    Base64.decode(arguments.text.toByteArray()).decodeToString()
+                                } catch (_: IllegalArgumentException) {
+                                    "Invalid Base64 string"
                                 }
                             }
                         }

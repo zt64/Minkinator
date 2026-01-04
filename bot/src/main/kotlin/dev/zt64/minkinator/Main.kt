@@ -18,6 +18,7 @@ import dev.zt64.minkinator.extension.media.EffectsExtension
 import dev.zt64.minkinator.extension.media.SvgExtension
 import dev.zt64.minkinator.util.error
 import io.ktor.client.*
+import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.serialization.json.Json
@@ -43,33 +44,35 @@ suspend fun main() {
 
             +GeneralExtension
             +BinaryExtension
-            +SvgExtension
-            +EventLogExtension
-            +FilterExtension
-            // add { GptExtension() }
-            // +MarkovExtension
-            +AvatarExtension
-            +NameNormalizerExtension
             +AnimalsExtension
             +SpotifyExtension
             +PingExtension
-            +RestrictedExtension
-            +PurgeExtension
-            +StickerExtension
+            +CoinTossExtension
             +GuildInfoExtension
             +UserInfoExtension
+            +SpaceExtension
+            +HttpCatExtension
+            +FileExtension
+
+            +EventLogExtension
+            +FilterExtension
+            +NameNormalizerExtension
+            +RestrictedExtension
+            +PurgeExtension
             +BanExtension
-            +CoinTossExtension
-            +EffectsExtension
             +KickExtension
             +RoleBoardExtension
             +MemberLogExtension
+
+            +AvatarExtension
+            +SvgExtension
+            +EffectsExtension
+            +StickerExtension
             +CaptionExtension
             +EmojiExtension
-            +SpaceExtension
+            // +SstvExtension
             +OcrExtension
 
-            // Games
             +TicTacToeExtension
             +GuessmojiExtension
             +TriviaExtension
@@ -97,10 +100,6 @@ suspend fun main() {
             all()
         }
 
-        presence {
-            playing("with Kotlin")
-        }
-
         sharding(::Shards)
 
         errorResponse { message, _ ->
@@ -122,6 +121,12 @@ suspend fun main() {
                     fun provideHttpClient(json: Json) = HttpClient {
                         install(ContentNegotiation) {
                             json(json)
+                        }
+
+                        install(HttpTimeout) {
+                            socketTimeoutMillis = 8000
+                            connectTimeoutMillis = 60000
+                            requestTimeoutMillis = 60000
                         }
                     }
 

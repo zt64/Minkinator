@@ -6,3 +6,4 @@
 build
 data
 /*.db
+hs_err_pid*.log

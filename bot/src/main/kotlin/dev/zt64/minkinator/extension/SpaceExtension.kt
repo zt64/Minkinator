@@ -2,7 +2,9 @@ package dev.zt64.minkinator.extension
 
 import dev.kord.common.Color
 import dev.kord.rest.builder.message.embed
+import dev.kordex.core.DiscordRelayedException
 import dev.kordex.core.extensions.Extension
+import dev.kordex.i18n.toKey
 import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.publicSlashCommand
 import io.ktor.client.*
@@ -74,10 +76,13 @@ object SpaceExtension : Extension() {
 
         publicSlashCommand(Translations.Command.apod, Translations.Command.Description.apod) {
             action {
-                val apod = httpClient
-                    .get(APOD_URL) {
+                val apod = try {
+                    httpClient.get(APOD_URL) {
                         parameter("api_key", "DEMO_KEY")
                     }.body<Apod>()
+                } catch (e: Exception) {
+                    throw DiscordRelayedException(e.message?.toKey() ?: "An unknown error occurred".toKey())
+                }
 
                 respond {
                     embed {

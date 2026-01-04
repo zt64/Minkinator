@@ -1,6 +1,7 @@
 package dev.zt64.minkinator.util
 
 import dev.kordex.core.commands.Arguments
+import dev.kordex.core.commands.application.message.EphemeralMessageCommand
 import dev.kordex.core.commands.application.slash.*
 import dev.kordex.core.commands.application.user.EphemeralUserCommand
 import dev.kordex.core.commands.chat.ChatCommand
@@ -112,6 +113,16 @@ suspend inline fun Extension.ephemeralUserCommand(name: Key, crossinline body: s
     body()
 }
 
+suspend inline fun Extension.ephemeralMessageCommand(
+    name: Key,
+    crossinline body: suspend EphemeralMessageCommand<*>.() -> Unit
+): EphemeralMessageCommand<ModalForm> {
+    return ephemeralMessageCommand {
+        this.name = name
+        body()
+    }
+}
+
 suspend inline fun SlashCommand<*, *, *>.publicSubCommand(name: Key, description: Key, crossinline body: suspend PublicSlashCommand<Arguments, *>.() -> Unit) =
     publicSubCommand {
         this.name = name
@@ -162,6 +173,17 @@ suspend inline fun <T : Arguments> SlashGroup.ephemeralSubCommand(
     noinline arguments: () -> T,
     crossinline body: suspend EphemeralSlashCommand<T, *>.() -> Unit
 ) = ephemeralSubCommand(arguments) {
+    this.name = name
+    this.description = description
+    body()
+}
+
+suspend inline fun <T : Arguments> SlashGroup.publicSubCommand(
+    name: Key,
+    description: Key,
+    noinline arguments: () -> T,
+    crossinline body: suspend PublicSlashCommand<T, *>.() -> Unit
+) = publicSubCommand(arguments) {
     this.name = name
     this.description = description
     body()

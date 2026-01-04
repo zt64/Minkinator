@@ -45,18 +45,16 @@ object OcrExtension : Extension() {
                     arguments.link != null -> {
                         httpClient.get(arguments.link!!).bodyAsChannel()
                     }
-
                     arguments.attachment != null -> {
                         httpClient.get(arguments.attachment!!.url).bodyAsChannel()
                     }
-
                     else -> {
                         throw DiscordRelayedException("No image provided".toKey())
                     }
                 }
 
                 val bi = ImageIO.read(image.toInputStream())
-                val r = tess.getWords(bi, ITessAPI.TessPageIteratorLevel.RIL_BLOCK).toList()
+                val r = tess.getWords(bi, ITessAPI.TessPageIteratorLevel.RIL_BLOCK).toList().drop(2).dropLast(3)
 
                 respond {
                     embed {
