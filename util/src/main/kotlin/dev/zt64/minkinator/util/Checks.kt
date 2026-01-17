@@ -7,11 +7,11 @@ import dev.kordex.core.checks.userFor
 import dev.kordex.core.commands.application.slash.SlashCommand
 import dev.kordex.core.commands.chat.ChatCommand
 import dev.kordex.core.i18n.toKey
-import dev.kordex.core.utils.env
+import dev.kordex.core.utils.envOrNull
 
 suspend fun <T : Event> CheckContext<T>.isSuperuser() {
     failIf("Only superusers may run this command".toKey()) {
-        userFor(event)!!.id !in env("SUPER_USER_IDS").split(",").map { Snowflake(it) }
+        userFor(event)!!.id !in envOrNull("SUPER_USER_IDS")?.split(",")?.map(::Snowflake).orEmpty()
     }
 }
 

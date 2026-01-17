@@ -19,12 +19,12 @@ object PingExtension : Extension() {
                 respond {
                     embed {
                         color = Color.success
-                        title = "Ping"
+                        title = "Pong!"
                         description = bot
                             .kordRef
                             .gateway
                             .averagePing
-                            ?.toString() ?: "Unknown"
+                            ?.let { "${it.inWholeMilliseconds} ms" } ?: "Unknown"
                     }
                 }
             }

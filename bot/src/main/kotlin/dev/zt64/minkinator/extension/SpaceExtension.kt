@@ -4,11 +4,13 @@ import dev.kord.common.Color
 import dev.kord.rest.builder.message.embed
 import dev.kordex.core.DiscordRelayedException
 import dev.kordex.core.extensions.Extension
+import dev.kordex.core.utils.env
 import dev.kordex.i18n.toKey
 import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.publicSlashCommand
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
@@ -61,7 +63,7 @@ object SpaceExtension : Extension() {
 
         @Serializable
         data class Apod(
-            val copyright: String,
+            val copyright: String? = null,
             val date: String,
             val explanation: String,
             @SerialName("hdurl")
@@ -74,14 +76,18 @@ object SpaceExtension : Extension() {
             val url: String
         )
 
+        val nasaApiKey = env("NASA_API_KEY")
         publicSlashCommand(Translations.Command.apod, Translations.Command.Description.apod) {
             action {
                 val apod = try {
                     httpClient.get(APOD_URL) {
-                        parameter("api_key", "DEMO_KEY")
+                        parameter("api_key", nasaApiKey)
                     }.body<Apod>()
+                } catch (e: HttpRequestTimeoutException) {
+                    throw DiscordRelayedException("NASA APOD API timed out. Is it down?".toKey())
                 } catch (e: Exception) {
-                    throw DiscordRelayedException(e.message?.toKey() ?: "An unknown error occurred".toKey())
+                    e.printStackTrace()
+                    throw DiscordRelayedException("An unknown error occurred".toKey())
                 }
 
                 respond {
@@ -89,10 +95,15 @@ object SpaceExtension : Extension() {
                         title = apod.title
                         description = apod.explanation
                         image = apod.hdUrl
-                        color = Color(255, 255, 255)
+                        color = Color(0x1e3a8a)
 
                         footer {
-                            text = "${apod.date} © ${apod.copyright}"
+                            text = buildString {
+                                append(apod.date)
+                                if (apod.copyright != null) {
+                                    append("© ${apod.copyright.removeSurrounding("\n").trim()}}")
+                                }
+                            }
                         }
                     }
                 }
