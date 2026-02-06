@@ -32,7 +32,7 @@ komapper-processor = { module = "org.komapper:komapper-processor", version.ref =
 
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 
-logback-classic = "ch.qos.logback:logback-classic:1.5.27"
+logback-classic = "ch.qos.logback:logback-classic:1.5.28"
 openai-client = "com.aallam.openai:openai-client:4.0.1"
 tess4j = "net.sourceforge.tess4j:tess4j:5.18.0"
 
