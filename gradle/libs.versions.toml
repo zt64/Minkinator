@@ -7,7 +7,7 @@ kord-ex-i18n-plugin = "1.1.1"
 ksp = "2.3.5"
 scrimmage = "4.3.6"
 kotlindl = "0.5.2"
-komapper = "5.7.0"
+komapper = "6.0.0"
 ktlintGradle = "14.0.1"
 ktlint = "1.7.1"
 
