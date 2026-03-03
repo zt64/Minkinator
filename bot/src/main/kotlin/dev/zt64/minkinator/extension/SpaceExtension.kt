@@ -67,7 +67,7 @@ object SpaceExtension : Extension() {
             val date: String,
             val explanation: String,
             @SerialName("hdurl")
-            val hdUrl: String,
+            val hdUrl: String? = null,
             @SerialName("media_type")
             val mediaType: String,
             @SerialName("service_version")
@@ -93,8 +93,8 @@ object SpaceExtension : Extension() {
                 respond {
                     embed {
                         title = apod.title
-                        description = apod.explanation
-                        image = apod.hdUrl
+                        description = "-# ${apod.explanation}"
+                        image = apod.hdUrl ?: apod.url
                         color = Color(0x1e3a8a)
 
                         footer {
