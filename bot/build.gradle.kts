@@ -44,7 +44,7 @@ dependencies {
 
     implementation("org.jetbrains.lets-plot:lets-plot-batik:4.9.0")
     implementation("org.jetbrains.lets-plot:lets-plot-common:4.9.0")
-    implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.12.1")
+    implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.13.0")
 
     implementation("org.bytedeco:ffmpeg-platform:7.1-1.5.11")
 
