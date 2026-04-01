@@ -46,7 +46,7 @@ dependencies {
     implementation("org.jetbrains.lets-plot:lets-plot-common:4.9.0")
     implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.13.0")
 
-    implementation("org.bytedeco:ffmpeg-platform:7.1-1.5.11")
+    implementation("org.bytedeco:ffmpeg-platform:8.0.1-1.5.13")
 
     implementation("com.twelvemonkeys.imageio:imageio-webp:3.13.1")
     implementation("com.twelvemonkeys.imageio:imageio-core:3.13.1")
