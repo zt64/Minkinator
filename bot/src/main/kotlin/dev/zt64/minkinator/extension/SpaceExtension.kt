@@ -10,7 +10,7 @@ import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.publicSlashCommand
 import io.ktor.client.*
 import io.ktor.client.call.*
-import io.ktor.client.plugins.*
+import io.ktor.client.network.sockets.*
 import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
@@ -83,7 +83,7 @@ object SpaceExtension : Extension() {
                     httpClient.get(APOD_URL) {
                         parameter("api_key", nasaApiKey)
                     }.body<Apod>()
-                } catch (e: HttpRequestTimeoutException) {
+                } catch (e: SocketTimeoutException) {
                     throw DiscordRelayedException("NASA APOD API timed out. Is it down?".toKey())
                 } catch (e: Exception) {
                     e.printStackTrace()
