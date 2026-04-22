@@ -34,20 +34,21 @@ dependencies {
     implementation(libs.logback.classic)
     implementation(libs.ktor.client.encoding)
     implementation(libs.tess4j)
-    implementation("org.bytedeco:tesseract:5.5.2-1.5.13")
-    implementation("org.bytedeco:tesseract-platform:5.5.2-1.5.13")
+    implementation(libs.tesseract)
+    implementation(libs.tesseract.platform)
     implementation(libs.bundles.scrimmage)
 
-    implementation("org.jetbrains.kotlin:kotlin-scripting-common")
-    implementation("org.jetbrains.kotlin:kotlin-scripting-jvm")
-    implementation("org.jetbrains.kotlin:kotlin-scripting-jvm-host")
+    implementation(libs.kotlin.scripting.common)
+    implementation(libs.kotlin.scripting.jvm)
+    implementation(libs.kotlin.scripting.jvm.host)
 
     implementation("org.jetbrains.lets-plot:lets-plot-batik:4.9.0")
     implementation("org.jetbrains.lets-plot:lets-plot-common:4.9.0")
     implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.13.0")
 
+    implementation(libs.qrcode)
+
     implementation("org.bytedeco:ffmpeg-platform:7.1-1.5.11")
 
-    implementation("com.twelvemonkeys.imageio:imageio-webp:3.13.1")
-    implementation("com.twelvemonkeys.imageio:imageio-core:3.13.1")
+    implementation(libs.imageio.webp)
 }

@@ -1,6 +1,7 @@
 [versions]
 kotlin = "2.3.20"
 ktor = "3.4.2"
+# Kord
 kord-ex = "2.4.1-SNAPSHOT"
 kord-ex-plugin = "1.9.2"
 kord-ex-i18n-plugin = "1.1.1"
@@ -8,6 +9,10 @@ ksp = "2.3.6"
 scrimmage = "4.4.2"
 kotlindl = "0.5.2"
 komapper = "5.7.0"
+imageio = "3.13.1"
+tesseract = "5.5.2-1.5.13"
+
+# Maintenance
 ktlintGradle = "14.2.0"
 ktlint = "1.7.1"
 
@@ -25,6 +30,10 @@ kotlindl-tensorflow = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-tens
 kotlindl-onnx = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-onnx", version.ref = "kotlindl" }
 kotlindl-visualization = { module = "org.jetbrains.kotlinx:kotlin-deeplearning-visualization", version.ref = "kotlindl" }
 
+kotlin-scripting-common = { module = "org.jetbrains.kotlin:kotlin-scripting-common" }
+kotlin-scripting-jvm = { module = "org.jetbrains.kotlin:kotlin-scripting-jvm" }
+kotlin-scripting-jvm-host = { module = "org.jetbrains.kotlin:kotlin-scripting-jvm-host" }
+
 # Komapper
 komapper-starter-r2dbc = { module = "org.komapper:komapper-starter-r2dbc", version.ref = "komapper" }
 komapper-dialect-h2-r2dbc = { module = "org.komapper:komapper-dialect-h2-r2dbc", version.ref = "komapper" }
@@ -32,9 +41,14 @@ komapper-processor = { module = "org.komapper:komapper-processor", version.ref =
 
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 
+qrcode = { module = "io.github.g0dkar:qrcode-kotlin", version = "4.5.0" }
 logback-classic = "ch.qos.logback:logback-classic:1.5.32"
 openai-client = "com.aallam.openai:openai-client:4.1.0"
 tess4j = "net.sourceforge.tess4j:tess4j:5.18.0"
+tesseract = { module = "org.bytedeco:tesseract", version.ref = "tesseract" }
+tesseract-platform = { module = "org.bytedeco:tesseract-platform", version.ref = "tesseract" }
+
+imageio-webp = { module = "com.twelvemonkeys.imageio:imageio-webp", version.ref = "imageio" }
 
 [bundles]
 scrimmage = ["scrimmage-core", "scrimmage-filters", "scrimmage-webp"]
