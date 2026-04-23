@@ -48,7 +48,7 @@ dependencies {
 
     implementation(libs.qrcode)
 
-    implementation("org.bytedeco:ffmpeg-platform:7.1-1.5.11")
+    implementation("org.bytedeco:ffmpeg-platform:8.0.1-1.5.13")
 
     implementation(libs.imageio.webp)
 }
