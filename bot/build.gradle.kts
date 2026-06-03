@@ -44,7 +44,7 @@ dependencies {
 
     implementation("org.jetbrains.lets-plot:lets-plot-batik:4.10.1")
     implementation("org.jetbrains.lets-plot:lets-plot-common:4.10.1")
-    implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.13.0")
+    implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.14.0")
 
     implementation(libs.qrcode)
 
