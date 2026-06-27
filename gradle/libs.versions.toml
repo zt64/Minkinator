@@ -42,7 +42,7 @@ komapper-processor = { module = "org.komapper:komapper-processor", version.ref =
 ktor-client-encoding = { module = "io.ktor:ktor-client-encoding", version.ref = "ktor" }
 
 qrcode = { module = "io.github.g0dkar:qrcode-kotlin", version = "4.5.0" }
-logback-classic = "ch.qos.logback:logback-classic:1.5.36"
+logback-classic = "ch.qos.logback:logback-classic:1.5.37"
 openai-client = "com.aallam.openai:openai-client:4.1.0"
 tess4j = "net.sourceforge.tess4j:tess4j:5.19.0"
 tesseract = { module = "org.bytedeco:tesseract", version.ref = "tesseract" }
