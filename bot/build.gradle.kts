@@ -43,7 +43,7 @@ dependencies {
     implementation(libs.kotlin.scripting.jvm.host)
 
     implementation("org.jetbrains.lets-plot:lets-plot-batik:4.11.0")
-    implementation("org.jetbrains.lets-plot:lets-plot-common:4.10.3")
+    implementation("org.jetbrains.lets-plot:lets-plot-common:4.11.0")
     implementation("org.jetbrains.lets-plot:lets-plot-kotlin-jvm:4.14.1")
 
     implementation(libs.qrcode)
