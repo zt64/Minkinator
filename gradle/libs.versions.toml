@@ -10,7 +10,7 @@ scrimmage = "4.6.7"
 kotlindl = "0.5.2"
 komapper = "5.7.0"
 imageio = "3.14.0"
-tesseract = "5.5.2-1.5.13"
+tesseract = "5.5.3-1.5.14"
 
 # Maintenance
 ktlintGradle = "14.2.0"
