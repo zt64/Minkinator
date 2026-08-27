@@ -2,7 +2,7 @@
 kotlin = "2.4.10"
 ktor = "3.5.2"
 # Kord
-kord-ex = "2.4.1-SNAPSHOT"
+kord-ex = "2.6.0"
 kord-ex-plugin = "1.9.2"
 kord-ex-i18n-plugin = "1.1.1"
 ksp = "2.3.11"
