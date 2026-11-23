@@ -72,9 +72,6 @@ class GeneralExtension : Extension() {
             name = "vnc".toKey(),
             description = "Get a random unsecured vnc image".toKey()
         ) {
-            allowInDms = true
-            guild(null)
-
             action {
                 @Serializable
                 data class VNC(
