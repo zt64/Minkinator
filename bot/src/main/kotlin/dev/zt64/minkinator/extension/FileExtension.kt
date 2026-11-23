@@ -3,6 +3,8 @@ package dev.zt64.minkinator.extension
 import dev.kord.rest.NamedFile
 import dev.kordex.core.commands.Arguments
 import dev.kordex.core.commands.converters.impl.attachment
+import dev.kordex.core.commands.converters.impl.defaultingInt
+import dev.kordex.core.commands.converters.impl.int
 import dev.kordex.core.extensions.Extension
 import dev.kordex.i18n.toKey
 import dev.zt64.minkinator.util.publicSlashCommand
@@ -29,12 +31,22 @@ class FileExtension : Extension() {
                     failIf("File too large (max 10MB)".toKey()) { value.size > 10_000_000 }
                 }
             }
+
+            val sampleRate by defaultingInt {
+                name = "sample-rate".toKey()
+                description = "The sample rate".toKey()
+                defaultValue = 44100
+
+                validate {
+                    failIf { value !in 8000..192000 }
+                }
+            }
         }
 
         publicSlashCommand("play-file".toKey(), "Convert any file to audio".toKey(), ::PlayFileArgs) {
             action {
                 val fileBytes = httpClient.get(arguments.file.url).readRawBytes()
-                val audioBytes = convertToAudio(fileBytes)
+                val audioBytes = convertToAudio(fileBytes, arguments.sampleRate.toFloat())
 
                 respond {
                     content = "File converted to audio (${fileBytes.size} bytes -> ${audioBytes.size / 1024}KB WAV)"
@@ -48,14 +60,14 @@ class FileExtension : Extension() {
     }
 
     @Suppress("ktlint:standard:comment-wrapping")
-    private fun convertToAudio(data: ByteArray): ByteArray {
+    private fun convertToAudio(data: ByteArray, sampleRate: Float = 44100f): ByteArray {
         val audioData = ByteArray(data.size) { i ->
-            ((data[i].toInt() - 128) * 0.1).toInt().toByte()
+            ((data[i] - 128) * 0.1).toInt().toByte()
         }
 
         val audioFormat = AudioFormat(
-            /* sampleRate = */ 44100f,
-            /* sampleSizeInBits = */ 8,
+            /* sampleRate = */ sampleRate,
+            /* sampleSizeInBits = */ 16,
             /* channels = */ 1,
             /* signed = */ true,
             /* bigEndian = */ false
