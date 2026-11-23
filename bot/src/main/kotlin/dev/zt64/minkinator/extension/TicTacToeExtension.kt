@@ -18,7 +18,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.time.Duration.Companion.seconds
 
-object TicTacToeExtension : Extension() {
+class TicTacToeExtension : Extension() {
     override val name = "tic-tac-toe"
 
     private val timeoutDuration = 30.seconds

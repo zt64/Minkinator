@@ -26,13 +26,13 @@ import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 import kotlin.time.Clock
 
-object SpaceExtension : Extension() {
+private const val SOLAR_CONDITIONS_URL = "https://www.hamqsl.com/solar101vhfpic.php"
+private const val APOD_URL = "https://api.nasa.gov/planetary/apod"
+
+class SpaceExtension : Extension() {
     override val name = "space"
 
     private val httpClient by inject<HttpClient>()
-
-    private const val SOLAR_CONDITIONS_URL = "https://www.hamqsl.com/solar101vhfpic.php"
-    private const val APOD_URL = "https://api.nasa.gov/planetary/apod"
 
     override suspend fun setup() {
         publicSlashCommand(Translations.Command.hamSolar, Translations.Command.Description.hamSolar) {

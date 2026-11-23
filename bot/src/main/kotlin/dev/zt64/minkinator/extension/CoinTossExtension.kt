@@ -7,7 +7,7 @@ import dev.kordex.core.i18n.toKey
 import dev.zt64.minkinator.util.publicSlashCommand
 import dev.zt64.minkinator.util.success
 
-object CoinTossExtension : Extension() {
+class CoinTossExtension : Extension() {
     override val name = "coin-toss"
 
     private enum class CoinState {

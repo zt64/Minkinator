@@ -30,7 +30,7 @@ import org.komapper.core.dsl.QueryDsl
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.time.Duration
 
-object FilterExtension : Extension() {
+class FilterExtension : Extension() {
     override val name = "filter"
 
     private val db: R2dbcDatabase by inject()

@@ -20,7 +20,7 @@ import dev.zt64.minkinator.util.ephemeralSlashCommand
 import dev.zt64.minkinator.util.ephemeralSubCommand
 import dev.zt64.minkinator.util.success
 
-object MemberLogExtension : Extension() {
+class MemberLogExtension : Extension() {
     override val name = "member-log"
 
     @OptIn(PrivilegedIntent::class)

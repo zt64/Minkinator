@@ -15,7 +15,7 @@ import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.*
 import kotlin.time.ExperimentalTime
 
-object SpotifyExtension : Extension() {
+class SpotifyExtension : Extension() {
     override val name = "spotify"
 
     @OptIn(PrivilegedIntent::class)

@@ -19,7 +19,7 @@ import dev.zt64.minkinator.util.success
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.take
 
-object PurgeExtension : Extension() {
+class PurgeExtension : Extension() {
     override val name = "purge"
 
     override suspend fun setup() {

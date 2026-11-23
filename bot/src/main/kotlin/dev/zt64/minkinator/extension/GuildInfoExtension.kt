@@ -8,7 +8,7 @@ import dev.kordex.core.extensions.Extension
 import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.*
 
-object GuildInfoExtension : Extension() {
+class GuildInfoExtension : Extension() {
     override val name = "guild-info"
 
     override suspend fun setup() {

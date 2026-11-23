@@ -20,12 +20,12 @@ import org.koin.core.component.inject
 import java.awt.Color
 import java.awt.Font
 
-object CaptionExtension : Extension() {
+private const val FONT_NAME = "Futura Extra Black Condensed"
+
+class CaptionExtension : Extension() {
     override val name = "caption"
 
     private val httpClient: HttpClient by inject()
-
-    private const val FONT_NAME = "Futura Extra Black Condensed"
 
     override suspend fun setup() {
         publicSlashCommand(

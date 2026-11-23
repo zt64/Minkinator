@@ -18,11 +18,11 @@ import dev.zt64.minkinator.util.publicSlashCommand
 import io.ktor.client.request.forms.*
 import io.ktor.utils.io.jvm.javaio.*
 
-object EmojiExtension : Extension() {
+private const val SCALE_FACTOR = 2.0
+
+class EmojiExtension : Extension() {
     override val name = "emoji"
     override val intents = mutableSetOf<Intent>(Intent.GuildEmojis)
-
-    private const val SCALE_FACTOR = 2.0
 
     override suspend fun setup() {
         class Args : Arguments() {

@@ -13,7 +13,7 @@ import dev.kordex.core.extensions.Extension
 import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.*
 
-object KickExtension : Extension() {
+class KickExtension : Extension() {
     override val name = "kick"
 
     override suspend fun setup() {

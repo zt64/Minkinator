@@ -17,18 +17,16 @@ import kotlinx.datetime.format
 import kotlinx.datetime.format.DateTimeComponents
 import kotlinx.serialization.Serializable
 import org.koin.core.component.inject
-import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-object GeneralExtension : Extension() {
+private const val VNC_BASE_URL = "https://computernewb.com/vncresolver/api/v1"
+
+class GeneralExtension : Extension() {
     override val name: String = "general"
 
     private val start = System.currentTimeMillis()
     private val httpClient: HttpClient by inject()
 
-    private const val VNC_BASE_URL = "https://computernewb.com/vncresolver/api/v1"
-
-    @OptIn(ExperimentalTime::class)
     override suspend fun setup() {
         publicSlashCommand(
             name = "stats".toKey(),

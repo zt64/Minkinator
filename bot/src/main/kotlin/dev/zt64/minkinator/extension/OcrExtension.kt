@@ -17,7 +17,7 @@ import net.sourceforge.tess4j.Tesseract
 import org.koin.core.component.inject
 import javax.imageio.ImageIO
 
-object OcrExtension : Extension() {
+class OcrExtension : Extension() {
     override val name = "ocr"
 
     private val httpClient: HttpClient by inject()

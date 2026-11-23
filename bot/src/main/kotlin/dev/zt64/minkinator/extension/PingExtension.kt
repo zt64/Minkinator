@@ -7,7 +7,7 @@ import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.publicSlashCommand
 import dev.zt64.minkinator.util.success
 
-object PingExtension : Extension() {
+class PingExtension : Extension() {
     override val name = "ping"
 
     override suspend fun setup() {

@@ -12,7 +12,7 @@ import dev.kordex.i18n.Key
 import dev.zt64.minkinator.util.*
 import kotlin.io.encoding.Base64
 
-object BinaryExtension : Extension() {
+class BinaryExtension : Extension() {
     override val name = "binary"
 
     override suspend fun setup() {

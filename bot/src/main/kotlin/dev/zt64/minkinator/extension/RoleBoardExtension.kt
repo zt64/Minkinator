@@ -12,7 +12,7 @@ import dev.zt64.minkinator.util.publicSlashCommand
 import dev.zt64.minkinator.util.publicSubCommand
 import dev.zt64.minkinator.util.warn
 
-object RoleBoardExtension : Extension() {
+class RoleBoardExtension : Extension() {
     override val name = "role-board"
 
     override suspend fun setup() {

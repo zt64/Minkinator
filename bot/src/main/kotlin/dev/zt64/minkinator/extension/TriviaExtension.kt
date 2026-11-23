@@ -31,7 +31,7 @@ import kotlinx.serialization.Serializable
 import org.koin.core.component.inject
 import kotlin.time.Duration.Companion.seconds
 
-object TriviaExtension : Extension() {
+class TriviaExtension : Extension() {
     override val name = "trivia"
 
     private val httpClient: HttpClient by inject()

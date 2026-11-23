@@ -7,10 +7,10 @@ import dev.kordex.core.extensions.Extension
 import dev.kordex.i18n.toKey
 import dev.zt64.minkinator.util.publicSlashCommand
 
-object HttpCatExtension : Extension() {
-    override val name: String = "httpcat"
+private const val BASE_URL = "https://http.cat"
 
-    private const val BASE_URL = "https://http.cat"
+class HttpCatExtension : Extension() {
+    override val name: String = "httpcat"
 
     private val VALID_STATUS_CODES = buildSet {
         addAll(100..103)

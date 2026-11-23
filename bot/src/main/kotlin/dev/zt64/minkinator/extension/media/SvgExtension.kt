@@ -18,7 +18,7 @@ import java.io.ByteArrayOutputStream
 import java.io.StringReader
 import javax.xml.parsers.DocumentBuilderFactory
 
-object SvgExtension : Extension() {
+class SvgExtension : Extension() {
     override val name = "svg"
 
     override suspend fun setup() {

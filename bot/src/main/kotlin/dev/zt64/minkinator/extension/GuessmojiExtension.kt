@@ -16,7 +16,7 @@ import dev.zt64.minkinator.util.*
 import kotlinx.coroutines.delay
 import kotlin.time.Duration.Companion.seconds
 
-object GuessmojiExtension : Extension() {
+class GuessmojiExtension : Extension() {
     override val name = "guessmoji"
 
     private val duration = 10.seconds

@@ -18,7 +18,7 @@ import io.ktor.client.statement.*
 import kotlinx.coroutines.flow.count
 import org.koin.core.component.inject
 
-object StickerExtension : Extension() {
+class StickerExtension : Extension() {
     override val name = "sticker"
 
     private val httpClient: HttpClient by inject()

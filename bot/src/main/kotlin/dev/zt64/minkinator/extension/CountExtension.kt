@@ -10,7 +10,7 @@ import org.koin.core.component.inject
 import org.komapper.r2dbc.R2dbcDatabase
 
 // Extension for adding a count command
-object CountExtension : Extension() {
+class CountExtension : Extension() {
     override val name = "count"
 
     private val db: R2dbcDatabase by inject()

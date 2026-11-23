@@ -10,7 +10,7 @@ import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.footer
 import dev.zt64.minkinator.util.publicSlashCommand
 
-object ConnectFourExtension : Extension() {
+class ConnectFourExtension : Extension() {
     override val name = "connect-four"
 
     override suspend fun setup() {

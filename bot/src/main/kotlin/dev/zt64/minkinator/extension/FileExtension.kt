@@ -15,7 +15,7 @@ import org.koin.core.component.inject
 import java.io.ByteArrayOutputStream
 import javax.sound.sampled.*
 
-object FileExtension : Extension() {
+class FileExtension : Extension() {
     override val name: String = "file"
 
     private val httpClient: HttpClient by inject()

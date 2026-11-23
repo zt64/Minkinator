@@ -16,7 +16,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.koin.core.component.inject
 
-object AnimalsExtension : Extension() {
+class AnimalsExtension : Extension() {
     override val name = "animals"
 
     private val httpClient: HttpClient by inject()

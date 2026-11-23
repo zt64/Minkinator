@@ -38,7 +38,7 @@ import org.komapper.core.dsl.query.single
 import org.komapper.r2dbc.R2dbcDatabase
 import kotlin.random.Random
 
-object MarkovExtension : Extension() {
+class MarkovExtension : Extension() {
     override val name = "markov"
 
     private val db: R2dbcDatabase by inject()

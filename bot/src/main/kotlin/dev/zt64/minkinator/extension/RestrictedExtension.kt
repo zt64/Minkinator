@@ -54,7 +54,7 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.DurationUnit
 import kotlin.time.measureTime
 
-object RestrictedExtension : Extension() {
+class RestrictedExtension : Extension() {
     override val name = "restricted"
     override val intents = mutableSetOf<Intent>(Intent.Guilds)
 

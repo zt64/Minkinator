@@ -11,7 +11,7 @@ import dev.kordex.core.extensions.Extension
 import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.*
 
-object AvatarExtension : Extension() {
+class AvatarExtension : Extension() {
     override val name = "avatar"
 
     override suspend fun setup() {

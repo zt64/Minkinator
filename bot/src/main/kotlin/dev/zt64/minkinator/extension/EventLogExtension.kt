@@ -9,7 +9,7 @@ import dev.kordex.core.commands.events.SlashCommandInvocationEvent
 import dev.kordex.core.extensions.Extension
 import dev.zt64.minkinator.util.event
 
-object EventLogExtension : Extension() {
+class EventLogExtension : Extension() {
     override val name = "event-log"
 
     override suspend fun setup() {

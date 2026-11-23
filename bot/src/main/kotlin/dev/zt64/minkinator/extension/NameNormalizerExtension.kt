@@ -22,7 +22,7 @@ import dev.zt64.minkinator.util.ephemeralSlashCommand
 import dev.zt64.minkinator.util.ephemeralUserCommand
 import java.text.Normalizer
 
-object NameNormalizerExtension : Extension() {
+class NameNormalizerExtension : Extension() {
     override val name = "name-normalizer"
 
     @OptIn(PrivilegedIntent::class)

@@ -40,7 +40,7 @@ import javax.imageio.ImageIO
 import kotlin.jvm.optionals.getOrNull
 import kotlin.math.*
 
-object EffectsExtension : Extension() {
+class EffectsExtension : Extension() {
     override val name = "effects"
 
     private val httpClient: HttpClient by inject()

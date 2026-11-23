@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.count
 import kotlinx.coroutines.flow.toList
 import kotlin.time.ExperimentalTime
 
-object UserInfoExtension : Extension() {
+class UserInfoExtension : Extension() {
     override val name = "user-info"
 
     @OptIn(ExperimentalTime::class)

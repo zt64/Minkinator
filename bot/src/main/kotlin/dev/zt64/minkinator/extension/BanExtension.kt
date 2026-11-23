@@ -14,7 +14,7 @@ import dev.zt64.minkinator.i18n.Translations
 import dev.zt64.minkinator.util.*
 import kotlinx.datetime.TimeZone
 
-object BanExtension : Extension() {
+class BanExtension : Extension() {
     override val name = "ban"
 
     override suspend fun setup() {
