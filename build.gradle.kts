@@ -28,12 +28,8 @@ subprojects {
         jvmToolchain(21)
     }
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-        compilerOptions.freeCompilerArgs = listOf("-Xcontext-parameters")
-    }
-
     dependencies {
-        val implementation by configurations
+        val implementation = configurations.getByName("implementation")
 
         implementation(rootProject.libs.kord.ex)
     }

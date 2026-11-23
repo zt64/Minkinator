@@ -16,6 +16,7 @@ import dev.zt64.minkinator.extension.*
 import dev.zt64.minkinator.extension.filter.FilterExtension
 import dev.zt64.minkinator.extension.media.EffectsExtension
 import dev.zt64.minkinator.extension.media.SvgExtension
+import dev.zt64.minkinator.extension.sstv.SstvExtension
 import dev.zt64.minkinator.util.error
 import io.ktor.client.*
 import io.ktor.client.plugins.*
@@ -40,44 +41,45 @@ suspend fun main() {
         }
 
         extensions {
-            operator fun Extension.unaryPlus() = add { this@unaryPlus }
+            operator fun (() -> Extension).unaryPlus() = add(this)
 
-            +GeneralExtension
-            +BinaryExtension
-            +AnimalsExtension
-            +SpotifyExtension
-            +PingExtension
-            +CoinTossExtension
-            +GuildInfoExtension
-            +UserInfoExtension
-            +SpaceExtension
-            +HttpCatExtension
-            +FileExtension
+            +::GeneralExtension
+            +::BinaryExtension
+            +::AnimalsExtension
+            +::SpotifyExtension
+            +::PingExtension
+            +::CoinTossExtension
+            +::GuildInfoExtension
+            +::UserInfoExtension
+            +::SpaceExtension
+            +::HttpCatExtension
+            +::FileExtension
 
-            +EventLogExtension
-            +FilterExtension
-            +NameNormalizerExtension
-            +RestrictedExtension
-            +PurgeExtension
-            +BanExtension
-            +KickExtension
-            +RoleBoardExtension
-            +MemberLogExtension
+            +::EventLogExtension
+            +::FilterExtension
+            +::NameNormalizerExtension
+            +::RestrictedExtension
+            +::PurgeExtension
+            +::BanExtension
+            +::KickExtension
+            +::RoleBoardExtension
+            +::MemberLogExtension
 
-            +AvatarExtension
-            +SvgExtension
-            +EffectsExtension
-            +StickerExtension
-            +CaptionExtension
-            +EmojiExtension
-            // +SstvExtension
-            +OcrExtension
+            +::AvatarExtension
+            +::SvgExtension
+            +::EffectsExtension
+            +::StickerExtension
+            +::CaptionExtension
+            +::EmojiExtension
+            +::SstvExtension
+            +::OcrExtension
+            +::QrExtension
 
-            +TicTacToeExtension
-            +GuessmojiExtension
-            +TriviaExtension
-            +ConnectFourExtension
-            +CountExtension
+            +::TicTacToeExtension
+            +::GuessmojiExtension
+            +::TriviaExtension
+            +::ConnectFourExtension
+            +::CountExtension
 
             sentryExtensionBuilder.enable = false
         }
@@ -91,6 +93,16 @@ suspend fun main() {
 
             check {
                 if (userFor(event)!!.asUser().isBot) fail()
+            }
+        }
+
+        applicationCommands {
+            defaultScope.userInstallable {
+                enabled = true
+
+                allowInDirectDMs()
+                allowInGroupDMs()
+                allowInGuilds()
             }
         }
 

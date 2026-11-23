@@ -71,7 +71,7 @@ class MarkovExtension : Extension() {
 
         val dictionaries = runCatching {
             kord.guilds.toList().associate { guild ->
-                guild.id to Dictionary.generate(guild.id)
+                guild.id to generateDictionary(guild.id)
             }
         }.onSuccess {
             bot.logger.info { "Dictionaries generated" }
@@ -420,7 +420,14 @@ class MarkovExtension : Extension() {
         }
     }
 
-    private class Dictionary private constructor(private val guildId: Snowflake) {
+
+    private suspend fun generateDictionary(guildId: Snowflake): Dictionary {
+        return Dictionary(guildId).also {
+            it.reload()
+        }
+    }
+
+    private inner class Dictionary(private val guildId: Snowflake) {
         var words = listOf<String>()
         var chain = mutableMapOf<List<String>, MutableList<String>>()
 
@@ -464,14 +471,6 @@ class MarkovExtension : Extension() {
                     key = listOf(key[1], w)
                 }
             }.trim()
-        }
-
-        companion object {
-            suspend fun generate(guildId: Snowflake): Dictionary {
-                return Dictionary(guildId).also {
-                    it.reload()
-                }
-            }
         }
     }
 }

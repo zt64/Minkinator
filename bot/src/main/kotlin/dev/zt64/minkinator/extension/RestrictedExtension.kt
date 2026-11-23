@@ -29,8 +29,9 @@ import kotlinx.coroutines.flow.toList
 import org.apache.batik.transcoder.TranscoderInput
 import org.apache.batik.transcoder.TranscoderOutput
 import org.apache.batik.transcoder.image.JPEGTranscoder
-import org.jetbrains.letsPlot.awt.plot.PlotSvgExport
 import org.jetbrains.letsPlot.core.util.MonolithicCommon
+import org.jetbrains.letsPlot.core.util.PlotExportCommon
+import org.jetbrains.letsPlot.core.util.PlotSvgExport
 import org.jetbrains.letsPlot.geom.geomLine
 import org.jetbrains.letsPlot.intern.toSpec
 import org.jetbrains.letsPlot.label.labs
@@ -321,7 +322,7 @@ class RestrictedExtension : Extension() {
             // Set the transcoding hints.
             t.addTranscodingHint(JPEGTranscoder.KEY_QUALITY, 0.8f)
 
-            val svg = PlotSvgExport.buildSvgImageFromRawSpecs(processedSpec)
+            val svg = PlotSvgExport.buildSvgImageFromRawSpecs(processedSpec, null, PlotExportCommon.SizeUnit.PX)
             val baos = ByteArrayOutputStream()
             val output = TranscoderOutput(baos)
             val input = TranscoderInput(StringReader(svg))
