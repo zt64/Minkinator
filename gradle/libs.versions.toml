@@ -1,6 +1,6 @@
 [versions]
 kotlin = "2.4.10"
-ktor = "3.5.2"
+ktor = "3.6.2"
 # Kord
 kord-ex = "2.7.0-SNAPSHOT"
 kord-ex-plugin = "1.9.2"
